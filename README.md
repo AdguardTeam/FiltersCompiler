@@ -26,3 +26,9 @@ The package could be run with the following command:
 npm install qunit
 npm install download-file-sync
 ```
+
+## Tests
+
+```
+npm test
+```
