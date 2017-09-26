@@ -1,0 +1,2 @@
+! Some special exclusions
+$special_exc

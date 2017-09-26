@@ -1,0 +1,17 @@
+{
+  "name": "adguard-filters-compiler",
+  "version": "0.0.1",
+  "description": "Adguard filters compiler",
+  "homepage": "http://adguard.com",
+  "dependencies": {
+    "download-file-sync": ">=1.0.4",
+    "qunit": ">=1.0.0"
+  },
+  "main": "index.js",
+  "engines": {
+    "node": ">= 0.4.1"
+  },
+  "scripts": {
+    "test": "node ./test/testrunner.js"
+  }
+}
