@@ -15,7 +15,8 @@ The package could be run with the following command:
  var compiler = require("adguard-filters-compiler");
  
  var filtersDir = path.join(__dirname, './filters');
- compiler.compile(filtersDir);
+ var logPath = path.join(__dirname, './log.txt');
+ compiler.compile(filtersDir, logPath);
 ```
 
 ## How to build
