@@ -31,7 +31,7 @@ QUnit.test("Test builder", function (assert) {
     assert.ok(filterText);
 
     var filterLines = filterText.split('\r\n');
-    assert.equal(filterLines.length, 24);
+    assert.equal(filterLines.length, 23);
 
     //TODO: Check header
 

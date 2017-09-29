@@ -13,6 +13,7 @@
 
 ! Some test rules
 ||test.com^
+||test.com^
 ||test.com^$third-party
 #%#test.com^$third-party
 ||test.com^$replace=

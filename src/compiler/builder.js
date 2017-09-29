@@ -1,6 +1,5 @@
 /* globals module, require, console */
 
-//TODO: Remove duplicates
 //TODO: Write detailed log to file
 
 module.exports = (function () {
@@ -217,6 +216,21 @@ module.exports = (function () {
     };
 
     /**
+     * Removes duplicates
+     *
+     * @param list
+     * @returns {*}
+     */
+    var removeDuplicates = function (list) {
+        var uniqueArray = list.filter(function(item, pos) {
+            return item.indexOf('!') === 0 ||
+                list.indexOf(item) === pos;
+        });
+
+        return uniqueArray;
+    };
+
+    /**
      * Compiles filter lines
      *
      * @param template
@@ -243,6 +257,7 @@ module.exports = (function () {
         }
 
         result = exclude(result, EXCLUDE_FILE);
+        result = removeDuplicates(result);
 
         return result;
     };
