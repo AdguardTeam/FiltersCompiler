@@ -1,7 +1,5 @@
 /* globals module, require, console */
 
-//TODO: Write detailed log to file
-
 module.exports = (function () {
 
     'use strict';
