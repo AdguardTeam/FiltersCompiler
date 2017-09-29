@@ -2,3 +2,4 @@
 test-common-rule.com
 ||test-common-rule.com^$replace=
 test-common-rule.com$special_exc
+example.com##h1:style(background-color: blue !important)

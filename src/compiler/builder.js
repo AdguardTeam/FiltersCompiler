@@ -1,5 +1,8 @@
 /* globals module, require, console */
 
+//TODO: Remove duplicates
+//TODO: Write detailed log to file
+
 module.exports = (function () {
 
     'use strict';
@@ -8,6 +11,7 @@ module.exports = (function () {
     var path = require('path');
 
     var version = require("./version.js");
+    var converter = require("./converter.js");
 
     var TEMPLATE_FILE = 'template.txt';
     var FILTER_FILE = 'filter.txt';
@@ -204,6 +208,8 @@ module.exports = (function () {
                 result = stripComments(result);
             }
         }
+
+        result = converter.convert(result);
 
         console.log('Inclusion lines:' + result.length);
 
