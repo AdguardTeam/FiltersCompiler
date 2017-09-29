@@ -3,7 +3,7 @@
 QUnit.test("Test converter", function (assert) {
     'use strict';
 
-    var converter = require('../src/compiler/converter.js');
+    var converter = require('../main/converter.js');
 
     var c = converter.convert(['example.com']);
     assert.equal(c[0], 'example.com');

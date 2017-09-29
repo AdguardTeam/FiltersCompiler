@@ -1,8 +1,10 @@
-/* globals module, console */
+/* globals module, console, require */
 
 module.exports = (function () {
 
     'use strict';
+
+    var logger = require("./utils/log.js");
 
     var CSS_RULE_MARK = "##";
     var CSS_RULE_NEW_MARK = "#$#";
@@ -27,10 +29,12 @@ module.exports = (function () {
             if (match) {
                 var groups = CSS_RULE_REPLACE_PATTERN.exec(rulePart);
                 if (groups.length !== 3) {
-                    console.warn("Cannot convert {}", rule);
+                    logger.warn("Cannot convert " + rule);
                 } else {
                     result = domain + ruleMark;
                     result += groups[1] + " { " + groups[2] + " }";
+
+                    logger.log('Rule "' + rule + '" converted');
                 }
             }
         }

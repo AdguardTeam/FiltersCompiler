@@ -3,7 +3,7 @@
 QUnit.test("Test versions", function (assert) {
     'use strict';
 
-    var version = require('../src/compiler/version.js');
+    var version = require('../main/utils/version.js');
 
     var v = version.increment('0.0.0.0');
     assert.equal('0.0.0.1', v);

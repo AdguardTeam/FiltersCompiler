@@ -9,8 +9,9 @@ module.exports = (function () {
     var fs = require('fs');
     var path = require('path');
 
-    var version = require("./version.js");
+    var version = require("./utils/version.js");
     var converter = require("./converter.js");
+    var logger = require("./utils/log.js");
 
     var TEMPLATE_FILE = 'template.txt';
     var FILTER_FILE = 'filter.txt';
@@ -50,7 +51,7 @@ module.exports = (function () {
      * @param url
      */
     var downloadFile = function (url) {
-        console.log("Downloading " + url);
+        logger.log("Downloading " + url);
 
         var downloadFileSync = require('download-file-sync');
         var content = downloadFileSync(url);
@@ -73,6 +74,8 @@ module.exports = (function () {
      * @param lines
      */
     var stripComments = function (lines) {
+        logger.log('Stripping comments');
+
         var result = [];
 
         for (var i = 0; i < lines.length; i++) {
@@ -94,7 +97,7 @@ module.exports = (function () {
      */
     var exclude = function (lines, exclusionsFileName) {
 
-        console.log('Applying exclusions');
+        logger.log('Applying exclusions');
 
         var exclusionsFile = path.join(currentDir, exclusionsFileName);
         var exclusions = readFile(exclusionsFile);
@@ -121,7 +124,7 @@ module.exports = (function () {
             }
         }
 
-        console.log('Excluded lines: ' + (lines.length - result.length));
+        logger.log('Excluded lines: ' + (lines.length - result.length));
 
         return result;
     };
@@ -182,10 +185,11 @@ module.exports = (function () {
         var options = parseIncludeLine(line);
 
         if (!options.url) {
+            logger.warn('Invalid include url');
             return result;
         }
 
-        console.log('Applying inclusion from ' + options.url);
+        logger.log('Applying inclusion from ' + options.url);
 
         var included;
         if (options.url.indexOf(':') >= 0) {
@@ -210,7 +214,7 @@ module.exports = (function () {
 
         result = converter.convert(result);
 
-        console.log('Inclusion lines:' + result.length);
+        logger.log('Inclusion lines:' + result.length);
 
         return result;
     };
@@ -222,6 +226,8 @@ module.exports = (function () {
      * @returns {*}
      */
     var removeDuplicates = function (list) {
+        logger.log('Removing duplicates');
+
         var uniqueArray = list.filter(function(item, pos) {
             return item.indexOf('!') === 0 ||
                 list.indexOf(item) === pos;
@@ -237,8 +243,6 @@ module.exports = (function () {
      * @returns {Array}
      */
     var compile = function (template) {
-        console.log('Compiling filter');
-
         var result = [];
 
         var lines = splitLines(template);
@@ -293,7 +297,7 @@ module.exports = (function () {
      * @returns {[*,*,*,*,string]}
      */
     var makeHeader = function (metadataFile, revision) {
-        console.log('Adding header');
+        logger.log('Adding header');
 
         //TODO: Add checksum
 
@@ -333,16 +337,18 @@ module.exports = (function () {
         var revisionFile = path.join(currentDir, REVISION_FILE);
         var revision = makeRevision(revisionFile);
 
+        logger.log('Compiling..');
         var compiled = compile(template);
+        logger.log('Compiled length:' + compiled.length);
 
         var metadataFile = path.join(currentDir, METADATA_FILE);
         var header = makeHeader(metadataFile, revision);
 
         var filter = header.concat(compiled);
 
-        console.log('Writing filter file, lines:' + filter.length);
+        logger.log('Writing filter file, lines:' + filter.length);
         writeFile(path.join(currentDir, FILTER_FILE), filter.join('\r\n'));
-        console.log('Writing revision file');
+        logger.log('Writing revision file..');
         writeFile(revisionFile, JSON.stringify(revision, null, "\t"));
     };
 
@@ -350,8 +356,11 @@ module.exports = (function () {
      * Builds all filters in child directories
      *
      * @param filtersDir
+     * @param logFile
      */
-    var build = function (filtersDir) {
+    var build = function (filtersDir, logFile) {
+        logger.initialize(logFile);
+        
         var items = fs.readdirSync(filtersDir);
 
         for (var i = 0; i < items.length; i++) {
@@ -360,9 +369,9 @@ module.exports = (function () {
             var filterDir = path.join(filtersDir, d);
             if (fs.lstatSync(filterDir).isDirectory()) {
 
-                console.log('Building filter: ' + d);
+                logger.log('Building filter: ' + d);
                 buildFilter(filterDir);
-                console.log('Building filter: ' + d + ' ok');
+                logger.log('Building filter: ' + d + ' ok');
             }
         }
     };
