@@ -26,6 +26,8 @@ module.exports = (function () {
 
         if (file) {
             fs.openSync(file, 'w');
+        } else {
+            console.warn('Log file is not specified');
         }
     };
 

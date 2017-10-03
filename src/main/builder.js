@@ -105,19 +105,31 @@ module.exports = (function () {
 
         exclusions = splitLines(exclusions);
 
+        var isExcluded = function (line, exclusions) {
+            for (var k = 0; k < exclusions.length; k++) {
+                var exclusion = exclusions[k].trim();
+
+                if (exclusion.indexOf("!") !== 0) {
+                    if (exclusion.indexOf("/") === 0 && exclusion.lastIndexOf("/") === exclusion.length - 1) {
+                        if (line.match(new RegExp(exclusion.substring(1, exclusion.length - 2)))) {
+                            return true;
+                        }
+                    } else {
+                        if (line.indexOf(exclusion) >= 0) {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        };
+
         var result = [];
         for (var i = 0; i < lines.length; i++) {
             var line = lines[i];
 
-            var flag = false;
-            for (var k = 0; k < exclusions.length; k++) {
-                if (line.indexOf(exclusions[k].trim()) >= 0) {
-                    flag = true;
-                    break;
-                }
-            }
-
-            if (!flag) {
+            if (!isExcluded(line, exclusions)) {
                 result.push(line);
             }
         }
@@ -226,7 +238,7 @@ module.exports = (function () {
     var removeDuplicates = function (list) {
         logger.log('Removing duplicates');
 
-        var uniqueArray = list.filter(function(item, pos) {
+        var uniqueArray = list.filter(function (item, pos) {
             return item.indexOf('!') === 0 ||
                 list.indexOf(item) === pos;
         });
@@ -358,7 +370,7 @@ module.exports = (function () {
      */
     var build = function (filtersDir, logFile) {
         logger.initialize(logFile);
-        
+
         var items = fs.readdirSync(filtersDir);
 
         for (var i = 0; i < items.length; i++) {

@@ -19,15 +19,6 @@ The package could be run with the following command:
  compiler.compile(filtersDir, logPath);
 ```
 
-## How to build
-
-### Requirements
-
-```
-npm install qunit
-npm install download-file-sync
-```
-
 ## Tests
 
 ```

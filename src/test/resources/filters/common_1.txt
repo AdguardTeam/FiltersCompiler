@@ -2,3 +2,5 @@
 test-common-1-rule.com
 ||test-common-1-rule.com^$replace=
 test-common-1-rule.com$special_exc
+regularexpressionexcluded
+regularexpression_not_excluded

@@ -32,7 +32,7 @@ QUnit.test("Test builder", function (assert) {
     assert.ok(filterText);
 
     var filterLines = filterText.split('\r\n');
-    assert.equal(filterLines.length, 23);
+    assert.equal(filterLines.length, 24);
 
     //TODO: Check header
 
@@ -54,4 +54,6 @@ QUnit.test("Test builder", function (assert) {
     assert.notOk(filterLines.indexOf('#%#test.com^$third-party') >= 0);
     assert.notOk(filterLines.indexOf('||test.com^$third-party') >= 0);
     assert.notOk(filterLines.indexOf('||test.com^$replace=') >= 0);
+    assert.notOk(filterLines.indexOf('regularexpressionexcluded') >= 0);
+    assert.ok(filterLines.indexOf('regularexpression_not_excluded') >= 0);
 });
