@@ -7,6 +7,14 @@ module.exports = (function () {
     var fs = require('fs');
 
     var file;
+    var logLevel = "DEBUG";
+
+    var levels = {
+        "DEBUG": 0,
+        "LOG": 1,
+        "WARN": 2,
+        "ERROR": 3
+    };
 
     var appendFile = function (message, level) {
         if (file) {
@@ -21,8 +29,22 @@ module.exports = (function () {
         }
     };
 
-    var initialize = function (path) {
+    var isLevelIncluded = function (level) {
+        return levels[logLevel] <= level;
+    };
+
+    /**
+     * Initializes logger
+     *
+     * @param path log file
+     * @param level log lvl
+     */
+    var initialize = function (path, level) {
+
         file = path;
+        if (level) {
+            logLevel = level;
+        }
 
         if (file) {
             fs.openSync(file, 'w');
@@ -31,19 +53,40 @@ module.exports = (function () {
         }
     };
 
+    /**
+     * Writes log message
+     *
+     * @param message
+     */
     var log = function (message) {
-        console.log(message);
-        appendFile(message, 'LOG');
+        if (isLevelIncluded(levels.LOG)) {
+            console.log(message);
+            appendFile(message, 'LOG');
+        }
     };
 
+    /**
+     * Writes log message
+     *
+     * @param message
+     */
     var warn = function (message) {
-        console.warn(message);
-        appendFile(message, 'WARN');
+        if (isLevelIncluded(levels.WARN)) {
+            console.warn(message);
+            appendFile(message, 'WARN');
+        }
     };
 
+    /**
+     * Writes log message
+     *
+     * @param message
+     */
     var error = function (message) {
-        console.error(message);
-        appendFile(message, 'ERROR');
+        if (isLevelIncluded(levels.ERROR)) {
+            console.error(message);
+            appendFile(message, 'ERROR');
+        }
     };
 
     return {
