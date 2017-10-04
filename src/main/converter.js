@@ -1,16 +1,16 @@
-/* globals module, console, require */
+/* globals require */
 
-module.exports = (function () {
+module.exports = (() => {
 
     'use strict';
 
-    var logger = require("./utils/log.js");
+    let logger = require("./utils/log.js");
 
-    var CSS_RULE_MARK = "##";
-    var CSS_RULE_NEW_MARK = "#$#";
-    var EXCEPTION_RULE_MARK = "#@#";
-    var EXCEPTION_RULE_NEW_MARK = "#@$#";
-    var CSS_RULE_REPLACE_PATTERN = /(.*):style\((.*)\)/g;
+    const CSS_RULE_MARK = "##";
+    const CSS_RULE_NEW_MARK = "#$#";
+    const EXCEPTION_RULE_MARK = "#@#";
+    const EXCEPTION_RULE_NEW_MARK = "#@$#";
+    const CSS_RULE_REPLACE_PATTERN = /(.*):style\((.*)\)/g;
 
     /**
      * Executes rule css conversion
@@ -19,22 +19,21 @@ module.exports = (function () {
      * @param parts
      * @param ruleMark
      */
-    var executeConversion = function (rule, parts, ruleMark) {
-        var result = rule;
-        var domain = parts[0];
+    let executeConversion = function (rule, parts, ruleMark) {
+        let result = rule;
+        let domain = parts[0];
 
         if (domain) {
-            var rulePart = parts[1];
-            var match = rulePart.match(CSS_RULE_REPLACE_PATTERN);
-            if (match) {
-                var groups = CSS_RULE_REPLACE_PATTERN.exec(rulePart);
+            let rulePart = parts[1];
+            if (rulePart.match(CSS_RULE_REPLACE_PATTERN)) {
+                let groups = CSS_RULE_REPLACE_PATTERN.exec(rulePart);
                 if (groups.length !== 3) {
-                    logger.warn("Cannot convert " + rule);
+                    logger.warn(`Cannot convert ${rule}`);
                 } else {
                     result = domain + ruleMark;
-                    result += groups[1] + " { " + groups[2] + " }";
+                    result += `${groups[1]} \{ ${groups[2]} }`;
 
-                    logger.log('Rule "' + rule + '" converted');
+                    logger.log(`Rule "${rule}" converted`);
                 }
             }
         }
@@ -55,18 +54,16 @@ module.exports = (function () {
      *
      * @param rulesList Array of rules
      */
-    var convert = function (rulesList) {
-        var result = [];
+    let convert = function (rulesList) {
+        let result = [];
 
-        for (var i = 0; i < rulesList.length; i++) {
-            var rule = rulesList[i].trim();
-
-            if (rule.indexOf(':style') >= 0) {
-                var parts;
-                if (rule.indexOf(CSS_RULE_MARK) >= 0 && rule.indexOf("###") < 0) {
+        for (let rule of rulesList) {
+            if (rule.includes(':style')) {
+                let parts;
+                if (rule.includes(CSS_RULE_MARK) && !rule.includes("###")) {
                     parts = rule.split(CSS_RULE_MARK, 2);
                     rule = executeConversion(rule, parts, CSS_RULE_NEW_MARK);
-                } else if (rule.indexOf(EXCEPTION_RULE_MARK) >= 0) {
+                } else if (rule.includes(EXCEPTION_RULE_MARK)) {
                     parts = rule.split(EXCEPTION_RULE_MARK, 2);
                     rule = executeConversion(rule, parts, EXCEPTION_RULE_NEW_MARK);
                 }

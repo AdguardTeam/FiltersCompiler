@@ -1,23 +1,36 @@
-/* globals module, require, console */
+/* globals require */
 
 module.exports = (function () {
 
     'use strict';
 
-    var fs = require('fs');
-    var path = require('path');
+    /**
+     * @typedef {Object} fs
+     * @property {function} readFileSync
+     * @property {function} writeFileSync
+     * @property {function} lstatSync
+     * @property {function} readdirSync
+     * @property {function} isDirectory
+     * @property {function} appendFile
+     */
+    let fs = require('fs');
+    /**
+     * @typedef {Object} path
+     * @property {function} join
+     */
+    let path = require('path');
 
-    var version = require("./utils/version.js");
-    var converter = require("./converter.js");
-    var logger = require("./utils/log.js");
+    let version = require("./utils/version.js");
+    let converter = require("./converter.js");
+    let logger = require("./utils/log.js");
 
-    var TEMPLATE_FILE = 'template.txt';
-    var FILTER_FILE = 'filter.txt';
-    var REVISION_FILE = 'revision.json';
-    var METADATA_FILE = 'metadata.json';
-    var EXCLUDE_FILE = 'exclude.txt';
+    const TEMPLATE_FILE = 'template.txt';
+    const FILTER_FILE = 'filter.txt';
+    const REVISION_FILE = 'revision.json';
+    const METADATA_FILE = 'metadata.json';
+    const EXCLUDE_FILE = 'exclude.txt';
 
-    var currentDir;
+    let currentDir;
 
     /**
      * Sync reads file content
@@ -25,7 +38,7 @@ module.exports = (function () {
      * @param path
      * @returns {*}
      */
-    var readFile = function (path) {
+    let readFile = function (path) {
         try {
             return fs.readFileSync(path, {encoding: 'utf-8'});
         } catch (e) {
@@ -39,7 +52,7 @@ module.exports = (function () {
      * @param path
      * @param data
      */
-    var writeFile = function (path, data) {
+    let writeFile = function (path, data) {
         fs.writeFileSync(path, data, 'utf8', {encoding: 'utf-8'});
     };
 
@@ -48,21 +61,19 @@ module.exports = (function () {
      *
      * @param url
      */
-    var downloadFile = function (url) {
-        logger.log("Downloading " + url);
+    let downloadFile = function (url) {
+        logger.log(`Downloading: ${url}`);
 
-        var downloadFileSync = require('download-file-sync');
-        var content = downloadFileSync(url);
-
-        return content;
+        let downloadFileSync = require('download-file-sync');
+        return downloadFileSync(url);
     };
 
     /**
      * Splits lines
      *
-     * @param lines
+     * @param string
      */
-    var splitLines = function (string) {
+    let splitLines = function (string) {
         return string.replace('\r', '\n').replace('\n\n', '\n').split('\n');
     };
 
@@ -71,13 +82,12 @@ module.exports = (function () {
      *
      * @param lines
      */
-    var stripComments = function (lines) {
-        logger.log('Stripping comments');
+    let stripComments = function (lines) {
+        logger.log('Stripping comments..');
 
-        var result = [];
+        let result = [];
 
-        for (var i = 0; i < lines.length; i++) {
-            var line = lines[i];
+        for (let line of lines) {
             if (line.indexOf('!') !== 0) {
                 result.push(line);
             }
@@ -93,29 +103,29 @@ module.exports = (function () {
      * @param exclusionsFileName
      * @returns {*}
      */
-    var exclude = function (lines, exclusionsFileName) {
+    let exclude = function (lines, exclusionsFileName) {
 
-        logger.log('Applying exclusions');
+        logger.log('Applying exclusions..');
 
-        var exclusionsFile = path.join(currentDir, exclusionsFileName);
-        var exclusions = readFile(exclusionsFile);
+        let exclusionsFile = path.join(currentDir, exclusionsFileName);
+        let exclusions = readFile(exclusionsFile);
         if (!exclusions) {
             return lines;
         }
 
         exclusions = splitLines(exclusions);
 
-        var isExcluded = function (line, exclusions) {
-            for (var k = 0; k < exclusions.length; k++) {
-                var exclusion = exclusions[k].trim();
+        let isExcluded = (line, exclusions) => {
+            for (let exclusion of exclusions) {
+                exclusion = exclusion.trim();
 
-                if (exclusion.indexOf("!") !== 0) {
-                    if (exclusion.indexOf("/") === 0 && exclusion.lastIndexOf("/") === exclusion.length - 1) {
+                if (!exclusion.startsWith('!')) {
+                    if (exclusion.startsWith("/") && exclusion.endsWith("/")) {
                         if (line.match(new RegExp(exclusion.substring(1, exclusion.length - 2)))) {
                             return true;
                         }
                     } else {
-                        if (line.indexOf(exclusion) >= 0) {
+                        if (line.includes(exclusion)) {
                             return true;
                         }
                     }
@@ -125,16 +135,14 @@ module.exports = (function () {
             return false;
         };
 
-        var result = [];
-        for (var i = 0; i < lines.length; i++) {
-            var line = lines[i];
-
+        let result = [];
+        for (let line of lines) {
             if (!isExcluded(line, exclusions)) {
                 result.push(line);
             }
         }
 
-        logger.log('Excluded lines: ' + (lines.length - result.length));
+        logger.log(`Excluded lines: ${lines.length - result.length}`);
 
         return result;
     };
@@ -145,13 +153,13 @@ module.exports = (function () {
      * @param line
      * @returns {{url: string, stripComments: boolean, exclude: *}}
      */
-    var parseIncludeLine = function (line) {
-        var parts = line.split(' ');
+    let parseIncludeLine = function (line) {
+        let parts = line.split(' ');
 
-        var url = parts[1].trim();
+        let url = parts[1].trim();
 
-        function stripEndQuotes(s) {
-            var t = s.length;
+        let stripEndQuotes = (s) => {
+            let t = s.length;
             if (s.charAt(0) === '"') {
                 s = s.substring(1, t--);
             }
@@ -159,18 +167,18 @@ module.exports = (function () {
                 s = s.substring(0, t);
             }
             return s;
-        }
+        };
 
         url = stripEndQuotes(url);
 
-        var stripComments = false;
-        var exclude = null;
+        let stripComments = false;
+        let exclude = null;
 
-        for (var i = 1; i < parts.length; i++) {
-            var attribute = parts[i].trim();
-            if (attribute.indexOf("/stripComments") === 0) {
+        for (let i = 1; i < parts.length; i++) {
+            let attribute = parts[i].trim();
+            if (attribute.startsWith("/stripComments")) {
                 stripComments = true;
-            } else if (attribute.indexOf("/exclude=") === 0) {
+            } else if (attribute.startsWith("/exclude=")) {
                 exclude = attribute.substring(attribute.indexOf('=') + 1);
                 exclude = stripEndQuotes(exclude);
             }
@@ -189,26 +197,21 @@ module.exports = (function () {
      * @param line
      * @returns {Array}
      */
-    var include = function (line) {
-        var result = [];
+    let include = function (line) {
+        let result = [];
 
-        var options = parseIncludeLine(line);
+        let options = parseIncludeLine(line);
 
         if (!options.url) {
             logger.warn('Invalid include url');
             return result;
         }
 
-        logger.log('Applying inclusion from ' + options.url);
+        logger.log(`Applying inclusion from: ${options.url}`);
 
-        var included;
-        if (options.url.indexOf(':') >= 0) {
-            // remote file
-            included = downloadFile(options.url);
-        } else {
-            // local file
-            included = readFile(path.join(currentDir, options.url));
-        }
+        let included = options.url.includes(':') ?
+            downloadFile(options.url) :
+            readFile(path.join(currentDir, options.url));
 
         if (included) {
             result = splitLines(included);
@@ -224,7 +227,7 @@ module.exports = (function () {
 
         result = converter.convert(result);
 
-        logger.log('Inclusion lines:' + result.length);
+        logger.log(`Inclusion lines: ${result.length}`);
 
         return result;
     };
@@ -235,15 +238,13 @@ module.exports = (function () {
      * @param list
      * @returns {*}
      */
-    var removeDuplicates = function (list) {
-        logger.log('Removing duplicates');
+    let removeDuplicates = function (list) {
+        logger.log('Removing duplicates..');
 
-        var uniqueArray = list.filter(function (item, pos) {
-            return item.indexOf('!') === 0 ||
+        return list.filter((item, pos) => {
+            return item.startsWith('!') ||
                 list.indexOf(item) === pos;
         });
-
-        return uniqueArray;
     };
 
     /**
@@ -252,15 +253,15 @@ module.exports = (function () {
      * @param template
      * @returns {Array}
      */
-    var compile = function (template) {
-        var result = [];
+    let compile = function (template) {
+        let result = [];
 
-        var lines = splitLines(template);
-        for (var i = 0; i < lines.length; i++) {
-            var line = lines[i].trim();
-            if (line.indexOf('@include ') === 0) {
-                var inc = include(line);
-                var k = 0;
+        let lines = splitLines(template);
+        for (let line of lines) {
+            if (line.startsWith('@include ')) {
+                let inc = include(line.trim());
+
+                let k = 0;
                 while (k < inc.length) {
                     result.push(inc[k].trim());
                     k++;
@@ -282,16 +283,16 @@ module.exports = (function () {
      * @param path
      * @returns {{version: string, timeUpdated: number}}
      */
-    var makeRevision = function (path) {
-        var result = {
+    let makeRevision = function (path) {
+        let result = {
             "version": "1.0.0.0",
             "timeUpdated": new Date().getTime()
         };
 
-        var current = readFile(path);
+        let current = readFile(path);
         if (current) {
-            var p = JSON.parse(current);
-            if (p.version) {
+            let p = JSON.parse(current);
+            if (p && p.version) {
                 result.version = version.increment(p.version);
             }
         }
@@ -306,29 +307,27 @@ module.exports = (function () {
      * @param revision
      * @returns {[*,*,*,*,string]}
      */
-    var makeHeader = function (metadataFile, revision) {
-        logger.log('Adding header');
+    let makeHeader = function (metadataFile, revision) {
+        logger.log('Adding header..');
 
         //TODO: Add checksum
 
-        var metadataString = readFile(metadataFile);
+        let metadataString = readFile(metadataFile);
         if (!metadataString) {
             throw new Error('Error reading metadata');
         }
 
-        var metadata = JSON.parse(metadataString);
-
-        var result = [
-            '! Title: ' + metadata.name,
-            '! Description: ' + metadata.description,
-            '! Version: ' + revision.version,
-            '! TimeUpdated: ' + new Date(revision.timeUpdated).toDateString(),
-            '! Expires: 2 days (update frequency)'
-        ];
+        let metadata = JSON.parse(metadataString);
 
         //TODO: Parse expires
 
-        return result;
+        return [
+            `! Title: ${metadata.name}`,
+            `! Description: ${metadata.description}`,
+            `! Version: ${revision.version}`,
+            `! TimeUpdated: ${new Date(revision.timeUpdated).toDateString()}`,
+            `! Expires: 2 days (update frequency)`
+        ];
     };
 
     /**
@@ -336,25 +335,25 @@ module.exports = (function () {
      *
      * @param filterDir
      */
-    var buildFilter = function (filterDir) {
+    let buildFilter = function (filterDir) {
         currentDir = filterDir;
 
-        var template = readFile(path.join(currentDir, TEMPLATE_FILE));
+        let template = readFile(path.join(currentDir, TEMPLATE_FILE));
         if (!template) {
             throw new Error('Invalid template');
         }
 
-        var revisionFile = path.join(currentDir, REVISION_FILE);
-        var revision = makeRevision(revisionFile);
+        let revisionFile = path.join(currentDir, REVISION_FILE);
+        let revision = makeRevision(revisionFile);
 
         logger.log('Compiling..');
-        var compiled = compile(template);
+        let compiled = compile(template);
         logger.log('Compiled length:' + compiled.length);
 
-        var metadataFile = path.join(currentDir, METADATA_FILE);
-        var header = makeHeader(metadataFile, revision);
+        let metadataFile = path.join(currentDir, METADATA_FILE);
+        let header = makeHeader(metadataFile, revision);
 
-        var filter = header.concat(compiled);
+        let filter = header.concat(compiled);
 
         logger.log('Writing filter file, lines:' + filter.length);
         writeFile(path.join(currentDir, FILTER_FILE), filter.join('\r\n'));
@@ -368,20 +367,18 @@ module.exports = (function () {
      * @param filtersDir
      * @param logFile
      */
-    var build = function (filtersDir, logFile) {
+    let build = function (filtersDir, logFile) {
         logger.initialize(logFile);
 
-        var items = fs.readdirSync(filtersDir);
+        let items = fs.readdirSync(filtersDir);
 
-        for (var i = 0; i < items.length; i++) {
-            var d = items[i];
-
-            var filterDir = path.join(filtersDir, d);
+        for (let directory of items) {
+            let filterDir = path.join(filtersDir, directory);
             if (fs.lstatSync(filterDir).isDirectory()) {
 
-                logger.log('Building filter: ' + d);
+                logger.log(`Building filter: ${directory}`);
                 buildFilter(filterDir);
-                logger.log('Building filter: ' + d + ' ok');
+                logger.log(`Building filter: ${directory} ok`);
             }
         }
     };

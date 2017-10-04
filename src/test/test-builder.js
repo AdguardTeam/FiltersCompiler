@@ -1,12 +1,12 @@
 /* globals require, QUnit, __dirname */
 
-QUnit.test("Test builder", function (assert) {
+QUnit.test("Test builder", (assert) => {
     'use strict';
 
-    var path = require('path');
-    var fs = require('fs');
+    let path = require('path');
+    let fs = require('fs');
 
-    var readFile = function (path) {
+    let readFile = function (path) {
         try {
             return fs.readFileSync(path, {encoding: 'utf-8'});
         } catch (e) {
@@ -14,24 +14,24 @@ QUnit.test("Test builder", function (assert) {
         }
     };
 
-    var builder = require("../main/builder.js");
+    let builder = require("../main/builder.js");
     assert.ok(builder);
 
-    var filtersDir = path.join(__dirname, './resources/filters');
-    var logFile = path.join(__dirname, './resources/log.txt');
+    let filtersDir = path.join(__dirname, './resources/filters');
+    let logFile = path.join(__dirname, './resources/log.txt');
     builder.build(filtersDir, logFile);
 
-    var revision = readFile(path.join(filtersDir, 'filter_2_English', 'revision.json'));
+    let revision = readFile(path.join(filtersDir, 'filter_2_English', 'revision.json'));
     assert.ok(revision);
     //
     revision = JSON.parse(revision);
     assert.ok(revision.version);
     assert.ok(revision.timeUpdated);
 
-    var filterText = readFile(path.join(filtersDir, 'filter_2_English', 'filter.txt'));
+    let filterText = readFile(path.join(filtersDir, 'filter_2_English', 'filter.txt'));
     assert.ok(filterText);
 
-    var filterLines = filterText.split('\r\n');
+    let filterLines = filterText.split('\r\n');
     assert.equal(filterLines.length, 24);
 
     //TODO: Check header

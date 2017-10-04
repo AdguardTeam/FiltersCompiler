@@ -1,27 +1,26 @@
-/* globals module, console, require */
+/* globals require */
 
 module.exports = (function () {
 
     'use strict';
 
-    var fs = require('fs');
+    let fs = require('fs');
 
-    var file;
-    var logLevel = "DEBUG";
+    let file;
+    let logLevel = "DEBUG";
 
-    var levels = {
+    const Levels = {
         "DEBUG": 0,
         "LOG": 1,
         "WARN": 2,
         "ERROR": 3
     };
 
-    var appendFile = function (message, level) {
+    let appendFile = function (message, level) {
         if (file) {
-            message = '[' + new Date().toLocaleTimeString() + '][' + level + ']: ' + message;
-            message += '\r\n';
+            message = `[${new Date().toLocaleTimeString()}][${level}]:${message}\r\n`;
 
-            fs.appendFile(file, message, function (err) {
+            fs.appendFile(file, message, (err) => {
                 if (err) {
                     throw err;
                 }
@@ -29,8 +28,8 @@ module.exports = (function () {
         }
     };
 
-    var isLevelIncluded = function (level) {
-        return levels[logLevel] <= level;
+    let isLevelIncluded = function (level) {
+        return Levels[logLevel] <= level;
     };
 
     /**
@@ -39,7 +38,7 @@ module.exports = (function () {
      * @param path log file
      * @param level log lvl
      */
-    var initialize = function (path, level) {
+    let initialize = function (path, level) {
 
         file = path;
         if (level) {
@@ -58,8 +57,8 @@ module.exports = (function () {
      *
      * @param message
      */
-    var log = function (message) {
-        if (isLevelIncluded(levels.LOG)) {
+    let log = function (message) {
+        if (isLevelIncluded(Levels.LOG)) {
             console.log(message);
             appendFile(message, 'LOG');
         }
@@ -70,8 +69,8 @@ module.exports = (function () {
      *
      * @param message
      */
-    var warn = function (message) {
-        if (isLevelIncluded(levels.WARN)) {
+    let warn = function (message) {
+        if (isLevelIncluded(Levels.WARN)) {
             console.warn(message);
             appendFile(message, 'WARN');
         }
@@ -82,8 +81,8 @@ module.exports = (function () {
      *
      * @param message
      */
-    var error = function (message) {
-        if (isLevelIncluded(levels.ERROR)) {
+    let error = function (message) {
+        if (isLevelIncluded(Levels.ERROR)) {
             console.error(message);
             appendFile(message, 'ERROR');
         }

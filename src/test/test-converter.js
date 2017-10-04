@@ -1,11 +1,11 @@
 /* globals require, QUnit */
 
-QUnit.test("Test converter", function (assert) {
+QUnit.test("Test converter", (assert) => {
     'use strict';
 
-    var converter = require('../main/converter.js');
+    let converter = require('../main/converter.js');
 
-    var c = converter.convert(['example.com']);
+    let c = converter.convert(['example.com']);
     assert.equal(c[0], 'example.com');
 
     c = converter.convert(['example.com##h1:style(background-color: blue !important)']);

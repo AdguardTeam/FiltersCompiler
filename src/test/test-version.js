@@ -1,11 +1,11 @@
-/* globals require, QUnit, version */
+/* globals require, QUnit */
 
-QUnit.test("Test versions", function (assert) {
+QUnit.test("Test versions", (assert) => {
     'use strict';
 
-    var version = require('../main/utils/version.js');
+    let version = require('../main/utils/version.js');
 
-    var v = version.increment('0.0.0.0');
+    let v = version.increment('0.0.0.0');
     assert.equal('0.0.0.1', v);
 
     v = version.increment('0.0.1.99');
