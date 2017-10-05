@@ -19,6 +19,7 @@ module.exports = (function () {
      * @property {function} join
      */
     let path = require('path');
+    let downloadFileSync = require('download-file-sync');
 
     let version = require("./utils/version.js");
     let converter = require("./converter.js");
@@ -64,7 +65,6 @@ module.exports = (function () {
     let downloadFile = function (url) {
         logger.log(`Downloading: ${url}`);
 
-        let downloadFileSync = require('download-file-sync');
         return downloadFileSync(url);
     };
 
@@ -134,12 +134,7 @@ module.exports = (function () {
 
         exclusions = splitLines(exclusions);
 
-        let result = [];
-        for (let line of lines) {
-            if (!isExcluded(line, exclusions)) {
-                result.push(line);
-            }
-        }
+        let result = lines.filter((line) => !isExcluded(line, exclusions));
 
         logger.log(`Excluded lines: ${lines.length - result.length}`);
 
