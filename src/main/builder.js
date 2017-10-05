@@ -53,7 +53,7 @@ module.exports = (function () {
      * @param data
      */
     let writeFile = function (path, data) {
-        fs.writeFileSync(path, data, 'utf8', {encoding: 'utf-8'});
+        fs.writeFileSync(path, data, 'utf8');
     };
 
     /**
@@ -74,7 +74,7 @@ module.exports = (function () {
      * @param string
      */
     let splitLines = function (string) {
-        return string.replace('\r', '\n').replace('\n\n', '\n').split('\n');
+        return string.split(/[\r\n]+/);
     };
 
     /**
@@ -85,15 +85,34 @@ module.exports = (function () {
     let stripComments = function (lines) {
         logger.log('Stripping comments..');
 
-        let result = [];
+        return lines.filter((line) => !line.startsWith('!'));
+    };
 
-        for (let line of lines) {
-            if (line.indexOf('!') !== 0) {
-                result.push(line);
+    /**
+     * Checks if line is excluded with specified set of exclusions
+     *
+     * @param line
+     * @param exclusions
+     * @returns {boolean}
+     */
+    let isExcluded = function (line, exclusions) {
+        for (let exclusion of exclusions) {
+            exclusion = exclusion.trim();
+
+            if (!exclusion.startsWith('!')) {
+                if (exclusion.startsWith("/") && exclusion.endsWith("/")) {
+                    if (line.match(new RegExp(exclusion.substring(1, exclusion.length - 2)))) {
+                        return true;
+                    }
+                } else {
+                    if (line.includes(exclusion)) {
+                        return true;
+                    }
+                }
             }
         }
 
-        return result;
+        return false;
     };
 
     /**
@@ -115,26 +134,6 @@ module.exports = (function () {
 
         exclusions = splitLines(exclusions);
 
-        let isExcluded = (line, exclusions) => {
-            for (let exclusion of exclusions) {
-                exclusion = exclusion.trim();
-
-                if (!exclusion.startsWith('!')) {
-                    if (exclusion.startsWith("/") && exclusion.endsWith("/")) {
-                        if (line.match(new RegExp(exclusion.substring(1, exclusion.length - 2)))) {
-                            return true;
-                        }
-                    } else {
-                        if (line.includes(exclusion)) {
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            return false;
-        };
-
         let result = [];
         for (let line of lines) {
             if (!isExcluded(line, exclusions)) {
@@ -148,6 +147,23 @@ module.exports = (function () {
     };
 
     /**
+     * Strips leading and trailing quotes from string
+     *
+     * @param s
+     * @returns {*}
+     */
+    let stripEndQuotes = function (s) {
+        let t = s.length;
+        if (s.charAt(0) === '"') {
+            s = s.substring(1, t--);
+        }
+        if (s.charAt(--t) === '"') {
+            s = s.substring(0, t);
+        }
+        return s;
+    };
+
+    /**
      * Parses include line
      *
      * @param line
@@ -157,17 +173,6 @@ module.exports = (function () {
         let parts = line.split(' ');
 
         let url = parts[1].trim();
-
-        let stripEndQuotes = (s) => {
-            let t = s.length;
-            if (s.charAt(0) === '"') {
-                s = s.substring(1, t--);
-            }
-            if (s.charAt(--t) === '"') {
-                s = s.substring(0, t);
-            }
-            return s;
-        };
 
         url = stripEndQuotes(url);
 
