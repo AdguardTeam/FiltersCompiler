@@ -1,13 +1,13 @@
-/* globals require, module */
+/* globals require */
 
 module.exports = (function () {
 
     'use strict';
 
-    var builder = require("./src/compiler/builder.js");
+    let builder = require("./src/main/builder.js");
 
-    var compile = function (path) {
-        return builder.build(path);
+    let compile = function (path, logPath) {
+        return builder.build(path, logPath);
     };
 
     return {

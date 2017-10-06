@@ -15,16 +15,8 @@ The package could be run with the following command:
  var compiler = require("adguard-filters-compiler");
  
  var filtersDir = path.join(__dirname, './filters');
- compiler.compile(filtersDir);
-```
-
-## How to build
-
-### Requirements
-
-```
-npm install qunit
-npm install download-file-sync
+ var logPath = path.join(__dirname, './log.txt');
+ compiler.compile(filtersDir, logPath);
 ```
 
 ## Tests

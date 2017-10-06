@@ -1,0 +1,4 @@
+! Some special exclusions
+$special_exc
+! Regexps exclusions
+/^regularexpression[a-z]+$/

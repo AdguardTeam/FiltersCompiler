@@ -12,6 +12,6 @@
     "node": ">= 0.4.1"
   },
   "scripts": {
-    "test": "node ./test/testrunner.js"
+    "test": "node ./src/test/testrunner.js"
   }
 }
