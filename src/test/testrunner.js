@@ -27,6 +27,13 @@
     });
 
     testRunner.run({
+        code: "./src/main/sorting.js",
+        tests: "./src/test/test-sorting.js"
+    }, (err, report) => {
+        //Do nothing
+    });
+
+    testRunner.run({
         deps: ["./src/main/utils/version.js", "./src/main/converter.js"],
         code: "./src/main/builder.js",
         tests: "./src/test/test-builder.js"
