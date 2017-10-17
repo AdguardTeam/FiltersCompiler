@@ -32,7 +32,7 @@ QUnit.test("Test builder", (assert) => {
     assert.ok(filterText);
 
     let filterLines = filterText.split('\r\n');
-    assert.equal(filterLines.length, 24);
+    assert.equal(filterLines.length, 23);
 
     //TODO: Check header
 

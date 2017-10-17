@@ -23,6 +23,7 @@ module.exports = (function () {
 
     let version = require("./utils/version.js");
     let converter = require("./converter.js");
+    let sorter = require("./sorting.js");
     let logger = require("./utils/log.js");
 
     const TEMPLATE_FILE = 'template.txt';
@@ -273,6 +274,7 @@ module.exports = (function () {
 
         result = exclude(result, EXCLUDE_FILE);
         result = removeDuplicates(result);
+        result = sorter.sort(result);
 
         return result;
     };
