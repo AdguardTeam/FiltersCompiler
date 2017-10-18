@@ -25,6 +25,7 @@ module.exports = (function () {
     let converter = require("./converter.js");
     let sorter = require("./sorting.js");
     let logger = require("./utils/log.js");
+    let utils = require("./utils/utils.js");
 
     const TEMPLATE_FILE = 'template.txt';
     const FILTER_FILE = 'filter.txt';
@@ -234,21 +235,6 @@ module.exports = (function () {
     };
 
     /**
-     * Removes duplicates
-     *
-     * @param list
-     * @returns {*}
-     */
-    let removeDuplicates = function (list) {
-        logger.log('Removing duplicates..');
-
-        return list.filter((item, pos) => {
-            return item.startsWith('!') ||
-                list.indexOf(item) === pos;
-        });
-    };
-
-    /**
      * Compiles filter lines
      *
      * @param template
@@ -273,7 +259,7 @@ module.exports = (function () {
         }
 
         result = exclude(result, EXCLUDE_FILE);
-        result = removeDuplicates(result);
+        result = utils.removeDuplicates(result);
         result = sorter.sort(result);
 
         return result;

@@ -5,22 +5,15 @@ module.exports = (() => {
     'use strict';
 
     let logger = require("./utils/log.js");
+    let utils = require("./utils/utils.js");
 
     const COMMENT_SEPARATOR = '!';
     const HINT_SEPARATOR = '!+';
-
-    /**
-     * Removes duplicates
-     *
-     * @param list
-     * @returns {*}
-     */
-    let removeDuplicates = function (list) {
-        return list.filter((item, pos) => {
-            return item.startsWith('!') ||
-                list.indexOf(item) === pos;
-        });
-    };
+    const MASK_REGEX_RULE = "/";
+    const MASK_WHITE_LIST = "@@";
+    const REPLACE_OPTION = "replace";
+    const OPTIONS_DELIMITER = "$";
+    const ESCAPE_CHARACTER = '\\';
 
     /**
      * Checks if line is element hiding rule
@@ -57,7 +50,7 @@ module.exports = (() => {
 
         let result = [];
         for (let selector of sortedSelectors) {
-            result.push(removeDuplicates(map[selector]).join(',') + '##' + selector);
+            result.push(utils.removeDuplicates(map[selector]).join(',') + '##' + selector);
         }
 
         return result;
@@ -87,11 +80,46 @@ module.exports = (() => {
      * @returns {{}}
      */
     let parseRuleModifiers = function (line) {
-        if (line.indexOf('$') < 0) {
+
+        // Regexp rule may contain dollar sign which also is options delimiter
+        if (line.startsWith(MASK_REGEX_RULE) && line.endsWith(MASK_REGEX_RULE) &&
+            line.indexOf(REPLACE_OPTION + '=') < 0) {
             return {};
         }
 
-        let options = line.substring(line.indexOf('$') + 1).split(',');
+        let startIndex = 0;
+        if (line.startsWith(MASK_WHITE_LIST)) {
+            startIndex = MASK_WHITE_LIST.length;
+        }
+
+        let optionsPart = null;
+        let foundEscaped = false;
+        // Start looking from the prev to the last symbol
+        // If dollar sign is the last symbol - we simply ignore it.
+        for (let i = (line.length - 2); i >= startIndex; i--) {
+            let c = line.charAt(i);
+            if (c === OPTIONS_DELIMITER) {
+                if (i > 0 && line.charAt(i - 1) === ESCAPE_CHARACTER) {
+                    foundEscaped = true;
+                } else {
+                    optionsPart = line.substring(i + 1);
+
+                    if (foundEscaped) {
+                        // Find and replace escaped options delimiter
+                        optionsPart = optionsPart.replace(ESCAPE_CHARACTER + OPTIONS_DELIMITER, OPTIONS_DELIMITER);
+                    }
+
+                    // Options delimiter was found, doing nothing
+                    break;
+                }
+            }
+        }
+
+        if (!optionsPart) {
+            return {};
+        }
+
+        let options = optionsPart.split(',');
 
         let result = {};
         options.map((m) => {
@@ -140,7 +168,7 @@ module.exports = (() => {
 
         let result = [];
         for (let url in map) {
-            let domains = removeDuplicates(map[url]);
+            let domains = utils.removeDuplicates(map[url]);
             domains.sort();
             result.push(url + '$domain=' + domains.join('|'));
         }
@@ -187,7 +215,7 @@ module.exports = (() => {
         result = result.concat(sortUrlBlockingRules(urlBlockingRules));
         result = result.concat(immutables);
 
-        return removeDuplicates(result);
+        return utils.removeDuplicates(result);
     };
 
     /**
