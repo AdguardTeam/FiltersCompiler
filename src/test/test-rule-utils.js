@@ -5,21 +5,21 @@ QUnit.test("Test rule utils", (assert) => {
 
     let ruleUtils = require('../main/utils/rule-utils.js');
 
-    let rule = 'rustorka.com##div[align="center"] > a > img';
+    let rule = 'example.com##div[align="center"] > a > img';
     assert.ok(ruleUtils.isElementHidingRule(rule));
 
-    rule = 'rustorka.com$script';
+    rule = 'example.com$script';
     assert.notOk(ruleUtils.isElementHidingRule(rule));
 
     try {
-        rule = 'rustorka.com$empty,script';
+        rule = 'example.com$empty,script';
         assert.ok(ruleUtils.parseRuleModifiers(rule));
     } catch (e) {
         assert.ok(false);
     }
 
     try {
-        rule = 'rustorka.com$$empty';
+        rule = 'example.com$$empty';
         assert.ok(ruleUtils.parseRuleModifiers(rule));
         assert.ok(false);
     } catch (e) {
