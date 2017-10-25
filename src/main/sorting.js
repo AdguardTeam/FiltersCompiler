@@ -7,9 +7,39 @@ module.exports = (() => {
     let logger = require("./utils/log.js");
     let utils = require("./utils/utils.js");
     let ruleUtils = require("./utils/rule-utils.js");
+    let validator = require("../../../validator/index.js");
+    validator.init();
 
     const COMMENT_SEPARATOR = '!';
     const HINT_SEPARATOR = '!+';
+
+    /**
+     * Validates css selector
+     *
+     * @param selector
+     * @returns {boolean}
+     */
+    let validateSelector = function (selector) {
+        if (!validator || !validator.validateCssSelector) {
+            return true;
+        }
+
+        return validator.validateCssSelector(selector);
+    };
+
+    /**
+     * Validates domains
+     *
+     * @param domains
+     * @returns {*}
+     */
+    let validateDomains = function (domains) {
+        if (!validator || !validator.validateDomains) {
+            return domains;
+        }
+
+        return validator.validateDomains(domains);
+    };
 
     /**
      * Sorts element hiding rules:
@@ -26,11 +56,15 @@ module.exports = (() => {
             let selector = line.substring(separatorIndex + 2);
             let domains = line.substring(0, separatorIndex).split(',');
 
+            if (!validateSelector(selector)) {
+                continue;
+            }
+
             if (!map[selector]) {
                 map[selector] = [];
             }
 
-            map[selector] = map[selector].concat(domains);
+            map[selector] = map[selector].concat(validateDomains(domains));
         }
 
         let sortedSelectors = Object.keys(map).sort();
@@ -102,6 +136,8 @@ module.exports = (() => {
         for (let url in map) {
             let domains = utils.removeDuplicates(map[url]);
             domains.sort();
+
+            domains = validateDomains(domains);
             result.push(url + '$domain=' + domains.join('|'));
         }
 
