@@ -20,6 +20,13 @@
     });
 
     testRunner.run({
+        code: "./src/main/utils/rule-utils.js",
+        tests: "./src/test/test-rule-utils.js"
+    }, (err, report) => {
+        //Do nothing
+    });
+
+    testRunner.run({
         code: "./src/main/converter.js",
         tests: "./src/test/test-converter.js"
     }, (err, report) => {
