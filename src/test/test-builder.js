@@ -39,13 +39,13 @@ QUnit.test("Test builder", (assert) => {
     //Common include
     assert.ok(filterLines.indexOf('! some common rules could be places here') >= 0);
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
-    assert.ok(filterLines.indexOf('test-common-rule.com$special_exc') >= 0);
+    assert.ok(filterLines.indexOf('test-common-rule.com$xmlhttprequest') >= 0);
     assert.ok(filterLines.indexOf('example.com#$#h1 { background-color: blue !important }') >= 0);
 
     //Common_1 include
     assert.ok(filterLines.indexOf('test-common-1-rule.com') >= 0);
     //Exclude_1
-    assert.notOk(filterLines.indexOf('test-common-1-rule.com$special_exc') >= 0);
+    assert.notOk(filterLines.indexOf('test-common-1-rule.com$xmlhttprequest') >= 0);
     //Strip comments
     assert.notOk(filterLines.indexOf('! some common rules could be places here, but comment are stripped') >= 0);
 

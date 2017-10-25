@@ -1,6 +1,6 @@
 ! some common rules could be places here, but comment are stripped
 test-common-1-rule.com
 ||test-common-1-rule.com^$replace=
-test-common-1-rule.com$special_exc
+test-common-1-rule.com$xmlhttprequest
 regularexpressionexcluded
 regularexpression_not_excluded

@@ -1,4 +1,4 @@
 ! Some special exclusions
-$special_exc
+$xmlhttprequest
 ! Regexps exclusions
 /^regularexpression[a-z]+$/
