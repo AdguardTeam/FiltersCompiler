@@ -18,20 +18,11 @@ QUnit.test("Test rule utils", (assert) => {
         assert.ok(false);
     }
 
-    try {
-        rule = 'example.com$$empty';
-        assert.ok(ruleUtils.parseRuleModifiers(rule));
-        assert.ok(false);
-    } catch (e) {
-        assert.ok(e);
-    }
+    rule = 'example.com$$empty';
+    assert.ok(ruleUtils.parseRuleModifiers(rule).empty);
 
-    try {
-        rule = '||example.com^$domain=domain.org,domain2.com';
-        assert.ok(ruleUtils.parseRuleModifiers(rule));
-        assert.ok(false);
-    } catch (e) {
-        assert.ok(e);
-    }
+    rule = '||example.com^$domain=domain.org';
+    assert.ok(ruleUtils.parseRuleModifiers(rule).domain);
+    assert.equal(ruleUtils.parseRuleModifiers(rule).domain[0], 'domain.org');
 });
 

@@ -8,10 +8,6 @@ module.exports = (() => {
     const OPTIONS_DELIMITER = "$";
     const ESCAPE_CHARACTER = '\\';
 
-    //TODO: Add more options
-    const VALID_OPTIONS = ['domain', '~domain','important', '~important', 'empty', '~empty',
-        'script', '~script', 'third-party', '~third-party', 'xmlhttprequest', '~xmlhttprequest'];
-
     /**
      * Checks if line is element hiding rule
      *
@@ -22,6 +18,20 @@ module.exports = (() => {
     };
 
     /**
+     * Parses rule css selector
+     *
+     * @param line
+     * @returns {string}
+     */
+    let parseCssSelector = function (line) {
+        if (line.indexOf('##') >= 0) {
+            return line.substring(line.indexOf('##') + 2);
+        }
+
+        return '';
+    };
+
+    /**
      * Parses rule modifiers
      *
      * @param line
@@ -29,13 +39,13 @@ module.exports = (() => {
      */
     let parseRuleModifiers = function (line) {
 
-        if (line.indexOf('$$') >= 0) {
-            throw new Error(`Invalid rule: ${line} - two option separators.`);
-        }
-
         // Regexp rule may contain dollar sign which also is options delimiter
         if (line.startsWith(MASK_REGEX_RULE) && line.endsWith(MASK_REGEX_RULE) &&
             line.indexOf(REPLACE_OPTION + '=') < 0) {
+            return {};
+        }
+
+        if (line.indexOf('#$#') >= 0) {
             return {};
         }
 
@@ -84,10 +94,6 @@ module.exports = (() => {
                 values = m.substring(separatorIndex + 1).split('|');
             }
 
-            if (!validateOptionName(name)) {
-                throw new Error(`Invalid rule options: ${line}`);
-            }
-
             if (!result[name]) {
                 result[name] = [];
             }
@@ -98,19 +104,9 @@ module.exports = (() => {
         return result;
     };
 
-    /**
-     * Validates option name
-     *
-     * @param option
-     * @returns {boolean}
-     */
-    let validateOptionName = function (option) {
-        option = option.trim();
-        return VALID_OPTIONS.indexOf(option) >= 0 || VALID_OPTIONS.indexOf('~' + option) >= 0;
-    };
-
     return {
         parseRuleModifiers: parseRuleModifiers,
-        isElementHidingRule: isElementHidingRule
+        isElementHidingRule: isElementHidingRule,
+        parseCssSelector: parseCssSelector
     };
 })();

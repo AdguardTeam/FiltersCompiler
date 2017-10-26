@@ -23,6 +23,7 @@ module.exports = (function () {
 
     let version = require("./utils/version.js");
     let converter = require("./converter.js");
+    let validator = require("./validator.js");
     let sorter = require("./sorting.js");
     let logger = require("./utils/log.js");
     let utils = require("./utils/utils.js");
@@ -260,6 +261,8 @@ module.exports = (function () {
 
         result = exclude(result, EXCLUDE_FILE);
         result = utils.removeDuplicates(result);
+
+        result = validator.validate(result);
         result = sorter.sort(result);
 
         return result;
@@ -354,9 +357,11 @@ module.exports = (function () {
      *
      * @param filtersDir
      * @param logFile
+     * @param domainBlacklistFile
      */
-    let build = function (filtersDir, logFile) {
+    let build = function (filtersDir, logFile, domainBlacklistFile) {
         logger.initialize(logFile);
+        validator.init(domainBlacklistFile);
 
         let items = fs.readdirSync(filtersDir);
 

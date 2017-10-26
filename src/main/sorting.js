@@ -7,39 +7,9 @@ module.exports = (() => {
     let logger = require("./utils/log.js");
     let utils = require("./utils/utils.js");
     let ruleUtils = require("./utils/rule-utils.js");
-    let validator = require("../../../validator/index.js");
-    validator.init();
 
     const COMMENT_SEPARATOR = '!';
     const HINT_SEPARATOR = '!+';
-
-    /**
-     * Validates css selector
-     *
-     * @param selector
-     * @returns {boolean}
-     */
-    let validateSelector = function (selector) {
-        if (!validator || !validator.validateCssSelector) {
-            return true;
-        }
-
-        return validator.validateCssSelector(selector);
-    };
-
-    /**
-     * Validates domains
-     *
-     * @param domains
-     * @returns {*}
-     */
-    let validateDomains = function (domains) {
-        if (!validator || !validator.validateDomains) {
-            return domains;
-        }
-
-        return validator.validateDomains(domains);
-    };
 
     /**
      * Sorts element hiding rules:
@@ -52,19 +22,14 @@ module.exports = (() => {
     let sortElementHidingRules = function (lines) {
         let map = {};
         for (let line of lines) {
-            let separatorIndex = line.indexOf('##');
-            let selector = line.substring(separatorIndex + 2);
-            let domains = line.substring(0, separatorIndex).split(',');
-
-            if (!validateSelector(selector)) {
-                continue;
-            }
+            let selector = ruleUtils.parseCssSelector(line);
+            let domains = line.substring(0, line.indexOf('#')).split(',');
 
             if (!map[selector]) {
                 map[selector] = [];
             }
 
-            map[selector] = map[selector].concat(validateDomains(domains));
+            map[selector] = map[selector].concat(domains);
         }
 
         let sortedSelectors = Object.keys(map).sort();
@@ -72,9 +37,6 @@ module.exports = (() => {
         let result = [];
         for (let selector of sortedSelectors) {
             let rule = utils.removeDuplicates(map[selector]).join(',') + '##' + selector;
-            if (rule.startsWith('||')) {
-                logger.warn(`|| are unnecessary for element hiding rule: ${rule}`);
-            }
             result.push(rule);
         }
 
@@ -113,22 +75,18 @@ module.exports = (() => {
         let map = {};
 
         lines.map((line) => {
-            try {
-                let modifiers = ruleUtils.parseRuleModifiers(line);
-                let names = Object.getOwnPropertyNames(modifiers);
-                if (names.length === 1 && modifiers.domain) {
-                    let url = line.substring(0, line.indexOf('$'));
+            let modifiers = ruleUtils.parseRuleModifiers(line);
+            let names = Object.getOwnPropertyNames(modifiers);
+            if (names.length === 1 && modifiers.domain) {
+                let url = line.substring(0, line.indexOf('$'));
 
-                    if (!map[url]) {
-                        map[url] = [];
-                    }
-
-                    map[url] = map[url].concat(modifiers.domain);
-                } else {
-                    rest.push(line);
+                if (!map[url]) {
+                    map[url] = [];
                 }
-            } catch (e) {
-                logger.error(e);
+
+                map[url] = map[url].concat(modifiers.domain);
+            } else {
+                rest.push(line);
             }
         });
 
@@ -137,7 +95,6 @@ module.exports = (() => {
             let domains = utils.removeDuplicates(map[url]);
             domains.sort();
 
-            domains = validateDomains(domains);
             result.push(url + '$domain=' + domains.join('|'));
         }
 

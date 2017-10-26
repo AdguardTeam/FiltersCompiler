@@ -34,6 +34,13 @@
     });
 
     testRunner.run({
+        code: "./src/main/validator.js",
+        tests: "./src/test/test-validator.js"
+    }, (err, report) => {
+        //Do nothing
+    });
+
+    testRunner.run({
         code: "./src/main/sorting.js",
         tests: "./src/test/test-sorting.js"
     }, (err, report) => {
