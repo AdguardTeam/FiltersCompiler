@@ -57,16 +57,56 @@ module.exports = (function () {
         }
     };
 
-    /**
-     * Validates list of domain with black list
-     */
-    let validateDomains = function (list) {
-        let result = true;
-        list.map((d) => {
-            if (domainsBlacklist.indexOf(d) > 0) {
+    let validateDomains = function (domains) {
+        return domains.filter((d) => {
+            if (domainsBlacklist.indexOf(d) >= 0) {
                 logger.error(`Blacklisted domain: ${d}`);
-                result = false;
+                return false;
             }
+
+            return true;
+        });
+    };
+
+    /**
+     * Validates list of rules with black list of domains
+     * returns modified list of rules without blacklisted domain options
+     */
+    let blacklistDomains = function (list) {
+        let result = [];
+
+        list.forEach((rule) => {
+            let corrected = rule;
+
+            //TODO: if rule is url blocking rule
+            if (!rule.startsWith('!') && !ruleUtils.isElementHidingRule(rule) && rule.indexOf('$$') < 0) {
+                let modifiers = ruleUtils.parseUrlRuleModifiers(rule);
+                if (modifiers.domain) {
+                    let validated = validateDomains(modifiers.domain);
+                    if (validated.length === 0) {
+                        logger.error(`All domains are blacklisted for rule: ${rule}`);
+                        return;
+                    }
+
+                    modifiers.domain = validated;
+                    //TODO: Parse in parser
+                    let url = rule.substring(0, rule.indexOf('$'));
+
+                    //TODO: construct in separate module
+                    let options = [];
+                    for (let m in modifiers) {
+                        if (modifiers[m] && modifiers[m].length > 0 ) {
+                            options.push(`${m}=${modifiers[m].join('|')}`);
+                        } else {
+                            options.push(m);
+                        }
+                    }
+
+                    corrected = `${url}$${options.join(',')}`;
+                }
+            }
+
+            result.push(corrected);
         });
 
         return result;
@@ -90,54 +130,48 @@ module.exports = (function () {
      * @returns {Array}
      */
     let validate = function (list) {
-        let result = [];
-        list.map((s) => {
+        return list.filter((s) => {
             if (s.startsWith('!')) {
-                result.push(s);
-                return;
+                return true;
             }
 
             if (ruleUtils.isElementHidingRule(s)) {
                 if (s.startsWith('||')) {
                     logger.error(`|| are unnecessary for element hiding rule: ${s}`);
-                    return;
+                    return false;
                 }
 
                 if (!validateCssSelector(ruleUtils.parseCssSelector(s))) {
                     logger.error(`Invalid selector: ${s}`);
-                    return;
+                    return false;
                 }
 
-                result.push(s);
+                return true;
             } else {
-                if (s.indexOf('$$') >= 0) {
+                // TODO: Fix for content-rules
+                // example.org$$script[data-src="banner"]
+                if (s.includes('$$')) {
                     logger.error(`Invalid rule: ${s} - two option separators.`);
-                    return;
+                    return false;
                 }
 
-                let modifiers = ruleUtils.parseRuleModifiers(s);
+                let modifiers = ruleUtils.parseUrlRuleModifiers(s);
                 for (let name in modifiers) {
                     if (!validateOptionName(name)) {
                         logger.error(`Invalid rule options: ${s}`);
-                        return;
+                        return false;
                     }
                 }
 
-                if (modifiers.domain && !validateDomains(modifiers.domain)) {
-                    logger.error(`Invalid rule domains: ${s}`);
-                    return;
-                }
-
-                result.push(s);
+                return true;
             }
         });
-
-        return result;
     };
 
     return {
         init: init,
-        validate: validate
+        validate: validate,
+        blacklistDomains: blacklistDomains
     };
 })();
 

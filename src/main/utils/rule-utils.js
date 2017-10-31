@@ -8,8 +8,11 @@ module.exports = (() => {
     const OPTIONS_DELIMITER = "$";
     const ESCAPE_CHARACTER = '\\';
 
+    //TODO: move to rule parser
+
     /**
      * Checks if line is element hiding rule
+     * TODO: Change to rule types enum
      *
      * @param line
      */
@@ -32,12 +35,12 @@ module.exports = (() => {
     };
 
     /**
-     * Parses rule modifiers
+     * Parses url rule modifiers
      *
      * @param line
      * @returns {{}}
      */
-    let parseRuleModifiers = function (line) {
+    let parseUrlRuleModifiers = function (line) {
 
         // Regexp rule may contain dollar sign which also is options delimiter
         if (line.startsWith(MASK_REGEX_RULE) && line.endsWith(MASK_REGEX_RULE) &&
@@ -84,7 +87,7 @@ module.exports = (() => {
         let options = optionsPart.split(',');
 
         let result = {};
-        options.map((m) => {
+        options.forEach((m) => {
             let separatorIndex = m.indexOf('=');
             let name = m;
             let values = '';
@@ -98,14 +101,16 @@ module.exports = (() => {
                 result[name] = [];
             }
 
-            result[name] = result[name].concat(values);
+            if (values) {
+                result[name] = result[name].concat(values);
+            }
         });
 
         return result;
     };
 
     return {
-        parseRuleModifiers: parseRuleModifiers,
+        parseUrlRuleModifiers: parseUrlRuleModifiers,
         isElementHidingRule: isElementHidingRule,
         parseCssSelector: parseCssSelector
     };

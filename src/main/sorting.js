@@ -20,23 +20,21 @@ module.exports = (() => {
      * @param lines
      */
     let sortElementHidingRules = function (lines) {
-        let map = {};
+        let map = new Map();
         for (let line of lines) {
             let selector = ruleUtils.parseCssSelector(line);
-            let domains = line.substring(0, line.indexOf('#')).split(',');
+            let selectorDomains = line.substring(0, line.indexOf('#')).split(',');
+            let domains = map.get(selector) || [];
 
-            if (!map[selector]) {
-                map[selector] = [];
-            }
-
-            map[selector] = map[selector].concat(domains);
+            map.set(selector, domains.concat(selectorDomains));
         }
 
-        let sortedSelectors = Object.keys(map).sort();
+        let sortedSelectors = Array.from(map.keys());
+        sortedSelectors.sort();
 
         let result = [];
         for (let selector of sortedSelectors) {
-            let rule = utils.removeDuplicates(map[selector]).join(',') + '##' + selector;
+            let rule = utils.removeDuplicates(map.get(selector)).join(',') + '##' + selector;
             result.push(rule);
         }
 
@@ -52,12 +50,12 @@ module.exports = (() => {
      * @param line
      */
     let isImmutableRule = function (line) {
-        return line.indexOf('#%#') >= 0 ||
-            line.indexOf('#$#') >= 0 ||
-            line.indexOf('$replace') >= 0 ||
-            line.indexOf('$protobuf=') >= 0 ||
-            line.indexOf('$csp=') >= 0 ||
-            line.indexOf('$app=') >= 0;
+        return line.includes('#%#') ||
+            line.includes('#$#') ||
+            line.includes('$replace') ||
+            line.includes('$protobuf=') ||
+            line.includes('$csp=') ||
+            line.includes('$app=');
     };
 
     /**
@@ -72,27 +70,24 @@ module.exports = (() => {
     let sortUrlBlockingRules = function (lines) {
 
         let rest = [];
-        let map = {};
+        let map = new Map();
 
-        lines.map((line) => {
-            let modifiers = ruleUtils.parseRuleModifiers(line);
+        lines.forEach((line) => {
+            let modifiers = ruleUtils.parseUrlRuleModifiers(line);
             let names = Object.getOwnPropertyNames(modifiers);
             if (names.length === 1 && modifiers.domain) {
                 let url = line.substring(0, line.indexOf('$'));
 
-                if (!map[url]) {
-                    map[url] = [];
-                }
-
-                map[url] = map[url].concat(modifiers.domain);
+                let domains = map.get(url) || [];
+                map.set(url, domains.concat(modifiers.domain));
             } else {
                 rest.push(line);
             }
         });
 
         let result = [];
-        for (let url in map) {
-            let domains = utils.removeDuplicates(map[url]);
+        for (let url of map.keys()) {
+            let domains = utils.removeDuplicates(map.get(url));
             domains.sort();
 
             result.push(url + '$domain=' + domains.join('|'));
@@ -121,6 +116,8 @@ module.exports = (() => {
             if (!line) {
                 continue;
             }
+
+            //TODO: handle content-rules
 
             if (line.startsWith('!')) {
                 comments.push(line);
@@ -194,7 +191,7 @@ module.exports = (() => {
         }
 
         let result = [];
-        blocks.map((b) => {
+        blocks.forEach((b) => {
             result = result.concat(sortBlock(b));
         });
 

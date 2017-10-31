@@ -1,5 +1,7 @@
 /* globals require */
 
+// TODO: figure out let-const for first-level funcs
+
 module.exports = (function () {
 
     'use strict';
@@ -263,6 +265,7 @@ module.exports = (function () {
         result = utils.removeDuplicates(result);
 
         result = validator.validate(result);
+        result = validator.blacklistDomains(result);
         result = sorter.sort(result);
 
         return result;
