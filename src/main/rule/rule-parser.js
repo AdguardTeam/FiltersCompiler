@@ -10,8 +10,14 @@ module.exports = (() => {
     const MASK_REGEX_RULE = "/";
     const MASK_WHITE_LIST = "@@";
     const MASK_ELEMENT_HIDING = "##";
+    const MASK_ELEMENT_HIDING_EXCEPTION = "#@#";
+    const MASK_CSS = "#$#";
+    const MASK_CSS_EXCEPTION = "#@$#";
+    const MASK_SCRIPT = "#%#";
+    const MASK_SCRIPT_EXCEPTION = "#@%#";
     const MASK_CONTENT = "$$";
     const MASK_COMMENT = "!";
+
     const REPLACE_OPTION = "replace";
     const OPTIONS_DELIMITER = "$";
     const ESCAPE_CHARACTER = '\\';
@@ -103,14 +109,15 @@ module.exports = (() => {
 
     /**
      * Checks if rule is url blocking rule
-     * TODO: Find out better way to detect url-blocking rules
      *
      * @param ruleText
      */
     const isUrlBlockingRule = function (ruleText) {
-        return !ruleText.includes('#%#') &&
-            !ruleText.includes('#$#') &&
-            !ruleText.includes('#@%#') &&
+        return !ruleText.includes(MASK_ELEMENT_HIDING_EXCEPTION) &&
+            !ruleText.includes(MASK_CSS) &&
+            !ruleText.includes(MASK_CSS_EXCEPTION) &&
+            !ruleText.includes(MASK_SCRIPT) &&
+            !ruleText.includes(MASK_SCRIPT_EXCEPTION) &&
             !ruleText.includes(MASK_CONTENT) &&
             !ruleText.startsWith(MASK_COMMENT);
     };

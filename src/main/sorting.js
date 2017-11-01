@@ -49,7 +49,7 @@ module.exports = (() => {
      *
      * @param line
      */
-    let isImmutableRule = function (line) {
+    const isImmutableRule = function (line) {
         return line.includes('#%#') ||
             line.includes('#$#') ||
             line.includes('$replace') ||
@@ -67,7 +67,7 @@ module.exports = (() => {
      *
      * @param rules
      */
-    let sortUrlBlockingRules = function (rules) {
+    const sortUrlBlockingRules = function (rules) {
 
         const rest = [];
         const map = new Map();

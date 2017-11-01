@@ -15,9 +15,39 @@ module.exports = (function () {
     const ruleParser = require("./rule/rule-parser.js");
     const RuleTypes = require("./rule/rule-types.js");
 
-    //TODO: Add more options
-    const VALID_OPTIONS = ['domain', '~domain','important', '~important', 'empty', '~empty',
-        'script', '~script', 'third-party', '~third-party', 'xmlhttprequest', '~xmlhttprequest'];
+    const VALID_OPTIONS = [
+        // Basic modifiers
+        'domain', '~domain',
+        'third-party', '~third-party',
+        'popup', '~popup',
+        'match-case', '~match-case',
+        'csp',
+        // Content type modifiers
+        'image', '~image',
+        'stylesheet', '~stylesheet',
+        'script', '~script',
+        'object', '~object',
+        'object-subrequest', '~object-subrequest',
+        'font', '~font',
+        'media', '~media',
+        'subdocument', '~subdocument',
+        'xmlhttprequest', '~xmlhttprequest',
+        'other', '~other',
+        // Exception rules modifiers
+        'elemhide',
+        'content',
+        'jsinject',
+        'urlblock',
+        'document',
+        'stealth',
+        'generichide',
+        'genericblock',
+        'important',
+        'empty',
+        'mp4',
+        'replace',
+        'protobuf',
+        'app'];
 
     let domainsBlacklist = [];
     let cssParser;
@@ -27,7 +57,7 @@ module.exports = (function () {
      *
      * @param domainBlacklistFile
      */
-    let init = function (domainBlacklistFile) {
+    const init = function (domainBlacklistFile) {
         try {
             let s = fs.readFileSync(domainBlacklistFile, {encoding: 'utf-8'});
             domainsBlacklist = s.split('\n');
