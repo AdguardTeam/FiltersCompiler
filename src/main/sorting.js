@@ -6,7 +6,9 @@ module.exports = (() => {
 
     let logger = require("./utils/log.js");
     let utils = require("./utils/utils.js");
-    let ruleUtils = require("./utils/rule-utils.js");
+    let ruleParser = require("./rule/rule-parser.js");
+    let Rule = require("./rule/rule.js");
+    let RuleTypes = require("./rule/rule-types.js");
 
     const COMMENT_SEPARATOR = '!';
     const HINT_SEPARATOR = '!+';
@@ -17,16 +19,15 @@ module.exports = (() => {
      *  merging the rules with the same CSS selector;
      *  removing duplicated domains;
      *
-     * @param lines
+     * @param rules
      */
-    let sortElementHidingRules = function (lines) {
+    let sortElementHidingRules = function (rules) {
         let map = new Map();
-        for (let line of lines) {
-            let selector = ruleUtils.parseCssSelector(line);
-            let selectorDomains = line.substring(0, line.indexOf('#')).split(',');
+        for (let rule of rules) {
+            let selector = rule.cssSelector;
             let domains = map.get(selector) || [];
 
-            map.set(selector, domains.concat(selectorDomains));
+            map.set(selector, domains.concat(rule.cssDomains));
         }
 
         let sortedSelectors = Array.from(map.keys());
@@ -34,8 +35,7 @@ module.exports = (() => {
 
         let result = [];
         for (let selector of sortedSelectors) {
-            let rule = utils.removeDuplicates(map.get(selector)).join(',') + '##' + selector;
-            result.push(rule);
+            result.push(Rule.buildNewCssRuleText(selector, utils.removeDuplicates(map.get(selector))));
         }
 
         return result;
@@ -65,23 +65,23 @@ module.exports = (() => {
      *  sorting and merging domains list if the rules contain only $domain= modifier
      *  removing duplicates;
      *
-     * @param lines
+     * @param rules
      */
-    let sortUrlBlockingRules = function (lines) {
+    let sortUrlBlockingRules = function (rules) {
 
         let rest = [];
         let map = new Map();
 
-        lines.forEach((line) => {
-            let modifiers = ruleUtils.parseUrlRuleModifiers(line);
+        rules.forEach((rule) => {
+            let modifiers = rule.modifiers;
             let names = Object.getOwnPropertyNames(modifiers);
             if (names.length === 1 && modifiers.domain) {
-                let url = line.substring(0, line.indexOf('$'));
+                let url = rule.url;
 
                 let domains = map.get(url) || [];
                 map.set(url, domains.concat(modifiers.domain));
             } else {
-                rest.push(line);
+                rest.push(rule.ruleText);
             }
         });
 
@@ -90,7 +90,7 @@ module.exports = (() => {
             let domains = utils.removeDuplicates(map.get(url));
             domains.sort();
 
-            result.push(url + '$domain=' + domains.join('|'));
+            result.push(Rule.buildNewUrlBlockingRuleText(url, domains));
         }
 
         result = result.concat(rest);
@@ -111,22 +111,28 @@ module.exports = (() => {
         let urlBlockingRules = [];
         let comments = [];
         let immutables = [];
+        let contentRules = [];
+        let otherRules = [];
 
         for (let line of list) {
             if (!line) {
                 continue;
             }
 
-            //TODO: handle content-rules
+            let rule = ruleParser.parseRule(line);
 
-            if (line.startsWith('!')) {
+            if (rule.ruleType === RuleTypes.Comment) {
                 comments.push(line);
-            } else if (ruleUtils.isElementHidingRule(line)) {
-                elementHidingRules.push(line);
+            } else if (rule.ruleType === RuleTypes.ElementHiding) {
+                elementHidingRules.push(rule);
             } else if (isImmutableRule(line)) {
                 immutables.push(line);
+            } else if (rule.ruleType === RuleTypes.UrlBlocking) {
+                urlBlockingRules.push(rule);
+            } else if (rule.ruleType === RuleTypes.Content) {
+                contentRules.push(line);
             } else {
-                urlBlockingRules.push(line);
+                otherRules.push(line);
             }
         }
 
@@ -135,6 +141,8 @@ module.exports = (() => {
         let result = comments;
         result = result.concat(sortElementHidingRules(elementHidingRules));
         result = result.concat(sortUrlBlockingRules(urlBlockingRules));
+        result = result.concat(contentRules);
+        result = result.concat(otherRules);
         result = result.concat(immutables);
 
         return utils.removeDuplicates(result);

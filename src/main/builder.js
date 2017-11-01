@@ -1,7 +1,5 @@
 /* globals require */
 
-// TODO: figure out let-const for first-level funcs
-
 module.exports = (function () {
 
     'use strict';

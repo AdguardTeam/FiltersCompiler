@@ -12,7 +12,8 @@ module.exports = (function () {
     let CssSelectorParser = require('css-selector-parser').CssSelectorParser;
 
     let logger = require("./utils/log.js");
-    let ruleUtils = require("./utils/rule-utils.js");
+    let ruleParser = require("./rule/rule-parser.js");
+    let RuleTypes = require("./rule/rule-types.js");
 
     //TODO: Add more options
     const VALID_OPTIONS = ['domain', '~domain','important', '~important', 'empty', '~empty',
@@ -75,34 +76,22 @@ module.exports = (function () {
     let blacklistDomains = function (list) {
         let result = [];
 
-        list.forEach((rule) => {
-            let corrected = rule;
+        list.forEach((line) => {
+            let corrected = line;
+            let rule = ruleParser.parseRule(line);
 
-            //TODO: if rule is url blocking rule
-            if (!rule.startsWith('!') && !ruleUtils.isElementHidingRule(rule) && rule.indexOf('$$') < 0) {
-                let modifiers = ruleUtils.parseUrlRuleModifiers(rule);
+            if (rule.ruleType === RuleTypes.UrlBlocking) {
+                let modifiers = rule.modifiers;
                 if (modifiers.domain) {
                     let validated = validateDomains(modifiers.domain);
                     if (validated.length === 0) {
-                        logger.error(`All domains are blacklisted for rule: ${rule}`);
+                        logger.error(`All domains are blacklisted for rule: ${line}`);
                         return;
                     }
 
                     modifiers.domain = validated;
-                    //TODO: Parse in parser
-                    let url = rule.substring(0, rule.indexOf('$'));
 
-                    //TODO: construct in separate module
-                    let options = [];
-                    for (let m in modifiers) {
-                        if (modifiers[m] && modifiers[m].length > 0 ) {
-                            options.push(`${m}=${modifiers[m].join('|')}`);
-                        } else {
-                            options.push(m);
-                        }
-                    }
-
-                    corrected = `${url}$${options.join(',')}`;
+                    corrected = rule.buildNewModifiers(modifiers);
                 }
             }
 
@@ -131,40 +120,37 @@ module.exports = (function () {
      */
     let validate = function (list) {
         return list.filter((s) => {
-            if (s.startsWith('!')) {
-                return true;
-            }
+            let rule = ruleParser.parseRule(s);
 
-            if (ruleUtils.isElementHidingRule(s)) {
+            if (rule.ruleType === RuleTypes.Comment) {
+                return true;
+            } else if (rule.ruleType === RuleTypes.ElementHiding) {
                 if (s.startsWith('||')) {
                     logger.error(`|| are unnecessary for element hiding rule: ${s}`);
                     return false;
                 }
 
-                if (!validateCssSelector(ruleUtils.parseCssSelector(s))) {
+                if (!validateCssSelector(rule.cssSelector)) {
                     logger.error(`Invalid selector: ${s}`);
                     return false;
                 }
-
-                return true;
-            } else {
-                // TODO: Fix for content-rules
-                // example.org$$script[data-src="banner"]
+            } else if (rule.ruleType === RuleTypes.UrlBlocking) {
+                // TODO: There is no way to separate content rules from incorrect $$ options separator
                 if (s.includes('$$')) {
                     logger.error(`Invalid rule: ${s} - two option separators.`);
                     return false;
                 }
 
-                let modifiers = ruleUtils.parseUrlRuleModifiers(s);
+                let modifiers = rule.modifiers;
                 for (let name in modifiers) {
                     if (!validateOptionName(name)) {
                         logger.error(`Invalid rule options: ${s}`);
                         return false;
                     }
                 }
-
-                return true;
             }
+
+            return true;
         });
     };
 

@@ -1,24 +1,20 @@
+/* globals require */
+
 module.exports = (() => {
 
     'use strict';
 
+    const Rule = require('./rule.js');
+    const RuleTypes = require('./rule-types.js');
+
     const MASK_REGEX_RULE = "/";
     const MASK_WHITE_LIST = "@@";
+    const MASK_ELEMENT_HIDING = "##";
+    const MASK_CONTENT = "$$";
+    const MASK_COMMENT = "!";
     const REPLACE_OPTION = "replace";
     const OPTIONS_DELIMITER = "$";
     const ESCAPE_CHARACTER = '\\';
-
-    //TODO: move to rule parser
-
-    /**
-     * Checks if line is element hiding rule
-     * TODO: Change to rule types enum
-     *
-     * @param line
-     */
-    let isElementHidingRule = function (line) {
-        return line.indexOf('##') >= 0;
-    };
 
     /**
      * Parses rule css selector
@@ -26,12 +22,8 @@ module.exports = (() => {
      * @param line
      * @returns {string}
      */
-    let parseCssSelector = function (line) {
-        if (line.indexOf('##') >= 0) {
-            return line.substring(line.indexOf('##') + 2);
-        }
-
-        return '';
+    const parseCssSelector = function (line) {
+        return line.substring(line.indexOf(MASK_ELEMENT_HIDING) + 2);
     };
 
     /**
@@ -40,7 +32,7 @@ module.exports = (() => {
      * @param line
      * @returns {{}}
      */
-    let parseUrlRuleModifiers = function (line) {
+    const parseUrlRuleModifiers = function (line) {
 
         // Regexp rule may contain dollar sign which also is options delimiter
         if (line.startsWith(MASK_REGEX_RULE) && line.endsWith(MASK_REGEX_RULE) &&
@@ -86,9 +78,9 @@ module.exports = (() => {
 
         let options = optionsPart.split(',');
 
-        let result = {};
+        const result = {};
         options.forEach((m) => {
-            let separatorIndex = m.indexOf('=');
+            const separatorIndex = m.indexOf('=');
             let name = m;
             let values = '';
 
@@ -109,9 +101,61 @@ module.exports = (() => {
         return result;
     };
 
+    /**
+     * Checks if rule is url blocking rule
+     * TODO: Find out better way to detect url-blocking rules
+     *
+     * @param ruleText
+     */
+    const isUrlBlockingRule = function (ruleText) {
+        return !ruleText.includes('#%#') &&
+            !ruleText.includes('#$#') &&
+            !ruleText.includes('#@%#') &&
+            !ruleText.includes(MASK_CONTENT) &&
+            !ruleText.startsWith(MASK_COMMENT);
+    };
+
+    /**
+     * Parses rule type from string
+     *
+     * @param ruleText
+     */
+    const parseRuleType = function (ruleText) {
+        if (ruleText.startsWith(MASK_COMMENT)) {
+            return RuleTypes.Comment;
+        } else if (ruleText.indexOf(MASK_ELEMENT_HIDING) >= 0) {
+            return RuleTypes.ElementHiding;
+        } else if (ruleText.includes(MASK_CONTENT)) {
+            return RuleTypes.Content;
+        } else if (isUrlBlockingRule(ruleText)) {
+            return RuleTypes.UrlBlocking;
+        } else {
+            return RuleTypes.Other;
+        }
+    };
+
+    /**
+     * Parses rule object from string
+     *
+     * @param ruleText
+     * @returns {Rule}
+     */
+    const parseRule = function (ruleText) {
+        const ruleType = parseRuleType(ruleText);
+        const rule = new Rule(ruleText, ruleType);
+
+        if (ruleType === RuleTypes.ElementHiding) {
+            rule.cssSelector = parseCssSelector(ruleText);
+            rule.cssDomains = ruleText.substring(0, ruleText.indexOf('#')).split(',');
+        } else if (ruleType === RuleTypes.UrlBlocking) {
+            rule.modifiers = parseUrlRuleModifiers(ruleText);
+            rule.url = ruleText.substring(0, ruleText.indexOf('$'));
+        }
+
+        return rule;
+    };
+
     return {
-        parseUrlRuleModifiers: parseUrlRuleModifiers,
-        isElementHidingRule: isElementHidingRule,
-        parseCssSelector: parseCssSelector
+        parseRule: parseRule
     };
 })();
