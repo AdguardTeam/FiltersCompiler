@@ -8,7 +8,7 @@ module.exports = (() => {
      * @param list
      * @returns {*}
      */
-    let removeDuplicates = function (list) {
+    const removeDuplicates = function (list) {
         return list.filter((item, pos) => {
             return item.startsWith('!') ||
                 list.indexOf(item) === pos;

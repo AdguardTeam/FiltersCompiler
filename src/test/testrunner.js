@@ -10,7 +10,7 @@
 (() => {
     "use strict";
 
-    let testRunner = require("qunit");
+    const testRunner = require("qunit");
 
     testRunner.run({
         code: "./src/main/utils/version.js",

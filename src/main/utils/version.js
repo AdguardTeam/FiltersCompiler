@@ -8,11 +8,11 @@ module.exports = (() => {
      * @param v version string
      * @returns {Array}
      */
-    let parse = function (v) {
+    const parse = function (v) {
         let version = [];
-        let parts = String(v || "").split(".");
+        const parts = String(v || "").split(".");
 
-        let parseVersionPart = (part) => {
+        const parseVersionPart = (part) => {
             if (isNaN(part)) {
                 return 0;
             }
@@ -32,8 +32,8 @@ module.exports = (() => {
      * @param v version string
      * @returns {string}
      */
-    let increment = function (v) {
-        let version = parse(v);
+    const increment = function (v) {
+        const version = parse(v);
 
         if (version.length > 0) {
             version[version.length - 1] = version[version.length - 1] + 1;

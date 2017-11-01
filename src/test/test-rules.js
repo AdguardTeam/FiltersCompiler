@@ -3,8 +3,8 @@
 QUnit.test("Test url rules changing modifiers", (assert) => {
     'use strict';
 
-    let RuleTypes = require('../main/rule/rule-types.js');
-    let ruleParser = require('../main/rule/rule-parser.js');
+    const RuleTypes = require('../main/rule/rule-types.js');
+    const ruleParser = require('../main/rule/rule-parser.js');
 
     let line = '||example.com^$domain=domain-one.org|domain-two.org';
     let rule = ruleParser.parseRule(line);
@@ -26,7 +26,7 @@ QUnit.test("Test url rules changing modifiers", (assert) => {
 QUnit.test("Test rules builds", (assert) => {
     'use strict';
 
-    let Rule = require('../main/rule/rule.js');
+    const Rule = require('../main/rule/rule.js');
 
     let ruleText = Rule.buildNewCssRuleText('selector', ['one.com', 'two.com']);
     assert.ok(ruleText);

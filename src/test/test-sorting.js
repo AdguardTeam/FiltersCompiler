@@ -3,7 +3,7 @@
 QUnit.test("Test sorting script", (assert) => {
     'use strict';
 
-    let sorter = require('../main/sorting.js');
+    const sorter = require('../main/sorting.js');
 
     const before = `
 !
@@ -121,15 +121,15 @@ seedoff.cc##div[id*="Composite"]
 QUnit.test("Test sorting script - elemhide rules", (assert) => {
     'use strict';
 
-    let before = `
+    const before = `
 bgoperator.ru##.l-index__side_a > canvas[width="188"][height="312"]
 chatovod.ru##.chatlist > tbody > tr[class="bold"]:not([class^="chatitem"])
 myfin1.by,myfin2.by##.menu_level_1 > li.left_bt
 myfin3.by,myfin2.by##.menu_level_1 > li.left_bt`;
 
-    let sorter = require('../main/sorting.js');
+    const sorter = require('../main/sorting.js');
 
-    let after = sorter.sort(before.split('\n'));
+    const after = sorter.sort(before.split('\n'));
     assert.ok(after);
     assert.equal(after.length, 3);
     assert.equal(after[0], 'chatovod.ru##.chatlist > tbody > tr[class="bold"]:not([class^="chatitem"])');
@@ -140,7 +140,7 @@ myfin3.by,myfin2.by##.menu_level_1 > li.left_bt`;
 QUnit.test("Test sorting script - url blocking rules", (assert) => {
     'use strict';
 
-    let before = `
+    const before = `
 ||graph.facebook.com^$domain=jp.gocro.smartnews.android|onemore.ru
 ||graph.facebook.com^$domain=com.zynga.crosswordswithfriends
 ||graph.facebook.com^$domain=com.urbandroid.sleep
@@ -150,9 +150,9 @@ QUnit.test("Test sorting script - url blocking rules", (assert) => {
 r.mradx.net/img/20/9D02B4.ogg
 ||r.mradx.net/img/D2/C79060.mp4`;
 
-    let sorter = require('../main/sorting.js');
+    const sorter = require('../main/sorting.js');
 
-    let after = sorter.sort(before.split('\n'));
+    const after = sorter.sort(before.split('\n'));
 
     assert.ok(after);
     assert.equal(after.length, 6);
@@ -167,15 +167,15 @@ r.mradx.net/img/20/9D02B4.ogg
 QUnit.test("Test sorting script - comments", (assert) => {
     'use strict';
 
-    let before = `! razlozhi.ru|yandex.by|yandex.com.tr|yandex.kz|yandex.ru|yandex.ua|syl.ru
+    const before = `! razlozhi.ru|yandex.by|yandex.com.tr|yandex.kz|yandex.ru|yandex.ua|syl.ru
 /:\/\/(otzovik.com)\/[a-zA-Z0-9-_]*=\//$script,domain=otzovik.com
 /:\/\/(otzovik.com)\/[a-zA-Z0-9-_]*==\//$script,domain=otzovik.com
 !
 ! comment`;
 
-    let sorter = require('../main/sorting.js');
+    const sorter = require('../main/sorting.js');
 
-    let after = sorter.sort(before.split('\n'));
+    const after = sorter.sort(before.split('\n'));
 
     assert.ok(after);
     assert.equal(after.length, 5);

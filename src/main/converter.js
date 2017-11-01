@@ -4,7 +4,7 @@ module.exports = (() => {
 
     'use strict';
 
-    let logger = require("./utils/log.js");
+    const logger = require("./utils/log.js");
 
     const CSS_RULE_MARK = "##";
     const CSS_RULE_NEW_MARK = "#$#";
@@ -19,14 +19,14 @@ module.exports = (() => {
      * @param parts
      * @param ruleMark
      */
-    let executeConversion = function (rule, parts, ruleMark) {
+    const executeConversion = function (rule, parts, ruleMark) {
         let result = rule;
-        let domain = parts[0];
+        const domain = parts[0];
 
         if (domain) {
             let rulePart = parts[1];
             if (rulePart.match(CSS_RULE_REPLACE_PATTERN)) {
-                let groups = CSS_RULE_REPLACE_PATTERN.exec(rulePart);
+                const groups = CSS_RULE_REPLACE_PATTERN.exec(rulePart);
                 if (groups.length !== 3) {
                     logger.warn(`Cannot convert ${rule}`);
                 } else {
@@ -54,8 +54,8 @@ module.exports = (() => {
      *
      * @param rulesList Array of rules
      */
-    let convert = function (rulesList) {
-        let result = [];
+    const convert = function (rulesList) {
+        const result = [];
 
         for (let rule of rulesList) {
             if (rule.includes(':style')) {

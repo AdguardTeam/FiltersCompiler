@@ -4,11 +4,11 @@ module.exports = (() => {
 
     'use strict';
 
-    let logger = require("./utils/log.js");
-    let utils = require("./utils/utils.js");
-    let ruleParser = require("./rule/rule-parser.js");
-    let Rule = require("./rule/rule.js");
-    let RuleTypes = require("./rule/rule-types.js");
+    const logger = require("./utils/log.js");
+    const utils = require("./utils/utils.js");
+    const ruleParser = require("./rule/rule-parser.js");
+    const Rule = require("./rule/rule.js");
+    const RuleTypes = require("./rule/rule-types.js");
 
     const COMMENT_SEPARATOR = '!';
     const HINT_SEPARATOR = '!+';
@@ -21,19 +21,19 @@ module.exports = (() => {
      *
      * @param rules
      */
-    let sortElementHidingRules = function (rules) {
-        let map = new Map();
+    const sortElementHidingRules = function (rules) {
+        const map = new Map();
         for (let rule of rules) {
-            let selector = rule.cssSelector;
-            let domains = map.get(selector) || [];
+            const selector = rule.cssSelector;
+            const domains = map.get(selector) || [];
 
             map.set(selector, domains.concat(rule.cssDomains));
         }
 
-        let sortedSelectors = Array.from(map.keys());
+        const sortedSelectors = Array.from(map.keys());
         sortedSelectors.sort();
 
-        let result = [];
+        const result = [];
         for (let selector of sortedSelectors) {
             result.push(Rule.buildNewCssRuleText(selector, utils.removeDuplicates(map.get(selector))));
         }
@@ -69,16 +69,16 @@ module.exports = (() => {
      */
     let sortUrlBlockingRules = function (rules) {
 
-        let rest = [];
-        let map = new Map();
+        const rest = [];
+        const map = new Map();
 
         rules.forEach((rule) => {
-            let modifiers = rule.modifiers;
-            let names = Object.getOwnPropertyNames(modifiers);
+            const modifiers = rule.modifiers;
+            const names = Object.getOwnPropertyNames(modifiers);
             if (names.length === 1 && modifiers.domain) {
-                let url = rule.url;
+                const url = rule.url;
 
-                let domains = map.get(url) || [];
+                const domains = map.get(url) || [];
                 map.set(url, domains.concat(modifiers.domain));
             } else {
                 rest.push(rule.ruleText);
@@ -87,7 +87,7 @@ module.exports = (() => {
 
         let result = [];
         for (let url of map.keys()) {
-            let domains = utils.removeDuplicates(map.get(url));
+            const domains = utils.removeDuplicates(map.get(url));
             domains.sort();
 
             result.push(Rule.buildNewUrlBlockingRuleText(url, domains));
@@ -104,15 +104,15 @@ module.exports = (() => {
      *
      * @param list
      */
-    let sortBlock = function (list) {
+    const sortBlock = function (list) {
         logger.log(`Sorting a block of ${list.length} rules..`);
 
-        let elementHidingRules = [];
-        let urlBlockingRules = [];
-        let comments = [];
-        let immutables = [];
-        let contentRules = [];
-        let otherRules = [];
+        const elementHidingRules = [];
+        const urlBlockingRules = [];
+        const comments = [];
+        const immutables = [];
+        const contentRules = [];
+        const otherRules = [];
 
         for (let line of list) {
             if (!line) {
@@ -167,12 +167,12 @@ module.exports = (() => {
      * @param list
      * @returns {*}
      */
-    let sort = function (list) {
+    const sort = function (list) {
 
         logger.log(`Sorting ${list.length} rules`);
 
         // Split to blocks with '! ' and '!+'
-        let blocks = [];
+        const blocks = [];
         let block = [];
         blocks.push(block);
 

@@ -3,8 +3,8 @@
 QUnit.test("Test rule parser - ruleTypes", (assert) => {
     'use strict';
 
-    let RuleTypes = require('../main/rule/rule-types.js');
-    let ruleParser = require('../main/rule/rule-parser.js');
+    const RuleTypes = require('../main/rule/rule-types.js');
+    const ruleParser = require('../main/rule/rule-parser.js');
 
     let line = '! comment';
     let rule = ruleParser.parseRule(line);
@@ -40,8 +40,8 @@ QUnit.test("Test rule parser - ruleTypes", (assert) => {
 QUnit.test("Test rule parser - element hiding rules", (assert) => {
     'use strict';
 
-    let RuleTypes = require('../main/rule/rule-types.js');
-    let ruleParser = require('../main/rule/rule-parser.js');
+    const RuleTypes = require('../main/rule/rule-types.js');
+    const ruleParser = require('../main/rule/rule-parser.js');
 
     let line = 'example.com##div[align="center"] > a > img';
     let rule = ruleParser.parseRule(line);
@@ -56,8 +56,8 @@ QUnit.test("Test rule parser - element hiding rules", (assert) => {
 QUnit.test("Test rule parser - url blocking rules", (assert) => {
     'use strict';
 
-    let RuleTypes = require('../main/rule/rule-types.js');
-    let ruleParser = require('../main/rule/rule-parser.js');
+    const RuleTypes = require('../main/rule/rule-types.js');
+    const ruleParser = require('../main/rule/rule-parser.js');
 
     let line = 'test-common-rule.com$xmlhttprequest';
     let rule = ruleParser.parseRule(line);

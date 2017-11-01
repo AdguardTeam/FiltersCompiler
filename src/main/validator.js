@@ -8,12 +8,12 @@ module.exports = (function () {
      * @typedef {Object} fs
      * @property {function} readFileSync
      */
-    let fs = require('fs');
-    let CssSelectorParser = require('css-selector-parser').CssSelectorParser;
+    const fs = require('fs');
+    const CssSelectorParser = require('css-selector-parser').CssSelectorParser;
 
-    let logger = require("./utils/log.js");
-    let ruleParser = require("./rule/rule-parser.js");
-    let RuleTypes = require("./rule/rule-types.js");
+    const logger = require("./utils/log.js");
+    const ruleParser = require("./rule/rule-parser.js");
+    const RuleTypes = require("./rule/rule-types.js");
 
     //TODO: Add more options
     const VALID_OPTIONS = ['domain', '~domain','important', '~important', 'empty', '~empty',
@@ -74,16 +74,16 @@ module.exports = (function () {
      * returns modified list of rules without blacklisted domain options
      */
     let blacklistDomains = function (list) {
-        let result = [];
+        const result = [];
 
         list.forEach((line) => {
             let corrected = line;
-            let rule = ruleParser.parseRule(line);
+            const rule = ruleParser.parseRule(line);
 
             if (rule.ruleType === RuleTypes.UrlBlocking) {
                 let modifiers = rule.modifiers;
                 if (modifiers.domain) {
-                    let validated = validateDomains(modifiers.domain);
+                    const validated = validateDomains(modifiers.domain);
                     if (validated.length === 0) {
                         logger.error(`All domains are blacklisted for rule: ${line}`);
                         return;
@@ -120,7 +120,7 @@ module.exports = (function () {
      */
     let validate = function (list) {
         return list.filter((s) => {
-            let rule = ruleParser.parseRule(s);
+            const rule = ruleParser.parseRule(s);
 
             if (rule.ruleType === RuleTypes.Comment) {
                 return true;
