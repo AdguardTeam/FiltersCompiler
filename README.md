@@ -16,7 +16,8 @@ The package could be run with the following command:
  
  var filtersDir = path.join(__dirname, './filters');
  var logPath = path.join(__dirname, './log.txt');
- compiler.compile(filtersDir, logPath);
+ var domainBlacklistFile = path.join(__dirname, './domainBlacklistFile.txt');
+ compiler.compile(filtersDir, logPath, domainBlacklistFile);
 ```
 
 ## Tests
