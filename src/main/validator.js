@@ -21,7 +21,10 @@ module.exports = (function () {
         'third-party', '~third-party',
         'popup', '~popup',
         'match-case', '~match-case',
+        // Special behaviour modifiers
         'csp',
+        'webrtc',
+        'websocket',
         // Content type modifiers
         'image', '~image',
         'stylesheet', '~stylesheet',
