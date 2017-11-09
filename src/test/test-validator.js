@@ -35,7 +35,6 @@ QUnit.test("Test incorrect rules", function (assert) {
     validator.init();
 
     const rules = ['||example.com##.div',
-        'test$$domain=yandex.ru',
         'test$domain=yandex.ru,google.com'];
     assert.ok(validator.validate(rules).length === 0);
 });
@@ -46,7 +45,11 @@ QUnit.test("Test blacklist domains", (assert) => {
     const before = `
 ||graph.com^$domain=google.com
 ||graph.facebook.com^$domain=jp.gocro.smartnews.android|onemore.ru|google.com|plus.one
-||image.winudf.com/*/upload/promopure/$~third-party,empty,domain=apkpure.com|yahoo.com`;
+||image.winudf.com/*/upload/promopure/$~third-party,empty,domain=apkpure.com|yahoo.com
+example.com##.div
+google.com###id
+google.com,one.com##a[href^=/], .container:has(nav) > a[href]:lt($var)
+`;
 
     const path = require('path');
     const domainsBlacklist = path.join(__dirname, './resources/domains-blacklist.txt');
@@ -57,11 +60,13 @@ QUnit.test("Test blacklist domains", (assert) => {
     const after = validator.blacklistDomains(before.trim().split('\n'));
 
     assert.ok(after);
-    assert.equal(after.length, 2);
+    assert.equal(after.length, 4);
 
     const correct = `
 ||graph.facebook.com^$domain=jp.gocro.smartnews.android|onemore.ru|plus.one
-||image.winudf.com/*/upload/promopure/$~third-party,empty,domain=apkpure.com`;
+||image.winudf.com/*/upload/promopure/$~third-party,empty,domain=apkpure.com
+example.com##.div
+one.com##a[href^=/], .container:has(nav) > a[href]:lt($var)`;
 
     assert.equal(after.join('\n').trim(), correct.trim());
 });

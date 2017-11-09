@@ -46,10 +46,6 @@ module.exports = (() => {
             return {};
         }
 
-        if (line.indexOf('#$#') >= 0) {
-            return {};
-        }
-
         let startIndex = 0;
         if (line.startsWith(MASK_WHITE_LIST)) {
             startIndex = MASK_WHITE_LIST.length;
@@ -108,7 +104,8 @@ module.exports = (() => {
     };
 
     /**
-     * Checks if rule is url blocking rule
+     * Checks if rule is url blocking rule,
+     * however there is no possibility to pick the url-blocking rules, we choose it as the rest of other known rules.
      *
      * @param ruleText
      */
@@ -158,6 +155,8 @@ module.exports = (() => {
             rule.modifiers = parseUrlRuleModifiers(ruleText);
             rule.url = ruleText.substring(0, ruleText.indexOf('$'));
         }
+
+        //TODO: Parse domains for js rules and content rules
 
         return rule;
     };

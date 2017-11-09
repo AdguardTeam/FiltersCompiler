@@ -4,6 +4,7 @@ module.exports = (() => {
 
     /**
      * Rule types enum
+     * TODO: Add JS-rules
      */
     return {
         Other: 0,

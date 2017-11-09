@@ -14,6 +14,7 @@ module.exports = (function () {
     const logger = require("./utils/log.js");
     const ruleParser = require("./rule/rule-parser.js");
     const RuleTypes = require("./rule/rule-types.js");
+    const Rule = require("./rule/rule.js");
 
     const VALID_OPTIONS = [
         // Basic modifiers
@@ -91,7 +92,7 @@ module.exports = (function () {
         }
     };
 
-    let validateDomains = function (domains) {
+    let removeBlacklistedDomains = function (domains) {
         return domains.filter((d) => {
             if (domainsBlacklist.indexOf(d) >= 0) {
                 logger.error(`Blacklisted domain: ${d}`);
@@ -116,7 +117,7 @@ module.exports = (function () {
             if (rule.ruleType === RuleTypes.UrlBlocking) {
                 let modifiers = rule.modifiers;
                 if (modifiers.domain) {
-                    const validated = validateDomains(modifiers.domain);
+                    const validated = removeBlacklistedDomains(modifiers.domain);
                     if (validated.length === 0) {
                         logger.error(`All domains are blacklisted for rule: ${line}`);
                         return;
@@ -125,6 +126,16 @@ module.exports = (function () {
                     modifiers.domain = validated;
 
                     corrected = rule.buildNewModifiers(modifiers);
+                }
+            } else if (rule.ruleType === RuleTypes.ElementHiding) {
+                if (rule.cssDomains) {
+                    const validated = removeBlacklistedDomains(rule.cssDomains);
+                    if (validated.length === 0) {
+                        logger.error(`All domains are blacklisted for rule: ${line}`);
+                        return;
+                    }
+
+                    corrected = Rule.buildNewCssRuleText(rule.cssSelector, validated);
                 }
             }
 
@@ -169,10 +180,10 @@ module.exports = (function () {
                 }
             } else if (rule.ruleType === RuleTypes.UrlBlocking) {
                 // TODO: There is no way to separate content rules from incorrect $$ options separator
-                if (s.includes('$$')) {
-                    logger.error(`Invalid rule: ${s} - two option separators.`);
-                    return false;
-                }
+                // if (s.includes('$$')) {
+                //     logger.error(`Invalid rule: ${s} - two option separators.`);
+                //     return false;
+                // }
 
                 let modifiers = rule.modifiers;
                 for (let name in modifiers) {
@@ -182,6 +193,9 @@ module.exports = (function () {
                     }
                 }
             }
+
+            //TODO: Validate content-rules attributes
+            //TODO: Validate ext-CSS rules
 
             return true;
         });
