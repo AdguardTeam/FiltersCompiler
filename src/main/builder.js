@@ -302,8 +302,6 @@ module.exports = (function () {
     const makeHeader = function (metadataFile, revision) {
         logger.log('Adding header..');
 
-        //TODO: Add checksum
-
         const metadataString = readFile(metadataFile);
         if (!metadataString) {
             throw new Error('Error reading metadata');
@@ -311,14 +309,12 @@ module.exports = (function () {
 
         const metadata = JSON.parse(metadataString);
 
-        //TODO: Parse expires
-
         return [
             `! Title: ${metadata.name}`,
             `! Description: ${metadata.description}`,
             `! Version: ${revision.version}`,
             `! TimeUpdated: ${new Date(revision.timeUpdated).toDateString()}`,
-            `! Expires: 2 days (update frequency)`
+            `! Expires: ${metadata.expires} (update frequency)`
         ];
     };
 

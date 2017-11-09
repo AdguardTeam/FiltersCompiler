@@ -34,8 +34,6 @@ QUnit.test("Test builder", (assert) => {
     const filterLines = filterText.split('\r\n');
     assert.equal(filterLines.length, 23);
 
-    //TODO: Check header
-
     //Common include
     assert.ok(filterLines.indexOf('! some common rules could be places here') >= 0);
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
