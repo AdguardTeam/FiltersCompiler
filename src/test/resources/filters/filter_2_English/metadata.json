@@ -4,7 +4,7 @@
   "description": "English Filter description",
   "timeAdded": 1404115015843,
   "homepage": "https://easylist.adblockplus.org/",
-  "expires": 21600,
+  "expires": "2 days",
   "displayNumber": 101,
   "groupId": 2,
   "subscriptionUrl": "https://easylist-downloads.adblockplus.org/easylist.txt",

@@ -13,17 +13,20 @@ module.exports = (function () {
      * @property {function} isDirectory
      * @property {function} appendFile
      */
-    let fs = require('fs');
+    const fs = require('fs');
     /**
      * @typedef {Object} path
      * @property {function} join
      */
-    let path = require('path');
-    let downloadFileSync = require('download-file-sync');
+    const path = require('path');
+    const downloadFileSync = require('download-file-sync');
 
-    let version = require("./utils/version.js");
-    let converter = require("./converter.js");
-    let logger = require("./utils/log.js");
+    const version = require("./utils/version.js");
+    const converter = require("./converter.js");
+    const validator = require("./validator.js");
+    const sorter = require("./sorting.js");
+    const logger = require("./utils/log.js");
+    const utils = require("./utils/utils.js");
 
     const TEMPLATE_FILE = 'template.txt';
     const FILTER_FILE = 'filter.txt';
@@ -39,7 +42,7 @@ module.exports = (function () {
      * @param path
      * @returns {*}
      */
-    let readFile = function (path) {
+    const readFile = function (path) {
         try {
             return fs.readFileSync(path, {encoding: 'utf-8'});
         } catch (e) {
@@ -53,7 +56,7 @@ module.exports = (function () {
      * @param path
      * @param data
      */
-    let writeFile = function (path, data) {
+    const writeFile = function (path, data) {
         fs.writeFileSync(path, data, 'utf8');
     };
 
@@ -62,7 +65,7 @@ module.exports = (function () {
      *
      * @param url
      */
-    let downloadFile = function (url) {
+    const downloadFile = function (url) {
         logger.log(`Downloading: ${url}`);
 
         return downloadFileSync(url);
@@ -73,7 +76,7 @@ module.exports = (function () {
      *
      * @param string
      */
-    let splitLines = function (string) {
+    const splitLines = function (string) {
         return string.split(/[\r\n]+/);
     };
 
@@ -82,7 +85,7 @@ module.exports = (function () {
      *
      * @param lines
      */
-    let stripComments = function (lines) {
+    const stripComments = function (lines) {
         logger.log('Stripping comments..');
 
         return lines.filter((line) => !line.startsWith('!'));
@@ -95,7 +98,7 @@ module.exports = (function () {
      * @param exclusions
      * @returns {boolean}
      */
-    let isExcluded = function (line, exclusions) {
+    const isExcluded = function (line, exclusions) {
         for (let exclusion of exclusions) {
             exclusion = exclusion.trim();
 
@@ -122,11 +125,11 @@ module.exports = (function () {
      * @param exclusionsFileName
      * @returns {*}
      */
-    let exclude = function (lines, exclusionsFileName) {
+    const exclude = function (lines, exclusionsFileName) {
 
         logger.log('Applying exclusions..');
 
-        let exclusionsFile = path.join(currentDir, exclusionsFileName);
+        const exclusionsFile = path.join(currentDir, exclusionsFileName);
         let exclusions = readFile(exclusionsFile);
         if (!exclusions) {
             return lines;
@@ -134,7 +137,7 @@ module.exports = (function () {
 
         exclusions = splitLines(exclusions);
 
-        let result = lines.filter((line) => !isExcluded(line, exclusions));
+        const result = lines.filter((line) => !isExcluded(line, exclusions));
 
         logger.log(`Excluded lines: ${lines.length - result.length}`);
 
@@ -147,7 +150,7 @@ module.exports = (function () {
      * @param s
      * @returns {*}
      */
-    let stripEndQuotes = function (s) {
+    const stripEndQuotes = function (s) {
         let t = s.length;
         if (s.charAt(0) === '"') {
             s = s.substring(1, t--);
@@ -164,8 +167,8 @@ module.exports = (function () {
      * @param line
      * @returns {{url: string, stripComments: boolean, exclude: *}}
      */
-    let parseIncludeLine = function (line) {
-        let parts = line.split(' ');
+    const parseIncludeLine = function (line) {
+        const parts = line.split(' ');
 
         let url = parts[1].trim();
 
@@ -197,10 +200,10 @@ module.exports = (function () {
      * @param line
      * @returns {Array}
      */
-    let include = function (line) {
+    const include = function (line) {
         let result = [];
 
-        let options = parseIncludeLine(line);
+        const options = parseIncludeLine(line);
 
         if (!options.url) {
             logger.warn('Invalid include url');
@@ -209,7 +212,7 @@ module.exports = (function () {
 
         logger.log(`Applying inclusion from: ${options.url}`);
 
-        let included = options.url.includes(':') ?
+        const included = options.url.includes(':') ?
             downloadFile(options.url) :
             readFile(path.join(currentDir, options.url));
 
@@ -233,33 +236,18 @@ module.exports = (function () {
     };
 
     /**
-     * Removes duplicates
-     *
-     * @param list
-     * @returns {*}
-     */
-    let removeDuplicates = function (list) {
-        logger.log('Removing duplicates..');
-
-        return list.filter((item, pos) => {
-            return item.startsWith('!') ||
-                list.indexOf(item) === pos;
-        });
-    };
-
-    /**
      * Compiles filter lines
      *
      * @param template
      * @returns {Array}
      */
-    let compile = function (template) {
+    const compile = function (template) {
         let result = [];
 
-        let lines = splitLines(template);
+        const lines = splitLines(template);
         for (let line of lines) {
             if (line.startsWith('@include ')) {
-                let inc = include(line.trim());
+                const inc = include(line.trim());
 
                 let k = 0;
                 while (k < inc.length) {
@@ -272,7 +260,11 @@ module.exports = (function () {
         }
 
         result = exclude(result, EXCLUDE_FILE);
-        result = removeDuplicates(result);
+        result = utils.removeDuplicates(result);
+
+        result = validator.validate(result);
+        result = validator.blacklistDomains(result);
+        result = sorter.sort(result);
 
         return result;
     };
@@ -283,13 +275,13 @@ module.exports = (function () {
      * @param path
      * @returns {{version: string, timeUpdated: number}}
      */
-    let makeRevision = function (path) {
-        let result = {
+    const makeRevision = function (path) {
+        const result = {
             "version": "1.0.0.0",
             "timeUpdated": new Date().getTime()
         };
 
-        let current = readFile(path);
+        const current = readFile(path);
         if (current) {
             let p = JSON.parse(current);
             if (p && p.version) {
@@ -307,26 +299,22 @@ module.exports = (function () {
      * @param revision
      * @returns {[*,*,*,*,string]}
      */
-    let makeHeader = function (metadataFile, revision) {
+    const makeHeader = function (metadataFile, revision) {
         logger.log('Adding header..');
 
-        //TODO: Add checksum
-
-        let metadataString = readFile(metadataFile);
+        const metadataString = readFile(metadataFile);
         if (!metadataString) {
             throw new Error('Error reading metadata');
         }
 
-        let metadata = JSON.parse(metadataString);
-
-        //TODO: Parse expires
+        const metadata = JSON.parse(metadataString);
 
         return [
             `! Title: ${metadata.name}`,
             `! Description: ${metadata.description}`,
             `! Version: ${revision.version}`,
             `! TimeUpdated: ${new Date(revision.timeUpdated).toDateString()}`,
-            `! Expires: 2 days (update frequency)`
+            `! Expires: ${metadata.expires} (update frequency)`
         ];
     };
 
@@ -335,25 +323,25 @@ module.exports = (function () {
      *
      * @param filterDir
      */
-    let buildFilter = function (filterDir) {
+    const buildFilter = function (filterDir) {
         currentDir = filterDir;
 
-        let template = readFile(path.join(currentDir, TEMPLATE_FILE));
+        const template = readFile(path.join(currentDir, TEMPLATE_FILE));
         if (!template) {
             throw new Error('Invalid template');
         }
 
-        let revisionFile = path.join(currentDir, REVISION_FILE);
-        let revision = makeRevision(revisionFile);
+        const revisionFile = path.join(currentDir, REVISION_FILE);
+        const revision = makeRevision(revisionFile);
 
         logger.log('Compiling..');
-        let compiled = compile(template);
+        const compiled = compile(template);
         logger.log('Compiled length:' + compiled.length);
 
-        let metadataFile = path.join(currentDir, METADATA_FILE);
-        let header = makeHeader(metadataFile, revision);
+        const metadataFile = path.join(currentDir, METADATA_FILE);
+        const header = makeHeader(metadataFile, revision);
 
-        let filter = header.concat(compiled);
+        const filter = header.concat(compiled);
 
         logger.log('Writing filter file, lines:' + filter.length);
         writeFile(path.join(currentDir, FILTER_FILE), filter.join('\r\n'));
@@ -366,14 +354,16 @@ module.exports = (function () {
      *
      * @param filtersDir
      * @param logFile
+     * @param domainBlacklistFile
      */
-    let build = function (filtersDir, logFile) {
+    const build = function (filtersDir, logFile, domainBlacklistFile) {
         logger.initialize(logFile);
+        validator.init(domainBlacklistFile);
 
-        let items = fs.readdirSync(filtersDir);
+        const items = fs.readdirSync(filtersDir);
 
         for (let directory of items) {
-            let filterDir = path.join(filtersDir, directory);
+            const filterDir = path.join(filtersDir, directory);
             if (fs.lstatSync(filterDir).isDirectory()) {
 
                 logger.log(`Building filter: ${directory}`);

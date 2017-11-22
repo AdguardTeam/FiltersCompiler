@@ -10,20 +10,48 @@
 (() => {
     "use strict";
 
-    let testRunner = require("qunit");
+    const testRunner = require("qunit");
 
     testRunner.run({
         code: "./src/main/utils/version.js",
         tests: "./src/test/test-version.js"
     }, (err, report) => {
-        //Do nothing
+        console.log(err);
+    });
+
+    testRunner.run({
+        code: "./src/main/rule/rule-parser.js",
+        tests: "./src/test/test-rule-parser.js"
+    }, (err, report) => {
+        console.log(err);
+    });
+
+    testRunner.run({
+        code: "./src/main/rule/rule.js",
+        tests: "./src/test/test-rules.js"
+    }, (err, report) => {
+        console.log(err);
     });
 
     testRunner.run({
         code: "./src/main/converter.js",
         tests: "./src/test/test-converter.js"
     }, (err, report) => {
-        //Do nothing
+        console.log(err);
+    });
+
+    testRunner.run({
+        code: "./src/main/validator.js",
+        tests: "./src/test/test-validator.js"
+    }, (err, report) => {
+        console.log(err);
+    });
+
+    testRunner.run({
+        code: "./src/main/sorting.js",
+        tests: "./src/test/test-sorting.js"
+    }, (err, report) => {
+        console.log(err);
     });
 
     testRunner.run({
@@ -31,6 +59,6 @@
         code: "./src/main/builder.js",
         tests: "./src/test/test-builder.js"
     }, (err, report) => {
-        //Do nothing
+        console.log(err);
     });
 })();
