@@ -70,3 +70,60 @@ one.com##a[href^=/], .container:has(nav) > a[href]:lt($var)`;
 
     assert.equal(after.join('\n').trim(), correct.trim());
 });
+
+QUnit.test("Test ext-css validation", function (assert) {
+    'use strict';
+
+    const validator = require("../main/validator.js");
+    validator.init();
+
+    let selector = "#main > table.w3-table-all.notranslate:first-child > tbody > tr:nth-child(17) > td.notranslate:nth-child(2)";
+    let ruleText = "w3schools.com##" + selector;
+    let rules = [ruleText];
+    assert.ok(validator.validate(rules).length > 0);
+
+    selector = "#:root div.ads";
+    ruleText = "w3schools.com##" + selector;
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length > 0);
+
+    selector = "#body div[attr='test']:first-child  div";
+    ruleText = "w3schools.com##" + selector;
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length > 0);
+
+    selector = ".todaystripe::after";
+    ruleText = "w3schools.com##" + selector;
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length > 0);
+
+    selector = ".todaystripe:matches-css(display: block)";
+    ruleText = "w3schools.com##" + selector;
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length > 0);
+
+    selector = ".todaystripe:matches-css-before(display: block)";
+    ruleText = "w3schools.com##" + selector;
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length > 0);
+
+    selector = ".todaystripe:matches-css-after(display: block)";
+    ruleText = "w3schools.com##" + selector;
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length > 0);
+
+    selector = ".todaystripe:has(.banner)";
+    ruleText = "w3schools.com##" + selector;
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length > 0);
+
+    selector = ".todaystripe:contains(test)";
+    ruleText = "w3schools.com##" + selector;
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length > 0);
+
+    //Invalid pseudo class
+    ruleText = "yandex.ru##[-ext-has=test]:matches(.whatisthis)";
+    rules = [ruleText];
+    assert.notOk(validator.validate(rules).length > 0);
+});

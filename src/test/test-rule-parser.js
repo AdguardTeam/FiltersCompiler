@@ -53,6 +53,37 @@ QUnit.test("Test rule parser - element hiding rules", (assert) => {
     assert.equal(rule.cssDomains[0], 'example.com');
 });
 
+QUnit.test("Test rule parser - element hiding rules - extended css", (assert) => {
+    'use strict';
+
+    const RuleTypes = require('../main/rule/rule-types.js');
+    const ruleParser = require('../main/rule/rule-parser.js');
+
+    let line = '~gamespot.com,~mint.com,~slidetoplay.com,~smh.com.au,~zattoo.com##.sponsored[-ext-contains=test]';
+    let rule = ruleParser.parseRule(line);
+    assert.ok(rule);
+    assert.equal(rule.ruleText, line);
+    assert.equal(rule.ruleType, RuleTypes.ElementHiding);
+    assert.equal(rule.cssSelector, '.sponsored[-ext-contains=test]');
+    assert.equal(rule.cssDomains.length, 5);
+
+    line = '~gamespot.com,~mint.com,~slidetoplay.com,~smh.com.au,~zattoo.com##.sponsored[-ext-has=test]';
+    rule = ruleParser.parseRule(line);
+    assert.ok(rule);
+    assert.equal(rule.ruleText, line);
+    assert.equal(rule.ruleType, RuleTypes.ElementHiding);
+    assert.equal(rule.cssSelector, '.sponsored[-ext-has=test]');
+    assert.equal(rule.cssDomains.length, 5);
+
+    line = '~gamespot.com,~mint.com,~slidetoplay.com,~smh.com.au,~zattoo.com##.sponsored:has(test)';
+    rule = ruleParser.parseRule(line);
+    assert.ok(rule);
+    assert.equal(rule.ruleText, line);
+    assert.equal(rule.ruleType, RuleTypes.ElementHiding);
+    assert.equal(rule.cssSelector, '.sponsored:has(test)');
+    assert.equal(rule.cssDomains.length, 5);
+});
+
 QUnit.test("Test rule parser - url blocking rules", (assert) => {
     'use strict';
 
