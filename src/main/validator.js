@@ -77,6 +77,11 @@ module.exports = (function () {
         "[-ext-matches-css-before=", "[-ext-matches-css-after=", ":has(", ":has-text(", ":contains(",
         ":matches-css(", ":matches-css-before(", ":matches-css-after(", ":-abp-has(", ":-abp-contains("];
 
+    const ATTRIBUTE_START_MARK = '[';
+    const ATTRIBUTE_END_MARK = ']';
+    const QUOTES = '"';
+    const TAG_CONTENT_MAX_LENGTH = 'max-length';
+
     let domainsBlacklist = [];
     let cssParser;
 
@@ -178,6 +183,60 @@ module.exports = (function () {
             nameStartIndex: nameStartIndex,
             nameEndIndex: nameEndIndex
         };
+    };
+
+    const getQuoteIndex = function (text, startIndex) {
+
+        let nextChar = '"';
+        let quoteIndex = startIndex - 2;
+
+        while (nextChar === '"') {
+            quoteIndex = text.indexOf(QUOTES, quoteIndex + 2);
+            if (quoteIndex === -1) {
+                return -1;
+            }
+            nextChar = text.length === (quoteIndex + 1) ? '0' : text.charAt(quoteIndex + 1);
+        }
+
+        return quoteIndex;
+    };
+
+    /**
+     * Validates content rule attributes
+     */
+    const validateContentRuleAttributes = function (line) {
+        let ruleStartIndex = line.indexOf(ATTRIBUTE_START_MARK);
+
+        while (ruleStartIndex !== -1) {
+            let equalityIndex = line.indexOf('=', ruleStartIndex + 1);
+            let quoteStartIndex = line.indexOf(QUOTES, equalityIndex + 1);
+            let quoteEndIndex = getQuoteIndex(line, quoteStartIndex + 1);
+            if (quoteStartIndex === -1 || quoteEndIndex === -1) {
+                break;
+            }
+
+            let ruleEndIndex = line.indexOf(ATTRIBUTE_END_MARK, quoteEndIndex + 1);
+
+            const attributeName = line.substring(ruleStartIndex + 1, equalityIndex);
+            let attributeValue = line.substring(quoteStartIndex + 1, quoteEndIndex);
+            attributeValue = attributeValue.replace(/""/g, '"');
+
+            if (attributeName === TAG_CONTENT_MAX_LENGTH) {
+                let maxLength = parseInt(attributeValue);
+                if (maxLength > 32768 || maxLength < 0) {
+                    logger.error(`Invalid tag max length: ${line}`);
+                    return false;
+                }
+            }
+
+            if (ruleEndIndex === -1) {
+                break;
+            }
+
+            ruleStartIndex = line.indexOf(ATTRIBUTE_START_MARK, ruleEndIndex + 1);
+        }
+
+        return true;
     };
 
     /**
@@ -326,9 +385,14 @@ module.exports = (function () {
                         return false;
                     }
                 }
+            } else if (rule.ruleType === RuleTypes.Content) {
+                if (!validateContentRuleAttributes(rule.ruleText)) {
+                    logger.error(`Invalid content rule: ${s}`);
+                    return false;
+                }
             }
 
-            //TODO: Validate content-rules attributes
+            //TODO: Check js rules validation
 
             return true;
         });

@@ -16,6 +16,7 @@ module.exports = (() => {
     const MASK_SCRIPT = "#%#";
     const MASK_SCRIPT_EXCEPTION = "#@%#";
     const MASK_CONTENT = "$$";
+    const MASK_CONTENT_EXCEPTION = "$@$";
     const MASK_COMMENT = "!";
 
     const REPLACE_OPTION = "replace";
@@ -116,6 +117,7 @@ module.exports = (() => {
             !ruleText.includes(MASK_SCRIPT) &&
             !ruleText.includes(MASK_SCRIPT_EXCEPTION) &&
             !ruleText.includes(MASK_CONTENT) &&
+            !ruleText.includes(MASK_CONTENT_EXCEPTION) &&
             !ruleText.startsWith(MASK_COMMENT);
     };
 
@@ -129,7 +131,7 @@ module.exports = (() => {
             return RuleTypes.Comment;
         } else if (ruleText.indexOf(MASK_ELEMENT_HIDING) >= 0) {
             return RuleTypes.ElementHiding;
-        } else if (ruleText.includes(MASK_CONTENT)) {
+        } else if (ruleText.includes(MASK_CONTENT) || ruleText.includes(MASK_CONTENT_EXCEPTION)) {
             return RuleTypes.Content;
         } else if (isUrlBlockingRule(ruleText)) {
             return RuleTypes.UrlBlocking;

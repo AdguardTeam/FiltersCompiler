@@ -127,3 +127,17 @@ QUnit.test("Test ext-css validation", function (assert) {
     rules = [ruleText];
     assert.notOk(validator.validate(rules).length > 0);
 });
+
+QUnit.test("Test content rules validation", function (assert) {
+    'use strict';
+
+    const validator = require("../main/validator.js");
+    validator.init();
+
+    let rules = ['~nigma.ru,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]'];
+    assert.ok(validator.validate(rules).length > 0);
+    rules = ['~nigma.ru,google.com$$div[id=\"ad_text\"][tag-content=\"teas\"\"ernet\"][max-length=\"500\"][min-length=\"50\"][wildcard=\"*.adriver.*\"][parent-search-level=\"15\"][parent-elements=\"td,table\"]'];
+    assert.ok(validator.validate(rules).length > 0);
+    rules = ['~nigma.ru,google.com$$div[id=\"ad_text\"][max-length=\"500000\"][min-length=\"50\"]'];
+    assert.notOk(validator.validate(rules).length > 0);
+});
