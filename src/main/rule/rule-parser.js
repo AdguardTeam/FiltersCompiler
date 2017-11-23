@@ -24,16 +24,6 @@ module.exports = (() => {
     const ESCAPE_CHARACTER = '\\';
 
     /**
-     * Parses rule css selector
-     *
-     * @param line
-     * @returns {string}
-     */
-    const parseCssSelector = function (line) {
-        return line.substring(line.indexOf(MASK_ELEMENT_HIDING) + 2);
-    };
-
-    /**
      * Parses url rule modifiers
      *
      * @param line
@@ -129,14 +119,41 @@ module.exports = (() => {
     const parseRuleType = function (ruleText) {
         if (ruleText.startsWith(MASK_COMMENT)) {
             return RuleTypes.Comment;
-        } else if (ruleText.indexOf(MASK_ELEMENT_HIDING) >= 0) {
+        } else if (ruleText.includes(MASK_ELEMENT_HIDING) || ruleText.includes(MASK_ELEMENT_HIDING_EXCEPTION)) {
             return RuleTypes.ElementHiding;
         } else if (ruleText.includes(MASK_CONTENT) || ruleText.includes(MASK_CONTENT_EXCEPTION)) {
             return RuleTypes.Content;
+        } else if (ruleText.includes(MASK_SCRIPT) || ruleText.includes(MASK_SCRIPT_EXCEPTION)) {
+            return RuleTypes.Script;
         } else if (isUrlBlockingRule(ruleText)) {
             return RuleTypes.UrlBlocking;
         } else {
             return RuleTypes.Other;
+        }
+    };
+
+    /**
+     * Parses rule type mask from string
+     *
+     * @param ruleText
+     */
+    const parseRuleMask = function (ruleText) {
+        if (ruleText.startsWith(MASK_COMMENT)) {
+            return MASK_COMMENT;
+        } else if (ruleText.includes(MASK_ELEMENT_HIDING)) {
+            return MASK_ELEMENT_HIDING;
+        } if (ruleText.includes(MASK_ELEMENT_HIDING_EXCEPTION)) {
+            return MASK_ELEMENT_HIDING_EXCEPTION;
+        } else if (ruleText.includes(MASK_CONTENT)) {
+            return MASK_CONTENT;
+        } if (ruleText.includes(MASK_CONTENT_EXCEPTION)) {
+            return MASK_CONTENT_EXCEPTION;
+        } else if (ruleText.includes(MASK_SCRIPT)) {
+            return MASK_SCRIPT;
+        } if (ruleText.includes(MASK_SCRIPT_EXCEPTION)) {
+            return MASK_SCRIPT_EXCEPTION;
+        } else {
+            return null;
         }
     };
 
@@ -147,18 +164,18 @@ module.exports = (() => {
      * @returns {Rule}
      */
     const parseRule = function (ruleText) {
+        const mask = parseRuleMask(ruleText);
         const ruleType = parseRuleType(ruleText);
         const rule = new Rule(ruleText, ruleType);
 
-        if (ruleType === RuleTypes.ElementHiding) {
-            rule.cssSelector = parseCssSelector(ruleText);
-            rule.cssDomains = ruleText.substring(0, ruleText.indexOf('#')).split(',');
-        } else if (ruleType === RuleTypes.UrlBlocking) {
+        if (ruleType === RuleTypes.UrlBlocking) {
             rule.modifiers = parseUrlRuleModifiers(ruleText);
             rule.url = ruleText.substring(0, ruleText.indexOf('$'));
+        } else if (ruleType === RuleTypes.ElementHiding || ruleType === RuleTypes.Content || ruleType === RuleTypes.Script) {
+            rule.contentPart = ruleText.substring(ruleText.indexOf(mask) + mask.length);
+            rule.domains = ruleText.substring(0, ruleText.indexOf(mask)).split(',');
+            rule.mask = mask;
         }
-
-        //TODO: Parse domains for js rules and content rules
 
         return rule;
     };

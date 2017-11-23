@@ -17,12 +17,21 @@ QUnit.test("Test rule parser - ruleTypes", (assert) => {
     assert.ok(rule);
     assert.equal(rule.ruleText, line);
     assert.equal(rule.ruleType, RuleTypes.ElementHiding);
+    assert.equal(rule.mask, '##');
 
     line = 'example.com$$script[data-src="banner"]';
     rule = ruleParser.parseRule(line);
     assert.ok(rule);
     assert.equal(rule.ruleText, line);
     assert.equal(rule.ruleType, RuleTypes.Content);
+    assert.equal(rule.mask, '$$');
+
+    line = 'example.org#%#window.__gaq = undefined;';
+    rule = ruleParser.parseRule(line);
+    assert.ok(rule);
+    assert.equal(rule.ruleText, line);
+    assert.equal(rule.ruleType, RuleTypes.Script);
+    assert.equal(rule.mask, '#%#');
 
     line = 'test-common-rule.com$xmlhttprequest';
     rule = ruleParser.parseRule(line);
@@ -48,9 +57,9 @@ QUnit.test("Test rule parser - element hiding rules", (assert) => {
     assert.ok(rule);
     assert.equal(rule.ruleText, line);
     assert.equal(rule.ruleType, RuleTypes.ElementHiding);
-    assert.equal(rule.cssSelector, 'div[align="center"] > a > img');
-    assert.equal(rule.cssDomains.length, 1);
-    assert.equal(rule.cssDomains[0], 'example.com');
+    assert.equal(rule.contentPart, 'div[align="center"] > a > img');
+    assert.equal(rule.domains.length, 1);
+    assert.equal(rule.domains[0], 'example.com');
 });
 
 QUnit.test("Test rule parser - element hiding rules - extended css", (assert) => {
@@ -64,24 +73,24 @@ QUnit.test("Test rule parser - element hiding rules - extended css", (assert) =>
     assert.ok(rule);
     assert.equal(rule.ruleText, line);
     assert.equal(rule.ruleType, RuleTypes.ElementHiding);
-    assert.equal(rule.cssSelector, '.sponsored[-ext-contains=test]');
-    assert.equal(rule.cssDomains.length, 5);
+    assert.equal(rule.contentPart, '.sponsored[-ext-contains=test]');
+    assert.equal(rule.domains.length, 5);
 
     line = '~gamespot.com,~mint.com,~slidetoplay.com,~smh.com.au,~zattoo.com##.sponsored[-ext-has=test]';
     rule = ruleParser.parseRule(line);
     assert.ok(rule);
     assert.equal(rule.ruleText, line);
     assert.equal(rule.ruleType, RuleTypes.ElementHiding);
-    assert.equal(rule.cssSelector, '.sponsored[-ext-has=test]');
-    assert.equal(rule.cssDomains.length, 5);
+    assert.equal(rule.contentPart, '.sponsored[-ext-has=test]');
+    assert.equal(rule.domains.length, 5);
 
     line = '~gamespot.com,~mint.com,~slidetoplay.com,~smh.com.au,~zattoo.com##.sponsored:has(test)';
     rule = ruleParser.parseRule(line);
     assert.ok(rule);
     assert.equal(rule.ruleText, line);
     assert.equal(rule.ruleType, RuleTypes.ElementHiding);
-    assert.equal(rule.cssSelector, '.sponsored:has(test)');
-    assert.equal(rule.cssDomains.length, 5);
+    assert.equal(rule.contentPart, '.sponsored:has(test)');
+    assert.equal(rule.domains.length, 5);
 });
 
 QUnit.test("Test rule parser - url blocking rules", (assert) => {
@@ -110,5 +119,35 @@ QUnit.test("Test rule parser - url blocking rules", (assert) => {
     assert.equal(rule.modifiers.domain.length, 2);
     assert.equal(rule.modifiers.domain[0], 'domain-one.org');
     assert.equal(rule.modifiers.domain[1], 'domain-two.org');
+});
+
+QUnit.test("Test rule parser - content rules", (assert) => {
+    'use strict';
+
+    const RuleTypes = require('../main/rule/rule-types.js');
+    const ruleParser = require('../main/rule/rule-parser.js');
+
+    let line = 'example.com$$script[data-src="banner"]';
+    let rule = ruleParser.parseRule(line);
+    assert.ok(rule);
+    assert.equal(rule.ruleText, line);
+    assert.equal(rule.ruleType, RuleTypes.Content);
+    assert.equal(rule.domains.length, 1);
+    assert.equal(rule.domains[0], 'example.com');
+});
+
+QUnit.test("Test rule parser - script rules", (assert) => {
+    'use strict';
+
+    const RuleTypes = require('../main/rule/rule-types.js');
+    const ruleParser = require('../main/rule/rule-parser.js');
+
+    let line = 'example.org#%#window.__gaq = undefined;';
+    let rule = ruleParser.parseRule(line);
+    assert.ok(rule);
+    assert.equal(rule.ruleText, line);
+    assert.equal(rule.ruleType, RuleTypes.Script);
+    assert.equal(rule.domains.length, 1);
+    assert.equal(rule.domains[0], 'example.org');
 });
 

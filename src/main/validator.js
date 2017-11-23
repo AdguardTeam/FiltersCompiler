@@ -306,15 +306,15 @@ module.exports = (function () {
 
                     corrected = rule.buildNewModifiers(modifiers);
                 }
-            } else if (rule.ruleType === RuleTypes.ElementHiding) {
-                if (rule.cssDomains) {
-                    const validated = removeBlacklistedDomains(rule.cssDomains);
+            } else if (rule.ruleType === RuleTypes.ElementHiding || rule.ruleType === RuleTypes.Content || rule.ruleType === RuleTypes.Script) {
+                if (rule.domains) {
+                    const validated = removeBlacklistedDomains(rule.domains);
                     if (validated.length === 0) {
                         logger.error(`All domains are blacklisted for rule: ${line}`);
                         return;
                     }
 
-                    corrected = Rule.buildNewCssRuleText(rule.cssSelector, validated);
+                    corrected = Rule.buildNewLeadingDomainsRuleText(rule.contentPart, validated, rule.mask);
                 }
             }
 
@@ -353,17 +353,17 @@ module.exports = (function () {
                     return false;
                 }
 
-                if (!validateCssSelector(rule.cssSelector)) {
+                if (!validateCssSelector(rule.contentPart)) {
                     logger.error(`Invalid selector: ${s}`);
                     return false;
                 }
 
-                const isExtendedCss = EXTENDED_CSS_MARKERS.some((m) => rule.cssSelector.includes(m));
+                const isExtendedCss = EXTENDED_CSS_MARKERS.some((m) => rule.contentPart.includes(m));
                 if (!isExtendedCss) {
                     return true;
                 }
 
-                const pseudoClass = parsePseudoClass(rule.cssSelector);
+                const pseudoClass = parsePseudoClass(rule.contentPart);
                 if (pseudoClass !== null) {
                     if (SUPPORTED_PSEUDO_CLASSES.indexOf(pseudoClass.name) < 0) {
                         logger.error(`Invalid pseudo class: ${s}`);

@@ -11,6 +11,7 @@ module.exports = (() => {
         Comment: 1,
         UrlBlocking: 2,
         ElementHiding: 3,
-        Content: 4
+        Content: 4,
+        Script: 5
     };
 })();

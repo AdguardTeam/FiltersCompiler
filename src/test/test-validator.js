@@ -39,7 +39,7 @@ QUnit.test("Test incorrect rules", function (assert) {
     assert.ok(validator.validate(rules).length === 0);
 });
 
-QUnit.test("Test blacklist domains", (assert) => {
+QUnit.test("Test blacklist domains - ulr/css rules", (assert) => {
     'use strict';
 
     const before = `
@@ -140,4 +140,36 @@ QUnit.test("Test content rules validation", function (assert) {
     assert.ok(validator.validate(rules).length > 0);
     rules = ['~nigma.ru,google.com$$div[id=\"ad_text\"][max-length=\"500000\"][min-length=\"50\"]'];
     assert.notOk(validator.validate(rules).length > 0);
+});
+
+QUnit.test("Test blacklist domains - content/script rules", (assert) => {
+    'use strict';
+
+    const before = `
+example.com$$script[data-src="banner1"]
+google.com$$script[data-src="banner2"]
+google.com,one.com$$script[data-src="banner3"]
+example.com#%#window.__gaq1 = undefined;
+google.com#%#window.__gaq2 = undefined;
+google.com,one.com#%#window.__gaq3 = undefined;
+`;
+
+    const path = require('path');
+    const domainsBlacklist = path.join(__dirname, './resources/domains-blacklist.txt');
+
+    const validator = require("../main/validator.js");
+    validator.init(domainsBlacklist);
+
+    const after = validator.blacklistDomains(before.trim().split('\n'));
+
+    assert.ok(after);
+    assert.equal(after.length, 4);
+
+    const correct = `
+example.com$$script[data-src="banner1"]
+one.com$$script[data-src="banner3"]
+example.com#%#window.__gaq1 = undefined;
+one.com#%#window.__gaq3 = undefined;`;
+
+    assert.equal(after.join('\n').trim(), correct.trim());
 });
