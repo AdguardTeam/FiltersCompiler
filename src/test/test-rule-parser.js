@@ -43,7 +43,7 @@ QUnit.test("Test rule parser - ruleTypes", (assert) => {
     rule = ruleParser.parseRule(line);
     assert.ok(rule);
     assert.equal(rule.ruleText, line);
-    assert.equal(rule.ruleType, RuleTypes.Other);
+    assert.equal(rule.ruleType, RuleTypes.Css);
 });
 
 QUnit.test("Test rule parser - element hiding rules", (assert) => {

@@ -6,11 +6,29 @@ module.exports = (() => {
      * Rule types enum
      */
     return {
-        Other: 0,
+        /**
+         * Comments
+         */
         Comment: 1,
+        /**
+         * Url blocking rules
+         */
         UrlBlocking: 2,
+        /**
+         * Element hiding rules
+         */
         ElementHiding: 3,
+        /**
+         * Content rules
+         */
         Content: 4,
-        Script: 5
+        /**
+         * Javascript rules
+         */
+        Script: 5,
+        /**
+         * Cosmetic css rules
+         */
+        Css: 5
     };
 })();

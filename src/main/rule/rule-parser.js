@@ -95,40 +95,25 @@ module.exports = (() => {
     };
 
     /**
-     * Checks if rule is url blocking rule,
-     * however there is no possibility to pick the url-blocking rules, we choose it as the rest of other known rules.
-     *
-     * @param ruleText
-     */
-    const isUrlBlockingRule = function (ruleText) {
-        return !ruleText.includes(MASK_ELEMENT_HIDING_EXCEPTION) &&
-            !ruleText.includes(MASK_CSS) &&
-            !ruleText.includes(MASK_CSS_EXCEPTION) &&
-            !ruleText.includes(MASK_SCRIPT) &&
-            !ruleText.includes(MASK_SCRIPT_EXCEPTION) &&
-            !ruleText.includes(MASK_CONTENT) &&
-            !ruleText.includes(MASK_CONTENT_EXCEPTION) &&
-            !ruleText.startsWith(MASK_COMMENT);
-    };
-
-    /**
      * Parses rule type from string
      *
      * @param ruleText
      */
     const parseRuleType = function (ruleText) {
-        if (ruleText.startsWith(MASK_COMMENT)) {
+        if (ruleText.startsWith(MASK_WHITE_LIST)) {
+            return RuleTypes.UrlBlocking;
+        } else if (ruleText.startsWith(MASK_COMMENT)) {
             return RuleTypes.Comment;
+        } else if (ruleText.includes(MASK_CSS) || ruleText.includes(MASK_CSS_EXCEPTION)) {
+            return RuleTypes.Css;
         } else if (ruleText.includes(MASK_ELEMENT_HIDING) || ruleText.includes(MASK_ELEMENT_HIDING_EXCEPTION)) {
             return RuleTypes.ElementHiding;
         } else if (ruleText.includes(MASK_CONTENT) || ruleText.includes(MASK_CONTENT_EXCEPTION)) {
             return RuleTypes.Content;
         } else if (ruleText.includes(MASK_SCRIPT) || ruleText.includes(MASK_SCRIPT_EXCEPTION)) {
             return RuleTypes.Script;
-        } else if (isUrlBlockingRule(ruleText)) {
-            return RuleTypes.UrlBlocking;
         } else {
-            return RuleTypes.Other;
+            return RuleTypes.UrlBlocking;
         }
     };
 
@@ -140,17 +125,21 @@ module.exports = (() => {
     const parseRuleMask = function (ruleText) {
         if (ruleText.startsWith(MASK_COMMENT)) {
             return MASK_COMMENT;
+        } else if (ruleText.includes(MASK_CSS)) {
+            return MASK_CSS;
+        } else if (ruleText.includes(MASK_CSS_EXCEPTION)) {
+            return MASK_CSS_EXCEPTION;
+        } else if (ruleText.includes(MASK_ELEMENT_HIDING_EXCEPTION)) {
+            return MASK_ELEMENT_HIDING_EXCEPTION;
         } else if (ruleText.includes(MASK_ELEMENT_HIDING)) {
             return MASK_ELEMENT_HIDING;
-        } if (ruleText.includes(MASK_ELEMENT_HIDING_EXCEPTION)) {
-            return MASK_ELEMENT_HIDING_EXCEPTION;
         } else if (ruleText.includes(MASK_CONTENT)) {
             return MASK_CONTENT;
         } if (ruleText.includes(MASK_CONTENT_EXCEPTION)) {
             return MASK_CONTENT_EXCEPTION;
         } else if (ruleText.includes(MASK_SCRIPT)) {
             return MASK_SCRIPT;
-        } if (ruleText.includes(MASK_SCRIPT_EXCEPTION)) {
+        } else if (ruleText.includes(MASK_SCRIPT_EXCEPTION)) {
             return MASK_SCRIPT_EXCEPTION;
         } else {
             return null;
@@ -170,6 +159,7 @@ module.exports = (() => {
 
         if (ruleType === RuleTypes.UrlBlocking) {
             rule.modifiers = parseUrlRuleModifiers(ruleText);
+            //TODO: check regexp rules
             rule.url = ruleText.substring(0, ruleText.indexOf('$'));
         } else if (ruleType === RuleTypes.ElementHiding || ruleType === RuleTypes.Content || ruleType === RuleTypes.Script) {
             rule.contentPart = ruleText.substring(ruleText.indexOf(mask) + mask.length);

@@ -81,6 +81,15 @@ module.exports = (function () {
     const ATTRIBUTE_END_MARK = ']';
     const QUOTES = '"';
     const TAG_CONTENT_MAX_LENGTH = 'max-length';
+    const VALID_TAGS_CONTENT = [
+        'id',
+        'tag-content',
+        'max-length',
+        'min-length',
+        'parent-elements',
+        'parent-search-level',
+        'wildcard'
+    ];
 
     let domainsBlacklist = [];
     let cssParser;
@@ -220,6 +229,11 @@ module.exports = (function () {
             const attributeName = line.substring(ruleStartIndex + 1, equalityIndex);
             let attributeValue = line.substring(quoteStartIndex + 1, quoteEndIndex);
             attributeValue = attributeValue.replace(/""/g, '"');
+
+            if (VALID_TAGS_CONTENT.indexOf(attributeName) < 0) {
+                logger.error(`Invalid tag: ${line}`);
+                return false;
+            }
 
             if (attributeName === TAG_CONTENT_MAX_LENGTH) {
                 let maxLength = parseInt(attributeValue);
