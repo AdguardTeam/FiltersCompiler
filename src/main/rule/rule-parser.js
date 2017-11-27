@@ -24,6 +24,16 @@ module.exports = (() => {
     const ESCAPE_CHARACTER = '\\';
 
     /**
+     * Checks if rule is regexp rule
+     *
+     * @param line
+     * @returns {boolean}
+     */
+    const isRegexpRule = function (line) {
+        return line.startsWith(MASK_REGEX_RULE) && line.endsWith(MASK_REGEX_RULE);
+    };
+
+    /**
      * Parses url rule modifiers
      *
      * @param line
@@ -32,7 +42,7 @@ module.exports = (() => {
     const parseUrlRuleModifiers = function (line) {
 
         // Regexp rule may contain dollar sign which also is options delimiter
-        if (line.startsWith(MASK_REGEX_RULE) && line.endsWith(MASK_REGEX_RULE) &&
+        if (isRegexpRule(line) &&
             line.indexOf(REPLACE_OPTION + '=') < 0) {
             return {};
         }
@@ -157,9 +167,8 @@ module.exports = (() => {
         const ruleType = parseRuleType(ruleText);
         const rule = new Rule(ruleText, ruleType);
 
-        if (ruleType === RuleTypes.UrlBlocking) {
+        if (ruleType === RuleTypes.UrlBlocking && !isRegexpRule(ruleText)) {
             rule.modifiers = parseUrlRuleModifiers(ruleText);
-            //TODO: check regexp rules
             rule.url = ruleText.substring(0, ruleText.indexOf('$'));
         } else if (ruleType === RuleTypes.ElementHiding || ruleType === RuleTypes.Content || ruleType === RuleTypes.Script) {
             rule.contentPart = ruleText.substring(ruleText.indexOf(mask) + mask.length);
