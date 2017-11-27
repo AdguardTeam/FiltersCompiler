@@ -29,6 +29,6 @@ module.exports = (() => {
         /**
          * Cosmetic css rules
          */
-        Css: 5
+        Css: 6
     };
 })();
