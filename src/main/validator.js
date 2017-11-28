@@ -77,10 +77,6 @@ module.exports = (function () {
         "[-ext-matches-css-before=", "[-ext-matches-css-after=", ":has(", ":has-text(", ":contains(",
         ":matches-css(", ":matches-css-before(", ":matches-css-after(", ":-abp-has(", ":-abp-contains("];
 
-    const ATTRIBUTE_START_MARK = '[';
-    const ATTRIBUTE_END_MARK = ']';
-    const QUOTES = '"';
-    const TAG_CONTENT_MAX_LENGTH = 'max-length';
     const VALID_TAGS_CONTENT = [
         'id',
         'tag-content',
@@ -90,6 +86,9 @@ module.exports = (function () {
         'parent-search-level',
         'wildcard'
     ];
+
+    const TAG_CONTENT_MAX_LENGTH = 'max-length';
+    const TAG_CONTENT_MAX_VALID_LENGTH = 32768;
 
     let domainsBlacklist = [];
     let cssParser;
@@ -194,63 +193,26 @@ module.exports = (function () {
         };
     };
 
-    const getQuoteIndex = function (text, startIndex) {
-
-        let nextChar = '"';
-        let quoteIndex = startIndex - 2;
-
-        while (nextChar === '"') {
-            quoteIndex = text.indexOf(QUOTES, quoteIndex + 2);
-            if (quoteIndex === -1) {
-                return -1;
-            }
-            nextChar = text.length === (quoteIndex + 1) ? '0' : text.charAt(quoteIndex + 1);
-        }
-
-        return quoteIndex;
-    };
-
     /**
      * Validates content rule attributes
      */
-    const validateContentRuleAttributes = function (line) {
-        let ruleStartIndex = line.indexOf(ATTRIBUTE_START_MARK);
-
-        while (ruleStartIndex !== -1) {
-            let equalityIndex = line.indexOf('=', ruleStartIndex + 1);
-            let quoteStartIndex = line.indexOf(QUOTES, equalityIndex + 1);
-            let quoteEndIndex = getQuoteIndex(line, quoteStartIndex + 1);
-            if (quoteStartIndex === -1 || quoteEndIndex === -1) {
-                break;
-            }
-
-            let ruleEndIndex = line.indexOf(ATTRIBUTE_END_MARK, quoteEndIndex + 1);
-
-            const attributeName = line.substring(ruleStartIndex + 1, equalityIndex);
-            let attributeValue = line.substring(quoteStartIndex + 1, quoteEndIndex);
-            attributeValue = attributeValue.replace(/""/g, '"');
-
-            if (VALID_TAGS_CONTENT.indexOf(attributeName) < 0) {
-                logger.error(`Invalid tag: ${line}`);
+    const validateContentRuleAttributes = function (ruleText, attributes) {
+        return attributes.every((a) => {
+            if (VALID_TAGS_CONTENT.indexOf(a.attributeName) < 0) {
+                logger.error(`Invalid tag: ${ruleText}`);
                 return false;
             }
 
-            if (attributeName === TAG_CONTENT_MAX_LENGTH) {
-                let maxLength = parseInt(attributeValue);
-                if (maxLength > 32768 || maxLength < 0) {
-                    logger.error(`Invalid tag max length: ${line}`);
+            if (a.attributeName === TAG_CONTENT_MAX_LENGTH) {
+                let maxLength = parseInt(a.attributeValue);
+                if (maxLength > TAG_CONTENT_MAX_VALID_LENGTH || maxLength < 0) {
+                    logger.error(`Invalid tag max length: ${ruleText}`);
                     return false;
                 }
             }
 
-            if (ruleEndIndex === -1) {
-                break;
-            }
-
-            ruleStartIndex = line.indexOf(ATTRIBUTE_START_MARK, ruleEndIndex + 1);
-        }
-
-        return true;
+            return true;
+        });
     };
 
     /**
@@ -402,7 +364,7 @@ module.exports = (function () {
                     }
                 }
             } else if (rule.ruleType === RuleTypes.Content) {
-                if (!validateContentRuleAttributes(rule.ruleText)) {
+                if (!validateContentRuleAttributes(rule.ruleText, rule.contentAttributes)) {
                     logger.error(`Invalid content rule: ${s}`);
                     return false;
                 }

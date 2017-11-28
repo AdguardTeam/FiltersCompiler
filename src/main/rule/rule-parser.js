@@ -23,6 +23,10 @@ module.exports = (() => {
     const OPTIONS_DELIMITER = "$";
     const ESCAPE_CHARACTER = '\\';
 
+    const ATTRIBUTE_START_MARK = '[';
+    const ATTRIBUTE_END_MARK = ']';
+    const QUOTES = '"';
+
     /**
      * Parses url rule modifiers
      *
@@ -31,10 +35,14 @@ module.exports = (() => {
      */
     const parseUrlRule = function (line) {
 
+        const result = {
+            urlRuleText: line
+        };
+
         // Regexp rule may contain dollar sign which also is options delimiter
         if (line.startsWith(MASK_REGEX_RULE) && line.endsWith(MASK_REGEX_RULE) &&
             line.indexOf(REPLACE_OPTION + '=') < 0) {
-            return {};
+            return result;
         }
 
         let startIndex = 0;
@@ -42,7 +50,7 @@ module.exports = (() => {
             startIndex = MASK_WHITE_LIST.length;
         }
 
-        let urlRuleText = line.substring(startIndex);
+        result.urlRuleText = line.substring(startIndex);
 
         let optionsPart = null;
         let foundEscaped = false;
@@ -54,7 +62,7 @@ module.exports = (() => {
                 if (i > 0 && line.charAt(i - 1) === ESCAPE_CHARACTER) {
                     foundEscaped = true;
                 } else {
-                    urlRuleText = line.substring(startIndex, i);
+                    result.urlRuleText = line.substring(startIndex, i);
                     optionsPart = line.substring(i + 1);
 
                     if (foundEscaped) {
@@ -69,12 +77,12 @@ module.exports = (() => {
         }
 
         if (!optionsPart) {
-            return {};
+            return result;
         }
 
         let options = optionsPart.split(',');
 
-        const result = {};
+        result.modifiers = {};
         options.forEach((m) => {
             const separatorIndex = m.indexOf('=');
             let name = m;
@@ -85,19 +93,69 @@ module.exports = (() => {
                 values = m.substring(separatorIndex + 1).split('|');
             }
 
-            if (!result[name]) {
-                result[name] = [];
+            if (!result.modifiers[name]) {
+                result.modifiers[name] = [];
             }
 
             if (values) {
-                result[name] = result[name].concat(values);
+                result.modifiers[name] = result.modifiers[name].concat(values);
             }
         });
 
-        return {
-            modifiers: result,
-            urlRuleText: urlRuleText
-        };
+        return result;
+    };
+
+    const getQuoteIndex = function (text, startIndex) {
+
+        let nextChar = '"';
+        let quoteIndex = startIndex - 2;
+
+        while (nextChar === '"') {
+            quoteIndex = text.indexOf(QUOTES, quoteIndex + 2);
+            if (quoteIndex === -1) {
+                return -1;
+            }
+            nextChar = text.length === (quoteIndex + 1) ? '0' : text.charAt(quoteIndex + 1);
+        }
+
+        return quoteIndex;
+    };
+
+    /**
+     * Parses content rule attributes
+     */
+    const parseContentRuleAttributes = function (line) {
+        const result = [];
+
+        let ruleStartIndex = line.indexOf(ATTRIBUTE_START_MARK);
+
+        while (ruleStartIndex !== -1) {
+            let equalityIndex = line.indexOf('=', ruleStartIndex + 1);
+            let quoteStartIndex = line.indexOf(QUOTES, equalityIndex + 1);
+            let quoteEndIndex = getQuoteIndex(line, quoteStartIndex + 1);
+            if (quoteStartIndex === -1 || quoteEndIndex === -1) {
+                break;
+            }
+
+            let ruleEndIndex = line.indexOf(ATTRIBUTE_END_MARK, quoteEndIndex + 1);
+
+            const attributeName = line.substring(ruleStartIndex + 1, equalityIndex);
+            let attributeValue = line.substring(quoteStartIndex + 1, quoteEndIndex);
+            attributeValue = attributeValue.replace(/""/g, '"');
+
+            result.push({
+                attributeName: attributeName,
+                attributeValue: attributeValue
+            });
+
+            if (ruleEndIndex === -1) {
+                break;
+            }
+
+            ruleStartIndex = line.indexOf(ATTRIBUTE_START_MARK, ruleEndIndex + 1);
+        }
+
+        return result;
     };
 
     /**
@@ -166,13 +224,17 @@ module.exports = (() => {
         if (ruleType === RuleTypes.UrlBlocking) {
             const parseResult = parseUrlRule(ruleText);
             rule.modifiers = parseResult.modifiers || [];
-            rule.url = parseResult.urlRuleText || ruleText;
+            rule.url = parseResult.urlRuleText;
         } else if (ruleType === RuleTypes.ElementHiding || ruleType === RuleTypes.Css ||
             ruleType === RuleTypes.Content || ruleType === RuleTypes.Script) {
 
             rule.contentPart = ruleText.substring(ruleText.indexOf(mask) + mask.length);
             rule.domains = ruleText.substring(0, ruleText.indexOf(mask)).split(',');
             rule.mask = mask;
+
+            if (ruleType === RuleTypes.Content) {
+                rule.contentAttributes = parseContentRuleAttributes(ruleText);
+            }
         }
 
         return rule;
