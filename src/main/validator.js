@@ -115,82 +115,47 @@ module.exports = (function () {
     };
 
     /**
-     * Validates css rule selector
+     * Parses css rule selector
      *
      * @param selector
      */
-    const validateCssSelector = function (selector) {
+    const parseCssSelector = function (selector) {
 
         try {
-            cssParser.parse(selector);
-            return true;
+            return cssParser.parse(selector);
         } catch (e) {
-            return false;
+            return null;
         }
     };
 
     /**
-     * Parses first pseudo class from the specified CSS selector
-     *
-     * @param selector
-     * @returns {*} first PseudoClass found or null
+     * Recursively validates pseudo classes in css selector parse result object
      */
-    const parsePseudoClass = function (selector) {
-        let beginIndex = 0;
-        let nameStartIndex = -1;
-        let squareBracketIndex = 0;
+    const validatePseudoClasses = function (obj) {
+        console.log(obj);
+        if (obj.type === 'selectors') {
+            let some = obj.selectors.some((s) => {
+                return !validatePseudoClasses(s);
+            });
 
-        while (squareBracketIndex >= 0) {
-            nameStartIndex = selector.indexOf(':', beginIndex);
-            if (nameStartIndex < 0) {
-                return null;
+            if (some) {
+                return false;
             }
+        } else if (obj.type === 'ruleSet') {
+            return validatePseudoClasses(obj.rule);
+        } else if (obj.type === 'rule') {
+            if (obj.pseudos) {
+                let some = obj.pseudos.some((p) => {
+                    return SUPPORTED_PSEUDO_CLASSES.indexOf(':' + p.name) < 0;
+                });
 
-            if (nameStartIndex > 0 && selector.charAt(nameStartIndex - 1) === '\\') {
-                // Escaped colon character
-                return null;
-            }
-
-            squareBracketIndex = selector.indexOf("[", beginIndex);
-            while (squareBracketIndex >= 0) {
-                if (nameStartIndex > squareBracketIndex) {
-                    let squareEndBracketIndex = selector.indexOf("]", squareBracketIndex + 1);
-                    beginIndex = squareEndBracketIndex + 1;
-                    if (nameStartIndex < squareEndBracketIndex) {
-                        // Means that colon character is somewhere inside attribute selector
-                        // Something like a[src^="http://domain.com"]
-                        break;
-                    }
-
-                    if (squareEndBracketIndex > 0) {
-                        squareBracketIndex = selector.indexOf("[", beginIndex);
-                    } else {
-                        // bad rule, example: a[src="http:
-                        return null;
-                    }
-                } else {
-                    squareBracketIndex = -1;
-                    break;
+                if (some) {
+                    return false;
                 }
             }
         }
 
-        let nameEndIndex = indexOfAny(selector, [' ', '\t', '>', '(', '[', '.', '#', ':', '+', '~', '"', "'"], nameStartIndex + 1);
-        if (nameEndIndex < 0) {
-            nameEndIndex = selector.length;
-        }
-
-        const name = selector.substring(nameStartIndex, nameEndIndex);
-        if (name.length <= 1) {
-            // Either empty name or a pseudo element (like ::content)
-            return null;
-        }
-
-        return {
-            name: name,
-            nameStartIndex: nameStartIndex,
-            nameEndIndex: nameEndIndex
-        };
+        return true;
     };
 
     /**
@@ -213,32 +178,6 @@ module.exports = (function () {
 
             return true;
         });
-    };
-
-    /**
-     * Look for any symbol from "chars" array starting at "start" index or from the start of the string
-     *
-     * @param str   String to search
-     * @param chars Chars to search for
-     * @param start Start index (optional, inclusive)
-     * @return int Index of the element found or null
-     */
-    const indexOfAny = function (str, chars, start) {
-
-        start = start || 0;
-
-        if (typeof str === 'string' && str.length <= start) {
-            return -1;
-        }
-
-        for (let i = start; i < str.length; i++) {
-            let c = str.charAt(i);
-            if (chars.indexOf(c) > -1) {
-                return i;
-            }
-        }
-
-        return -1;
     };
 
     /**
@@ -331,7 +270,8 @@ module.exports = (function () {
                     return false;
                 }
 
-                if (!validateCssSelector(rule.contentPart)) {
+                let cssSelector = parseCssSelector(rule.contentPart);
+                if (!cssSelector) {
                     logger.error(`Invalid selector: ${s}`);
                     return false;
                 }
@@ -341,12 +281,9 @@ module.exports = (function () {
                     return true;
                 }
 
-                const pseudoClass = parsePseudoClass(rule.contentPart);
-                if (pseudoClass !== null) {
-                    if (SUPPORTED_PSEUDO_CLASSES.indexOf(pseudoClass.name) < 0) {
-                        logger.error(`Invalid pseudo class: ${s}`);
-                        return false;
-                    }
+                if (!validatePseudoClasses(cssSelector)) {
+                    logger.error(`Invalid pseudo class: ${s}`);
+                    return false;
                 }
 
             } else if (rule.ruleType === RuleTypes.UrlBlocking) {

@@ -126,6 +126,10 @@ QUnit.test("Test ext-css validation", function (assert) {
     ruleText = "yandex.ru##[-ext-has=test]:matches(.whatisthis)";
     rules = [ruleText];
     assert.notOk(validator.validate(rules).length > 0);
+
+    ruleText = "yandex.ru##[-ext-has=test]:matches(.whatisthis), .todaystripe:contains(test)";
+    rules = [ruleText];
+    assert.notOk(validator.validate(rules).length > 0);
 });
 
 QUnit.test("Test content rules validation", function (assert) {
