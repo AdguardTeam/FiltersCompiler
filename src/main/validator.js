@@ -283,7 +283,7 @@ module.exports = (function () {
      * Filters blacklisted domains
      *
      * @param domains
-     * @returns {Array.<T>|*}
+     * @returns boolean
      */
     const removeBlacklistedDomains = function (domains) {
         return domains.filter((d) => {

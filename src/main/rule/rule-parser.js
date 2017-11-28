@@ -24,25 +24,15 @@ module.exports = (() => {
     const ESCAPE_CHARACTER = '\\';
 
     /**
-     * Checks if rule is regexp rule
-     *
-     * @param line
-     * @returns {boolean}
-     */
-    const isRegexpRule = function (line) {
-        return line.startsWith(MASK_REGEX_RULE) && line.endsWith(MASK_REGEX_RULE);
-    };
-
-    /**
      * Parses url rule modifiers
      *
      * @param line
      * @returns {{}}
      */
-    const parseUrlRuleModifiers = function (line) {
+    const parseUrlRule = function (line) {
 
         // Regexp rule may contain dollar sign which also is options delimiter
-        if (isRegexpRule(line) &&
+        if (line.startsWith(MASK_REGEX_RULE) && line.endsWith(MASK_REGEX_RULE) &&
             line.indexOf(REPLACE_OPTION + '=') < 0) {
             return {};
         }
@@ -51,6 +41,8 @@ module.exports = (() => {
         if (line.startsWith(MASK_WHITE_LIST)) {
             startIndex = MASK_WHITE_LIST.length;
         }
+
+        let urlRuleText = line.substring(startIndex);
 
         let optionsPart = null;
         let foundEscaped = false;
@@ -62,6 +54,7 @@ module.exports = (() => {
                 if (i > 0 && line.charAt(i - 1) === ESCAPE_CHARACTER) {
                     foundEscaped = true;
                 } else {
+                    urlRuleText = line.substring(startIndex, i);
                     optionsPart = line.substring(i + 1);
 
                     if (foundEscaped) {
@@ -101,7 +94,10 @@ module.exports = (() => {
             }
         });
 
-        return result;
+        return {
+            modifiers: result,
+            urlRuleText: urlRuleText
+        };
     };
 
     /**
@@ -167,9 +163,10 @@ module.exports = (() => {
         const ruleType = parseRuleType(ruleText);
         const rule = new Rule(ruleText, ruleType);
 
-        if (ruleType === RuleTypes.UrlBlocking && !isRegexpRule(ruleText)) {
-            rule.modifiers = parseUrlRuleModifiers(ruleText);
-            rule.url = ruleText.substring(0, ruleText.indexOf('$'));
+        if (ruleType === RuleTypes.UrlBlocking) {
+            const parseResult = parseUrlRule(ruleText);
+            rule.modifiers = parseResult.modifiers || [];
+            rule.url = parseResult.urlRuleText || ruleText;
         } else if (ruleType === RuleTypes.ElementHiding || ruleType === RuleTypes.Content || ruleType === RuleTypes.Script) {
             rule.contentPart = ruleText.substring(ruleText.indexOf(mask) + mask.length);
             rule.domains = ruleText.substring(0, ruleText.indexOf(mask)).split(',');
