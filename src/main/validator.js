@@ -132,7 +132,6 @@ module.exports = (function () {
      * Recursively validates pseudo classes in css selector parse result object
      */
     const validatePseudoClasses = function (obj) {
-        console.log(obj);
         if (obj.type === 'selectors') {
             let some = obj.selectors.some((s) => {
                 return !validatePseudoClasses(s);
