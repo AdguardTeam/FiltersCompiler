@@ -167,7 +167,9 @@ module.exports = (() => {
             const parseResult = parseUrlRule(ruleText);
             rule.modifiers = parseResult.modifiers || [];
             rule.url = parseResult.urlRuleText || ruleText;
-        } else if (ruleType === RuleTypes.ElementHiding || ruleType === RuleTypes.Content || ruleType === RuleTypes.Script) {
+        } else if (ruleType === RuleTypes.ElementHiding || ruleType === RuleTypes.Css ||
+            ruleType === RuleTypes.Content || ruleType === RuleTypes.Script) {
+
             rule.contentPart = ruleText.substring(ruleText.indexOf(mask) + mask.length);
             rule.domains = ruleText.substring(0, ruleText.indexOf(mask)).split(',');
             rule.mask = mask;

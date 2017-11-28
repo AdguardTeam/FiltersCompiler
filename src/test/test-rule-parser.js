@@ -62,6 +62,22 @@ QUnit.test("Test rule parser - element hiding rules", (assert) => {
     assert.equal(rule.domains[0], 'example.com');
 });
 
+QUnit.test("Test rule parser - cosmetic css rules", (assert) => {
+    'use strict';
+
+    const RuleTypes = require('../main/rule/rule-types.js');
+    const ruleParser = require('../main/rule/rule-parser.js');
+
+    let line = 'example.com#$#body { background-color: #333!important; }';
+    let rule = ruleParser.parseRule(line);
+    assert.ok(rule);
+    assert.equal(rule.ruleText, line);
+    assert.equal(rule.ruleType, RuleTypes.Css);
+    assert.equal(rule.contentPart, 'body { background-color: #333!important; }');
+    assert.equal(rule.domains.length, 1);
+    assert.equal(rule.domains[0], 'example.com');
+});
+
 QUnit.test("Test rule parser - element hiding rules - extended css", (assert) => {
     'use strict';
 

@@ -175,3 +175,34 @@ one.com#%#window.__gaq3 = undefined;`;
 
     assert.equal(after.join('\n').trim(), correct.trim());
 });
+
+QUnit.test("Test blacklist domains - cosmetic css rules", (assert) => {
+    'use strict';
+
+    const before = `
+example.com,google.com#$#body { background-color: #111!important; }
+one.com#$#body { background-color: #333!important; }
+two.com,google.com#$#body { background-color: #333!important; }
+google.com,one.com$$script[data-src="banner3"]
+`;
+
+    const path = require('path');
+    const domainsBlacklist = path.join(__dirname, './resources/domains-blacklist.txt');
+
+    const validator = require("../main/validator.js");
+    validator.init(domainsBlacklist);
+
+    const after = validator.blacklistDomains(before.trim().split('\n'));
+
+    assert.ok(after);
+    assert.equal(after.length, 4);
+
+    const correct = `
+example.com#$#body { background-color: #111!important; }
+one.com#$#body { background-color: #333!important; }
+two.com#$#body { background-color: #333!important; }
+one.com$$script[data-src="banner3"]
+`;
+
+    assert.equal(after.join('\n').trim(), correct.trim());
+});

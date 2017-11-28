@@ -320,7 +320,9 @@ module.exports = (function () {
 
                     corrected = rule.buildNewModifiers(modifiers);
                 }
-            } else if (rule.ruleType === RuleTypes.ElementHiding || rule.ruleType === RuleTypes.Content || rule.ruleType === RuleTypes.Script) {
+            } else if (rule.ruleType === RuleTypes.ElementHiding || rule.ruleType === RuleTypes.Css ||
+                rule.ruleType === RuleTypes.Content || rule.ruleType === RuleTypes.Script) {
+
                 if (rule.domains) {
                     const validated = removeBlacklistedDomains(rule.domains);
                     if (validated.length === 0) {
