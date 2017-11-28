@@ -133,24 +133,16 @@ module.exports = (function () {
      */
     const validatePseudoClasses = function (obj) {
         if (obj.type === 'selectors') {
-            let some = obj.selectors.some((s) => {
-                return !validatePseudoClasses(s);
+            return obj.selectors.every((s) => {
+                return validatePseudoClasses(s);
             });
-
-            if (some) {
-                return false;
-            }
         } else if (obj.type === 'ruleSet') {
             return validatePseudoClasses(obj.rule);
         } else if (obj.type === 'rule') {
             if (obj.pseudos) {
-                let some = obj.pseudos.some((p) => {
-                    return SUPPORTED_PSEUDO_CLASSES.indexOf(':' + p.name) < 0;
+                return obj.pseudos.every((p) => {
+                    return SUPPORTED_PSEUDO_CLASSES.indexOf(':' + p.name) >= 0;
                 });
-
-                if (some) {
-                    return false;
-                }
             }
         }
 
