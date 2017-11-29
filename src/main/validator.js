@@ -77,6 +77,19 @@ module.exports = (function () {
         "[-ext-matches-css-before=", "[-ext-matches-css-after=", ":has(", ":has-text(", ":contains(",
         ":matches-css(", ":matches-css-before(", ":matches-css-after(", ":-abp-has(", ":-abp-contains("];
 
+    const VALID_TAGS_CONTENT = [
+        'id',
+        'tag-content',
+        'max-length',
+        'min-length',
+        'parent-elements',
+        'parent-search-level',
+        'wildcard'
+    ];
+
+    const TAG_CONTENT_MAX_LENGTH = 'max-length';
+    const TAG_CONTENT_MAX_VALID_LENGTH = 32768;
+
     let domainsBlacklist = [];
     let cssParser;
 
@@ -102,115 +115,67 @@ module.exports = (function () {
     };
 
     /**
-     * Validates css rule selector
+     * Parses css rule selector
      *
      * @param selector
      */
-    const validateCssSelector = function (selector) {
+    const parseCssSelector = function (selector) {
 
         try {
-            cssParser.parse(selector);
-            return true;
+            return cssParser.parse(selector);
         } catch (e) {
-            return false;
-        }
-    };
-
-    /**
-     * Parses first pseudo class from the specified CSS selector
-     *
-     * @param selector
-     * @returns {*} first PseudoClass found or null
-     */
-    const parsePseudoClass = function (selector) {
-        let beginIndex = 0;
-        let nameStartIndex = -1;
-        let squareBracketIndex = 0;
-
-        while (squareBracketIndex >= 0) {
-            nameStartIndex = selector.indexOf(':', beginIndex);
-            if (nameStartIndex < 0) {
-                return null;
-            }
-
-            if (nameStartIndex > 0 && selector.charAt(nameStartIndex - 1) === '\\') {
-                // Escaped colon character
-                return null;
-            }
-
-            squareBracketIndex = selector.indexOf("[", beginIndex);
-            while (squareBracketIndex >= 0) {
-                if (nameStartIndex > squareBracketIndex) {
-                    let squareEndBracketIndex = selector.indexOf("]", squareBracketIndex + 1);
-                    beginIndex = squareEndBracketIndex + 1;
-                    if (nameStartIndex < squareEndBracketIndex) {
-                        // Means that colon character is somewhere inside attribute selector
-                        // Something like a[src^="http://domain.com"]
-                        break;
-                    }
-
-                    if (squareEndBracketIndex > 0) {
-                        squareBracketIndex = selector.indexOf("[", beginIndex);
-                    } else {
-                        // bad rule, example: a[src="http:
-                        return null;
-                    }
-                } else {
-                    squareBracketIndex = -1;
-                    break;
-                }
-            }
-        }
-
-        let nameEndIndex = indexOfAny(selector, [' ', '\t', '>', '(', '[', '.', '#', ':', '+', '~', '"', "'"], nameStartIndex + 1);
-        if (nameEndIndex < 0) {
-            nameEndIndex = selector.length;
-        }
-
-        const name = selector.substring(nameStartIndex, nameEndIndex);
-        if (name.length <= 1) {
-            // Either empty name or a pseudo element (like ::content)
             return null;
         }
-
-        return {
-            name: name,
-            nameStartIndex: nameStartIndex,
-            nameEndIndex: nameEndIndex
-        };
     };
 
     /**
-     * Look for any symbol from "chars" array starting at "start" index or from the start of the string
-     *
-     * @param str   String to search
-     * @param chars Chars to search for
-     * @param start Start index (optional, inclusive)
-     * @return int Index of the element found or null
+     * Recursively validates pseudo classes in css selector parse result object
      */
-    const indexOfAny = function (str, chars, start) {
-
-        start = start || 0;
-
-        if (typeof str === 'string' && str.length <= start) {
-            return -1;
-        }
-
-        for (let i = start; i < str.length; i++) {
-            let c = str.charAt(i);
-            if (chars.indexOf(c) > -1) {
-                return i;
+    const validatePseudoClasses = function (obj) {
+        if (obj.type === 'selectors') {
+            return obj.selectors.every((s) => {
+                return validatePseudoClasses(s);
+            });
+        } else if (obj.type === 'ruleSet') {
+            return validatePseudoClasses(obj.rule);
+        } else if (obj.type === 'rule') {
+            if (obj.pseudos) {
+                return obj.pseudos.every((p) => {
+                    return SUPPORTED_PSEUDO_CLASSES.indexOf(':' + p.name) >= 0;
+                });
             }
         }
 
-        return -1;
+        return true;
+    };
+
+    /**
+     * Validates content rule attributes
+     */
+    const validateContentRuleAttributes = function (ruleText, attributes) {
+        return attributes.every((a) => {
+            if (VALID_TAGS_CONTENT.indexOf(a.attributeName) < 0) {
+                logger.error(`Invalid tag: ${ruleText}`);
+                return false;
+            }
+
+            if (a.attributeName === TAG_CONTENT_MAX_LENGTH) {
+                let maxLength = parseInt(a.attributeValue);
+                if (maxLength > TAG_CONTENT_MAX_VALID_LENGTH || maxLength < 0) {
+                    logger.error(`Invalid tag max length: ${ruleText}`);
+                    return false;
+                }
+            }
+
+            return true;
+        });
     };
 
     /**
      * Filters blacklisted domains
      *
      * @param domains
-     * @returns {Array.<T>|*}
+     * @returns boolean
      */
     const removeBlacklistedDomains = function (domains) {
         return domains.filter((d) => {
@@ -247,15 +212,17 @@ module.exports = (function () {
 
                     corrected = rule.buildNewModifiers(modifiers);
                 }
-            } else if (rule.ruleType === RuleTypes.ElementHiding) {
-                if (rule.cssDomains) {
-                    const validated = removeBlacklistedDomains(rule.cssDomains);
+            } else if (rule.ruleType === RuleTypes.ElementHiding || rule.ruleType === RuleTypes.Css ||
+                rule.ruleType === RuleTypes.Content || rule.ruleType === RuleTypes.Script) {
+
+                if (rule.domains) {
+                    const validated = removeBlacklistedDomains(rule.domains);
                     if (validated.length === 0) {
                         logger.error(`All domains are blacklisted for rule: ${line}`);
                         return;
                     }
 
-                    corrected = Rule.buildNewCssRuleText(rule.cssSelector, validated);
+                    corrected = Rule.buildNewLeadingDomainsRuleText(rule.contentPart, validated, rule.mask);
                 }
             }
 
@@ -294,22 +261,20 @@ module.exports = (function () {
                     return false;
                 }
 
-                if (!validateCssSelector(rule.cssSelector)) {
+                let cssSelector = parseCssSelector(rule.contentPart);
+                if (!cssSelector) {
                     logger.error(`Invalid selector: ${s}`);
                     return false;
                 }
 
-                const isExtendedCss = EXTENDED_CSS_MARKERS.some((m) => rule.cssSelector.includes(m));
+                const isExtendedCss = EXTENDED_CSS_MARKERS.some((m) => rule.contentPart.includes(m));
                 if (!isExtendedCss) {
                     return true;
                 }
 
-                const pseudoClass = parsePseudoClass(rule.cssSelector);
-                if (pseudoClass !== null) {
-                    if (SUPPORTED_PSEUDO_CLASSES.indexOf(pseudoClass.name) < 0) {
-                        logger.error(`Invalid pseudo class: ${s}`);
-                        return false;
-                    }
+                if (!validatePseudoClasses(cssSelector)) {
+                    logger.error(`Invalid pseudo class: ${s}`);
+                    return false;
                 }
 
             } else if (rule.ruleType === RuleTypes.UrlBlocking) {
@@ -326,9 +291,14 @@ module.exports = (function () {
                         return false;
                     }
                 }
+            } else if (rule.ruleType === RuleTypes.Content) {
+                if (!validateContentRuleAttributes(rule.ruleText, rule.contentAttributes)) {
+                    logger.error(`Invalid content rule: ${s}`);
+                    return false;
+                }
             }
 
-            //TODO: Validate content-rules attributes
+            //TODO: Check js rules validation
 
             return true;
         });

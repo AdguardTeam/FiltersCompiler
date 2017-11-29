@@ -28,7 +28,7 @@ QUnit.test("Test rules builds", (assert) => {
 
     const Rule = require('../main/rule/rule.js');
 
-    let ruleText = Rule.buildNewCssRuleText('selector', ['one.com', 'two.com']);
+    let ruleText = Rule.buildNewLeadingDomainsRuleText('selector', ['one.com', 'two.com'], '##');
     assert.ok(ruleText);
     assert.equal(ruleText, 'one.com,two.com##selector');
 

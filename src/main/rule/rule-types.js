@@ -4,13 +4,31 @@ module.exports = (() => {
 
     /**
      * Rule types enum
-     * TODO: Add JS-rules
      */
     return {
-        Other: 0,
+        /**
+         * Comments
+         */
         Comment: 1,
+        /**
+         * Url blocking rules
+         */
         UrlBlocking: 2,
+        /**
+         * Element hiding rules
+         */
         ElementHiding: 3,
-        Content: 4
+        /**
+         * Content rules
+         */
+        Content: 4,
+        /**
+         * Javascript rules
+         */
+        Script: 5,
+        /**
+         * Cosmetic css rules
+         */
+        Css: 6
     };
 })();

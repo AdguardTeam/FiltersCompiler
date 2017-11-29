@@ -39,7 +39,7 @@ QUnit.test("Test incorrect rules", function (assert) {
     assert.ok(validator.validate(rules).length === 0);
 });
 
-QUnit.test("Test blacklist domains", (assert) => {
+QUnit.test("Test blacklist domains - ulr/css rules", (assert) => {
     'use strict';
 
     const before = `
@@ -126,4 +126,87 @@ QUnit.test("Test ext-css validation", function (assert) {
     ruleText = "yandex.ru##[-ext-has=test]:matches(.whatisthis)";
     rules = [ruleText];
     assert.notOk(validator.validate(rules).length > 0);
+
+    ruleText = "yandex.ru##[-ext-has=test]:matches(.whatisthis), .todaystripe:contains(test)";
+    rules = [ruleText];
+    assert.notOk(validator.validate(rules).length > 0);
+});
+
+QUnit.test("Test content rules validation", function (assert) {
+    'use strict';
+
+    const validator = require("../main/validator.js");
+    validator.init();
+
+    let rules = ['~nigma.ru,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]'];
+    assert.ok(validator.validate(rules).length > 0);
+    rules = ['~nigma.ru,google.com$$div[id=\"ad_text\"][tag-content=\"teas\"\"ernet\"][max-length=\"500\"][min-length=\"50\"][wildcard=\"*.adriver.*\"][parent-search-level=\"15\"][parent-elements=\"td,table\"]'];
+    assert.ok(validator.validate(rules).length > 0);
+    rules = ['~nigma.ru,google.com$$div[id=\"ad_text\"][max-length=\"500000\"][min-length=\"50\"]'];
+    assert.notOk(validator.validate(rules).length > 0);
+    rules = ['~nigma.ru,google.com$$div[id=\"ad_text\"][tag-content=\"teas\"\"ernet\"][max-length=\"500\"][min-length=\"50\"][smth=\"1\"]'];
+    assert.notOk(validator.validate(rules).length > 0);
+});
+
+QUnit.test("Test blacklist domains - content/script rules", (assert) => {
+    'use strict';
+
+    const before = `
+example.com$$script[data-src="banner1"]
+google.com$$script[data-src="banner2"]
+google.com,one.com$$script[data-src="banner3"]
+example.com#%#window.__gaq1 = undefined;
+google.com#%#window.__gaq2 = undefined;
+google.com,one.com#%#window.__gaq3 = undefined;
+`;
+
+    const path = require('path');
+    const domainsBlacklist = path.join(__dirname, './resources/domains-blacklist.txt');
+
+    const validator = require("../main/validator.js");
+    validator.init(domainsBlacklist);
+
+    const after = validator.blacklistDomains(before.trim().split('\n'));
+
+    assert.ok(after);
+    assert.equal(after.length, 4);
+
+    const correct = `
+example.com$$script[data-src="banner1"]
+one.com$$script[data-src="banner3"]
+example.com#%#window.__gaq1 = undefined;
+one.com#%#window.__gaq3 = undefined;`;
+
+    assert.equal(after.join('\n').trim(), correct.trim());
+});
+
+QUnit.test("Test blacklist domains - cosmetic css rules", (assert) => {
+    'use strict';
+
+    const before = `
+example.com,google.com#$#body { background-color: #111!important; }
+one.com#$#body { background-color: #333!important; }
+two.com,google.com#$#body { background-color: #333!important; }
+google.com,one.com$$script[data-src="banner3"]
+`;
+
+    const path = require('path');
+    const domainsBlacklist = path.join(__dirname, './resources/domains-blacklist.txt');
+
+    const validator = require("../main/validator.js");
+    validator.init(domainsBlacklist);
+
+    const after = validator.blacklistDomains(before.trim().split('\n'));
+
+    assert.ok(after);
+    assert.equal(after.length, 4);
+
+    const correct = `
+example.com#$#body { background-color: #111!important; }
+one.com#$#body { background-color: #333!important; }
+two.com#$#body { background-color: #333!important; }
+one.com$$script[data-src="banner3"]
+`;
+
+    assert.equal(after.join('\n').trim(), correct.trim());
 });

@@ -24,10 +24,10 @@ module.exports = (() => {
     const sortElementHidingRules = function (rules) {
         const map = new Map();
         for (let rule of rules) {
-            const selector = rule.cssSelector;
+            const selector = rule.contentPart;
             const domains = map.get(selector) || [];
 
-            map.set(selector, domains.concat(rule.cssDomains));
+            map.set(selector, domains.concat(rule.domains));
         }
 
         const sortedSelectors = Array.from(map.keys());
@@ -35,7 +35,7 @@ module.exports = (() => {
 
         const result = [];
         for (let selector of sortedSelectors) {
-            result.push(Rule.buildNewCssRuleText(selector, utils.removeDuplicates(map.get(selector))));
+            result.push(Rule.buildNewLeadingDomainsRuleText(selector, utils.removeDuplicates(map.get(selector)), '##'));
         }
 
         return result;

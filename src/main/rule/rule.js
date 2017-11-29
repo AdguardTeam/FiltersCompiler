@@ -12,8 +12,8 @@ module.exports = class Rule {
         this.ruleText = ruleText;
         this.ruleType = ruleType;
         this.modifiers = null;
-        this.cssSelector = null;
-        this.cssDomains = null;
+        this.contentPart = null;
+        this.domains = null;
         this.url = null;
     }
 
@@ -37,14 +37,16 @@ module.exports = class Rule {
     }
 
     /**
-     * Builds css rule ruleText with selector and domains
+     * Builds rule ruleText, for rule with leading domains
+     * like css, content, script rules
      *
-     * @param selector
+     * @param contentPart
      * @param domains
+     * @param mask
      * @returns {string}
      */
-    static buildNewCssRuleText(selector, domains) {
-        return `${domains.join(',')}##${selector}`;
+    static buildNewLeadingDomainsRuleText(contentPart, domains, mask) {
+        return `${domains.join(',')}${mask}${contentPart}`;
     }
 
     /**
