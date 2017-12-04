@@ -105,7 +105,6 @@ module.exports = (() => {
      * @param list
      */
     const sortBlock = function (list) {
-        logger.log(`Sorting a block of ${list.length} rules..`);
 
         const elementHidingRules = [];
         const urlBlockingRules = [];

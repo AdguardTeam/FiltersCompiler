@@ -210,3 +210,30 @@ one.com$$script[data-src="banner3"]
 
     assert.equal(after.join('\n').trim(), correct.trim());
 });
+
+QUnit.test("Test blacklist domains - no domain rules", function (assert) {
+    'use strict';
+
+    const before = `###PopUpWnd
+||graph.com
+google.com###id
+example.com##.div
+`;
+
+    const path = require('path');
+    const domainsBlacklist = path.join(__dirname, './resources/domains-blacklist.txt');
+
+    const validator = require("../main/validator.js");
+    validator.init(domainsBlacklist);
+
+    const after = validator.blacklistDomains(before.trim().split('\n'));
+
+    assert.ok(after);
+    assert.equal(after.length, 3);
+
+    const correct = `###PopUpWnd
+||graph.com
+example.com##.div`;
+
+    assert.equal(after.join('\n').trim(), correct.trim());
+});
