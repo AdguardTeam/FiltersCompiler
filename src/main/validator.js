@@ -101,7 +101,11 @@ module.exports = (function () {
     const init = function (domainBlacklistFile) {
         try {
             let s = fs.readFileSync(domainBlacklistFile, {encoding: 'utf-8'});
-            domainsBlacklist = s.split('\n');
+            if (s) {
+                domainsBlacklist = s.split('\n');
+            } else {
+                domainsBlacklist = [];
+            }
         } catch (e) {
             domainsBlacklist = [];
         }
@@ -178,6 +182,10 @@ module.exports = (function () {
      * @returns boolean
      */
     const removeBlacklistedDomains = function (domains) {
+        if (domainsBlacklist.length === 0) {
+            return domains;
+        }
+
         return domains.filter((d) => {
             if (domainsBlacklist.indexOf(d) >= 0) {
                 logger.error(`Blacklisted domain: ${d}`);
