@@ -16,6 +16,7 @@ module.exports = (() => {
         MASK_SCRIPT_EXCEPTION: "#@%#",
         MASK_CONTENT: "$$",
         MASK_CONTENT_EXCEPTION: "$@$",
-        MASK_COMMENT: "!"
+        MASK_COMMENT: "!",
+        MASK_HINT: "!+"
     };
 })();

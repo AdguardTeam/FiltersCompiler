@@ -96,5 +96,6 @@ QUnit.test("Test builder - platforms", (assert) => {
 
     //const filterOptimizedContent = readFile(path.join(platforms, 'extension/chromium', '2_optimized.txt'));
 
-    //TODO: Add more different cases checks
+    //TODO: Add more different cases
+    //TODO: Add hints cases
 });
