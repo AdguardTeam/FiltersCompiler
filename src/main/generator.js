@@ -270,6 +270,8 @@ module.exports = (() => {
      * @param config
      */
     const cleanupRules = function (originalRules, config) {
+        //TODO: Implement
+
         return originalRules;
     };
 
