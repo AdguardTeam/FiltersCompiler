@@ -80,4 +80,21 @@ QUnit.test("Test builder - platforms", (assert) => {
 
     const filterText = readFile(path.join(filtersDir, 'filter_2_English', 'filter.txt'));
     assert.ok(filterText);
+
+    assert.ok(fs.existsSync(path.join(platforms, 'android')));
+    assert.ok(fs.existsSync(path.join(platforms, 'extension')));
+    assert.ok(fs.existsSync(path.join(platforms, 'extension/chromium')));
+    assert.ok(fs.existsSync(path.join(platforms, 'extension/ublock')));
+
+    const filterContent = readFile(path.join(platforms, 'extension/chromium', '2.txt'));
+    assert.ok(filterContent);
+
+    const filterLines = filterContent.split('\r\n');
+    assert.equal(filterLines.length, 24);
+
+    assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
+
+    //const filterOptimizedContent = readFile(path.join(platforms, 'extension/chromium', '2_optimized.txt'));
+
+    //TODO: Add more different cases checks
 });

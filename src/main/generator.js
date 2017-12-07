@@ -271,8 +271,12 @@ module.exports = (() => {
         return originalRules;
     };
 
+    /**
+     * This will create a dir given a path such as './folder/subfolder'
+     *
+     * @param dir
+     */
     const createDir = (dir) => {
-        // This will create a dir given a path such as './folder/subfolder'
         const splitPath = dir.split('/');
         splitPath.reduce((path, subPath) => {
             let currentPath;
