@@ -35,6 +35,8 @@ module.exports = (function () {
     const FILTER_FILE = 'filter.txt';
     const REVISION_FILE = 'revision.json';
     const EXCLUDE_FILE = 'exclude.txt';
+    const METADATA_FILE = 'metadata.json';
+
 
     let currentDir;
 
@@ -331,6 +333,7 @@ module.exports = (function () {
     const build = function (filtersDir, logFile, domainBlacklistFile, platformsPath) {
         logger.initialize(logFile);
         validator.init(domainBlacklistFile);
+        generator.init(FILTER_FILE, METADATA_FILE, REVISION_FILE);
 
         const items = fs.readdirSync(filtersDir);
 

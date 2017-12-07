@@ -6,18 +6,7 @@ module.exports = (() => {
 
     const Rule = require('./rule.js');
     const RuleTypes = require('./rule-types.js');
-
-    const MASK_REGEX_RULE = "/";
-    const MASK_WHITE_LIST = "@@";
-    const MASK_ELEMENT_HIDING = "##";
-    const MASK_ELEMENT_HIDING_EXCEPTION = "#@#";
-    const MASK_CSS = "#$#";
-    const MASK_CSS_EXCEPTION = "#@$#";
-    const MASK_SCRIPT = "#%#";
-    const MASK_SCRIPT_EXCEPTION = "#@%#";
-    const MASK_CONTENT = "$$";
-    const MASK_CONTENT_EXCEPTION = "$@$";
-    const MASK_COMMENT = "!";
+    const RuleMasks = require('./rule-masks.js');
 
     const REPLACE_OPTION = "replace";
     const OPTIONS_DELIMITER = "$";
@@ -40,14 +29,14 @@ module.exports = (() => {
         };
 
         // Regexp rule may contain dollar sign which also is options delimiter
-        if (line.startsWith(MASK_REGEX_RULE) && line.endsWith(MASK_REGEX_RULE) &&
+        if (line.startsWith(RuleMasks.MASK_REGEX_RULE) && line.endsWith(RuleMasks.MASK_REGEX_RULE) &&
             line.indexOf(REPLACE_OPTION + '=') < 0) {
             return result;
         }
 
         let startIndex = 0;
-        if (line.startsWith(MASK_WHITE_LIST)) {
-            startIndex = MASK_WHITE_LIST.length;
+        if (line.startsWith(RuleMasks.MASK_WHITE_LIST)) {
+            startIndex = RuleMasks.MASK_WHITE_LIST.length;
         }
 
         result.urlRuleText = line.substring(startIndex);
@@ -164,17 +153,17 @@ module.exports = (() => {
      * @param ruleText
      */
     const parseRuleType = function (ruleText) {
-        if (ruleText.startsWith(MASK_WHITE_LIST)) {
+        if (ruleText.startsWith(RuleMasks.MASK_WHITE_LIST)) {
             return RuleTypes.UrlBlocking;
-        } else if (ruleText.startsWith(MASK_COMMENT)) {
+        } else if (ruleText.startsWith(RuleMasks.MASK_COMMENT)) {
             return RuleTypes.Comment;
-        } else if (ruleText.includes(MASK_CSS) || ruleText.includes(MASK_CSS_EXCEPTION)) {
+        } else if (ruleText.includes(RuleMasks.MASK_CSS) || ruleText.includes(RuleMasks.MASK_CSS_EXCEPTION)) {
             return RuleTypes.Css;
-        } else if (ruleText.includes(MASK_ELEMENT_HIDING) || ruleText.includes(MASK_ELEMENT_HIDING_EXCEPTION)) {
+        } else if (ruleText.includes(RuleMasks.MASK_ELEMENT_HIDING) || ruleText.includes(RuleMasks.MASK_ELEMENT_HIDING_EXCEPTION)) {
             return RuleTypes.ElementHiding;
-        } else if (ruleText.includes(MASK_CONTENT) || ruleText.includes(MASK_CONTENT_EXCEPTION)) {
+        } else if (ruleText.includes(RuleMasks.MASK_CONTENT) || ruleText.includes(RuleMasks.MASK_CONTENT_EXCEPTION)) {
             return RuleTypes.Content;
-        } else if (ruleText.includes(MASK_SCRIPT) || ruleText.includes(MASK_SCRIPT_EXCEPTION)) {
+        } else if (ruleText.includes(RuleMasks.MASK_SCRIPT) || ruleText.includes(RuleMasks.MASK_SCRIPT_EXCEPTION)) {
             return RuleTypes.Script;
         } else {
             return RuleTypes.UrlBlocking;
@@ -187,24 +176,24 @@ module.exports = (() => {
      * @param ruleText
      */
     const parseRuleMask = function (ruleText) {
-        if (ruleText.startsWith(MASK_COMMENT)) {
-            return MASK_COMMENT;
-        } else if (ruleText.includes(MASK_CSS)) {
-            return MASK_CSS;
-        } else if (ruleText.includes(MASK_CSS_EXCEPTION)) {
-            return MASK_CSS_EXCEPTION;
-        } else if (ruleText.includes(MASK_ELEMENT_HIDING_EXCEPTION)) {
-            return MASK_ELEMENT_HIDING_EXCEPTION;
-        } else if (ruleText.includes(MASK_ELEMENT_HIDING)) {
-            return MASK_ELEMENT_HIDING;
-        } else if (ruleText.includes(MASK_CONTENT)) {
-            return MASK_CONTENT;
-        } if (ruleText.includes(MASK_CONTENT_EXCEPTION)) {
-            return MASK_CONTENT_EXCEPTION;
-        } else if (ruleText.includes(MASK_SCRIPT)) {
-            return MASK_SCRIPT;
-        } else if (ruleText.includes(MASK_SCRIPT_EXCEPTION)) {
-            return MASK_SCRIPT_EXCEPTION;
+        if (ruleText.startsWith(RuleMasks.MASK_COMMENT)) {
+            return RuleMasks.MASK_COMMENT;
+        } else if (ruleText.includes(RuleMasks.MASK_CSS)) {
+            return RuleMasks.MASK_CSS;
+        } else if (ruleText.includes(RuleMasks.MASK_CSS_EXCEPTION)) {
+            return RuleMasks.MASK_CSS_EXCEPTION;
+        } else if (ruleText.includes(RuleMasks.MASK_ELEMENT_HIDING_EXCEPTION)) {
+            return RuleMasks.MASK_ELEMENT_HIDING_EXCEPTION;
+        } else if (ruleText.includes(RuleMasks.MASK_ELEMENT_HIDING)) {
+            return RuleMasks.MASK_ELEMENT_HIDING;
+        } else if (ruleText.includes(RuleMasks.MASK_CONTENT)) {
+            return RuleMasks.MASK_CONTENT;
+        } if (ruleText.includes(RuleMasks.MASK_CONTENT_EXCEPTION)) {
+            return RuleMasks.MASK_CONTENT_EXCEPTION;
+        } else if (ruleText.includes(RuleMasks.MASK_SCRIPT)) {
+            return RuleMasks.MASK_SCRIPT;
+        } else if (ruleText.includes(RuleMasks.MASK_SCRIPT_EXCEPTION)) {
+            return RuleMasks.MASK_SCRIPT_EXCEPTION;
         } else {
             return null;
         }

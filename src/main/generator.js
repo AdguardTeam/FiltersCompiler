@@ -9,33 +9,25 @@ module.exports = (() => {
     const md5 = require('md5');
 
     const logger = require("./utils/log.js");
-
-    const FILTER_FILE = 'filter.txt';
-    const METADATA_FILE = 'metadata.json';
-    const REVISION_FILE = 'revision.json';
+    const RuleMasks = require('./rule/rule-masks.js');
 
     const RULES_SEPARATOR = "\r\n";
 
-    const MASK_CSS_INJECT_RULE = "#$#";
-    const MASK_CSS_INJECT_EXCEPTION_RULE = "#@$#";
-    const MASK_SCRIPT_RULE = "#%#";
-    const MASK_SCRIPT_EXCEPTION_RULE = "#@%#";
-
     const CONTENT_BLOCKER_PATTERNS_EXCEPTIONS
-        = [MASK_SCRIPT_RULE, MASK_SCRIPT_EXCEPTION_RULE, MASK_CSS_INJECT_RULE, MASK_CSS_INJECT_EXCEPTION_RULE,
+        = [RuleMasks.MASK_SCRIPT, RuleMasks.MASK_SCRIPT_EXCEPTION, RuleMasks.MASK_CSS, RuleMasks.MASK_CSS_EXCEPTION,
         "$mp4", "$replace=", "$stealth", "$empty", "important,replace=", "$app", "$protobuf", "important,protobuf", "[-ext-", "$$"];
 
     const EXTENSIONS_RULES_PATTERNS_EXCEPTIONS
         = ["$mp4", "$replace=", "$stealth", "important,replace=", "$app", "$network", "$protobuf", "important,protobuf", "$$"];
 
     const SAFARI_EXTENSIONS_RULES_PATTERNS_EXCEPTIONS
-        = EXTENSIONS_RULES_PATTERNS_EXCEPTIONS.push("$csp");
+        = EXTENSIONS_RULES_PATTERNS_EXCEPTIONS.concat(["$csp"]);
 
     const ANDROID_CONTENT_BLOCKER_PATTERNS_EXCEPTIONS
-        = CONTENT_BLOCKER_PATTERNS_EXCEPTIONS.push("$csp");
+        = CONTENT_BLOCKER_PATTERNS_EXCEPTIONS.concat(["$csp"]);
 
     const UBLOCK_RULES_PATTERNS_EXCEPTIONS
-        = EXTENSIONS_RULES_PATTERNS_EXCEPTIONS.concat([MASK_SCRIPT_RULE, MASK_SCRIPT_EXCEPTION_RULE]);
+        = EXTENSIONS_RULES_PATTERNS_EXCEPTIONS.concat([RuleMasks.MASK_SCRIPT, RuleMasks.MASK_SCRIPT_EXCEPTION]);
 
     /**
      * Platforms configurations
@@ -189,6 +181,10 @@ module.exports = (() => {
         }
     };
 
+    let filterFile = null;
+    let metadataFile = null;
+    let revisionFile = null;
+
     /**
      * Sync reads file content
      *
@@ -324,11 +320,11 @@ module.exports = (() => {
         let mask = 'filter_';
         const filterId = filterDir.substring(filterDir.lastIndexOf(mask) + mask.length, filterDir.lastIndexOf('_'));
 
-        const originalRules = readFile(path.join(filterDir, FILTER_FILE));
+        const originalRules = readFile(path.join(filterDir, filterFile));
 
-        const metadataFile = path.join(filterDir, METADATA_FILE);
-        const revisionFile = path.join(filterDir, REVISION_FILE);
-        const header = makeHeader(metadataFile, revisionFile);
+        const metadataFilePath = path.join(filterDir, metadataFile);
+        const revisionFilePath = path.join(filterDir, revisionFile);
+        const header = makeHeader(metadataFilePath, revisionFilePath);
 
         for (let platform in PlatformPaths) {
 
@@ -341,6 +337,19 @@ module.exports = (() => {
             const platformDir = path.join(platformsPath, config.path);
             writeFilterRules(filterId, platformDir, config.platform, platformHeader, rules, false);
         }
+    };
+
+    /**
+     * Initializes service
+     *
+     * @param filterFileName
+     * @param metadataFileName
+     * @param revisionFileName
+     */
+    const init = function (filterFileName, metadataFileName, revisionFileName) {
+        filterFile = filterFileName;
+        metadataFile = metadataFileName;
+        revisionFile = revisionFileName;
     };
 
     /**
@@ -373,6 +382,7 @@ module.exports = (() => {
     };
 
     return {
+        init: init,
         generate: generate
     };
 })();
