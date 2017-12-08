@@ -32,7 +32,7 @@ QUnit.test("Test builder", (assert) => {
     assert.ok(filterText);
 
     const filterLines = filterText.split('\r\n');
-    assert.equal(filterLines.length, 18);
+    assert.equal(filterLines.length, 20);
 
     //Common include
     assert.ok(filterLines.indexOf('! some common rules could be places here') >= 0);
@@ -71,7 +71,6 @@ QUnit.test("Test builder - platforms", (assert) => {
     };
 
     const builder = require("../main/builder.js");
-    assert.ok(builder);
 
     const filtersDir = path.join(__dirname, './resources/filters');
     const logFile = path.join(__dirname, './resources/log_platforms.txt');
@@ -86,23 +85,29 @@ QUnit.test("Test builder - platforms", (assert) => {
     assert.ok(filterContent);
 
     let filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 24);
+    assert.equal(filterLines.length, 26);
 
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
+    assert.ok(filterLines.indexOf('test-common-1-rule.com') >= 0);
     assert.ok(filterLines.indexOf('! some common rules could be places here') >= 0);
+    assert.ok(filterLines.indexOf('||adg_start_script_inject') >= 0);
+    assert.ok(filterLines.indexOf('~nigma.ru,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]') >= 0);
 
     //TODO: Add optimized
     //const filterOptimizedContent = readFile(path.join(platforms, 'extension/chromium', '2_optimized.txt'));
 
-    //TODO: Add more different cases
-    //TODO: Add hints cases
-
-    filterContent = readFile(path.join(platforms, 'config/comments', '2.txt'));
+    filterContent = readFile(path.join(platforms, 'config/test', '2.txt'));
     assert.ok(filterContent);
 
     filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 12);
+    assert.equal(filterLines.length, 11);
 
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
+    assert.notOk(filterLines.indexOf('test-common-1-rule.com') >= 0);
     assert.notOk(filterLines.indexOf('! some common rules could be places here') >= 0);
+    assert.notOk(filterLines.indexOf('||adg_start_script_inject') >= 0);
+    assert.notOk(filterLines.indexOf('~nigma.ru,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]') >= 0);
+
+
+    //TODO: Add hints cases
 });

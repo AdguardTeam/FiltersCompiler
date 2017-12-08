@@ -12,12 +12,13 @@
   },
   "TEST_COMMENTS": {
     "platform": "test",
-    "path": "config/comments",
+    "path": "config/test",
     "configuration": {
-      "omitAdgHackRules": false,
+      "omitAdgHackRules": true,
       "omitCommentRules": true,
-      "omitContentRules": false,
-      "omitRulePatterns": false,
+      "omitContentRules": true,
+      "omitRulePatterns": [
+        "test-common-1-rule"],
       "ignoreRuleHints": true
     }
   },
