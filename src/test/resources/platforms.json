@@ -1,13 +1,13 @@
 {
   "TEST": {
-    "platform": "test",
+    "platform": "one",
     "path": "test",
     "configuration": {
       "omitAdgHackRules": false,
       "omitCommentRules": false,
       "omitContentRules": false,
       "omitRulePatterns": false,
-      "ignoreRuleHints": true
+      "ignoreRuleHints": false
     }
   },
   "TEST_COMMENTS": {

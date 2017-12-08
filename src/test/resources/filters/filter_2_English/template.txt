@@ -19,3 +19,5 @@
 ||test.com^$replace=
 ||adg_start_script_inject
 ~nigma.ru,google.com$$div[id="ad_text"][wildcard="*teasernet*tararar*"]
+!+ NOT_PLATFORM(test, windows)
+excluded_platform
