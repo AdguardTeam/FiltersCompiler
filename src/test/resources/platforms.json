@@ -1,0 +1,35 @@
+{
+  "TEST": {
+    "platform": "test",
+    "path": "test",
+    "configuration": {
+      "omitAdgHackRules": false,
+      "omitCommentRules": false,
+      "omitContentRules": false,
+      "omitRulePatterns": false,
+      "ignoreRuleHints": true
+    }
+  },
+  "TEST_COMMENTS": {
+    "platform": "test",
+    "path": "config/comments",
+    "configuration": {
+      "omitAdgHackRules": false,
+      "omitCommentRules": true,
+      "omitContentRules": false,
+      "omitRulePatterns": false,
+      "ignoreRuleHints": true
+    }
+  },
+  "TEST_HINTS": {
+    "platform": "test",
+    "path": "hints",
+    "configuration": {
+      "omitAdgHackRules": false,
+      "omitCommentRules": false,
+      "omitContentRules": false,
+      "omitRulePatterns": false,
+      "ignoreRuleHints": false
+    }
+  }
+}

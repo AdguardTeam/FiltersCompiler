@@ -27,7 +27,7 @@ module.exports = (function () {
     const converter = require("./converter.js");
     const validator = require("./validator.js");
     const sorter = require("./sorting.js");
-    const generator = require("./generator.js");
+    const generator = require("./platforms/generator.js");
     const logger = require("./utils/log.js");
     const utils = require("./utils/utils.js");
 
@@ -330,10 +330,10 @@ module.exports = (function () {
      * @param domainBlacklistFile
      * @param platformsPath
      */
-    const build = function (filtersDir, logFile, domainBlacklistFile, platformsPath) {
+    const build = function (filtersDir, logFile, domainBlacklistFile, platformsPath, platformsConfigFile) {
         logger.initialize(logFile);
         validator.init(domainBlacklistFile);
-        generator.init(FILTER_FILE, METADATA_FILE, REVISION_FILE);
+        generator.init(FILTER_FILE, METADATA_FILE, REVISION_FILE, platformsConfigFile);
 
         const items = fs.readdirSync(filtersDir);
 

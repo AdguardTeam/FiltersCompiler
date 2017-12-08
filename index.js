@@ -6,8 +6,8 @@ module.exports = (function () {
 
     let builder = require("./src/main/builder.js");
 
-    let compile = function (path, logPath, domainBlacklistFile, platformsPath) {
-        return builder.build(path, logPath, domainBlacklistFile, platformsPath);
+    let compile = function (path, logPath, domainBlacklistFile, platformsPath, platformsConfig) {
+        return builder.build(path, logPath, domainBlacklistFile, platformsPath, platformsConfig);
     };
 
     return {

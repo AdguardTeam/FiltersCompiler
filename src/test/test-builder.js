@@ -76,26 +76,33 @@ QUnit.test("Test builder - platforms", (assert) => {
     const filtersDir = path.join(__dirname, './resources/filters');
     const logFile = path.join(__dirname, './resources/log_platforms.txt');
     const platforms = path.join(__dirname, './resources/platforms');
-    builder.build(filtersDir, logFile, null, platforms);
+    const platformsConfig = path.join(__dirname, './resources/platforms.json');
+    builder.build(filtersDir, logFile, null, platforms, platformsConfig);
 
     const filterText = readFile(path.join(filtersDir, 'filter_2_English', 'filter.txt'));
     assert.ok(filterText);
 
-    assert.ok(fs.existsSync(path.join(platforms, 'android')));
-    assert.ok(fs.existsSync(path.join(platforms, 'extension')));
-    assert.ok(fs.existsSync(path.join(platforms, 'extension/chromium')));
-    assert.ok(fs.existsSync(path.join(platforms, 'extension/ublock')));
-
-    const filterContent = readFile(path.join(platforms, 'extension/chromium', '2.txt'));
+    let filterContent = readFile(path.join(platforms, 'test', '2.txt'));
     assert.ok(filterContent);
 
-    const filterLines = filterContent.split('\r\n');
+    let filterLines = filterContent.split('\r\n');
     assert.equal(filterLines.length, 24);
 
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
+    assert.ok(filterLines.indexOf('! some common rules could be places here') >= 0);
 
+    //TODO: Add optimized
     //const filterOptimizedContent = readFile(path.join(platforms, 'extension/chromium', '2_optimized.txt'));
 
     //TODO: Add more different cases
     //TODO: Add hints cases
+
+    filterContent = readFile(path.join(platforms, 'config/comments', '2.txt'));
+    assert.ok(filterContent);
+
+    filterLines = filterContent.split('\r\n');
+    assert.equal(filterLines.length, 12);
+
+    assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
+    assert.notOk(filterLines.indexOf('! some common rules could be places here') >= 0);
 });
