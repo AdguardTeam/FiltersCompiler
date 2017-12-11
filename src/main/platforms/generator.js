@@ -7,11 +7,14 @@ module.exports = (() => {
     const fs = require('fs');
     const path = require('path');
     const md5 = require('md5');
+    const downloadFileSync = require('download-file-sync');
 
     const logger = require("../utils/log.js");
     const filter = require("./filter.js");
 
     const RULES_SEPARATOR = "\r\n";
+
+    const OPTIMIZATION_STATS_DOWNLOAD_URL = 'https://chrome.adtidy.org/filters/{0}/stats.json?key=4DDBE80A3DA94D819A00523252FB6380';
 
     /**
      * Platforms configurations
@@ -20,6 +23,7 @@ module.exports = (() => {
     let filterFile = null;
     let metadataFile = null;
     let revisionFile = null;
+    let optimizationEnabled = true;
 
     /**
      * Sync reads file content
@@ -148,24 +152,31 @@ module.exports = (() => {
         let mask = 'filter_';
         const filterId = filterDir.substring(filterDir.lastIndexOf(mask) + mask.length, filterDir.lastIndexOf('_'));
 
-        const originalRules = readFile(path.join(filterDir, filterFile));
+        const originalRules = readFile(path.join(filterDir, filterFile)).split('\r\n');
 
         const metadataFilePath = path.join(filterDir, metadataFile);
         const revisionFilePath = path.join(filterDir, revisionFile);
         const header = makeHeader(metadataFilePath, revisionFilePath);
 
+        let optimizationConfig;
+        if (optimizationEnabled) {
+            optimizationConfig = downloadFileSync(OPTIMIZATION_STATS_DOWNLOAD_URL.replace('{0}', filterId));
+        }
+
         for (let platform in platformPathsConfig) {
 
             const config = platformPathsConfig[platform];
-            const rules = filter.cleanupRules(originalRules.split('\r\n'), config);
+            const rules = filter.cleanupRules(originalRules, config);
+            const optimizedRules = filter.cleanupAndOptimizeRules(originalRules, config, optimizationConfig, filterId);
+
             const platformHeader = [calculateChecksum(header, rules)].concat(header);
+            const platformOptimizedHeader = [calculateChecksum(header, optimizedRules)].concat(header);
 
-            //TODO: Add optimization configs
-
-            logger.log(`Filter ${filterId}. Rules ${originalRules.length} => ${rules.length} => {?}. PlatformPath: '${config.path}'`);
+            logger.log(`Filter ${filterId}. Rules ${originalRules.length} => ${rules.length} => ${rules.length}. PlatformPath: '${config.path}'`);
 
             const platformDir = path.join(platformsPath, config.path);
             writeFilterRules(filterId, platformDir, config.platform, platformHeader, rules, false);
+            writeFilterRules(filterId, platformDir, config.platform, platformOptimizedHeader, optimizedRules, true);
         }
     };
 
@@ -225,8 +236,16 @@ module.exports = (() => {
         }
     };
 
+    /**
+     * Disables optimized filter builds
+     */
+    const disableOptimization = function () {
+        optimizationEnabled = false;
+    };
+
     return {
         init: init,
-        generate: generate
+        generate: generate,
+        disableOptimization: disableOptimization
     };
 })();

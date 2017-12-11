@@ -14,6 +14,9 @@ QUnit.test("Test builder", (assert) => {
         }
     };
 
+    const generator = require("../main/platforms/generator.js");
+    generator.disableOptimization();
+
     const builder = require("../main/builder.js");
     assert.ok(builder);
 
@@ -70,6 +73,9 @@ QUnit.test("Test builder - platforms", (assert) => {
         }
     };
 
+    const generator = require("../main/platforms/generator.js");
+    generator.disableOptimization();
+
     const builder = require("../main/builder.js");
 
     const filtersDir = path.join(__dirname, './resources/filters');
@@ -120,7 +126,4 @@ QUnit.test("Test builder - platforms", (assert) => {
     assert.ok(filterLines.indexOf('||adg_start_script_inject') >= 0);
     assert.ok(filterLines.indexOf('~nigma.ru,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]') >= 0);
     assert.notOk(filterLines.indexOf('excluded_platform') >= 0);
-
-    //TODO: Add optimized
-    //const filterOptimizedContent = readFile(path.join(platforms, 'extension/chromium', '2_optimized.txt'));
 });

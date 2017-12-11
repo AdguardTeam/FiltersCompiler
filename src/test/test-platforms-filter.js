@@ -43,7 +43,74 @@ QUnit.test("Test hints", (assert) => {
     assert.ok(after.indexOf('included_platform_2') >= 0);
     assert.ok(after.indexOf('not_optimized') >= 0);
     assert.ok(after.indexOf('invalid_hint') >= 0);
-
-    //TODO: Check NOT_OPTIMIZED hint
 });
 
+QUnit.test("Test optimization hints", (assert) => {
+    'use strict';
+
+    const filter = require('../main/platforms/filter.js');
+
+    const config = {
+        "platform": "test",
+        "path": "hints",
+        "configuration": {
+            "omitAdgHackRules": false,
+            "omitCommentRules": false,
+            "omitContentRules": false,
+            "omitRulePatterns": false,
+            "ignoreRuleHints": false
+        }
+    };
+
+    const optimizationConfig = {
+        "groups": [
+            {
+                "config": {
+                    "type": "WHITELIST",
+                    "scope": "DOMAIN",
+                    "hits": 1
+                },
+                "rules": {
+                    "optimized.com": 0,
+                    "other.com": 4,
+                    "not_optimized": 1
+                }
+            },
+            {
+                "config": {
+                    "type": "ELEMHIDE",
+                    "scope": "DOMAIN",
+                    "hits": 70
+                },
+                "rules": {
+                    "###optimized": 0,
+                    "###rule2": 4,
+                    "###rule3": 1
+                }
+            }
+        ],
+        "percent": 10
+    };
+
+    //TODO: Check optimization percent
+
+    const before = [
+        "! Comment",
+        "example.com",
+        "optimized.com",
+        "###optimized",
+        "!+ NOT_OPTIMIZED",
+        "not_optimized"
+    ];
+
+    const after = filter.cleanupAndOptimizeRules(before, config, optimizationConfig, 0);
+
+    assert.ok(after);
+    assert.equal(after.length, 3);
+
+    assert.notOk(after.indexOf('! Comment') >= 0);
+    assert.ok(after.indexOf('example.com') >= 0);
+    assert.notOk(after.indexOf('optimized.com') >= 0);
+    assert.notOk(after.indexOf('###optimized') >= 0);
+    assert.ok(after.indexOf('not_optimized') >= 0);
+});
