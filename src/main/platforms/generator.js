@@ -172,7 +172,7 @@ module.exports = (() => {
             const platformHeader = [calculateChecksum(header, rules)].concat(header);
             const platformOptimizedHeader = [calculateChecksum(header, optimizedRules)].concat(header);
 
-            logger.log(`Filter ${filterId}. Rules ${originalRules.length} => ${rules.length} => ${rules.length}. PlatformPath: '${config.path}'`);
+            logger.log(`Filter ${filterId}. Rules ${originalRules.length} => ${rules.length} => ${optimizedRules.length}. PlatformPath: '${config.path}'`);
 
             const platformDir = path.join(platformsPath, config.path);
             writeFilterRules(filterId, platformDir, config.platform, platformHeader, rules, false);
