@@ -113,10 +113,10 @@ module.exports = (() => {
                 if (!fs.existsSync(currentPath)) {
                     fs.mkdirSync(currentPath);
                 }
-            }
-            else {
+            } else {
                 currentPath = subPath;
             }
+
             return currentPath;
         }, '');
     };
@@ -194,8 +194,7 @@ module.exports = (() => {
 
         const config = readFile(platformsConfigFile);
         if (!config) {
-            let message = 'Platforms config file is invalid';
-            logger.error(message);
+            logger.error('Platforms config file is invalid: ' + platformsConfigFile);
             return;
         }
 

@@ -108,14 +108,14 @@ module.exports = (() => {
             return true;
         }
 
+        if (!platform) {
+            return true;
+        }
+
         const stripped = hint.substring(HINT_MASK.length).trim();
 
         const supportedPlatforms = parsePlatforms(stripped, PLATFORM_HINT_REGEXP);
         const unsupportedPlatforms = parsePlatforms(stripped, NOT_PLATFORM_HINT_REGEXP);
-
-        if (!platform) {
-            return true;
-        }
 
         const supported = supportedPlatforms.length === 0 || supportedPlatforms.indexOf(platform) >= 0;
         const unsupported = unsupportedPlatforms.length > 0 && unsupportedPlatforms.indexOf(platform) >= 0;
