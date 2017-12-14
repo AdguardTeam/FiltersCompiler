@@ -122,6 +122,159 @@ module.exports = (() => {
     };
 
     /**
+     * Writes metadata files
+     */
+    const writeFiltersMetadata = function (platformsPath, filtersDir, filtersMetadata) {
+        logger.log('Writing filters metadata');
+
+        const groups = JSON.parse(readFile(path.join(filtersDir, '../groups', 'metadata.json')));
+        if (!groups) {
+            logger.error('Error reading groups metadata');
+            return;
+        }
+
+        let tags = JSON.parse(readFile(path.join(filtersDir, '../tags', 'metadata.json')));
+        if (!tags) {
+            logger.error('Error reading tags metadata');
+            return;
+        }
+
+        const localizations = loadLocales(path.join(filtersDir, '../locales'));
+
+        for (let platform in platformPathsConfig) {
+            const config = platformPathsConfig[platform];
+            const platformDir = path.join(platformsPath, config.path);
+            createDir(platformDir);
+
+            logger.log('Writing filters metadata: ' + config.path);
+            const filtersFile = path.join(platformDir, `filters.json`);
+            const metadata = {groups: groups, tags: tags, filters: filtersMetadata};
+            if (platform === 'MAC') {
+                //Hide tag fields for old app versions
+                delete metadata.tags;
+            }
+            fs.writeFileSync(filtersFile, JSON.stringify(metadata, null, '\t'), 'utf8');
+
+            logger.log('Writing filters localizations: ' + config.path);
+            const filtersI18nFile = path.join(platformDir, `filters_i18n.json`);
+            const i18nMetadata = {groups: localizations.groups, tags: localizations.tags, filters: localizations.filters};
+            if (platform === 'MAC') {
+                //Hide tag fields for old app versions
+                delete i18nMetadata.tags;
+            }
+            fs.writeFileSync(filtersI18nFile, JSON.stringify(i18nMetadata, null, '\t'), 'utf8');
+        }
+
+        logger.log('Writing filters metadata done');
+    };
+
+    /**
+     * Loads filter metadata
+     *
+     * @param filterDir
+     * @returns {null}
+     */
+    const loadFilterMetadata = function (filterDir) {
+        const metadataFilePath = path.join(filterDir, metadataFile);
+
+        const metadataString = readFile(metadataFilePath);
+        if (!metadataString) {
+            logger.error('Error reading filter metadata:' + filterDir);
+            return null;
+        }
+
+        return JSON.parse(metadataString);
+    };
+
+    /**
+     * Parses object info
+     * @param string
+     * @param mask
+     * @returns {{id: *, message: *}}
+     */
+    const parseInfo = (string, mask) => {
+        let searchIndex = string.indexOf(mask) + mask.length;
+
+        return {
+            id: string.substring(searchIndex, string.indexOf('.', searchIndex)),
+            message: string.substring(string.lastIndexOf('.') + 1)
+        };
+    };
+
+    /**
+     * Loads localizations
+     *
+     * @param dir
+     */
+    const loadLocales = function (dir) {
+
+        const result = {
+            groups: {},
+            tags: {},
+            filters: {}
+        };
+
+        const locales = fs.readdirSync(dir);
+        for (let directory of locales) {
+            const localeDir = path.join(dir, directory);
+            if (fs.lstatSync(localeDir).isDirectory()) {
+                const groups = JSON.parse(readFile(path.join(localeDir, 'groups.json')));
+                if (groups) {
+                    for (let group of groups) {
+                        for (let p in group) {
+                            const info = parseInfo(p, 'group.');
+                            if (!info || !info.id) {
+                                continue;
+                            }
+
+                            let id = info.id;
+                            result.groups[id] = result.groups[id] || {};
+                            result.groups[id][directory] = result.groups[id][directory] || {};
+                            result.groups[id][directory][info.message] = group[p];
+                        }
+                    }
+                }
+
+                let tags = JSON.parse(readFile(path.join(localeDir, 'tags.json')));
+                if (tags) {
+                    for (let tag of tags) {
+                        for (let p in tag) {
+                            const info = parseInfo(p, 'tag.');
+                            if (!info || !info.id) {
+                                continue;
+                            }
+
+                            let id = info.id;
+                            result.tags[id] = result.tags[id] || {};
+                            result.tags[id][directory] = result.tags[id][directory] || {};
+                            result.tags[id][directory][info.message] = tag[p];
+                        }
+                    }
+                }
+
+                let filters = JSON.parse(readFile(path.join(localeDir, 'filters.json')));
+                if (filters) {
+                    for (let filter of filters) {
+                        for (let p in filter) {
+                            const info = parseInfo(p, 'filter.');
+                            if (!info || !info.id) {
+                                continue;
+                            }
+
+                            let id = info.id;
+                            result.filters[id] = result.filters[id] || {};
+                            result.filters[id][directory] = result.filters[id][directory] || {};
+                            result.filters[id][directory][info.message] = filter[p];
+                        }
+                    }
+                }
+            }
+        }
+
+        return result;
+    };
+
+    /**
      * Writes filter platform build
      */
     const writeFilterRules = function (filterId, dir, platform, rulesHeader, rules, optimized) {
@@ -220,10 +373,8 @@ module.exports = (() => {
 
         createDir(platformsPath);
 
-        //TODO: Write metadata?
-
+        const filtersMetadata = [];
         const items = fs.readdirSync(filtersDir);
-
         for (let directory of items) {
             const filterDir = path.join(filtersDir, directory);
             if (fs.lstatSync(filterDir).isDirectory()) {
@@ -231,8 +382,12 @@ module.exports = (() => {
                 logger.log(`Building filter platforms: ${directory}`);
                 buildFilter(filterDir, platformsPath);
                 logger.log(`Building filter platforms: ${directory} done`);
+
+                filtersMetadata.push(loadFilterMetadata(filterDir));
             }
         }
+
+        writeFiltersMetadata(platformsPath, filtersDir, filtersMetadata);
     };
 
     /**
