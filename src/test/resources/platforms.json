@@ -1,6 +1,6 @@
 {
   "TEST": {
-    "platform": "one",
+    "platform": "ext_ublock",
     "path": "test",
     "configuration": {
       "omitAdgHackRules": false,

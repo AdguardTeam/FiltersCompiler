@@ -11,6 +11,7 @@ module.exports = (() => {
 
     const logger = require("../utils/log.js");
     const filter = require("./filter.js");
+    const workaround = require('../utils/workaround.js');
 
     const RULES_SEPARATOR = "\r\n";
 
@@ -284,12 +285,17 @@ module.exports = (() => {
 
         createDir(dir);
 
-        // TODO: Ublock exception
-        // For the English filter only we should provide additional filter version.
-        // if (filterId === 2 && platform === 'ext_ublock' && !optimized) {
-        //     const secondFile = path.join(dir, `${filterId}_without_easylist.txt`)
-        //     //FileUtils.writeStringToFile(file, joinRulesWithHeader(WorkaroundUtils.rewriteHeader(header), WorkaroundUtils.rewriteRules(rules), RULES_SEPARATOR), "utf-8");
-        // }
+        // For English filter only we should provide additional filter version.
+        if (filterId == 2 && platform === 'ext_ublock' && !optimized) {
+            const secondFile = path.join(dir, `${filterId}_without_easylist.txt`);
+
+            let correctedHeader = workaround.rewriteHeader(rulesHeader);
+            let correctedRules = workaround.rewriteRules(rules);
+            const header = [calculateChecksum(correctedHeader, correctedRules)].concat(correctedHeader);
+            const correctedData = header.concat(correctedRules).join(RULES_SEPARATOR);
+
+            fs.writeFileSync(secondFile, correctedData, 'utf8');
+        }
 
         fs.writeFileSync(filterFile, data, 'utf8');
     };
