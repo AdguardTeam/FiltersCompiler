@@ -1,0 +1,219 @@
+{
+  "WINDOWS": {
+    "platform": "windows",
+    "path": "windows",
+    "configuration": {
+      "omitAdgHackRules": false,
+      "omitCommentRules": false,
+      "omitContentRules": false,
+      "omitRulePatterns": false,
+      "ignoreRuleHints": false
+    }
+  },
+  "MAC": {
+    "platform": "mac",
+    "path": "mac",
+    "configuration": {
+      "omitAdgHackRules": false,
+      "omitCommentRules": false,
+      "omitContentRules": false,
+      "omitRulePatterns": false,
+      "ignoreRuleHints": false
+    }
+  },
+  "MAC_V2": {
+    "platform": "mac",
+    "path": "mac_v2",
+    "configuration": {
+      "omitAdgHackRules": false,
+      "omitCommentRules": false,
+      "omitContentRules": false,
+      "omitRulePatterns": false,
+      "ignoreRuleHints": false
+    }
+  },
+
+  "ANDROID": {
+    "platform": "android",
+    "path": "android",
+    "configuration": {
+      "omitAdgHackRules": true,
+      "omitCommentRules": false,
+      "omitContentRules": false,
+      "omitRulePatterns": ["$stealth"],
+      "ignoreRuleHints": false
+    }
+  },
+
+  "IOS": {
+    "platform": "ios",
+    "path": "ios",
+    "configuration": {
+      "omitAdgHackRules": true,
+      "omitCommentRules": false,
+      "omitContentRules": true,
+      "omitRulePatterns": [
+        "#%#",
+        "#@%#",
+        "#$#",
+        "#@$#",
+        "$mp4",
+        "$replace=",
+        "$stealth",
+        "$empty",
+        "important,replace=",
+        "$app",
+        "$protobuf",
+        "important,protobuf",
+        "[-ext-",
+        "$$"],
+      "ignoreRuleHints": false
+    }
+  },
+
+  "EXTENSION_CHROMIUM": {
+    "platform": "ext_chromium",
+    "path": "extension/chromium",
+    "configuration": {
+      "omitAdgHackRules": true,
+      "omitCommentRules": false,
+      "omitContentRules": true,
+      "omitRulePatterns": [
+        "$mp4",
+        "$replace=",
+        "$stealth",
+        "important,replace=",
+        "$app", "$network",
+        "$protobuf",
+        "important,protobuf",
+        "$$"],
+      "ignoreRuleHints": false
+    }
+  },
+  "EXTENSION_FIREFOX": {
+    "platform": "ext_ff",
+    "path": "extension/firefox",
+    "configuration": {
+      "omitAdgHackRules": true,
+      "omitCommentRules": false,
+      "omitContentRules": true,
+      "omitRulePatterns": [
+        "$mp4",
+        "$replace=",
+        "$stealth",
+        "important,replace=",
+        "$app", "$network",
+        "$protobuf",
+        "important,protobuf",
+        "$$"],
+      "ignoreRuleHints": false
+    }
+  },
+  "EXTENSION_SAFARI": {
+    "platform": "ext_safari",
+    "path": "extension/safari",
+    "configuration": {
+      "omitAdgHackRules": true,
+      "omitCommentRules": false,
+      "omitContentRules": true,
+      "omitRulePatterns": [
+        "$mp4",
+        "$replace=",
+        "$stealth",
+        "important,replace=",
+        "$app", "$network",
+        "$protobuf",
+        "important,protobuf",
+        "$$",
+        "$csp"],
+      "ignoreRuleHints": false
+    }
+  },
+  "EXTENSION_EDGE": {
+    "platform": "ext_edge",
+    "path": "extension/edge",
+    "configuration": {
+      "omitAdgHackRules": true,
+      "omitCommentRules": false,
+      "omitContentRules": true,
+      "omitRulePatterns": [
+        "$mp4",
+        "$replace=",
+        "$stealth",
+        "important,replace=",
+        "$app", "$network",
+        "$protobuf",
+        "important,protobuf",
+        "$$"],
+      "ignoreRuleHints": false
+    }
+  },
+  "EXTENSION_OPERA": {
+    "platform": "ext_opera",
+    "path": "extension/opera",
+    "configuration": {
+      "omitAdgHackRules": true,
+      "omitCommentRules": false,
+      "omitContentRules": true,
+      "omitRulePatterns": [
+        "$mp4",
+        "$replace=",
+        "$stealth",
+        "important,replace=",
+        "$app", "$network",
+        "$protobuf",
+        "important,protobuf",
+        "$$"],
+      "ignoreRuleHints": false
+    }
+  },
+
+  "EXTENSION_ANDROID_CONTENT_BLOCKER": {
+    "platform": "ext_android_cb",
+    "path": "extension/android-content-blocker",
+    "configuration": {
+      "omitAdgHackRules": true,
+      "omitCommentRules": false,
+      "omitContentRules": true,
+      "omitRulePatterns": [
+        "#%#",
+        "#@%#",
+        "#$#",
+        "#@$#",
+        "$mp4",
+        "$replace=",
+        "$stealth",
+        "$empty",
+        "important,replace=",
+        "$app",
+        "$protobuf",
+        "important,protobuf",
+        "[-ext-",
+        "$$",
+        "$csp"],
+      "ignoreRuleHints": false
+    }
+  },
+
+  "EXTENSION_UBLOCK": {
+    "platform": "ext_ublock",
+    "path": "extension/ublock",
+    "configuration": {
+      "omitAdgHackRules": true,
+      "omitCommentRules": false,
+      "omitContentRules": true,
+      "omitRulePatterns": [
+        "$mp4",
+        "$replace=",
+        "$stealth",
+        "important,replace=",
+        "$app", "$network",
+        "$protobuf",
+        "important,protobuf",
+        "$$",
+        "#%#",
+        "#@%#"],
+      "ignoreRuleHints": false
+    }
+  }
+}
