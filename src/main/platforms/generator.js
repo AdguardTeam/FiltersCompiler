@@ -148,7 +148,7 @@ module.exports = (() => {
             createDir(platformDir);
 
             logger.log('Writing filters metadata: ' + config.path);
-            const filtersFile = path.join(platformDir, `filters.json`);
+            const filtersFile = path.join(platformDir, 'filters.json');
             const metadata = {groups: groups, tags: tags, filters: filtersMetadata};
             if (platform === 'MAC') {
                 //Hide tag fields for old app versions
