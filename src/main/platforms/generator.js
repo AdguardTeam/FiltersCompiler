@@ -157,7 +157,7 @@ module.exports = (() => {
             fs.writeFileSync(filtersFile, JSON.stringify(metadata, null, '\t'), 'utf8');
 
             logger.log('Writing filters localizations: ' + config.path);
-            const filtersI18nFile = path.join(platformDir, `filters_i18n.json`);
+            const filtersI18nFile = path.join(platformDir, 'filters_i18n.json');
             const i18nMetadata = {groups: localizations.groups, tags: localizations.tags, filters: localizations.filters};
             if (platform === 'MAC') {
                 //Hide tag fields for old app versions
@@ -180,8 +180,7 @@ module.exports = (() => {
 
         const metadataString = readFile(metadataFilePath);
         if (!metadataString) {
-            logger.error('Error reading filter metadata:' + filterDir);
-            return null;
+            throw new Error('Error reading filter metadata:' + filterDir);
         }
 
         return JSON.parse(metadataString);
@@ -189,6 +188,8 @@ module.exports = (() => {
 
     /**
      * Parses object info
+     * Splits string {mask}{id}.{message} like "group.1.name" etc.
+     *
      * @param string
      * @param mask
      * @returns {{id: *, message: *}}
@@ -287,14 +288,14 @@ module.exports = (() => {
 
         // For English filter only we should provide additional filter version.
         if (filterId == 2 && platform === 'ext_ublock' && !optimized) {
-            const secondFile = path.join(dir, `${filterId}_without_easylist.txt`);
+            const correctedFile = path.join(dir, `${filterId}_without_easylist.txt`);
 
             let correctedHeader = workaround.rewriteHeader(rulesHeader);
             let correctedRules = workaround.rewriteRules(rules);
             const header = [calculateChecksum(correctedHeader, correctedRules)].concat(correctedHeader);
             const correctedData = header.concat(correctedRules).join(RULES_SEPARATOR);
 
-            fs.writeFileSync(secondFile, correctedData, 'utf8');
+            fs.writeFileSync(correctedFile, correctedData, 'utf8');
         }
 
         fs.writeFileSync(filterFile, data, 'utf8');

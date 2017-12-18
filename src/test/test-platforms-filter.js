@@ -9,10 +9,9 @@ QUnit.test("Test hints", (assert) => {
         "platform": "test",
         "path": "hints",
         "configuration": {
-            "omitAdgHackRules": false,
-            "omitCommentRules": false,
-            "omitContentRules": false,
-            "omitRulePatterns": false,
+            "removeCommentRules": false,
+            "removeContentRules": false,
+            "removeRulePatterns": false,
             "ignoreRuleHints": false
         }
     };
@@ -54,10 +53,9 @@ QUnit.test("Test optimization hints", (assert) => {
         "platform": "test",
         "path": "hints",
         "configuration": {
-            "omitAdgHackRules": false,
-            "omitCommentRules": false,
-            "omitContentRules": false,
-            "omitRulePatterns": false,
+            "removeCommentRules": false,
+            "removeContentRules": false,
+            "removeRulePatterns": false,
             "ignoreRuleHints": false
         }
     };

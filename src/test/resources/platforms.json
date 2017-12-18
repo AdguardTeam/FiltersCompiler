@@ -3,10 +3,9 @@
     "platform": "ext_ublock",
     "path": "test",
     "configuration": {
-      "omitAdgHackRules": false,
-      "omitCommentRules": false,
-      "omitContentRules": false,
-      "omitRulePatterns": false,
+      "removeCommentRules": false,
+      "removeContentRules": false,
+      "removeRulePatterns": false,
       "ignoreRuleHints": false
     }
   },
@@ -14,10 +13,9 @@
     "platform": "test",
     "path": "config/test",
     "configuration": {
-      "omitAdgHackRules": true,
-      "omitCommentRules": true,
-      "omitContentRules": true,
-      "omitRulePatterns": [
+      "removeCommentRules": true,
+      "removeContentRules": true,
+      "removeRulePatterns": [
         "test-common-1-rule"],
       "ignoreRuleHints": true
     }
@@ -26,10 +24,9 @@
     "platform": "test",
     "path": "hints",
     "configuration": {
-      "omitAdgHackRules": false,
-      "omitCommentRules": false,
-      "omitContentRules": false,
-      "omitRulePatterns": false,
+      "removeCommentRules": false,
+      "removeContentRules": false,
+      "removeRulePatterns": false,
       "ignoreRuleHints": false
     }
   }

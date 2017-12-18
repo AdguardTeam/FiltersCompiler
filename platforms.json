@@ -3,10 +3,9 @@
     "platform": "windows",
     "path": "windows",
     "configuration": {
-      "omitAdgHackRules": false,
-      "omitCommentRules": false,
-      "omitContentRules": false,
-      "omitRulePatterns": false,
+      "removeCommentRules": false,
+      "removeContentRules": false,
+      "removeRulePatterns": false,
       "ignoreRuleHints": false
     }
   },
@@ -14,10 +13,9 @@
     "platform": "mac",
     "path": "mac",
     "configuration": {
-      "omitAdgHackRules": false,
-      "omitCommentRules": false,
-      "omitContentRules": false,
-      "omitRulePatterns": false,
+      "removeCommentRules": false,
+      "removeContentRules": false,
+      "removeRulePatterns": false,
       "ignoreRuleHints": false
     }
   },
@@ -25,10 +23,9 @@
     "platform": "mac",
     "path": "mac_v2",
     "configuration": {
-      "omitAdgHackRules": false,
-      "omitCommentRules": false,
-      "omitContentRules": false,
-      "omitRulePatterns": false,
+      "removeCommentRules": false,
+      "removeContentRules": false,
+      "removeRulePatterns": false,
       "ignoreRuleHints": false
     }
   },
@@ -37,10 +34,9 @@
     "platform": "android",
     "path": "android",
     "configuration": {
-      "omitAdgHackRules": true,
-      "omitCommentRules": false,
-      "omitContentRules": false,
-      "omitRulePatterns": ["$stealth"],
+      "removeCommentRules": false,
+      "removeContentRules": false,
+      "removeRulePatterns": ["$stealth"],
       "ignoreRuleHints": false
     }
   },
@@ -49,10 +45,9 @@
     "platform": "ios",
     "path": "ios",
     "configuration": {
-      "omitAdgHackRules": true,
-      "omitCommentRules": false,
-      "omitContentRules": true,
-      "omitRulePatterns": [
+      "removeCommentRules": false,
+      "removeContentRules": true,
+      "removeRulePatterns": [
         "#%#",
         "#@%#",
         "#$#",
@@ -75,10 +70,9 @@
     "platform": "ext_chromium",
     "path": "extension/chromium",
     "configuration": {
-      "omitAdgHackRules": true,
-      "omitCommentRules": false,
-      "omitContentRules": true,
-      "omitRulePatterns": [
+      "removeCommentRules": false,
+      "removeContentRules": true,
+      "removeRulePatterns": [
         "$mp4",
         "$replace=",
         "$stealth",
@@ -94,10 +88,9 @@
     "platform": "ext_ff",
     "path": "extension/firefox",
     "configuration": {
-      "omitAdgHackRules": true,
-      "omitCommentRules": false,
-      "omitContentRules": true,
-      "omitRulePatterns": [
+      "removeCommentRules": false,
+      "removeContentRules": true,
+      "removeRulePatterns": [
         "$mp4",
         "$replace=",
         "$stealth",
@@ -113,10 +106,9 @@
     "platform": "ext_safari",
     "path": "extension/safari",
     "configuration": {
-      "omitAdgHackRules": true,
-      "omitCommentRules": false,
-      "omitContentRules": true,
-      "omitRulePatterns": [
+      "removeCommentRules": false,
+      "removeContentRules": true,
+      "removeRulePatterns": [
         "$mp4",
         "$replace=",
         "$stealth",
@@ -133,10 +125,9 @@
     "platform": "ext_edge",
     "path": "extension/edge",
     "configuration": {
-      "omitAdgHackRules": true,
-      "omitCommentRules": false,
-      "omitContentRules": true,
-      "omitRulePatterns": [
+      "removeCommentRules": false,
+      "removeContentRules": true,
+      "removeRulePatterns": [
         "$mp4",
         "$replace=",
         "$stealth",
@@ -152,10 +143,9 @@
     "platform": "ext_opera",
     "path": "extension/opera",
     "configuration": {
-      "omitAdgHackRules": true,
-      "omitCommentRules": false,
-      "omitContentRules": true,
-      "omitRulePatterns": [
+      "removeCommentRules": false,
+      "removeContentRules": true,
+      "removeRulePatterns": [
         "$mp4",
         "$replace=",
         "$stealth",
@@ -172,10 +162,9 @@
     "platform": "ext_android_cb",
     "path": "extension/android-content-blocker",
     "configuration": {
-      "omitAdgHackRules": true,
-      "omitCommentRules": false,
-      "omitContentRules": true,
-      "omitRulePatterns": [
+      "removeCommentRules": false,
+      "removeContentRules": true,
+      "removeRulePatterns": [
         "#%#",
         "#@%#",
         "#$#",
@@ -199,10 +188,9 @@
     "platform": "ext_ublock",
     "path": "extension/ublock",
     "configuration": {
-      "omitAdgHackRules": true,
-      "omitCommentRules": false,
-      "omitContentRules": true,
-      "omitRulePatterns": [
+      "removeCommentRules": false,
+      "removeContentRules": true,
+      "removeRulePatterns": [
         "$mp4",
         "$replace=",
         "$stealth",

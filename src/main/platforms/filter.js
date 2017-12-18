@@ -10,10 +10,6 @@ module.exports = (() => {
 
     const HINT_MASK = RuleMasks.MASK_HINT + " ";
 
-    const ADG_SCRIPT_HACK = "adg_start_script_inject";
-    const ADG_STYLE_HACK = "adg_start_style_inject";
-    const LOADED_SCRIPT_STRING = "loaded-script=\"true\"";
-
     const PLATFORM_HINT_REGEXP = /(^| )PLATFORM\(([^)]+)\)/g;
     const NOT_PLATFORM_HINT_REGEXP = /(.*)NOT_PLATFORM\(([^)]+)\)/g;
 
@@ -159,26 +155,18 @@ module.exports = (() => {
             return true;
         }
 
-        if (config.configuration.omitCommentRules && ruleText.startsWith(RuleMasks.MASK_COMMENT)) {
+        if (config.configuration.removeCommentRules && ruleText.startsWith(RuleMasks.MASK_COMMENT)) {
             return true;
         }
 
-        if (config.configuration.omitAdgHackRules &&
-            (ruleText.includes(ADG_SCRIPT_HACK) ||
-            ruleText.includes(ADG_STYLE_HACK) ||
-            ruleText.includes(LOADED_SCRIPT_STRING))) {
-
-            return true;
-        }
-
-        if (config.configuration.omitContentRules &&
+        if (config.configuration.removeContentRules &&
             (ruleText.includes(RuleMasks.MASK_CONTENT) ||
             ruleText.includes(RuleMasks.MASK_CONTENT_EXCEPTION))) {
             return true;
         }
 
-        if (config.configuration.omitRulePatterns) {
-            for (let pattern of config.configuration.omitRulePatterns) {
+        if (config.configuration.removeRulePatterns) {
+            for (let pattern of config.configuration.removeRulePatterns) {
                 if (ruleText.includes(pattern)) {
                     return true;
                 }
@@ -301,7 +289,7 @@ module.exports = (() => {
      */
     const cleanupAndOptimizeRules = function (rules, config, optimizationConfig, filterId) {
 
-        config.configuration.omitCommentRules = true;
+        config.configuration.removeCommentRules = true;
 
         const ruleLines = splitRuleHintLines(rules, config.platform);
 
