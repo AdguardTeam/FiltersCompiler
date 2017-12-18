@@ -3,8 +3,6 @@
     "platform": "ext_ublock",
     "path": "test",
     "configuration": {
-      "removeCommentRules": false,
-      "removeContentRules": false,
       "removeRulePatterns": false,
       "ignoreRuleHints": false
     }
@@ -13,9 +11,9 @@
     "platform": "test",
     "path": "config/test",
     "configuration": {
-      "removeCommentRules": true,
-      "removeContentRules": true,
       "removeRulePatterns": [
+        "^\\!",
+        "\\$\\$|\\$\\@\\$",
         "test-common-1-rule"],
       "ignoreRuleHints": true
     }
@@ -24,8 +22,6 @@
     "platform": "test",
     "path": "hints",
     "configuration": {
-      "removeCommentRules": false,
-      "removeContentRules": false,
       "removeRulePatterns": false,
       "ignoreRuleHints": false
     }

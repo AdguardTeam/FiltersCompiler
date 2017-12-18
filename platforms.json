@@ -3,8 +3,6 @@
     "platform": "windows",
     "path": "windows",
     "configuration": {
-      "removeCommentRules": false,
-      "removeContentRules": false,
       "removeRulePatterns": false,
       "ignoreRuleHints": false
     }
@@ -13,8 +11,6 @@
     "platform": "mac",
     "path": "mac",
     "configuration": {
-      "removeCommentRules": false,
-      "removeContentRules": false,
       "removeRulePatterns": false,
       "ignoreRuleHints": false
     }
@@ -23,8 +19,6 @@
     "platform": "mac",
     "path": "mac_v2",
     "configuration": {
-      "removeCommentRules": false,
-      "removeContentRules": false,
       "removeRulePatterns": false,
       "ignoreRuleHints": false
     }
@@ -34,9 +28,7 @@
     "platform": "android",
     "path": "android",
     "configuration": {
-      "removeCommentRules": false,
-      "removeContentRules": false,
-      "removeRulePatterns": ["$stealth"],
+      "removeRulePatterns": ["\\$stealth"],
       "ignoreRuleHints": false
     }
   },
@@ -45,23 +37,21 @@
     "platform": "ios",
     "path": "ios",
     "configuration": {
-      "removeCommentRules": false,
-      "removeContentRules": true,
       "removeRulePatterns": [
+        "\\$\\$|\\$\\@\\$",
         "#%#",
         "#@%#",
-        "#$#",
-        "#@$#",
-        "$mp4",
-        "$replace=",
-        "$stealth",
-        "$empty",
+        "#\\$#",
+        "#@\\$#",
+        "\\$mp4",
+        "\\$replace=",
+        "\\$stealth",
+        "\\$empty",
         "important,replace=",
-        "$app",
-        "$protobuf",
+        "\\$app",
+        "\\$protobuf",
         "important,protobuf",
-        "[-ext-",
-        "$$"],
+        "\\[-ext-"],
       "ignoreRuleHints": false
     }
   },
@@ -70,17 +60,16 @@
     "platform": "ext_chromium",
     "path": "extension/chromium",
     "configuration": {
-      "removeCommentRules": false,
-      "removeContentRules": true,
       "removeRulePatterns": [
-        "$mp4",
-        "$replace=",
-        "$stealth",
+        "\\$\\$|\\$\\@\\$",
+        "\\$mp4",
+        "\\$replace=",
+        "\\$stealth",
         "important,replace=",
-        "$app", "$network",
-        "$protobuf",
-        "important,protobuf",
-        "$$"],
+        "\\$app",
+        "\\$network",
+        "\\$protobuf",
+        "important,protobuf"],
       "ignoreRuleHints": false
     }
   },
@@ -88,17 +77,16 @@
     "platform": "ext_ff",
     "path": "extension/firefox",
     "configuration": {
-      "removeCommentRules": false,
-      "removeContentRules": true,
       "removeRulePatterns": [
-        "$mp4",
-        "$replace=",
-        "$stealth",
+        "\\$\\$|\\$\\@\\$",
+        "\\$mp4",
+        "\\$replace=",
+        "\\$stealth",
         "important,replace=",
-        "$app", "$network",
-        "$protobuf",
-        "important,protobuf",
-        "$$"],
+        "\\$app",
+        "\\$network",
+        "\\$protobuf",
+        "important,protobuf"],
       "ignoreRuleHints": false
     }
   },
@@ -106,18 +94,17 @@
     "platform": "ext_safari",
     "path": "extension/safari",
     "configuration": {
-      "removeCommentRules": false,
-      "removeContentRules": true,
       "removeRulePatterns": [
-        "$mp4",
-        "$replace=",
-        "$stealth",
+        "\\$\\$|\\$\\@\\$",
+        "\\$mp4",
+        "\\$replace=",
+        "\\$stealth",
         "important,replace=",
-        "$app", "$network",
-        "$protobuf",
+        "\\$app",
+        "\\$network",
+        "\\$protobuf",
         "important,protobuf",
-        "$$",
-        "$csp"],
+        "\\$csp"],
       "ignoreRuleHints": false
     }
   },
@@ -125,17 +112,16 @@
     "platform": "ext_edge",
     "path": "extension/edge",
     "configuration": {
-      "removeCommentRules": false,
-      "removeContentRules": true,
       "removeRulePatterns": [
-        "$mp4",
-        "$replace=",
-        "$stealth",
+        "\\$\\$|\\$\\@\\$",
+        "\\$mp4",
+        "\\$replace=",
+        "\\$stealth",
         "important,replace=",
-        "$app", "$network",
-        "$protobuf",
-        "important,protobuf",
-        "$$"],
+        "\\$app",
+        "\\$network",
+        "\\$protobuf",
+        "important,protobuf"],
       "ignoreRuleHints": false
     }
   },
@@ -143,17 +129,16 @@
     "platform": "ext_opera",
     "path": "extension/opera",
     "configuration": {
-      "removeCommentRules": false,
-      "removeContentRules": true,
       "removeRulePatterns": [
-        "$mp4",
-        "$replace=",
-        "$stealth",
+        "\\$\\$|\\$\\@\\$",
+        "\\$mp4",
+        "\\$replace=",
+        "\\$stealth",
         "important,replace=",
-        "$app", "$network",
-        "$protobuf",
-        "important,protobuf",
-        "$$"],
+        "\\$app",
+        "\\$network",
+        "\\$protobuf",
+        "important,protobuf"],
       "ignoreRuleHints": false
     }
   },
@@ -162,24 +147,22 @@
     "platform": "ext_android_cb",
     "path": "extension/android-content-blocker",
     "configuration": {
-      "removeCommentRules": false,
-      "removeContentRules": true,
       "removeRulePatterns": [
+        "\\$\\$|\\$\\@\\$",
         "#%#",
         "#@%#",
-        "#$#",
-        "#@$#",
-        "$mp4",
-        "$replace=",
-        "$stealth",
-        "$empty",
+        "#\\$#",
+        "#@\\$#",
+        "\\$mp4",
+        "\\$replace=",
+        "\\$stealth",
+        "\\$empty",
         "important,replace=",
-        "$app",
-        "$protobuf",
+        "\\$app",
+        "\\$protobuf",
         "important,protobuf",
-        "[-ext-",
-        "$$",
-        "$csp"],
+        "\\[-ext-",
+        "\\$csp"],
       "ignoreRuleHints": false
     }
   },
@@ -188,17 +171,16 @@
     "platform": "ext_ublock",
     "path": "extension/ublock",
     "configuration": {
-      "removeCommentRules": false,
-      "removeContentRules": true,
       "removeRulePatterns": [
-        "$mp4",
-        "$replace=",
-        "$stealth",
+        "\\$\\$|\\$\\@\\$",
+        "\\$mp4",
+        "\\$replace=",
+        "\\$stealth",
         "important,replace=",
-        "$app", "$network",
-        "$protobuf",
+        "\\$app",
+        "\\$network",
+        "\\$protobuf",
         "important,protobuf",
-        "$$",
         "#%#",
         "#@%#"],
       "ignoreRuleHints": false

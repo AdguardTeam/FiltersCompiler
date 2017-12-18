@@ -9,8 +9,6 @@ QUnit.test("Test hints", (assert) => {
         "platform": "test",
         "path": "hints",
         "configuration": {
-            "removeCommentRules": false,
-            "removeContentRules": false,
             "removeRulePatterns": false,
             "ignoreRuleHints": false
         }
@@ -53,8 +51,6 @@ QUnit.test("Test optimization hints", (assert) => {
         "platform": "test",
         "path": "hints",
         "configuration": {
-            "removeCommentRules": false,
-            "removeContentRules": false,
             "removeRulePatterns": false,
             "ignoreRuleHints": false
         }

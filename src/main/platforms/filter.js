@@ -9,6 +9,7 @@ module.exports = (() => {
     const RuleMasks = require('../rule/rule-masks.js');
 
     const HINT_MASK = RuleMasks.MASK_HINT + " ";
+    const COMMENT_REGEXP = "^\\!";
 
     const PLATFORM_HINT_REGEXP = /(^| )PLATFORM\(([^)]+)\)/g;
     const NOT_PLATFORM_HINT_REGEXP = /(.*)NOT_PLATFORM\(([^)]+)\)/g;
@@ -155,19 +156,9 @@ module.exports = (() => {
             return true;
         }
 
-        if (config.configuration.removeCommentRules && ruleText.startsWith(RuleMasks.MASK_COMMENT)) {
-            return true;
-        }
-
-        if (config.configuration.removeContentRules &&
-            (ruleText.includes(RuleMasks.MASK_CONTENT) ||
-            ruleText.includes(RuleMasks.MASK_CONTENT_EXCEPTION))) {
-            return true;
-        }
-
         if (config.configuration.removeRulePatterns) {
             for (let pattern of config.configuration.removeRulePatterns) {
-                if (ruleText.includes(pattern)) {
+                if (ruleText.match(new RegExp(pattern))) {
                     return true;
                 }
             }
@@ -289,7 +280,8 @@ module.exports = (() => {
      */
     const cleanupAndOptimizeRules = function (rules, config, optimizationConfig, filterId) {
 
-        config.configuration.removeCommentRules = true;
+        config.configuration.removeRulePatterns = config.configuration.removeRulePatterns || [];
+        config.configuration.removeRulePatterns.push(COMMENT_REGEXP);
 
         const ruleLines = splitRuleHintLines(rules, config.platform);
 
