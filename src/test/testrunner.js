@@ -55,6 +55,13 @@
     });
 
     testRunner.run({
+        code: "./src/main/platforms/filter.js",
+        tests: "./src/test/test-platforms-filter.js"
+    }, (err, report) => {
+        console.log(err);
+    });
+
+    testRunner.run({
         deps: ["./src/main/utils/version.js", "./src/main/converter.js"],
         code: "./src/main/builder.js",
         tests: "./src/test/test-builder.js"

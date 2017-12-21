@@ -12,6 +12,8 @@ module.exports = (function () {
      * @property {function} readdirSync
      * @property {function} isDirectory
      * @property {function} appendFile
+     * @property {function} existsSync
+     * @property {function} mkdirSync
      */
     const fs = require('fs');
     /**
@@ -25,14 +27,16 @@ module.exports = (function () {
     const converter = require("./converter.js");
     const validator = require("./validator.js");
     const sorter = require("./sorting.js");
+    const generator = require("./platforms/generator.js");
     const logger = require("./utils/log.js");
     const utils = require("./utils/utils.js");
 
     const TEMPLATE_FILE = 'template.txt';
     const FILTER_FILE = 'filter.txt';
     const REVISION_FILE = 'revision.json';
-    const METADATA_FILE = 'metadata.json';
     const EXCLUDE_FILE = 'exclude.txt';
+    const METADATA_FILE = 'metadata.json';
+
 
     let currentDir;
 
@@ -293,32 +297,6 @@ module.exports = (function () {
     };
 
     /**
-     * Creates header contents
-     *
-     * @param metadataFile
-     * @param revision
-     * @returns {[*,*,*,*,string]}
-     */
-    const makeHeader = function (metadataFile, revision) {
-        logger.log('Adding header..');
-
-        const metadataString = readFile(metadataFile);
-        if (!metadataString) {
-            throw new Error('Error reading metadata');
-        }
-
-        const metadata = JSON.parse(metadataString);
-
-        return [
-            `! Title: ${metadata.name}`,
-            `! Description: ${metadata.description}`,
-            `! Version: ${revision.version}`,
-            `! TimeUpdated: ${new Date(revision.timeUpdated).toDateString()}`,
-            `! Expires: ${metadata.expires} (update frequency)`
-        ];
-    };
-
-    /**
      * Builds filter txt file from directory contents
      *
      * @param filterDir
@@ -338,13 +316,8 @@ module.exports = (function () {
         const compiled = compile(template);
         logger.log('Compiled length:' + compiled.length);
 
-        const metadataFile = path.join(currentDir, METADATA_FILE);
-        const header = makeHeader(metadataFile, revision);
-
-        const filter = header.concat(compiled);
-
-        logger.log('Writing filter file, lines:' + filter.length);
-        writeFile(path.join(currentDir, FILTER_FILE), filter.join('\r\n'));
+        logger.log('Writing filter file, lines:' + compiled.length);
+        writeFile(path.join(currentDir, FILTER_FILE), compiled.join('\r\n'));
         logger.log('Writing revision file..');
         writeFile(revisionFile, JSON.stringify(revision, null, "\t"));
     };
@@ -355,10 +328,12 @@ module.exports = (function () {
      * @param filtersDir
      * @param logFile
      * @param domainBlacklistFile
+     * @param platformsPath
      */
-    const build = function (filtersDir, logFile, domainBlacklistFile) {
+    const build = function (filtersDir, logFile, domainBlacklistFile, platformsPath, platformsConfigFile) {
         logger.initialize(logFile);
         validator.init(domainBlacklistFile);
+        generator.init(FILTER_FILE, METADATA_FILE, REVISION_FILE, platformsConfigFile);
 
         const items = fs.readdirSync(filtersDir);
 
@@ -371,6 +346,10 @@ module.exports = (function () {
                 logger.log(`Building filter: ${directory} ok`);
             }
         }
+
+        logger.log(`Generating platforms`);
+        generator.generate(filtersDir, platformsPath);
+        logger.log(`Generating platforms done`);
     };
 
     return {

@@ -1,0 +1,29 @@
+{
+  "TEST": {
+    "platform": "ext_ublock",
+    "path": "test",
+    "configuration": {
+      "removeRulePatterns": false,
+      "ignoreRuleHints": false
+    }
+  },
+  "TEST_COMMENTS": {
+    "platform": "test",
+    "path": "config/test",
+    "configuration": {
+      "removeRulePatterns": [
+        "^\\!",
+        "\\$\\$|\\$\\@\\$",
+        "test-common-1-rule"],
+      "ignoreRuleHints": true
+    }
+  },
+  "TEST_HINTS": {
+    "platform": "test",
+    "path": "hints",
+    "configuration": {
+      "removeRulePatterns": false,
+      "ignoreRuleHints": false
+    }
+  }
+}

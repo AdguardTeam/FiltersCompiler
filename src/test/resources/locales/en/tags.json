@@ -1,0 +1,42 @@
+[
+	{
+		"tag.3.description": "Blocks social widgets",
+		"tag.3.name": "Blocks social widgets"
+	},
+	{
+		"tag.9.description": "Filter references EasyList",
+		"tag.9.name": "Filter references EasyList"
+	},
+	{
+		"tag.6.description": "Blocks EU cookie notices",
+		"tag.6.name": "Blocks EU cookie notices"
+	},
+	{
+		"tag.7.name": "Language-specific filter",
+		"tag.7.description": "Language-specific filter"
+	},
+	{
+		"tag.2.description": "Blocks trackers",
+		"tag.2.name": "Blocks trackers"
+	},
+	{
+		"tag.8.description": "Language-specific filter",
+		"tag.8.name": "Language-specific filter"
+	},
+	{
+		"tag.1.description": "Blocks ads",
+		"tag.1.name": "Blocks ads"
+	},
+	{
+		"tag.4.description": "Security-related filter",
+		"tag.4.name": "Security-related filter"
+	},
+	{
+		"tag.10.name": "Filter is recommended to be used with AdGuard",
+		"tag.10.description": "Filter is recommended to be used with AdGuard"
+	},
+	{
+		"tag.5.description": "Filter is for blocking annoyances",
+		"tag.5.name": "Filter is for blocking annoyances"
+	}
+]

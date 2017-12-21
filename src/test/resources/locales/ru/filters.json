@@ -1,0 +1,10 @@
+[
+	{
+		"filter.1.name": "Localized Russian filter",
+		"filter.1.description": "Localized Adguard Russian filter. Filter that enables blocking of ads on websites in Russian."
+	},
+	{
+		"filter.2.name": "Localized English filter",
+		"filter.2.description": "Localized EasyList + Adguard English filter. Filter list that specifically removes adverts on English language websites."
+	}
+]
