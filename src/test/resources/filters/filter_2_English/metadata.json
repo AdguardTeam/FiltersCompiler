@@ -9,6 +9,6 @@
   "groupId": 2,
   "subscriptionUrl": "https://easylist-downloads.adblockplus.org/easylist.txt",
   "tags": [
-    1
+    "purpose:ads"
   ]
 }

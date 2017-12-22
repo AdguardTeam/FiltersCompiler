@@ -123,6 +123,39 @@ module.exports = (() => {
     };
 
     /**
+     * Replaces tags keywords with tag ids
+     *
+     * @param filters
+     * @param tags
+     */
+    const replaceTagKeywords = function (filters, tags) {
+        const tagsMap = new Map();
+
+        tags.forEach((f) => {
+            tagsMap.set(f.keyword, f.tagId);
+        });
+
+        for (const f of filters) {
+            if (f.tags) {
+                let ids = [];
+                for (const t of f.tags) {
+                    let id = tagsMap.get(t);
+                    if (id) {
+                        ids.push(id);
+                    } else {
+                        logger.error("Missing tag with keyword: " + t);
+                    }
+                }
+
+                delete f.tags;
+                f.tags = ids;
+            }
+        }
+
+        return filters;
+    };
+
+    /**
      * Writes metadata files
      */
     const writeFiltersMetadata = function (platformsPath, filtersDir, filtersMetadata) {
@@ -139,6 +172,8 @@ module.exports = (() => {
             logger.error('Error reading tags metadata');
             return;
         }
+
+        filtersMetadata = replaceTagKeywords(filtersMetadata, tags);
 
         const localizations = loadLocales(path.join(filtersDir, '../locales'));
 
