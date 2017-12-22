@@ -323,6 +323,30 @@ module.exports = (function () {
     };
 
     /**
+     * Parses directory recursive
+     *
+     * @param filtersDir
+     */
+    const parseDirectory = function (filtersDir) {
+        const items = fs.readdirSync(filtersDir);
+
+        for (let directory of items) {
+            const filterDir = path.join(filtersDir, directory);
+            if (fs.lstatSync(filterDir).isDirectory()) {
+
+                let template = path.join(filterDir, TEMPLATE_FILE);
+                if (fs.existsSync(template)) {
+                    logger.log(`Building filter: ${directory}`);
+                    buildFilter(filterDir);
+                    logger.log(`Building filter: ${directory} ok`);
+                } else {
+                    parseDirectory(filterDir);
+                }
+            }
+        }
+    };
+
+    /**
      * Builds all filters in child directories
      *
      * @param filtersDir
@@ -335,17 +359,7 @@ module.exports = (function () {
         validator.init(domainBlacklistFile);
         generator.init(FILTER_FILE, METADATA_FILE, REVISION_FILE, platformsConfigFile);
 
-        const items = fs.readdirSync(filtersDir);
-
-        for (let directory of items) {
-            const filterDir = path.join(filtersDir, directory);
-            if (fs.lstatSync(filterDir).isDirectory()) {
-
-                logger.log(`Building filter: ${directory}`);
-                buildFilter(filterDir);
-                logger.log(`Building filter: ${directory} ok`);
-            }
-        }
+        parseDirectory(filtersDir);
 
         logger.log(`Generating platforms`);
         generator.generate(filtersDir, platformsPath);
