@@ -362,6 +362,32 @@ module.exports = (() => {
     };
 
     /**
+     * Parses directory recursive
+     *
+     * @param filtersDir
+     * @param filtersMetadata
+     */
+    const parseDirectory = function (filtersDir, filtersMetadata, platformsPath) {
+        const items = fs.readdirSync(filtersDir);
+        for (let directory of items) {
+            const filterDir = path.join(filtersDir, directory);
+            if (fs.lstatSync(filterDir).isDirectory()) {
+
+                let metadataFilePath = path.join(filterDir, metadataFile);
+                if (fs.existsSync(metadataFilePath)) {
+                    logger.log(`Building filter platforms: ${directory}`);
+                    buildFilter(filterDir, platformsPath);
+                    logger.log(`Building filter platforms: ${directory} done`);
+
+                    filtersMetadata.push(loadFilterMetadata(filterDir));
+                } else {
+                    parseDirectory(filterDir, filtersMetadata, platformsPath);
+                }
+            }
+        }
+    };
+
+    /**
      * Generates platforms builds
      *
      * @param filtersDir
@@ -381,18 +407,8 @@ module.exports = (() => {
         createDir(platformsPath);
 
         const filtersMetadata = [];
-        const items = fs.readdirSync(filtersDir);
-        for (let directory of items) {
-            const filterDir = path.join(filtersDir, directory);
-            if (fs.lstatSync(filterDir).isDirectory()) {
 
-                logger.log(`Building filter platforms: ${directory}`);
-                buildFilter(filterDir, platformsPath);
-                logger.log(`Building filter platforms: ${directory} done`);
-
-                filtersMetadata.push(loadFilterMetadata(filterDir));
-            }
-        }
+        parseDirectory(filtersDir, filtersMetadata, platformsPath);
 
         writeFiltersMetadata(platformsPath, filtersDir, filtersMetadata);
     };
