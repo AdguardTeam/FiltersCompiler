@@ -156,6 +156,30 @@ module.exports = (() => {
     };
 
     /**
+     * In case of backward compatibility
+     * Adds 'languages' metadata field parsed from 'lang:' tags
+     *
+     * @param filters
+     * @param tags
+     */
+    const parseLangTags = function (filters) {
+        for (const f of filters) {
+            if (f.tags) {
+                const filterLanguages = [];
+                for (const t of f.tags) {
+                    if (t.startsWith('lang:')) {
+                        filterLanguages.push(t.substring(5));
+                    }
+                }
+
+                f.languages = filterLanguages;
+            }
+        }
+
+        return filters;
+    };
+
+    /**
      * Writes metadata files
      */
     const writeFiltersMetadata = function (platformsPath, filtersDir, filtersMetadata) {
@@ -173,6 +197,7 @@ module.exports = (() => {
             return;
         }
 
+        filtersMetadata = parseLangTags(filtersMetadata);
         filtersMetadata = replaceTagKeywords(filtersMetadata, tags);
 
         const localizations = loadLocales(path.join(filtersDir, '../locales'));
@@ -212,13 +237,24 @@ module.exports = (() => {
      */
     const loadFilterMetadata = function (filterDir) {
         const metadataFilePath = path.join(filterDir, metadataFile);
-
         const metadataString = readFile(metadataFilePath);
         if (!metadataString) {
             throw new Error('Error reading filter metadata:' + filterDir);
         }
 
-        return JSON.parse(metadataString);
+        const revisionFilePath = path.join(filterDir, revisionFile);
+        const revisionString = readFile(revisionFilePath);
+        if (!revisionString) {
+            throw new Error('Error reading filter revision:' + filterDir);
+        }
+
+        const revision = JSON.parse(revisionString);
+
+        const result = JSON.parse(metadataString);
+        result.version = revision.version;
+        result.timeUpdated = revision.timeUpdated;
+
+        return result;
     };
 
     /**

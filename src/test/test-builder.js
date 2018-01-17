@@ -87,6 +87,31 @@ QUnit.test("Test builder - platforms", (assert) => {
     const filterText = readFile(path.join(filtersDir, 'filter_2_English', 'filter.txt'));
     assert.ok(filterText);
 
+    let filtersMetadata = readFile(path.join(platforms, 'test', 'filters.json'));
+    assert.ok(filtersMetadata);
+    filtersMetadata = JSON.parse(filtersMetadata);
+    assert.ok(filtersMetadata.filters);
+    assert.ok(filtersMetadata.filters[0]);
+    assert.equal(filtersMetadata.filters[0].filterId, 2);
+    assert.equal(filtersMetadata.filters[0].name, 'English Filter');
+    assert.equal(filtersMetadata.filters[0].description, 'English Filter description');
+    assert.equal(filtersMetadata.filters[0].timeAdded, 1404115015843);
+    assert.equal(filtersMetadata.filters[0].homepage, 'https://easylist.adblockplus.org/');
+    assert.equal(filtersMetadata.filters[0].expires, '2 days');
+    assert.equal(filtersMetadata.filters[0].displayNumber, 101);
+    assert.equal(filtersMetadata.filters[0].groupId, 2);
+    assert.equal(filtersMetadata.filters[0].subscriptionUrl, 'https://easylist-downloads.adblockplus.org/easylist.txt');
+    assert.ok(filtersMetadata.filters[0].version);
+    assert.ok(filtersMetadata.filters[0].timeUpdated);
+    assert.equal(filtersMetadata.filters[0].languages.length, 2);
+    assert.equal(filtersMetadata.filters[0].languages[0], 'en');
+    assert.equal(filtersMetadata.filters[0].languages[1], 'pl');
+    assert.equal(filtersMetadata.filters[0].tags.length, 1);
+    assert.equal(filtersMetadata.filters[0].tags[0], 1);
+
+    let filtersI18nMetadata = readFile(path.join(platforms, 'test', 'filters_i18n.json'));
+    assert.ok(filtersI18nMetadata);
+
     let filterContent = readFile(path.join(platforms, 'test', '2.txt'));
     assert.ok(filterContent);
 
