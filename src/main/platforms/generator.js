@@ -218,7 +218,21 @@ module.exports = (() => {
             throw new Error('Error reading filter metadata:' + filterDir);
         }
 
-        return JSON.parse(metadataString);
+        const revisionFilePath = path.join(filterDir, revisionFile);
+        const revisionString = readFile(revisionFilePath);
+        if (!revisionString) {
+            throw new Error('Error reading filter revision:' + filterDir);
+        }
+
+        const revision = JSON.parse(revisionString);
+
+        const result = JSON.parse(metadataString);
+        result.version = revision.version;
+        result.timeUpdated = revision.timeUpdated;
+
+        //TODO: add languages field
+
+        return result;
     };
 
     /**
