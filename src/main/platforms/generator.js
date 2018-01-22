@@ -253,6 +253,7 @@ module.exports = (() => {
         const result = JSON.parse(metadataString);
         result.version = revision.version;
         result.timeUpdated = revision.timeUpdated;
+        delete result.disabled;
 
         return result;
     };
