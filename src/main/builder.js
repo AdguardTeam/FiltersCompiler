@@ -72,7 +72,12 @@ module.exports = (function () {
     const downloadFile = function (url) {
         logger.log(`Downloading: ${url}`);
 
-        return downloadFileSync(url);
+        try {
+            return downloadFileSync(url);
+        } catch (e) {
+            logger.error(`Error downloading file from ${url} cause: ${e}`);
+            return null;
+        }
     };
 
     /**
