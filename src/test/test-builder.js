@@ -35,7 +35,7 @@ QUnit.test("Test builder", (assert) => {
     assert.ok(filterText);
 
     const filterLines = filterText.split('\r\n');
-    assert.equal(filterLines.length, 21);
+    assert.equal(filterLines.length, 22);
 
     //Common include
     assert.ok(filterLines.indexOf('! some common rules could be places here') >= 0);

@@ -268,7 +268,7 @@ module.exports = (function () {
 
         result = validator.validate(result);
         result = validator.blacklistDomains(result);
-        result = sorter.sort(result);
+        //result = sorter.sort(result);
 
         return result;
     };
