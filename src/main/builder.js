@@ -314,8 +314,15 @@ module.exports = (function () {
             throw new Error('Invalid template');
         }
 
+        const metadata = readFile(path.join(currentDir, METADATA_FILE));
+        if (JSON.parse(metadata).skip) {
+            logger.warn('Filter skipped');
+            return;
+        }
+
         const revisionFile = path.join(currentDir, REVISION_FILE);
         const revision = makeRevision(revisionFile);
+
 
         logger.log('Compiling..');
         const compiled = compile(template);
