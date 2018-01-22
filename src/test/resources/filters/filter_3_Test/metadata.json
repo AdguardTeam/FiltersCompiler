@@ -11,5 +11,5 @@
   "tags": [
     "purpose:ads", "lang:en", "lang:pl"
   ],
-  "skip": true
+  "disabled": true
 }

@@ -310,14 +310,13 @@ module.exports = (function () {
         }
 
         const metadata = readFile(path.join(currentDir, METADATA_FILE));
-        if (JSON.parse(metadata).skip) {
+        if (JSON.parse(metadata).disabled) {
             logger.warn('Filter skipped');
             return;
         }
 
         const revisionFile = path.join(currentDir, REVISION_FILE);
         const revision = makeRevision(revisionFile);
-
 
         logger.log('Compiling..');
         const compiled = compile(template);
