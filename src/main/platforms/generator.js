@@ -156,6 +156,30 @@ module.exports = (() => {
     };
 
     /**
+     * Parses "Expires" field and converts it to seconds
+     *
+     * @param filters
+     */
+    const replaceExpires = function (filters) {
+        for (const f of filters) {
+            if (f.expires) {
+                if (f.expires.indexOf('days') > 0) {
+                    f.expires = parseInt(f.expires) * 24 * 60 * 60;
+                } else if (f.expires.indexOf('hours') > 0) {
+                    f.expires = parseInt(f.expires) * 60 * 60;
+                }
+
+                if (isNaN(f.expires)) {
+                    //Default
+                    f.expires = 86400;
+                }
+            }
+        }
+
+        return filters;
+    };
+
+    /**
      * In case of backward compatibility
      * Adds 'languages' metadata field parsed from 'lang:' tags
      *
@@ -199,6 +223,7 @@ module.exports = (() => {
 
         filtersMetadata = parseLangTags(filtersMetadata);
         filtersMetadata = replaceTagKeywords(filtersMetadata, tags);
+        filtersMetadata = replaceExpires(filtersMetadata);
 
         const localizations = loadLocales(path.join(filtersDir, '../locales'));
 
