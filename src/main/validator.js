@@ -87,9 +87,6 @@ module.exports = (function () {
         'wildcard'
     ];
 
-    const TAG_CONTENT_MAX_LENGTH = 'max-length';
-    const TAG_CONTENT_MAX_VALID_LENGTH = 32768;
-
     let domainsBlacklist = [];
     let cssParser;
 
@@ -162,15 +159,6 @@ module.exports = (function () {
                 logger.error(`Invalid tag: ${ruleText}`);
                 return false;
             }
-
-            if (a.attributeName === TAG_CONTENT_MAX_LENGTH) {
-                let maxLength = parseInt(a.attributeValue);
-                if (maxLength > TAG_CONTENT_MAX_VALID_LENGTH || maxLength < 0) {
-                    logger.error(`Invalid tag max length: ${ruleText}`);
-                    return false;
-                }
-            }
-
             return true;
         });
     };
