@@ -167,3 +167,32 @@ QUnit.test("Test rule parser - script rules", (assert) => {
     assert.equal(rule.domains[0], 'example.org');
 });
 
+QUnit.test("Test rule parser - replace rules", (assert) => {
+    'use strict';
+
+    const RuleTypes = require('../main/rule/rule-types.js');
+    const ruleParser = require('../main/rule/rule-parser.js');
+
+    let line = '||api.ivi.ru/light/?$replace=/"files":[\s\S]*"mraid_file_url"/"files": []\, "mraid_file_url"/';
+    let rule = ruleParser.parseRule(line);
+    console.log(rule);
+    assert.ok(rule);
+    assert.equal(rule.ruleText, line);
+    assert.equal(rule.ruleType, RuleTypes.UrlBlocking);
+    assert.ok(rule.modifiers.replace);
+    assert.equal(rule.url, '||api.ivi.ru/light/?');
+});
+
+QUnit.test("Test rule parser - some rules", (assert) => {
+    'use strict';
+
+    const RuleTypes = require('../main/rule/rule-types.js');
+    const ruleParser = require('../main/rule/rule-parser.js');
+
+    let line = 'puls4.com##.media-actions-list > li:not(:nth-child(3)):not(:nth-child(4))';
+    let rule = ruleParser.parseRule(line);
+    assert.ok(rule);
+    assert.equal(rule.ruleText, line);
+    assert.equal(rule.ruleType, RuleTypes.ElementHiding);
+});
+
