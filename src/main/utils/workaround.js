@@ -89,9 +89,25 @@ module.exports = (() => {
         return filtered;
     };
 
+    /**
+     * Replaces Version: with OriginalVersion: comments in case of some client cannot afford it.
+     *
+     * @param rules
+     */
+    const fixVersionComments = function (rules) {
+        return rules.map((x) => {
+            if (x.startsWith('! Version:')) {
+                return x.replace('! Version:', '! OriginalVersion:');
+            }
+
+            return x;
+        });
+    };
+
     return {
         overrideRule: overrideRule,
         rewriteHeader: rewriteHeader,
-        rewriteRules: rewriteRules
+        rewriteRules: rewriteRules,
+        fixVersionComments: fixVersionComments
     };
 })();

@@ -30,6 +30,7 @@ module.exports = (function () {
     const generator = require("./platforms/generator.js");
     const logger = require("./utils/log.js");
     const utils = require("./utils/utils.js");
+    const workaround = require('./utils/workaround.js');
 
     const TEMPLATE_FILE = 'template.txt';
     const FILTER_FILE = 'filter.txt';
@@ -230,6 +231,8 @@ module.exports = (function () {
             if (options.stripComments) {
                 result = stripComments(result);
             }
+
+            result = workaround.fixVersionComments(result);
         }
 
         result = converter.convert(result);

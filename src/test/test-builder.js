@@ -35,13 +35,17 @@ QUnit.test("Test builder", (assert) => {
     assert.ok(filterText);
 
     const filterLines = filterText.split('\r\n');
-    assert.equal(filterLines.length, 22);
+    assert.equal(filterLines.length, 23);
 
     //Common include
     assert.ok(filterLines.indexOf('! some common rules could be places here') >= 0);
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
     assert.ok(filterLines.indexOf('test-common-rule.com$xmlhttprequest') >= 0);
     assert.ok(filterLines.indexOf('example.com#$#h1 { background-color: blue !important }') >= 0);
+
+    //Check replace version comment
+    assert.notOk(filterLines.indexOf('! Version: 11.9090.19.19') >= 0);
+    assert.ok(filterLines.indexOf('! OriginalVersion: 11.9090.19.19') >= 0);
 
     //Common_1 include
     assert.ok(filterLines.indexOf('test-common-1-rule.com') >= 0);
@@ -116,7 +120,7 @@ QUnit.test("Test builder - platforms", (assert) => {
     assert.ok(filterContent);
 
     let filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 27);
+    assert.equal(filterLines.length, 28);
 
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
     assert.ok(filterLines.indexOf('test-common-1-rule.com') >= 0);
@@ -141,7 +145,7 @@ QUnit.test("Test builder - platforms", (assert) => {
     assert.ok(filterContent);
 
     filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 25);
+    assert.equal(filterLines.length, 26);
 
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
     assert.ok(filterLines.indexOf('test-common-1-rule.com') >= 0);
