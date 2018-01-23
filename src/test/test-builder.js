@@ -101,7 +101,7 @@ QUnit.test("Test builder - platforms", (assert) => {
     assert.equal(filtersMetadata.filters[0].description, 'English Filter description');
     assert.equal(filtersMetadata.filters[0].timeAdded, 1404115015843);
     assert.equal(filtersMetadata.filters[0].homepage, 'https://easylist.adblockplus.org/');
-    assert.equal(filtersMetadata.filters[0].expires, '2 days');
+    assert.equal(filtersMetadata.filters[0].expires, 172800);
     assert.equal(filtersMetadata.filters[0].displayNumber, 101);
     assert.equal(filtersMetadata.filters[0].groupId, 2);
     assert.equal(filtersMetadata.filters[0].subscriptionUrl, 'https://easylist-downloads.adblockplus.org/easylist.txt');

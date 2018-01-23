@@ -104,10 +104,20 @@ module.exports = (() => {
         });
     };
 
+    /**
+     * Removes `[Adblock Plus x.x]` strings
+     *
+     * @param inclusionContent
+     */
+    const removeAdblockVersion = function (inclusionContent) {
+        return inclusionContent.replace(/\!?.?\[Adblock.*?\]\r?\n?/g, "");
+    };
+
     return {
         overrideRule: overrideRule,
         rewriteHeader: rewriteHeader,
         rewriteRules: rewriteRules,
-        fixVersionComments: fixVersionComments
+        fixVersionComments: fixVersionComments,
+        removeAdblockVersion: removeAdblockVersion
     };
 })();
