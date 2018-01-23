@@ -163,9 +163,9 @@ module.exports = (() => {
     const replaceExpires = function (filters) {
         for (const f of filters) {
             if (f.expires) {
-                if (f.expires.indexOf('days') > 0) {
+                if (f.expires.indexOf('day') > 0) {
                     f.expires = parseInt(f.expires) * 24 * 60 * 60;
-                } else if (f.expires.indexOf('hours') > 0) {
+                } else if (f.expires.indexOf('hour') > 0) {
                     f.expires = parseInt(f.expires) * 60 * 60;
                 }
 
