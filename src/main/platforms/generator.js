@@ -393,6 +393,7 @@ module.exports = (() => {
         let optimizationConfig;
         if (optimizationEnabled) {
             optimizationConfig = downloadFileSync(OPTIMIZATION_STATS_DOWNLOAD_URL.replace('{0}', filterId));
+            optimizationConfig = JSON.parse(optimizationConfig);
         }
 
         for (let platform in platformPathsConfig) {
