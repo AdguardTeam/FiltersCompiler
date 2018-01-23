@@ -222,7 +222,8 @@ module.exports = (function () {
             readFile(path.join(currentDir, options.url));
 
         if (included) {
-            result = splitLines(included);
+            result = workaround.removeAdblockVersion(included);
+            result = splitLines(result);
 
             if (options.exclude) {
                 result = exclude(result, options.exclude);
