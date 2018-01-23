@@ -87,9 +87,6 @@ module.exports = (function () {
         'wildcard'
     ];
 
-    const TAG_CONTENT_MAX_LENGTH = 'max-length';
-    const TAG_CONTENT_MAX_VALID_LENGTH = 32768;
-
     let domainsBlacklist = [];
     let cssParser;
 
