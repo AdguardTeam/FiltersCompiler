@@ -277,7 +277,7 @@ module.exports = (() => {
 
         const result = JSON.parse(metadataString);
         result.version = revision.version;
-        result.timeUpdated = revision.timeUpdated;
+        result.timeUpdated = new Date(revision.timeUpdated).toDateString();
         delete result.disabled;
 
         return result;

@@ -294,6 +294,7 @@ module.exports = (function () {
             let p = JSON.parse(current);
             if (p && p.version) {
                 result.version = version.increment(p.version);
+                result.timeUpdated = new Date().getTime();
             }
         }
 
