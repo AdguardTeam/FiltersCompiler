@@ -433,7 +433,7 @@ module.exports = (() => {
 
             logger.log(`Filter ${filterId}. Rules ${originalRules.length} => ${rules.length} => ${optimizedRules.length}. PlatformPath: '${config.path}'`);
 
-            const platformDir = path.join(platformsPath, config.path);
+            const platformDir = path.join(platformsPath, config.path, 'filters');
             writeFilterRules(filterId, platformDir, config.platform, platformHeader, rules, false);
             writeFilterRules(filterId, platformDir, config.platform, platformOptimizedHeader, optimizedRules, true);
         }
