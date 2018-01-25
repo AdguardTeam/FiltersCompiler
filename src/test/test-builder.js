@@ -116,7 +116,7 @@ QUnit.test("Test builder - platforms", (assert) => {
     let filtersI18nMetadata = readFile(path.join(platforms, 'test', 'filters_i18n.json'));
     assert.ok(filtersI18nMetadata);
 
-    let filterContent = readFile(path.join(platforms, 'test', '2.txt'));
+    let filterContent = readFile(path.join(platforms, 'test', 'filters', '2.txt'));
     assert.ok(filterContent);
 
     let filterLines = filterContent.split('\r\n');
@@ -128,7 +128,7 @@ QUnit.test("Test builder - platforms", (assert) => {
     assert.ok(filterLines.indexOf('~nigma.ru,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]') >= 0);
     assert.ok(filterLines.indexOf('excluded_platform') >= 0);
 
-    filterContent = readFile(path.join(platforms, 'config/test', '2.txt'));
+    filterContent = readFile(path.join(platforms, 'config/test', 'filters', '2.txt'));
     assert.ok(filterContent);
 
     filterLines = filterContent.split('\r\n');
@@ -141,7 +141,7 @@ QUnit.test("Test builder - platforms", (assert) => {
     assert.ok(filterLines.indexOf('excluded_platform') >= 0);
 
 
-    filterContent = readFile(path.join(platforms, 'hints', '2.txt'));
+    filterContent = readFile(path.join(platforms, 'hints', 'filters', '2.txt'));
     assert.ok(filterContent);
 
     filterLines = filterContent.split('\r\n');
