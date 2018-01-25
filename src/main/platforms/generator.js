@@ -66,7 +66,7 @@ module.exports = (() => {
             `! Title: ${metadata.name}`,
             `! Description: ${metadata.description}`,
             `! Version: ${revision.version}`,
-            `! TimeUpdated: ${new Date(revision.timeUpdated).toDateString()}`,
+            `! TimeUpdated: ${new Date(revision.timeUpdated).toISOString()}`,
             `! Expires: ${metadata.expires} (update frequency)`
         ];
     };
@@ -277,7 +277,8 @@ module.exports = (() => {
 
         const result = JSON.parse(metadataString);
         result.version = revision.version;
-        result.timeUpdated = revision.timeUpdated;
+        result.timeUpdated = new Date(revision.timeUpdated).toISOString();
+        result.timeAdded = new Date(result.timeAdded).toISOString();
         delete result.disabled;
 
         return result;
