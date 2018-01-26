@@ -218,7 +218,8 @@ module.exports = (function () {
 
         logger.log(`Applying inclusion from: ${options.url}`);
 
-        const included = options.url.includes(':') ?
+        let externalInclude = options.url.includes(':');
+        const included = externalInclude ?
             downloadFile(options.url) :
             readFile(path.join(currentDir, options.url));
 
@@ -228,6 +229,10 @@ module.exports = (function () {
 
             if (options.exclude) {
                 result = exclude(result, options.exclude);
+            }
+
+            if (externalInclude) {
+                result = exclude(result, COMMON_EXCLUDE_FILE);
             }
 
             if (options.stripComments) {
@@ -269,7 +274,6 @@ module.exports = (function () {
         }
 
         result = exclude(result, EXCLUDE_FILE);
-        result = exclude(result, COMMON_EXCLUDE_FILE);
         result = utils.removeDuplicates(result);
 
         result = validator.validate(result);
