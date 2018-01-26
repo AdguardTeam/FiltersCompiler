@@ -293,14 +293,18 @@ module.exports = (() => {
             return !shouldOmitRuleWithOptimization(r, optimizationConfig);
         });
 
+        let result;
         // We check that our optimization is correct and didn't remove valuable rules
         // We do it via comparing expected optimization percent with real (ratio between optimized rules number and all rules number)
         if (optimizationConfig && !isOptimizationCorrect(filterId, filtered, optimized, optimizationConfig)) {
             // Back to default OPTIMIZATION
-            return joinRuleHintLines(filtered);
+            result = joinRuleHintLines(filtered);
+        } else {
+            result = joinRuleHintLines(optimized);
         }
 
-        return joinRuleHintLines(optimized);
+        config.configuration.removeRulePatterns.pop();
+        return result;
     };
 
     return {
