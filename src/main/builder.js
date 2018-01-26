@@ -36,6 +36,7 @@ module.exports = (function () {
     const FILTER_FILE = 'filter.txt';
     const REVISION_FILE = 'revision.json';
     const EXCLUDE_FILE = 'exclude.txt';
+    const COMMON_EXCLUDE_FILE = '../exclusions.txt';
     const METADATA_FILE = 'metadata.json';
 
 
@@ -268,6 +269,7 @@ module.exports = (function () {
         }
 
         result = exclude(result, EXCLUDE_FILE);
+        result = exclude(result, COMMON_EXCLUDE_FILE);
         result = utils.removeDuplicates(result);
 
         result = validator.validate(result);

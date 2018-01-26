@@ -20,3 +20,4 @@
 ~nigma.ru,google.com$$div[id="ad_text"][wildcard="*teasernet*tararar*"]
 !+ NOT_PLATFORM(test, windows)
 excluded_platform
+default_exclusion
