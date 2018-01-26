@@ -37,6 +37,7 @@ module.exports = (() => {
         let startIndex = 0;
         if (line.startsWith(RuleMasks.MASK_WHITE_LIST)) {
             startIndex = RuleMasks.MASK_WHITE_LIST.length;
+            result.whiteList = true;
         }
 
         result.urlRuleText = line.substring(startIndex);
@@ -259,6 +260,7 @@ module.exports = (() => {
             const parseResult = parseUrlRule(ruleText);
             rule.modifiers = parseResult.modifiers || [];
             rule.url = parseResult.urlRuleText;
+            rule.whiteList = parseResult.whiteList;
         } else if (ruleType === RuleTypes.ElementHiding || ruleType === RuleTypes.Css ||
             ruleType === RuleTypes.Content || ruleType === RuleTypes.Script) {
 

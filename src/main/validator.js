@@ -14,6 +14,7 @@ module.exports = (function () {
     const logger = require("./utils/log.js");
     const ruleParser = require("./rule/rule-parser.js");
     const RuleTypes = require("./rule/rule-types.js");
+    const RuleMasks = require("./rule/rule-masks.js");
     const Rule = require("./rule/rule.js");
 
     const VALID_OPTIONS = [
@@ -207,6 +208,9 @@ module.exports = (function () {
                     modifiers.domain = validated;
 
                     corrected = rule.buildNewModifiers(modifiers);
+                    if (rule.whiteList) {
+                        corrected = RuleMasks.MASK_WHITE_LIST + corrected;
+                    }
                 }
             } else if (rule.ruleType === RuleTypes.ElementHiding || rule.ruleType === RuleTypes.Css ||
                 rule.ruleType === RuleTypes.Content || rule.ruleType === RuleTypes.Script) {

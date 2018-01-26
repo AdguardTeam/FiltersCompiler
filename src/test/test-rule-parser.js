@@ -175,7 +175,6 @@ QUnit.test("Test rule parser - replace rules", (assert) => {
 
     let line = '||api.ivi.ru/light/?$replace=/"files":[\s\S]*"mraid_file_url"/"files": []\, "mraid_file_url"/';
     let rule = ruleParser.parseRule(line);
-    console.log(rule);
     assert.ok(rule);
     assert.equal(rule.ruleText, line);
     assert.equal(rule.ruleType, RuleTypes.UrlBlocking);
@@ -194,5 +193,13 @@ QUnit.test("Test rule parser - some rules", (assert) => {
     assert.ok(rule);
     assert.equal(rule.ruleText, line);
     assert.equal(rule.ruleType, RuleTypes.ElementHiding);
+
+    line = '@@||sedu.adhands.ru/view/?sid^$script,domain=tveda.ru';
+    rule = ruleParser.parseRule(line);
+    assert.ok(rule);
+    assert.equal(rule.ruleText, line);
+    assert.equal(rule.ruleType, RuleTypes.UrlBlocking);
+    assert.equal(rule.url, '||sedu.adhands.ru/view/?sid^');
+    assert.equal(rule.whiteList, true);
 });
 

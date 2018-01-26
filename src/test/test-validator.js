@@ -49,6 +49,7 @@ QUnit.test("Test blacklist domains - ulr/css rules", (assert) => {
 example.com##.div
 google.com###id
 google.com,one.com##a[href^=/], .container:has(nav) > a[href]:lt($var)
+@@||graph.com^$domain=not-google.com
 `;
 
     const path = require('path');
@@ -60,13 +61,14 @@ google.com,one.com##a[href^=/], .container:has(nav) > a[href]:lt($var)
     const after = validator.blacklistDomains(before.trim().split('\n'));
 
     assert.ok(after);
-    assert.equal(after.length, 4);
+    assert.equal(after.length, 5);
 
     const correct = `
 ||graph.facebook.com^$domain=jp.gocro.smartnews.android|onemore.ru|plus.one
 ||image.winudf.com/*/upload/promopure/$~third-party,empty,domain=apkpure.com
 example.com##.div
-one.com##a[href^=/], .container:has(nav) > a[href]:lt($var)`;
+one.com##a[href^=/], .container:has(nav) > a[href]:lt($var)
+@@||graph.com^$domain=not-google.com`;
 
     assert.equal(after.join('\n').trim(), correct.trim());
 });
