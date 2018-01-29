@@ -78,16 +78,6 @@ module.exports = (function () {
         "[-ext-matches-css-before=", "[-ext-matches-css-after=", ":has(", ":has-text(", ":contains(",
         ":matches-css(", ":matches-css-before(", ":matches-css-after(", ":-abp-has(", ":-abp-contains("];
 
-    const VALID_TAGS_CONTENT = [
-        'id',
-        'tag-content',
-        'max-length',
-        'min-length',
-        'parent-elements',
-        'parent-search-level',
-        'wildcard'
-    ];
-
     let domainsBlacklist = [];
     let cssParser;
 
@@ -149,19 +139,6 @@ module.exports = (function () {
         }
 
         return true;
-    };
-
-    /**
-     * Validates content rule attributes
-     */
-    const validateContentRuleAttributes = function (ruleText, attributes) {
-        return attributes.every((a) => {
-            if (VALID_TAGS_CONTENT.indexOf(a.attributeName) < 0) {
-                logger.error(`Invalid tag: ${ruleText}`);
-                return false;
-            }
-            return true;
-        });
     };
 
     /**
@@ -291,11 +268,6 @@ module.exports = (function () {
                         logger.error(`Invalid rule options: ${s}`);
                         return false;
                     }
-                }
-            } else if (rule.ruleType === RuleTypes.Content) {
-                if (!validateContentRuleAttributes(rule.ruleText, rule.contentAttributes)) {
-                    logger.error(`Invalid content rule: ${s}`);
-                    return false;
                 }
             }
 

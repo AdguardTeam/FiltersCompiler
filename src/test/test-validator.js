@@ -157,8 +157,6 @@ QUnit.test("Test content rules validation", function (assert) {
     assert.ok(validator.validate(rules).length > 0);
     rules = ['~nigma.ru,google.com$$div[id=\"ad_text\"][max-length=\"500000\"][min-length=\"50\"]'];
     assert.ok(validator.validate(rules).length > 0);
-    rules = ['~nigma.ru,google.com$$div[id=\"ad_text\"][tag-content=\"teas\"\"ernet\"][max-length=\"500\"][min-length=\"50\"][smth=\"1\"]'];
-    assert.notOk(validator.validate(rules).length > 0);
 });
 
 QUnit.test("Test blacklist domains - content/script rules", (assert) => {
