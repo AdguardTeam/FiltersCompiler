@@ -26,7 +26,7 @@ module.exports = (function () {
         // Special behaviour modifiers
         'csp',
         'webrtc',
-        'websocket',
+        'websocket', '~websocket',
         // Content type modifiers
         'image', '~image',
         'stylesheet', '~stylesheet',
@@ -240,7 +240,7 @@ module.exports = (function () {
      */
     const validateOptionName = function (option) {
         option = option.trim();
-        return VALID_OPTIONS.indexOf(option) >= 0 || VALID_OPTIONS.indexOf('~' + option) >= 0;
+        return VALID_OPTIONS.indexOf(option) >= 0;
     };
 
     /**

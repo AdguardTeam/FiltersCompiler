@@ -268,3 +268,13 @@ example.com##.div
 
     assert.equal(after.join('\n').trim(), correct.trim());
 });
+
+QUnit.test("Test validation - various rules", function (assert) {
+    'use strict';
+
+    const validator = require("../main/validator.js");
+    validator.init();
+
+    let rules = ['||onedrive.su/code/bshow.php$empty,important,~websocket'];
+    assert.ok(validator.validate(rules).length > 0);
+});
