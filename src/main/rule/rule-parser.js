@@ -43,25 +43,16 @@ module.exports = (() => {
         result.urlRuleText = line.substring(startIndex);
 
         let optionsPart = null;
-        let foundEscaped = false;
         // Start looking from the prev to the last symbol
         // If dollar sign is the last symbol - we simply ignore it.
         for (let i = (line.length - 2); i >= startIndex; i--) {
             let c = line.charAt(i);
             if (c === OPTIONS_DELIMITER) {
                 if (i > 0 && line.charAt(i - 1) === ESCAPE_CHARACTER) {
-                    foundEscaped = true;
+                    //Dp nothing
                 } else {
                     result.urlRuleText = line.substring(startIndex, i);
                     optionsPart = line.substring(i + 1);
-
-                    if (foundEscaped) {
-                        // Find and replace escaped options delimiter
-                        optionsPart = optionsPart.replace(ESCAPE_CHARACTER + OPTIONS_DELIMITER, OPTIONS_DELIMITER);
-                    }
-
-                    // Options delimiter was found, doing nothing
-                    break;
                 }
             }
         }
@@ -135,7 +126,6 @@ module.exports = (() => {
                 if (i === 0) { // jshint ignore:line
                     // Ignore
                 } else if (str.charAt(i - 1) === escapeCharacter) {
-                    sb.splice(sb.length - 1, 1);
                     sb.push(c);
                 } else {
                     if (preserveAllTokens || sb.length > 0) {
