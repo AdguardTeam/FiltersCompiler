@@ -219,6 +219,7 @@ module.exports = (function () {
         logger.log(`Applying inclusion from: ${options.url}`);
 
         let externalInclude = options.url.includes(':');
+        let shouldApplyCommonExclusions = externalInclude && options.url.includes('/AdguardFilters/');
         const included = externalInclude ?
             downloadFile(options.url) :
             readFile(path.join(currentDir, options.url));
@@ -231,7 +232,7 @@ module.exports = (function () {
                 result = exclude(result, options.exclude);
             }
 
-            if (externalInclude) {
+            if (shouldApplyCommonExclusions) {
                 result = exclude(result, COMMON_EXCLUDE_FILE);
             }
 
