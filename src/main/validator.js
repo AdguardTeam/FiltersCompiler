@@ -261,19 +261,20 @@ module.exports = (function () {
                     return false;
                 }
 
-                let cssSelector = parseCssSelector(rule.contentPart);
-                if (!cssSelector) {
-                    logger.error(`Invalid selector: ${s}`);
-                    return false;
-                }
-
                 const isExtendedCss = EXTENDED_CSS_MARKERS.some((m) => rule.contentPart.includes(m));
-                if (!isExtendedCss) {
+                if (isExtendedCss) {
+                    //TODO: Some extended css selector couldn't be parsed yet, so we cannot validate pseudos
+                    // if (!validatePseudoClasses(cssSelector)) {
+                    //     logger.error(`Invalid pseudo class: ${s}`);
+                    //     return false;
+                    // }
+
                     return true;
                 }
 
-                if (!validatePseudoClasses(cssSelector)) {
-                    logger.error(`Invalid pseudo class: ${s}`);
+                let cssSelector = parseCssSelector(rule.contentPart);
+                if (!cssSelector) {
+                    logger.error(`Invalid selector: ${s}`);
                     return false;
                 }
 
