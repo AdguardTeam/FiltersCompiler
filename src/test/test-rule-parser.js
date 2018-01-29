@@ -201,5 +201,14 @@ QUnit.test("Test rule parser - some rules", (assert) => {
     assert.equal(rule.ruleType, RuleTypes.UrlBlocking);
     assert.equal(rule.url, '||sedu.adhands.ru/view/?sid^');
     assert.equal(rule.whiteList, true);
+
+    line = '||news.yandex.*/*/*-*-*-*-$replace=/Ya[([0-9]{10\\,15})]([\\s\\S]*)\\$/,script,important,domain=news.yandex.by|news.yandex.com|news.yandex.fr|news.yandex.kz|news.yandex.ru|news.yandex.ua';
+    rule = ruleParser.parseRule(line);
+    assert.ok(rule);
+    assert.equal(rule.ruleText, line);
+    assert.equal(rule.ruleType, RuleTypes.UrlBlocking);
+    assert.equal(rule.url, '||news.yandex.*/*/*-*-*-*-');
+    assert.ok(rule.modifiers.replace);
+    assert.equal(rule.modifiers.replace, '/Ya[([0-9]{10\\,15})]([\\s\\S]*)\\$/');
 });
 

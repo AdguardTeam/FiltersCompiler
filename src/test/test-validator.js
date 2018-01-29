@@ -239,3 +239,32 @@ example.com##.div`;
 
     assert.equal(after.join('\n').trim(), correct.trim());
 });
+
+QUnit.test("Test blacklist domains - replace rules", function (assert) {
+    'use strict';
+
+    const before = `###PopUpWnd
+||graph.com
+google.com###id
+example.com##.div
+||news.yandex.*/*/*-*-*-*-$replace=/Ya\[([0-9]{10\,15})\]\([\s\S]*\)\$/,script,important,domain=news.yandex.by|news.yandex.com|news.yandex.fr|news.yandex.kz|news.yandex.ru|news.yandex.ua|google.com
+`;
+
+    const path = require('path');
+    const domainsBlacklist = path.join(__dirname, './resources/domains-blacklist.txt');
+
+    const validator = require("../main/validator.js");
+    validator.init(domainsBlacklist);
+
+    const after = validator.blacklistDomains(before.trim().split('\n'));
+
+    assert.ok(after);
+    assert.equal(after.length, 4);
+
+    const correct = `###PopUpWnd
+||graph.com
+example.com##.div
+||news.yandex.*/*/*-*-*-*-$replace=/Ya\[([0-9]{10\,15})\]\([\s\S]*\)\$/,script,important,domain=news.yandex.by|news.yandex.com|news.yandex.fr|news.yandex.kz|news.yandex.ru|news.yandex.ua`;
+
+    assert.equal(after.join('\n').trim(), correct.trim());
+});
