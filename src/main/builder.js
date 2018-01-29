@@ -36,7 +36,6 @@ module.exports = (function () {
     const FILTER_FILE = 'filter.txt';
     const REVISION_FILE = 'revision.json';
     const EXCLUDE_FILE = 'exclude.txt';
-    const COMMON_EXCLUDE_FILE = '../exclusions.txt';
     const METADATA_FILE = 'metadata.json';
 
 
@@ -219,7 +218,6 @@ module.exports = (function () {
         logger.log(`Applying inclusion from: ${options.url}`);
 
         let externalInclude = options.url.includes(':');
-        let shouldApplyCommonExclusions = externalInclude && options.url.includes('/AdguardFilters/');
         const included = externalInclude ?
             downloadFile(options.url) :
             readFile(path.join(currentDir, options.url));
@@ -230,10 +228,6 @@ module.exports = (function () {
 
             if (options.exclude) {
                 result = exclude(result, options.exclude);
-            }
-
-            if (shouldApplyCommonExclusions) {
-                result = exclude(result, COMMON_EXCLUDE_FILE);
             }
 
             if (options.stripComments) {
