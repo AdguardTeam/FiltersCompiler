@@ -54,6 +54,8 @@ module.exports = (function () {
         'network',
         'replace',
         'protobuf',
+        'collapse', '~collapse',
+        'ping',
         'app'];
 
     /**
