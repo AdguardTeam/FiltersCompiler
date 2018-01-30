@@ -7,11 +7,11 @@ module.exports = (() => {
     const fs = require('fs');
     const path = require('path');
     const md5 = require('md5');
-    const downloadFileSync = require('download-file-sync');
 
     const logger = require("../utils/log.js");
     const filter = require("./filter.js");
     const workaround = require('../utils/workaround.js');
+    const webutils = require('../utils/webutils.js');
 
     const RULES_SEPARATOR = "\r\n";
 
@@ -418,7 +418,7 @@ module.exports = (() => {
 
         let optimizationConfig;
         if (optimizationEnabled) {
-            optimizationConfig = downloadFileSync(OPTIMIZATION_STATS_DOWNLOAD_URL.replace('{0}', filterId));
+            optimizationConfig = webutils.downloadFile(OPTIMIZATION_STATS_DOWNLOAD_URL.replace('{0}', filterId));
             optimizationConfig = JSON.parse(optimizationConfig);
         }
 
