@@ -222,7 +222,7 @@ module.exports = (function () {
             downloadFile(options.url) :
             readFile(path.join(currentDir, options.url));
 
-        if (included) {
+        if (included && !included.startsWith('404: Not Found')) {
             result = workaround.removeAdblockVersion(included);
             result = splitLines(result);
 
@@ -235,6 +235,8 @@ module.exports = (function () {
             }
 
             result = workaround.fixVersionComments(result);
+        } else {
+            throw new Error(`Error handling include from: ${options.url}`);
         }
 
         result = converter.convert(result);
