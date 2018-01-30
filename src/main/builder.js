@@ -21,7 +21,6 @@ module.exports = (function () {
      * @property {function} join
      */
     const path = require('path');
-    const downloadFileSync = require('download-file-sync');
 
     const version = require("./utils/version.js");
     const converter = require("./converter.js");
@@ -31,6 +30,7 @@ module.exports = (function () {
     const logger = require("./utils/log.js");
     const utils = require("./utils/utils.js");
     const workaround = require('./utils/workaround.js');
+    const webutils = require('./utils/webutils.js');
 
     const TEMPLATE_FILE = 'template.txt';
     const FILTER_FILE = 'filter.txt';
@@ -63,17 +63,6 @@ module.exports = (function () {
      */
     const writeFile = function (path, data) {
         fs.writeFileSync(path, data, 'utf8');
-    };
-
-    /**
-     * Sync downloads file from url
-     *
-     * @param url
-     */
-    const downloadFile = function (url) {
-        logger.log(`Downloading: ${url}`);
-
-        return downloadFileSync(url);
     };
 
     /**
@@ -219,10 +208,10 @@ module.exports = (function () {
 
         let externalInclude = options.url.includes(':');
         const included = externalInclude ?
-            downloadFile(options.url) :
+            webutils.downloadFile(options.url) :
             readFile(path.join(currentDir, options.url));
 
-        if (included && !included.startsWith('404: Not Found')) {
+        if (included) {
             result = workaround.removeAdblockVersion(included);
             result = splitLines(result);
 
