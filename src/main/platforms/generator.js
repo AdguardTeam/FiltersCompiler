@@ -7,6 +7,7 @@ module.exports = (() => {
     const fs = require('fs');
     const path = require('path');
     const md5 = require('md5');
+    const moment = require('moment');
 
     const logger = require("../utils/log.js");
     const filter = require("./filter.js");
@@ -66,7 +67,7 @@ module.exports = (() => {
             `! Title: ${metadata.name}`,
             `! Description: ${metadata.description}`,
             `! Version: ${revision.version}`,
-            `! TimeUpdated: ${new Date(revision.timeUpdated).toISOString()}`,
+            `! TimeUpdated: ${moment(revision.timeUpdated).format()}`,
             `! Expires: ${metadata.expires} (update frequency)`
         ];
     };
@@ -234,19 +235,17 @@ module.exports = (() => {
 
             logger.log('Writing filters metadata: ' + config.path);
             const filtersFile = path.join(platformDir, 'filters.json');
-            const metadata = {groups: groups, tags: tags, filters: filtersMetadata};
+            let metadata = {groups: groups, tags: tags, filters: filtersMetadata};
             if (platform === 'MAC') {
-                //Hide tag fields for old app versions
-                delete metadata.tags;
+                metadata = workaround.rewriteMetadataForOldMac(metadata);
             }
             fs.writeFileSync(filtersFile, JSON.stringify(metadata, null, '\t'), 'utf8');
 
             logger.log('Writing filters localizations: ' + config.path);
             const filtersI18nFile = path.join(platformDir, 'filters_i18n.json');
-            const i18nMetadata = {groups: localizations.groups, tags: localizations.tags, filters: localizations.filters};
+            let i18nMetadata = {groups: localizations.groups, tags: localizations.tags, filters: localizations.filters};
             if (platform === 'MAC') {
-                //Hide tag fields for old app versions
-                delete i18nMetadata.tags;
+                i18nMetadata = workaround.rewriteMetadataForOldMac(i18nMetadata);
             }
             fs.writeFileSync(filtersI18nFile, JSON.stringify(i18nMetadata, null, '\t'), 'utf8');
         }
@@ -277,8 +276,8 @@ module.exports = (() => {
 
         const result = JSON.parse(metadataString);
         result.version = revision.version;
-        result.timeUpdated = new Date(revision.timeUpdated).toISOString();
-        result.timeAdded = new Date(result.timeAdded).toISOString();
+        result.timeUpdated = moment(revision.timeUpdated).format();
+        result.timeAdded = moment(result.timeAdded).format();
         delete result.disabled;
 
         return result;
