@@ -113,11 +113,33 @@ module.exports = (() => {
         return inclusionContent.replace(/\!?.?\[Adblock.*?\]\r?\n?/g, "");
     };
 
+    /**
+     * Corrects metadata for backward compatibility with old clients on MAC platform
+     * Hides tag fields
+     *
+     * @param metadata
+     */
+    const rewriteMetadataForOldMac = function (metadata) {
+        delete metadata.tags;
+
+        if (metadata.filters) {
+            for (let f of metadata.filters) {
+                if (f.tags) {
+                    delete f.tags;
+                    delete f.timeAdded;
+                }
+            }
+        }
+
+        return metadata;
+    };
+
     return {
         overrideRule: overrideRule,
         rewriteHeader: rewriteHeader,
         rewriteRules: rewriteRules,
         fixVersionComments: fixVersionComments,
-        removeAdblockVersion: removeAdblockVersion
+        removeAdblockVersion: removeAdblockVersion,
+        rewriteMetadataForOldMac: rewriteMetadataForOldMac
     };
 })();
