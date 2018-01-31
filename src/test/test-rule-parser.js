@@ -210,5 +210,25 @@ QUnit.test("Test rule parser - some rules", (assert) => {
     assert.equal(rule.url, '||news.yandex.*/*/*-*-*-*-');
     assert.ok(rule.modifiers.replace);
     assert.equal(rule.modifiers.replace, '/Ya[([0-9]{10\\,15})]([\\s\\S]*)\\$/');
+
+    line = '||kopp-verlag.de/$WS/kopp-verlag/banners/$third-party';
+    rule = ruleParser.parseRule(line);
+    assert.ok(rule);
+    assert.equal(rule.ruleText, line);
+    assert.equal(rule.ruleType, RuleTypes.UrlBlocking);
+    assert.equal(rule.url, '||kopp-verlag.de/$WS/kopp-verlag/banners/');
+    assert.ok(rule.modifiers["third-party"]);
+
+    line = '/\\.website\\/[0-9]{2,9}\\/$/$script,stylesheet,third-party,xmlhttprequest';
+    rule = ruleParser.parseRule(line);
+    assert.ok(rule);
+    assert.equal(rule.ruleText, line);
+    assert.equal(rule.ruleType, RuleTypes.UrlBlocking);
+    assert.equal(rule.url, '/\\.website\\/[0-9]{2,9}\\/$/');
+    assert.ok(rule.modifiers["third-party"]);
+    assert.ok(rule.modifiers.script);
+    assert.ok(rule.modifiers.stylesheet);
+    assert.ok(rule.modifiers.xmlhttprequest);
+
 });
 

@@ -49,10 +49,13 @@ module.exports = (() => {
             let c = line.charAt(i);
             if (c === OPTIONS_DELIMITER) {
                 if (i > 0 && line.charAt(i - 1) === ESCAPE_CHARACTER) {
-                    //Dp nothing
+                    //Do nothing
                 } else {
                     result.urlRuleText = line.substring(startIndex, i);
                     optionsPart = line.substring(i + 1);
+
+                    // Options delimiter was found, doing nothing
+                    break;
                 }
             }
         }
