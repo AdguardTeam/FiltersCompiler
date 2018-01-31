@@ -122,7 +122,7 @@ module.exports = (() => {
     const rewriteMetadataForOldMac = function (metadata) {
         delete metadata.tags;
 
-        if (metadata.filters) {
+        if (metadata.filters && metadata.filters.length > 0) {
             for (let f of metadata.filters) {
                 if (f.tags) {
                     delete f.tags;
