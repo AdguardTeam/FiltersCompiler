@@ -202,8 +202,16 @@ QUnit.test("Test rule parser - some rules", (assert) => {
     assert.equal(rule.url, '||sedu.adhands.ru/view/?sid^');
     assert.equal(rule.whiteList, true);
 
-    line = '||news.yandex.*/*/*-*-*-*-$replace=/Ya[([0-9]{10\\,15})]([\\s\\S]*)\\$/,script,important,domain=news.yandex.by|news.yandex.com|news.yandex.fr|news.yandex.kz|news.yandex.ru|news.yandex.ua';
-    rule = ruleParser.parseRule(line);
+});
+
+QUnit.test("Test rule parser - options parsing", (assert) => {
+    'use strict';
+
+    const RuleTypes = require('../main/rule/rule-types.js');
+    const ruleParser = require('../main/rule/rule-parser.js');
+
+    let line = '||news.yandex.*/*/*-*-*-*-$replace=/Ya[([0-9]{10\\,15})]([\\s\\S]*)\\$/,script,important,domain=news.yandex.by|news.yandex.com|news.yandex.fr|news.yandex.kz|news.yandex.ru|news.yandex.ua';
+    let rule = ruleParser.parseRule(line);
     assert.ok(rule);
     assert.equal(rule.ruleText, line);
     assert.equal(rule.ruleType, RuleTypes.UrlBlocking);
@@ -229,6 +237,13 @@ QUnit.test("Test rule parser - some rules", (assert) => {
     assert.ok(rule.modifiers.script);
     assert.ok(rule.modifiers.stylesheet);
     assert.ok(rule.modifiers.xmlhttprequest);
+
+    line = '/\\.party\\/[0-9]{2,9}\\/$/';
+    rule = ruleParser.parseRule(line);
+    assert.ok(rule);
+    assert.equal(rule.ruleText, line);
+    assert.equal(rule.ruleType, RuleTypes.UrlBlocking);
+    assert.equal(rule.url, '/\\.party\\/[0-9]{2,9}\\/$/');
 
 });
 
