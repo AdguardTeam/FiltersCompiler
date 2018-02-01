@@ -15,7 +15,7 @@ module.exports = (function () {
      * @property {function} existsSync
      * @property {function} mkdirSync
      */
-    const fs = require('fs');
+    const fs = require('graceful-fs');
     /**
      * @typedef {Object} path
      * @property {function} join
@@ -51,14 +51,7 @@ module.exports = (function () {
      */
     const readFile = function (path) {
         try {
-            let stats = fs.statSync(path);
-            let buf = new Buffer(stats.size);
-
-            let fd = fs.openSync(path, 'r');
-            fs.readSync(fd, buf, 0, buf.length, 0);
-            fs.closeSync(fd);
-
-            return buf.toString();
+            return fs.readFileSync(path, {encoding: 'utf-8'});
         } catch (e) {
             return null;
         }
