@@ -51,7 +51,6 @@ module.exports = (function () {
      */
     const readFile = function (path) {
         try {
-            //fs.writeSync(fd,r,0,'utf8');
             let stats = fs.statSync(path);
             let buf = new Buffer(stats.size);
 
