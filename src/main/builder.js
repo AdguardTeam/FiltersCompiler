@@ -93,7 +93,6 @@ module.exports = (function () {
      * @param line
      * @param exclusions
      * @param excluded
-     * @returns {boolean}
      */
     const isExcluded = function (line, exclusions, excluded) {
         for (let exclusion of exclusions) {
@@ -109,12 +108,12 @@ module.exports = (function () {
                     logger.log(message);
                     excluded.push('! ' + message);
                     excluded.push(line);
-                    return true;
+                    return exclusion;
                 }
             }
         }
 
-        return false;
+        return null;
     };
 
     /**
@@ -140,8 +139,9 @@ module.exports = (function () {
         const result = [];
 
         lines.forEach((line) => {
-            if (isExcluded(line, exclusions, excluded)) {
-                result.push(`${RuleMasks.MASK_COMMENT} [excluded] ${line}`);
+            const exclusion = isExcluded(line, exclusions, excluded);
+            if (exclusion) {
+                result.push(`${RuleMasks.MASK_COMMENT} [excluded by ${exclusion}] ${line}`);
             } else {
                 result.push(line);
             }
