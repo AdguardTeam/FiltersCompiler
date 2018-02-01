@@ -292,7 +292,7 @@ module.exports = (function () {
             throw new Error(`Error handling include from: ${options.url}`);
         }
 
-        result = converter.convert(result);
+        result = converter.convert(result, excluded);
 
         logger.log(`Inclusion lines: ${result.length}`);
 
