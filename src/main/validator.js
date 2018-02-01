@@ -149,9 +149,11 @@ module.exports = (function () {
      * Filters blacklisted domains
      *
      * @param domains
+     * @param rule
+     * @param excluded
      * @returns boolean
      */
-    const removeBlacklistedDomains = function (domains) {
+    const removeBlacklistedDomains = function (domains, rule, excluded) {
         if (domainsBlacklist.length === 0) {
             return domains;
         }
@@ -159,6 +161,12 @@ module.exports = (function () {
         return domains.filter((d) => {
             if (domainsBlacklist.indexOf(d) >= 0) {
                 logger.error(`Blacklisted domain: ${d}`);
+
+                if (excluded) {
+                    excluded.push(`! ${d} is blacklisted: `);
+                    excluded.push(rule);
+                }
+
                 return false;
             }
 
@@ -170,7 +178,7 @@ module.exports = (function () {
      * Validates list of rules with black list of domains
      * returns modified list of rules without blacklisted domain options
      */
-    const blacklistDomains = function (list) {
+    const blacklistDomains = function (list, excluded) {
         const result = [];
 
         list.forEach((line) => {
@@ -180,9 +188,15 @@ module.exports = (function () {
             if (rule.ruleType === RuleTypes.UrlBlocking) {
                 let modifiers = rule.modifiers;
                 if (modifiers.domain) {
-                    const validated = removeBlacklistedDomains(modifiers.domain);
+                    const validated = removeBlacklistedDomains(modifiers.domain, line, excluded);
                     if (validated.length === 0) {
                         logger.error(`All domains are blacklisted for rule: ${line}`);
+
+                        if (excluded) {
+                            excluded.push('! All domains are blacklisted for rule:');
+                            excluded.push(line);
+                        }
+
                         return;
                     }
 
@@ -197,9 +211,15 @@ module.exports = (function () {
                 rule.ruleType === RuleTypes.Content || rule.ruleType === RuleTypes.Script) {
 
                 if (rule.domains) {
-                    const validated = removeBlacklistedDomains(rule.domains);
+                    const validated = removeBlacklistedDomains(rule.domains, line, excluded);
                     if (validated.length === 0) {
                         logger.error(`All domains are blacklisted for rule: ${line}`);
+
+                        if (excluded) {
+                            excluded.push('! All domains are blacklisted for rule:');
+                            excluded.push(line);
+                        }
+
                         return;
                     }
 
@@ -228,9 +248,10 @@ module.exports = (function () {
      * Validates list of rules
      *
      * @param list
+     * @param excluded
      * @returns {Array}
      */
-    const validate = function (list) {
+    const validate = function (list, excluded) {
         return list.filter((s) => {
             const rule = ruleParser.parseRule(s);
 
@@ -239,6 +260,12 @@ module.exports = (function () {
             } else if (rule.ruleType === RuleTypes.ElementHiding) {
                 if (s.startsWith('||')) {
                     logger.error(`|| are unnecessary for element hiding rule: ${s}`);
+
+                    if (excluded) {
+                        excluded.push('! || are unnecessary for element hiding rule:');
+                        excluded.push(rule.ruleText);
+                    }
+
                     return false;
                 }
 
@@ -256,6 +283,11 @@ module.exports = (function () {
                 let cssSelector = parseCssSelector(rule.contentPart);
                 if (!cssSelector) {
                     logger.error(`Invalid selector: ${s}`);
+
+                    if (excluded) {
+                        excluded.push('! Invalid selector:');
+                        excluded.push(rule.ruleText);
+                    }
                     return false;
                 }
 
@@ -270,6 +302,11 @@ module.exports = (function () {
                 for (let name in modifiers) {
                     if (!validateOptionName(name)) {
                         logger.error(`Invalid rule options: ${s}`);
+
+                        if (excluded) {
+                            excluded.push('! Invalid rule options:');
+                            excluded.push(rule.ruleText);
+                        }
                         return false;
                     }
                 }
