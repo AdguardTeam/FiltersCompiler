@@ -35,7 +35,7 @@ QUnit.test("Test builder", (assert) => {
     assert.ok(filterText);
 
     const filterLines = filterText.split('\r\n');
-    assert.equal(filterLines.length, 23);
+    assert.equal(filterLines.length, 26);
 
     //Common include
     assert.ok(filterLines.indexOf('! some common rules could be places here') >= 0);
@@ -120,7 +120,7 @@ QUnit.test("Test builder - platforms", (assert) => {
     assert.ok(filterContent);
 
     let filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 28);
+    assert.equal(filterLines.length, 31);
 
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
     assert.ok(filterLines.indexOf('test-common-1-rule.com') >= 0);
@@ -132,7 +132,7 @@ QUnit.test("Test builder - platforms", (assert) => {
     assert.ok(filterContent);
 
     filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 13);
+    assert.equal(filterLines.length, 14);
 
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
     assert.notOk(filterLines.indexOf('test-common-1-rule.com') >= 0);
@@ -145,13 +145,13 @@ QUnit.test("Test builder - platforms", (assert) => {
     assert.ok(filterContent);
 
     filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 26);
+    assert.equal(filterLines.length, 27);
 
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
     assert.ok(filterLines.indexOf('test-common-1-rule.com') >= 0);
     assert.ok(filterLines.indexOf('! some common rules could be places here') >= 0);
     assert.ok(filterLines.indexOf('~nigma.ru,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]') >= 0);
-    assert.notOk(filterLines.indexOf('excluded_platform') >= 0);
+    assert.ok(filterLines.indexOf('excluded_platform') >= 0);
 
     //Check MAC platform
     let filtersMetadataMAC = readFile(path.join(platforms, 'mac', 'filters.json'));

@@ -29,6 +29,7 @@ module.exports = (function () {
     const generator = require("./platforms/generator.js");
     const logger = require("./utils/log.js");
     const utils = require("./utils/utils.js");
+    const RuleMasks = require("./rule/rule-masks");
     const workaround = require('./utils/workaround.js');
     const webutils = require('./utils/webutils.js');
 
@@ -36,6 +37,7 @@ module.exports = (function () {
     const FILTER_FILE = 'filter.txt';
     const REVISION_FILE = 'revision.json';
     const EXCLUDE_FILE = 'exclude.txt';
+    const EXCLUDED_LINES_FILE = 'diff.txt';
     const METADATA_FILE = 'metadata.json';
 
 
@@ -82,7 +84,17 @@ module.exports = (function () {
     const stripComments = function (lines) {
         logger.log('Stripping comments..');
 
-        return lines.filter((line) => !line.startsWith('!'));
+        return lines.filter((line, pos) => {
+            if (pos > 0 && lines[pos - 1].startsWith(RuleMasks.MASK_HINT)) {
+                return true;
+            }
+
+            if (line.startsWith(RuleMasks.MASK_HINT)) {
+                return true;
+            }
+
+            return !line.startsWith(RuleMasks.MASK_COMMENT);
+        });
     };
 
     /**
@@ -90,26 +102,28 @@ module.exports = (function () {
      *
      * @param line
      * @param exclusions
-     * @returns {boolean}
+     * @param excluded
      */
-    const isExcluded = function (line, exclusions) {
+    const isExcluded = function (line, exclusions, excluded) {
         for (let exclusion of exclusions) {
             exclusion = exclusion.trim();
 
             if (!exclusion.startsWith('!')) {
-                if (exclusion.startsWith("/") && exclusion.endsWith("/")) {
-                    if (line.match(new RegExp(exclusion.substring(1, exclusion.length - 2)))) {
-                        return true;
-                    }
-                } else {
-                    if (line.includes(exclusion)) {
-                        return true;
-                    }
+                let message = `${line} is excluded by: ${exclusion}`;
+
+                let isExcludedByRegexp = exclusion.startsWith("/") && exclusion.endsWith("/") &&
+                    line.match(new RegExp(exclusion.substring(1, exclusion.length - 2)));
+
+                if (isExcludedByRegexp || line.includes(exclusion)) {
+                    logger.log(message);
+                    excluded.push('! ' + message);
+                    excluded.push(line);
+                    return exclusion;
                 }
             }
         }
 
-        return false;
+        return null;
     };
 
     /**
@@ -117,9 +131,10 @@ module.exports = (function () {
      *
      * @param lines
      * @param exclusionsFileName
+     * @param excluded
      * @returns {*}
      */
-    const exclude = function (lines, exclusionsFileName) {
+    const exclude = function (lines, exclusionsFileName, excluded) {
 
         logger.log('Applying exclusions..');
 
@@ -131,9 +146,18 @@ module.exports = (function () {
 
         exclusions = splitLines(exclusions);
 
-        const result = lines.filter((line) => !isExcluded(line, exclusions));
+        const result = [];
 
-        logger.log(`Excluded lines: ${lines.length - result.length}`);
+        lines.forEach((line, pos) => {
+            const exclusion = isExcluded(line, exclusions, excluded);
+            if (exclusion) {
+                if (pos > 0 && lines[pos-1].startsWith(RuleMasks.MASK_HINT)) {
+                    result.push(`${RuleMasks.MASK_COMMENT} [excluded by ${exclusion}] ${line}`);
+                }
+            } else {
+                result.push(line);
+            }
+        });
 
         return result;
     };
@@ -153,6 +177,45 @@ module.exports = (function () {
             s = s.substring(0, t);
         }
         return s;
+    };
+
+    /**
+     * Removes rules array duplicates,
+     * ignores comments and hinted rules
+     *
+     * @param list
+     * @returns {*}
+     */
+    const removeRuleDuplicates = function (list, excluded) {
+        logger.log('Removing duplicates..');
+
+        return list.filter((item, pos) => {
+            if (pos > 0) {
+                let previous = list[pos - 1];
+                if (previous && previous.startsWith(RuleMasks.MASK_HINT))  {
+                    return true;
+                }
+            }
+
+            let duplicatePosition = list.indexOf(item);
+            if (duplicatePosition !== pos && duplicatePosition > 0) {
+                let duplicate = list[duplicatePosition - 1];
+                if (duplicate && duplicate.startsWith(RuleMasks.MASK_HINT))  {
+                    return true;
+                }
+            }
+
+            const result = item.startsWith(RuleMasks.MASK_COMMENT) ||
+                duplicatePosition === pos;
+
+            if (!result) {
+                logger.log(`${item} removed as duplicate`);
+                excluded.push('! Duplicated:');
+                excluded.push(item);
+            }
+
+            return result;
+        });
     };
 
     /**
@@ -192,9 +255,10 @@ module.exports = (function () {
      * Creates content from include line
      *
      * @param line
+     * @param excluded
      * @returns {Array}
      */
-    const include = function (line) {
+    const include = function (line, excluded) {
         let result = [];
 
         const options = parseIncludeLine(line);
@@ -216,7 +280,7 @@ module.exports = (function () {
             result = splitLines(result);
 
             if (options.exclude) {
-                result = exclude(result, options.exclude);
+                result = exclude(result, options.exclude, excluded);
             }
 
             if (options.stripComments) {
@@ -228,7 +292,7 @@ module.exports = (function () {
             throw new Error(`Error handling include from: ${options.url}`);
         }
 
-        result = converter.convert(result);
+        result = converter.convert(result, excluded);
 
         logger.log(`Inclusion lines: ${result.length}`);
 
@@ -239,15 +303,15 @@ module.exports = (function () {
      * Compiles filter lines
      *
      * @param template
-     * @returns {Array}
      */
     const compile = function (template) {
         let result = [];
+        let excluded = [];
 
         const lines = splitLines(template);
         for (let line of lines) {
             if (line.startsWith('@include ')) {
-                const inc = include(line.trim());
+                const inc = include(line.trim(), excluded);
 
                 let k = 0;
                 while (k < inc.length) {
@@ -259,14 +323,17 @@ module.exports = (function () {
             }
         }
 
-        result = exclude(result, EXCLUDE_FILE);
-        result = utils.removeDuplicates(result);
+        result = exclude(result, EXCLUDE_FILE, excluded);
+        result = removeRuleDuplicates(result, excluded);
 
         result = validator.validate(result);
         result = validator.blacklistDomains(result);
         //result = sorter.sort(result);
 
-        return result;
+        return {
+            lines: result,
+            excluded: excluded
+        };
     };
 
     /**
@@ -316,11 +383,16 @@ module.exports = (function () {
         const revision = makeRevision(revisionFile);
 
         logger.log('Compiling..');
-        const compiled = compile(template);
+        const result = compile(template);
+        const compiled = result.lines;
+        const excluded = result.excluded;
         logger.log('Compiled length:' + compiled.length);
+        logger.log('Excluded length:' + excluded.length);
 
         logger.log('Writing filter file, lines:' + compiled.length);
         writeFile(path.join(currentDir, FILTER_FILE), compiled.join('\r\n'));
+        logger.log('Writing excluded file, lines:' + excluded.length);
+        writeFile(path.join(currentDir, EXCLUDED_LINES_FILE), excluded.join('\r\n'));
         logger.log('Writing revision file..');
         writeFile(revisionFile, JSON.stringify(revision, null, "\t"));
     };
