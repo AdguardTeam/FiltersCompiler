@@ -84,7 +84,17 @@ module.exports = (function () {
     const stripComments = function (lines) {
         logger.log('Stripping comments..');
 
-        return lines.filter((line) => !line.startsWith('!'));
+        return lines.filter((line, pos) => {
+            if (pos > 0 && lines[pos - 1].startsWith(RuleMasks.MASK_HINT)) {
+                return true;
+            }
+
+            if (line.startsWith(RuleMasks.MASK_HINT)) {
+                return true;
+            }
+
+            return !line.startsWith(RuleMasks.MASK_COMMENT);
+        });
     };
 
     /**
