@@ -51,7 +51,15 @@ module.exports = (function () {
      */
     const readFile = function (path) {
         try {
-            return fs.readFileSync(path, {encoding: 'utf-8'});
+            //fs.writeSync(fd,r,0,'utf8');
+            let stats = fs.statSync(path);
+            let buf = new Buffer(stats.size);
+
+            let fd = fs.openSync(path, 'r');
+            fs.readSync(fd, buf, 0, buf.length, 0);
+            fs.closeSync(fd);
+
+            return buf.toString();
         } catch (e) {
             return null;
         }
@@ -151,7 +159,7 @@ module.exports = (function () {
         lines.forEach((line, pos) => {
             const exclusion = isExcluded(line, exclusions, excluded);
             if (exclusion) {
-                if (pos > 0 && lines[pos-1].startsWith(RuleMasks.MASK_HINT)) {
+                if (pos > 0 && lines[pos - 1].startsWith(RuleMasks.MASK_HINT)) {
                     result.push(`${RuleMasks.MASK_COMMENT} [excluded by ${exclusion}] ${line}`);
                 }
             } else {
@@ -192,7 +200,7 @@ module.exports = (function () {
         return list.filter((item, pos) => {
             if (pos > 0) {
                 let previous = list[pos - 1];
-                if (previous && previous.startsWith(RuleMasks.MASK_HINT))  {
+                if (previous && previous.startsWith(RuleMasks.MASK_HINT)) {
                     return true;
                 }
             }
@@ -200,7 +208,7 @@ module.exports = (function () {
             let duplicatePosition = list.indexOf(item);
             if (duplicatePosition !== pos && duplicatePosition > 0) {
                 let duplicate = list[duplicatePosition - 1];
-                if (duplicate && duplicate.startsWith(RuleMasks.MASK_HINT))  {
+                if (duplicate && duplicate.startsWith(RuleMasks.MASK_HINT)) {
                     return true;
                 }
             }
