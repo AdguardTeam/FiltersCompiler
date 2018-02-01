@@ -15,6 +15,7 @@
 ||test.com^
 ||test.com^
 ||test.com^$third-party
+!+ NOT_PLATFORM(test, windows)
 #%#test.com^$third-party
 ||test.com^$replace=
 ~nigma.ru,google.com$$div[id="ad_text"][wildcard="*teasernet*tararar*"]

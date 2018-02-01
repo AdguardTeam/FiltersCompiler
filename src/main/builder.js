@@ -138,10 +138,12 @@ module.exports = (function () {
 
         const result = [];
 
-        lines.forEach((line) => {
+        lines.forEach((line, pos) => {
             const exclusion = isExcluded(line, exclusions, excluded);
             if (exclusion) {
-                result.push(`${RuleMasks.MASK_COMMENT} [excluded by ${exclusion}] ${line}`);
+                if (pos > 0 && lines[pos-1].startsWith(RuleMasks.MASK_HINT)) {
+                    result.push(`${RuleMasks.MASK_COMMENT} [excluded by ${exclusion}] ${line}`);
+                }
             } else {
                 result.push(line);
             }

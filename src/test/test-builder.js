@@ -35,7 +35,7 @@ QUnit.test("Test builder", (assert) => {
     assert.ok(filterText);
 
     const filterLines = filterText.split('\r\n');
-    assert.equal(filterLines.length, 30);
+    assert.equal(filterLines.length, 26);
 
     //Common include
     assert.ok(filterLines.indexOf('! some common rules could be places here') >= 0);
@@ -120,7 +120,7 @@ QUnit.test("Test builder - platforms", (assert) => {
     assert.ok(filterContent);
 
     let filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 35);
+    assert.equal(filterLines.length, 31);
 
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
     assert.ok(filterLines.indexOf('test-common-1-rule.com') >= 0);
@@ -145,7 +145,7 @@ QUnit.test("Test builder - platforms", (assert) => {
     assert.ok(filterContent);
 
     filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 33);
+    assert.equal(filterLines.length, 27);
 
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
     assert.ok(filterLines.indexOf('test-common-1-rule.com') >= 0);
