@@ -326,8 +326,8 @@ module.exports = (function () {
         result = exclude(result, EXCLUDE_FILE, excluded);
         result = removeRuleDuplicates(result, excluded);
 
-        result = validator.validate(result);
-        result = validator.blacklistDomains(result);
+        result = validator.validate(result, excluded);
+        result = validator.blacklistDomains(result, excluded);
         //result = sorter.sort(result);
 
         return {
