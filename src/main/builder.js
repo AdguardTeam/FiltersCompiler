@@ -15,7 +15,7 @@ module.exports = (function () {
      * @property {function} existsSync
      * @property {function} mkdirSync
      */
-    const fs = require('fs');
+    const fs = require('graceful-fs');
     /**
      * @typedef {Object} path
      * @property {function} join
