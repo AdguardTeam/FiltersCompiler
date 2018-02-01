@@ -141,7 +141,7 @@ module.exports = (function () {
 
         lines.forEach((line) => {
             if (isExcluded(line, exclusions, excluded)) {
-                result.push(RuleMasks.MASK_COMMENT + line);
+                result.push(`${RuleMasks.MASK_COMMENT} [excluded] ${line}`);
             } else {
                 result.push(line);
             }
