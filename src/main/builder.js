@@ -29,6 +29,7 @@ module.exports = (function () {
     const generator = require("./platforms/generator.js");
     const logger = require("./utils/log.js");
     const utils = require("./utils/utils.js");
+    const RuleMasks = require("./rule/rule-masks");
     const workaround = require('./utils/workaround.js');
     const webutils = require('./utils/webutils.js');
 
@@ -99,10 +100,12 @@ module.exports = (function () {
             if (!exclusion.startsWith('!')) {
                 if (exclusion.startsWith("/") && exclusion.endsWith("/")) {
                     if (line.match(new RegExp(exclusion.substring(1, exclusion.length - 2)))) {
+                        logger.log(`${line} is excluded by regexp ${exclusion}`);
                         return true;
                     }
                 } else {
                     if (line.includes(exclusion)) {
+                        logger.log(`${line} is excluded by ${exclusion}`);
                         return true;
                     }
                 }
@@ -153,6 +156,43 @@ module.exports = (function () {
             s = s.substring(0, t);
         }
         return s;
+    };
+
+    /**
+     * Removes rules array duplicates,
+     * ignores comments and hinted rules
+     *
+     * @param list
+     * @returns {*}
+     */
+    const removeRuleDuplicates = function (list) {
+        logger.log('Removing duplicates..');
+
+        return list.filter((item, pos) => {
+            if (pos > 0) {
+                let previous = list[pos - 1];
+                if (previous && previous.startsWith(RuleMasks.MASK_HINT))  {
+                    return true;
+                }
+            }
+
+            let duplicatePosition = list.indexOf(item);
+            if (duplicatePosition !== pos && duplicatePosition > 0) {
+                let duplicate = list[duplicatePosition - 1];
+                if (duplicate && duplicate.startsWith(RuleMasks.MASK_HINT))  {
+                    return true;
+                }
+            }
+
+            const result = item.startsWith(RuleMasks.MASK_COMMENT) ||
+                duplicatePosition === pos;
+
+            if (!result) {
+                logger.log(`${item} removed as duplicate`);
+            }
+
+            return result;
+        });
     };
 
     /**
@@ -260,7 +300,7 @@ module.exports = (function () {
         }
 
         result = exclude(result, EXCLUDE_FILE);
-        result = utils.removeDuplicates(result);
+        result = removeRuleDuplicates(result);
 
         result = validator.validate(result);
         result = validator.blacklistDomains(result);

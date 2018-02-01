@@ -120,7 +120,7 @@ QUnit.test("Test builder - platforms", (assert) => {
     assert.ok(filterContent);
 
     let filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 28);
+    assert.equal(filterLines.length, 29);
 
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
     assert.ok(filterLines.indexOf('test-common-1-rule.com') >= 0);
@@ -132,7 +132,7 @@ QUnit.test("Test builder - platforms", (assert) => {
     assert.ok(filterContent);
 
     filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 13);
+    assert.equal(filterLines.length, 14);
 
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
     assert.notOk(filterLines.indexOf('test-common-1-rule.com') >= 0);
@@ -145,7 +145,7 @@ QUnit.test("Test builder - platforms", (assert) => {
     assert.ok(filterContent);
 
     filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 26);
+    assert.equal(filterLines.length, 27);
 
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
     assert.ok(filterLines.indexOf('test-common-1-rule.com') >= 0);
