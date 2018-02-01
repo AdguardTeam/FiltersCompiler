@@ -102,20 +102,14 @@ module.exports = (function () {
             if (!exclusion.startsWith('!')) {
                 let message = `${line} is excluded by: ${exclusion}`;
 
-                if (exclusion.startsWith("/") && exclusion.endsWith("/")) {
-                    if (line.match(new RegExp(exclusion.substring(1, exclusion.length - 2)))) {
-                        logger.log(message);
-                        excluded.push('! ' + message);
-                        excluded.push(line);
-                        return true;
-                    }
-                } else {
-                    if (line.includes(exclusion)) {
-                        logger.log(message);
-                        excluded.push('! ' + message);
-                        excluded.push(line);
-                        return true;
-                    }
+                let isExcludedByRegexp = exclusion.startsWith("/") && exclusion.endsWith("/") &&
+                    line.match(new RegExp(exclusion.substring(1, exclusion.length - 2)));
+
+                if (isExcludedByRegexp || line.includes(exclusion)) {
+                    logger.log(message);
+                    excluded.push('! ' + message);
+                    excluded.push(line);
+                    return true;
                 }
             }
         }
