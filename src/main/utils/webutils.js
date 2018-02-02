@@ -16,7 +16,7 @@ module.exports = (() => {
         logger.log(`Downloading: ${url}`);
 
         return require('child_process')
-            .execFileSync('curl', ['--fail', '-L', url], {encoding: 'utf8'});
+            .execFileSync('curl', ['--fail', '--silent', '-L', url], {encoding: 'utf8'});
     };
 
     return {
