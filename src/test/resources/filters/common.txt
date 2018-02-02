@@ -1,0 +1,7 @@
+! Version: 11.9090.19.19
+! [Adblock Plus 2.0]
+! some common rules could be places here
+test-common-rule.com
+||test-common-rule.com^$replace=
+test-common-rule.com$xmlhttprequest
+example.com##h1:style(background-color: blue !important)

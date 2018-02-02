@@ -1,0 +1,22 @@
+! Homepage: http://adguard.com/filters.html#english
+! License: http://creativecommons.org/licenses/by-sa/3.0/
+!
+!-------------------------------------------------------------------------------!
+!------------------ General JS API ---------------------------------------------!
+!-------------------------------------------------------------------------------!
+@include ../common.txt
+@include ../common_1.txt /exclude="../exclude_1.txt" /stripComments
+!-------------------------------------------------------------------------------!
+!------------------ EasyList rules ---------------------------------------------!
+!-------------------------------------------------------------------------------!
+!@include "https://easylist.github.io/easylist/easylist.txt" /stripComments
+
+! Some test rules
+||test.com^
+||test.com^
+||test.com^$third-party
+#%#test.com^$third-party
+||test.com^$replace=
+~nigma.ru,google.com$$div[id="ad_text"][wildcard="*teasernet*tararar*"]
+!+ NOT_PLATFORM(test, windows)
+excluded_platform
