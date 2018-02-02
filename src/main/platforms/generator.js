@@ -185,19 +185,24 @@ module.exports = (() => {
      * Adds 'languages' metadata field parsed from 'lang:' tags
      *
      * @param filters
-     * @param tags
      */
     const parseLangTags = function (filters) {
         for (const f of filters) {
             if (f.tags) {
                 const filterLanguages = [];
+                let hasRecommended = false;
                 for (const t of f.tags) {
+                    if (!hasRecommended && t === 'recommended') {
+                        hasRecommended = true;
+                    }
+
                     if (t.startsWith('lang:')) {
                         filterLanguages.push(t.substring(5));
                     }
                 }
 
-                f.languages = filterLanguages;
+                // Languages will be added for recommended filters only
+                f.languages = hasRecommended ? filterLanguages : [];
             }
         }
 
