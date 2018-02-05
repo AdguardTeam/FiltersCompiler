@@ -1,4 +1,4 @@
-/* globals require */
+/* globals require, Buffer */
 
 module.exports = (function () {
 
@@ -21,6 +21,7 @@ module.exports = (function () {
      * @property {function} join
      */
     const path = require('path');
+    const md5 = require('md5');
 
     const version = require("./utils/version.js");
     const converter = require("./converter.js");
@@ -337,23 +338,34 @@ module.exports = (function () {
     };
 
     /**
-     * Creates revision object
+     * Creates revision object,
+     * doesn't increment version if hash is not changed
      *
      * @param path
+     * @param hash
      * @returns {{version: string, timeUpdated: number}}
      */
-    const makeRevision = function (path) {
+    const makeRevision = function (path, hash) {
         const result = {
             "version": "1.0.0.0",
-            "timeUpdated": new Date().getTime()
+            "timeUpdated": new Date().getTime(),
+            "hash": hash
         };
 
         const current = readFile(path);
         if (current) {
-            let p = JSON.parse(current);
-            if (p && p.version) {
-                result.version = version.increment(p.version);
-                result.timeUpdated = new Date().getTime();
+            let currentRevision = JSON.parse(current);
+            if (currentRevision.version) {
+                result.version = currentRevision.version;
+
+                if (currentRevision.timeUpdated) {
+                    result.timeUpdated = currentRevision.timeUpdated;
+                }
+
+                if (!currentRevision.hash || currentRevision.hash !== result.hash) {
+                    result.version = version.increment(currentRevision.version);
+                    result.timeUpdated = new Date().getTime();
+                }
             }
         }
 
@@ -379,9 +391,6 @@ module.exports = (function () {
             return;
         }
 
-        const revisionFile = path.join(currentDir, REVISION_FILE);
-        const revision = makeRevision(revisionFile);
-
         logger.log('Compiling..');
         const result = compile(template);
         const compiled = result.lines;
@@ -389,11 +398,17 @@ module.exports = (function () {
         logger.log('Compiled length:' + compiled.length);
         logger.log('Excluded length:' + excluded.length);
 
+        const compiledData = compiled.join('\r\n');
+
         logger.log('Writing filter file, lines:' + compiled.length);
-        writeFile(path.join(currentDir, FILTER_FILE), compiled.join('\r\n'));
+        writeFile(path.join(currentDir, FILTER_FILE), compiledData);
         logger.log('Writing excluded file, lines:' + excluded.length);
         writeFile(path.join(currentDir, EXCLUDED_LINES_FILE), excluded.join('\r\n'));
         logger.log('Writing revision file..');
+
+        const hash = new Buffer(md5(compiledData, {asString: true})).toString('base64').trim();
+        const revisionFile = path.join(currentDir, REVISION_FILE);
+        const revision = makeRevision(revisionFile, hash);
         writeFile(revisionFile, JSON.stringify(revision, null, "\t"));
     };
 

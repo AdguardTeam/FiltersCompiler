@@ -11,13 +11,17 @@ This package is suggested to be used with filters repository with directory stru
 The package could be run with the following command:
 
 ```
- var path = require('path');
- var compiler = require("adguard-filters-compiler");
  
- var filtersDir = path.join(__dirname, './filters');
- var logPath = path.join(__dirname, './log.txt');
- var domainBlacklistFile = path.join(__dirname, './domainBlacklistFile.txt');
- compiler.compile(filtersDir, logPath, domainBlacklistFile);
+ const path = require('path');
+ const compiler = require("adguard-filters-compiler");
+ 
+ const filtersDir = path.join(__dirname, './filters');
+ const logPath = path.join(__dirname, './log.txt');
+ const domainBlacklistFile = path.join(__dirname, './domains-blacklist.txt');
+ 
+ const platformsPath = path.join(__dirname, './platforms');
+ 
+ compiler.compile(filtersDir, logPath, domainBlacklistFile, platformsPath);
 ```
 
 ## Tests
