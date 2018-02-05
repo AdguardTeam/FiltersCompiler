@@ -175,7 +175,6 @@ QUnit.test("Test rule parser - replace rules", (assert) => {
 
     let line = '||api.ivi.ru/light/?$replace=/"files":[\s\S]*"mraid_file_url"/"files": []\, "mraid_file_url"/';
     let rule = ruleParser.parseRule(line);
-    console.log(rule);
     assert.ok(rule);
     assert.equal(rule.ruleText, line);
     assert.equal(rule.ruleType, RuleTypes.UrlBlocking);
@@ -194,5 +193,57 @@ QUnit.test("Test rule parser - some rules", (assert) => {
     assert.ok(rule);
     assert.equal(rule.ruleText, line);
     assert.equal(rule.ruleType, RuleTypes.ElementHiding);
+
+    line = '@@||sedu.adhands.ru/view/?sid^$script,domain=tveda.ru';
+    rule = ruleParser.parseRule(line);
+    assert.ok(rule);
+    assert.equal(rule.ruleText, line);
+    assert.equal(rule.ruleType, RuleTypes.UrlBlocking);
+    assert.equal(rule.url, '||sedu.adhands.ru/view/?sid^');
+    assert.equal(rule.whiteList, true);
+
+});
+
+QUnit.test("Test rule parser - options parsing", (assert) => {
+    'use strict';
+
+    const RuleTypes = require('../main/rule/rule-types.js');
+    const ruleParser = require('../main/rule/rule-parser.js');
+
+    let line = '||news.yandex.*/*/*-*-*-*-$replace=/Ya[([0-9]{10\\,15})]([\\s\\S]*)\\$/,script,important,domain=news.yandex.by|news.yandex.com|news.yandex.fr|news.yandex.kz|news.yandex.ru|news.yandex.ua';
+    let rule = ruleParser.parseRule(line);
+    assert.ok(rule);
+    assert.equal(rule.ruleText, line);
+    assert.equal(rule.ruleType, RuleTypes.UrlBlocking);
+    assert.equal(rule.url, '||news.yandex.*/*/*-*-*-*-');
+    assert.ok(rule.modifiers.replace);
+    assert.equal(rule.modifiers.replace, '/Ya[([0-9]{10\\,15})]([\\s\\S]*)\\$/');
+
+    line = '||kopp-verlag.de/$WS/kopp-verlag/banners/$third-party';
+    rule = ruleParser.parseRule(line);
+    assert.ok(rule);
+    assert.equal(rule.ruleText, line);
+    assert.equal(rule.ruleType, RuleTypes.UrlBlocking);
+    assert.equal(rule.url, '||kopp-verlag.de/$WS/kopp-verlag/banners/');
+    assert.ok(rule.modifiers["third-party"]);
+
+    line = '/\\.website\\/[0-9]{2,9}\\/$/$script,stylesheet,third-party,xmlhttprequest';
+    rule = ruleParser.parseRule(line);
+    assert.ok(rule);
+    assert.equal(rule.ruleText, line);
+    assert.equal(rule.ruleType, RuleTypes.UrlBlocking);
+    assert.equal(rule.url, '/\\.website\\/[0-9]{2,9}\\/$/');
+    assert.ok(rule.modifiers["third-party"]);
+    assert.ok(rule.modifiers.script);
+    assert.ok(rule.modifiers.stylesheet);
+    assert.ok(rule.modifiers.xmlhttprequest);
+
+    line = '/\\.party\\/[0-9]{2,9}\\/$/';
+    rule = ruleParser.parseRule(line);
+    assert.ok(rule);
+    assert.equal(rule.ruleText, line);
+    assert.equal(rule.ruleType, RuleTypes.UrlBlocking);
+    assert.equal(rule.url, '/\\.party\\/[0-9]{2,9}\\/$/');
+
 });
 

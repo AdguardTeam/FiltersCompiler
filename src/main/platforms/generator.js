@@ -7,11 +7,12 @@ module.exports = (() => {
     const fs = require('fs');
     const path = require('path');
     const md5 = require('md5');
-    const downloadFileSync = require('download-file-sync');
+    const moment = require('moment');
 
     const logger = require("../utils/log.js");
     const filter = require("./filter.js");
     const workaround = require('../utils/workaround.js');
+    const webutils = require('../utils/webutils.js');
 
     const RULES_SEPARATOR = "\r\n";
 
@@ -66,7 +67,7 @@ module.exports = (() => {
             `! Title: ${metadata.name}`,
             `! Description: ${metadata.description}`,
             `! Version: ${revision.version}`,
-            `! TimeUpdated: ${new Date(revision.timeUpdated).toISOString()}`,
+            `! TimeUpdated: ${moment(revision.timeUpdated).format()}`,
             `! Expires: ${metadata.expires} (update frequency)`
         ];
     };
@@ -184,19 +185,24 @@ module.exports = (() => {
      * Adds 'languages' metadata field parsed from 'lang:' tags
      *
      * @param filters
-     * @param tags
      */
     const parseLangTags = function (filters) {
         for (const f of filters) {
             if (f.tags) {
                 const filterLanguages = [];
+                let hasRecommended = false;
                 for (const t of f.tags) {
+                    if (!hasRecommended && t === 'recommended') {
+                        hasRecommended = true;
+                    }
+
                     if (t.startsWith('lang:')) {
                         filterLanguages.push(t.substring(5));
                     }
                 }
 
-                f.languages = filterLanguages;
+                // Languages will be added for recommended filters only
+                f.languages = hasRecommended ? filterLanguages : [];
             }
         }
 
@@ -234,19 +240,17 @@ module.exports = (() => {
 
             logger.log('Writing filters metadata: ' + config.path);
             const filtersFile = path.join(platformDir, 'filters.json');
-            const metadata = {groups: groups, tags: tags, filters: filtersMetadata};
+            let metadata = {groups: groups, tags: tags, filters: filtersMetadata};
             if (platform === 'MAC') {
-                //Hide tag fields for old app versions
-                delete metadata.tags;
+                metadata = workaround.rewriteMetadataForOldMac(metadata);
             }
             fs.writeFileSync(filtersFile, JSON.stringify(metadata, null, '\t'), 'utf8');
 
             logger.log('Writing filters localizations: ' + config.path);
             const filtersI18nFile = path.join(platformDir, 'filters_i18n.json');
-            const i18nMetadata = {groups: localizations.groups, tags: localizations.tags, filters: localizations.filters};
+            let i18nMetadata = {groups: localizations.groups, tags: localizations.tags, filters: localizations.filters};
             if (platform === 'MAC') {
-                //Hide tag fields for old app versions
-                delete i18nMetadata.tags;
+                i18nMetadata = workaround.rewriteMetadataForOldMac(i18nMetadata);
             }
             fs.writeFileSync(filtersI18nFile, JSON.stringify(i18nMetadata, null, '\t'), 'utf8');
         }
@@ -277,8 +281,8 @@ module.exports = (() => {
 
         const result = JSON.parse(metadataString);
         result.version = revision.version;
-        result.timeUpdated = new Date(revision.timeUpdated).toISOString();
-        result.timeAdded = new Date(result.timeAdded).toISOString();
+        result.timeUpdated = moment(revision.timeUpdated).format();
+        result.timeAdded = moment(result.timeAdded).format();
         delete result.disabled;
 
         return result;
@@ -418,7 +422,7 @@ module.exports = (() => {
 
         let optimizationConfig;
         if (optimizationEnabled) {
-            optimizationConfig = downloadFileSync(OPTIMIZATION_STATS_DOWNLOAD_URL.replace('{0}', filterId));
+            optimizationConfig = webutils.downloadFile(OPTIMIZATION_STATS_DOWNLOAD_URL.replace('{0}', filterId));
             optimizationConfig = JSON.parse(optimizationConfig);
         }
 

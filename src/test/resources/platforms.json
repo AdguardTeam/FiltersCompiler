@@ -25,5 +25,13 @@
       "removeRulePatterns": false,
       "ignoreRuleHints": false
     }
+  },
+  "MAC": {
+    "platform": "mac",
+    "path": "mac",
+    "configuration": {
+      "removeRulePatterns": false,
+      "ignoreRuleHints": false
+    }
   }
 }

@@ -14,6 +14,7 @@ module.exports = (function () {
     const logger = require("./utils/log.js");
     const ruleParser = require("./rule/rule-parser.js");
     const RuleTypes = require("./rule/rule-types.js");
+    const RuleMasks = require("./rule/rule-masks.js");
     const Rule = require("./rule/rule.js");
 
     const VALID_OPTIONS = [
@@ -25,7 +26,7 @@ module.exports = (function () {
         // Special behaviour modifiers
         'csp',
         'webrtc',
-        'websocket',
+        'websocket', '~websocket',
         // Content type modifiers
         'image', '~image',
         'stylesheet', '~stylesheet',
@@ -42,15 +43,19 @@ module.exports = (function () {
         'content',
         'jsinject',
         'urlblock',
-        'document',
+        'document', '~document',
         'stealth',
         'generichide',
         'genericblock',
         'important',
         'empty',
         'mp4',
+        'extension', '~extension',
+        'network',
         'replace',
         'protobuf',
+        'collapse', '~collapse',
+        'ping',
         'app'];
 
     /**
@@ -76,16 +81,6 @@ module.exports = (function () {
     const EXTENDED_CSS_MARKERS = ["[-ext-has=", "[-ext-contains=", "[-ext-has-text=", "[-ext-matches-css=",
         "[-ext-matches-css-before=", "[-ext-matches-css-after=", ":has(", ":has-text(", ":contains(",
         ":matches-css(", ":matches-css-before(", ":matches-css-after(", ":-abp-has(", ":-abp-contains("];
-
-    const VALID_TAGS_CONTENT = [
-        'id',
-        'tag-content',
-        'max-length',
-        'min-length',
-        'parent-elements',
-        'parent-search-level',
-        'wildcard'
-    ];
 
     let domainsBlacklist = [];
     let cssParser;
@@ -151,25 +146,14 @@ module.exports = (function () {
     };
 
     /**
-     * Validates content rule attributes
-     */
-    const validateContentRuleAttributes = function (ruleText, attributes) {
-        return attributes.every((a) => {
-            if (VALID_TAGS_CONTENT.indexOf(a.attributeName) < 0) {
-                logger.error(`Invalid tag: ${ruleText}`);
-                return false;
-            }
-            return true;
-        });
-    };
-
-    /**
      * Filters blacklisted domains
      *
      * @param domains
+     * @param rule
+     * @param excluded
      * @returns boolean
      */
-    const removeBlacklistedDomains = function (domains) {
+    const removeBlacklistedDomains = function (domains, rule, excluded) {
         if (domainsBlacklist.length === 0) {
             return domains;
         }
@@ -177,6 +161,12 @@ module.exports = (function () {
         return domains.filter((d) => {
             if (domainsBlacklist.indexOf(d) >= 0) {
                 logger.error(`Blacklisted domain: ${d}`);
+
+                if (excluded) {
+                    excluded.push(`! ${d} is blacklisted: `);
+                    excluded.push(rule);
+                }
+
                 return false;
             }
 
@@ -188,7 +178,7 @@ module.exports = (function () {
      * Validates list of rules with black list of domains
      * returns modified list of rules without blacklisted domain options
      */
-    const blacklistDomains = function (list) {
+    const blacklistDomains = function (list, excluded) {
         const result = [];
 
         list.forEach((line) => {
@@ -198,23 +188,38 @@ module.exports = (function () {
             if (rule.ruleType === RuleTypes.UrlBlocking) {
                 let modifiers = rule.modifiers;
                 if (modifiers.domain) {
-                    const validated = removeBlacklistedDomains(modifiers.domain);
+                    const validated = removeBlacklistedDomains(modifiers.domain, line, excluded);
                     if (validated.length === 0) {
                         logger.error(`All domains are blacklisted for rule: ${line}`);
+
+                        if (excluded) {
+                            excluded.push('! All domains are blacklisted for rule:');
+                            excluded.push(line);
+                        }
+
                         return;
                     }
 
                     modifiers.domain = validated;
 
                     corrected = rule.buildNewModifiers(modifiers);
+                    if (rule.whiteList) {
+                        corrected = RuleMasks.MASK_WHITE_LIST + corrected;
+                    }
                 }
             } else if (rule.ruleType === RuleTypes.ElementHiding || rule.ruleType === RuleTypes.Css ||
                 rule.ruleType === RuleTypes.Content || rule.ruleType === RuleTypes.Script) {
 
                 if (rule.domains) {
-                    const validated = removeBlacklistedDomains(rule.domains);
+                    const validated = removeBlacklistedDomains(rule.domains, line, excluded);
                     if (validated.length === 0) {
                         logger.error(`All domains are blacklisted for rule: ${line}`);
+
+                        if (excluded) {
+                            excluded.push('! All domains are blacklisted for rule:');
+                            excluded.push(line);
+                        }
+
                         return;
                     }
 
@@ -236,16 +241,17 @@ module.exports = (function () {
      */
     const validateOptionName = function (option) {
         option = option.trim();
-        return VALID_OPTIONS.indexOf(option) >= 0 || VALID_OPTIONS.indexOf('~' + option) >= 0;
+        return VALID_OPTIONS.indexOf(option) >= 0;
     };
 
     /**
      * Validates list of rules
      *
      * @param list
+     * @param excluded
      * @returns {Array}
      */
-    const validate = function (list) {
+    const validate = function (list, excluded) {
         return list.filter((s) => {
             const rule = ruleParser.parseRule(s);
 
@@ -254,22 +260,34 @@ module.exports = (function () {
             } else if (rule.ruleType === RuleTypes.ElementHiding) {
                 if (s.startsWith('||')) {
                     logger.error(`|| are unnecessary for element hiding rule: ${s}`);
+
+                    if (excluded) {
+                        excluded.push('! || are unnecessary for element hiding rule:');
+                        excluded.push(rule.ruleText);
+                    }
+
                     return false;
+                }
+
+                const isExtendedCss = EXTENDED_CSS_MARKERS.some((m) => rule.contentPart.includes(m));
+                if (isExtendedCss) {
+                    //TODO: Some extended css selector couldn't be parsed yet, so we cannot validate pseudos
+                    // if (!validatePseudoClasses(cssSelector)) {
+                    //     logger.error(`Invalid pseudo class: ${s}`);
+                    //     return false;
+                    // }
+
+                    return true;
                 }
 
                 let cssSelector = parseCssSelector(rule.contentPart);
                 if (!cssSelector) {
                     logger.error(`Invalid selector: ${s}`);
-                    return false;
-                }
 
-                const isExtendedCss = EXTENDED_CSS_MARKERS.some((m) => rule.contentPart.includes(m));
-                if (!isExtendedCss) {
-                    return true;
-                }
-
-                if (!validatePseudoClasses(cssSelector)) {
-                    logger.error(`Invalid pseudo class: ${s}`);
+                    if (excluded) {
+                        excluded.push('! Invalid selector:');
+                        excluded.push(rule.ruleText);
+                    }
                     return false;
                 }
 
@@ -284,13 +302,13 @@ module.exports = (function () {
                 for (let name in modifiers) {
                     if (!validateOptionName(name)) {
                         logger.error(`Invalid rule options: ${s}`);
+
+                        if (excluded) {
+                            excluded.push('! Invalid rule options:');
+                            excluded.push(rule.ruleText);
+                        }
                         return false;
                     }
-                }
-            } else if (rule.ruleType === RuleTypes.Content) {
-                if (!validateContentRuleAttributes(rule.ruleText, rule.contentAttributes)) {
-                    logger.error(`Invalid content rule: ${s}`);
-                    return false;
                 }
             }
 

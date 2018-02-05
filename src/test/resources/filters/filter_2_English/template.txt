@@ -15,8 +15,12 @@
 ||test.com^
 ||test.com^
 ||test.com^$third-party
+!+ NOT_PLATFORM(test, windows)
 #%#test.com^$third-party
 ||test.com^$replace=
 ~nigma.ru,google.com$$div[id="ad_text"][wildcard="*teasernet*tararar*"]
 !+ NOT_PLATFORM(test, windows)
 excluded_platform
+excluded_platform
+||news.yandex.*/*/*-*-*-*-$replace=/Ya\[([0-9]{10\,15})\]\([\s\S]*\)\$/,script,important,domain=news.yandex.by|news.yandex.com|news.yandex.fr|news.yandex.kz|news.yandex.ru|news.yandex.ua
+invalid_options$invalid_opt

@@ -6,7 +6,7 @@ module.exports = (function () {
 
     const fs = require('fs');
 
-    let file;
+    let fd;
     let logLevel = "DEBUG";
 
     const Levels = {
@@ -17,14 +17,10 @@ module.exports = (function () {
     };
 
     const appendFile = function (message, level) {
-        if (file) {
+        if (fd) {
             message = `[${new Date().toLocaleTimeString()}][${level}]:${message}\r\n`;
 
-            fs.appendFile(file, message, (err) => {
-                if (err) {
-                    throw err;
-                }
-            });
+            fs.appendFileSync(fd, message, 'utf8');
         }
     };
 
@@ -40,13 +36,12 @@ module.exports = (function () {
      */
     const initialize = function (path, level) {
 
-        file = path;
         if (level) {
             logLevel = level;
         }
 
-        if (file) {
-            fs.openSync(file, 'w');
+        if (path) {
+            fd = fs.openSync(path, 'w');
         } else {
             console.warn('Log file is not specified');
         }
