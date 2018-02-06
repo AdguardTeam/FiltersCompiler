@@ -110,7 +110,7 @@ QUnit.test("Test builder - platforms", (assert) => {
     assert.equal(filtersMetadata.filters[0].languages.length, 2);
     assert.equal(filtersMetadata.filters[0].languages[0], 'en');
     assert.equal(filtersMetadata.filters[0].languages[1], 'pl');
-    assert.equal(filtersMetadata.filters[0].tags.length, 1);
+    assert.equal(filtersMetadata.filters[0].tags.length, 4);
     assert.equal(filtersMetadata.filters[0].tags[0], 1);
 
     let filtersI18nMetadata = readFile(path.join(platforms, 'test', 'filters_i18n.json'));
