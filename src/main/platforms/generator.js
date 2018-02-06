@@ -18,6 +18,9 @@ module.exports = (() => {
 
     const OPTIMIZATION_STATS_DOWNLOAD_URL = 'https://chrome.adtidy.org/filters/{0}/stats.json?key=4DDBE80A3DA94D819A00523252FB6380';
 
+    const filterIdsPool = [];
+    const metadataFilterIdsPool = [];
+
     /**
      * Platforms configurations
      */
@@ -87,6 +90,20 @@ module.exports = (() => {
     };
 
     /**
+     * Checks if filter id is unique
+     *
+     * @param pool
+     * @param filterId
+     */
+    const checkFilterId = function (pool, filterId) {
+        if (pool.indexOf(filterId) >= 0) {
+            throw new Error('Invalid filters: Filter identifier is not unique: ' + filterId);
+        }
+
+        pool.push(filterId);
+    };
+
+    /**
      * Calculates checksum
      * See:
      * https://adblockplus.org/en/filters#special-comments
@@ -136,6 +153,7 @@ module.exports = (() => {
             tagsMap.set(f.keyword, f.tagId);
         });
 
+        const lostTags = [];
         for (const f of filters) {
             if (f.tags) {
                 let ids = [];
@@ -145,12 +163,17 @@ module.exports = (() => {
                         ids.push(id);
                     } else {
                         logger.error("Missing tag with keyword: " + t);
+                        lostTags.push(t);
                     }
                 }
 
                 delete f.tags;
                 f.tags = ids;
             }
+        }
+
+        if (lostTags.length > 0) {
+            throw new Error("Missing tag with keyword: " + lostTags.join(', '));
         }
 
         return filters;
@@ -285,6 +308,8 @@ module.exports = (() => {
         result.timeAdded = moment(result.timeAdded).format();
         delete result.disabled;
 
+        checkFilterId(metadataFilterIdsPool, result.filterId);
+
         return result;
     };
 
@@ -411,8 +436,11 @@ module.exports = (() => {
      */
     const buildFilter = function (filterDir, platformsPath) {
 
-        let mask = 'filter_';
-        const filterId = filterDir.substring(filterDir.lastIndexOf(mask) + mask.length, filterDir.lastIndexOf('_'));
+        const mask = 'filter_';
+        const start = filterDir.lastIndexOf(mask) + mask.length;
+        const filterId = filterDir.substring(start, filterDir.indexOf('_', start));
+
+        checkFilterId(filterIdsPool, filterId);
 
         const originalRules = readFile(path.join(filterDir, filterFile)).split('\r\n');
 
