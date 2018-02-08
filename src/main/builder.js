@@ -280,6 +280,12 @@ module.exports = (function () {
             result = workaround.removeAdblockVersion(included);
             result = splitLines(result);
 
+            for (let line of result) {
+                if (/^!\s?[Rr]edirect:/.test(line)) {
+                    throw new Error(`Error: include contains redirect directive: ${options.url}`);
+                }
+            }
+
             if (options.exclude) {
                 result = exclude(result, options.exclude, excluded);
             }
