@@ -109,7 +109,7 @@ module.exports = (function () {
         for (let exclusion of exclusions) {
             exclusion = exclusion.trim();
 
-            if (!exclusion.startsWith('!')) {
+            if (exclusion && !exclusion.startsWith('!')) {
                 let message = `${line} is excluded by: ${exclusion}`;
 
                 let isExcludedByRegexp = exclusion.startsWith("/") && exclusion.endsWith("/") &&
