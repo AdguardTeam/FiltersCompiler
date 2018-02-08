@@ -107,6 +107,7 @@ QUnit.test("Test builder - platforms", (assert) => {
     assert.equal(filtersMetadata.filters[0].subscriptionUrl, 'https://easylist-downloads.adblockplus.org/easylist.txt');
     assert.ok(filtersMetadata.filters[0].version);
     assert.ok(filtersMetadata.filters[0].timeUpdated);
+    assert.ok(/\d\d-\d\d-\d\dT\d\d:\d\d:\d\d[+-]\d\d\d\d/.test(filtersMetadata.filters[0].timeUpdated));
     assert.equal(filtersMetadata.filters[0].languages.length, 2);
     assert.equal(filtersMetadata.filters[0].languages[0], 'en');
     assert.equal(filtersMetadata.filters[0].languages[1], 'pl');
