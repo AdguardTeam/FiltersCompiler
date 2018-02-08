@@ -253,6 +253,20 @@ module.exports = (function () {
     };
 
     /**
+     * Checks if lines contains invalid redirect directives
+     *
+     * @param lines
+     * @param url
+     */
+    const checkRedirects = function (lines, url) {
+        for (let line of lines) {
+            if (/^!\s?[Rr]edirect:/.test(line)) {
+                throw new Error(`Error: include ${url} contains redirect directive: ${line}`);
+            }
+        }
+    };
+
+    /**
      * Creates content from include line
      *
      * @param line
@@ -280,11 +294,7 @@ module.exports = (function () {
             result = workaround.removeAdblockVersion(included);
             result = splitLines(result);
 
-            for (let line of result) {
-                if (/^!\s?[Rr]edirect:/.test(line)) {
-                    throw new Error(`Error: include contains redirect directive: ${options.url}`);
-                }
-            }
+            checkRedirects(result, options.url);
 
             if (options.exclude) {
                 result = exclude(result, options.exclude, excluded);
