@@ -304,8 +304,8 @@ module.exports = (() => {
 
         const result = JSON.parse(metadataString);
         result.version = revision.version;
-        result.timeUpdated = moment(revision.timeUpdated).format();
-        result.timeAdded = moment(result.timeAdded).format();
+        result.timeUpdated = moment(revision.timeUpdated).format("YYYY-MM-DDTHH:mm:ssZZ");
+        result.timeAdded = moment(result.timeAdded).format("YYYY-MM-DDTHH:mm:ssZZ");
         delete result.disabled;
 
         checkFilterId(metadataFilterIdsPool, result.filterId);
