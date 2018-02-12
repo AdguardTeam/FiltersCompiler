@@ -267,14 +267,16 @@ module.exports = (() => {
             if (platform === 'MAC') {
                 metadata = workaround.rewriteMetadataForOldMac(metadata);
             }
+
             fs.writeFileSync(filtersFile, JSON.stringify(metadata, null, '\t'), 'utf8');
 
             logger.log('Writing filters localizations: ' + config.path);
             const filtersI18nFile = path.join(platformDir, 'filters_i18n.json');
             let i18nMetadata = {groups: localizations.groups, tags: localizations.tags, filters: localizations.filters};
             if (platform === 'MAC') {
-                i18nMetadata = workaround.rewriteMetadataForOldMac(i18nMetadata);
+                delete i18nMetadata.tags;
             }
+
             fs.writeFileSync(filtersI18nFile, JSON.stringify(i18nMetadata, null, '\t'), 'utf8');
         }
 

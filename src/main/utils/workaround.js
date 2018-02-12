@@ -120,10 +120,13 @@ module.exports = (() => {
      * @param metadata
      */
     const rewriteMetadataForOldMac = function (metadata) {
-        delete metadata.tags;
+        const result = {};
 
-        if (metadata.filters && metadata.filters.length > 0) {
-            for (let f of metadata.filters) {
+        result.groups = metadata.groups.slice(0);
+        result.filters = metadata.filters.slice(0);
+
+        if (result.filters && result.filters.length > 0) {
+            for (let f of result.filters) {
                 if (f.tags) {
                     delete f.tags;
                     delete f.timeAdded;
@@ -131,7 +134,7 @@ module.exports = (() => {
             }
         }
 
-        return metadata;
+        return result;
     };
 
     return {
