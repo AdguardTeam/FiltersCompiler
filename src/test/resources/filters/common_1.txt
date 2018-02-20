@@ -4,3 +4,5 @@ test-common-1-rule.com
 test-common-1-rule.com$xmlhttprequest
 regularexpressionexcluded
 regularexpression_not_excluded
+###adsbox
+###adsbox-not-excluded

@@ -2,3 +2,4 @@
 $xmlhttprequest
 ! Regexps exclusions
 /^regularexpression[a-z]+$/
+/^##.adsbox$/
