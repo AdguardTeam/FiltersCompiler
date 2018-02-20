@@ -113,7 +113,7 @@ module.exports = (function () {
                 let message = `${line} is excluded by: ${exclusion}`;
 
                 let isExcludedByRegexp = exclusion.startsWith("/") && exclusion.endsWith("/") &&
-                    line.match(new RegExp(exclusion.substring(1, exclusion.length - 2)));
+                    line.match(new RegExp(exclusion.substring(1, exclusion.length - 1)));
 
                 if (isExcludedByRegexp || line.includes(exclusion)) {
                     logger.log(message);
