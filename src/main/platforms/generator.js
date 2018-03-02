@@ -461,7 +461,7 @@ module.exports = (() => {
         const revisionFilePath = path.join(filterDir, revisionFile);
         const header = makeHeader(metadataFilePath, revisionFilePath);
 
-        let optimizationConfig = optimization.getFilterOptimizationConfig(filterId);
+        const optimizationConfig = optimization.getFilterOptimizationConfig(filterId);
 
         for (let platform in platformPathsConfig) {
 
