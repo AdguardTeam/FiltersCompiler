@@ -15,7 +15,8 @@ QUnit.test("Test builder", (assert) => {
     };
 
     const generator = require("../main/platforms/generator.js");
-    generator.disableOptimization();
+    const optimization = require("../main/optimization.js");
+    optimization.disableOptimization();
 
     const builder = require("../main/builder.js");
     assert.ok(builder);
@@ -78,7 +79,8 @@ QUnit.test("Test builder - platforms", (assert) => {
     };
 
     const generator = require("../main/platforms/generator.js");
-    generator.disableOptimization();
+    const optimization = require("../main/optimization.js");
+    optimization.disableOptimization();
 
     const builder = require("../main/builder.js");
 

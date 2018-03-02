@@ -7,6 +7,7 @@ module.exports = (() => {
     const logger = require("../utils/log.js");
     const Workaround = require('../utils/workaround.js');
     const RuleMasks = require('../rule/rule-masks.js');
+    const optimization = require('../optimization');
 
     const HINT_MASK = RuleMasks.MASK_HINT + " ";
     const COMMENT_REGEXP = "^\\!";
@@ -24,7 +25,7 @@ module.exports = (() => {
      * @param rules rules
      * @param platform Platform
      */
-    const splitRuleHintLines = function(rules, platform) {
+    const splitRuleHintLines = function (rules, platform) {
         const result = [];
         if (rules) {
             for (let i = 0; i < rules.length; i++) {
@@ -184,18 +185,7 @@ module.exports = (() => {
             return false;
         }
 
-        if (!optimizationConfig || !optimizationConfig.groups) {
-            return false;
-        }
-
-        for (let group of optimizationConfig.groups) {
-            let hits = group.rules[ruleText];
-            if (hits !== undefined && hits < group.config.hits) {
-                return true;
-            }
-        }
-
-        return false;
+        return optimization.skipRuleWithOptimization(ruleText, optimizationConfig);
     };
 
     /**
