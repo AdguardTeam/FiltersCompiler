@@ -12,12 +12,9 @@ module.exports = (() => {
     const logger = require("../utils/log.js");
     const filter = require("./filter.js");
     const workaround = require('../utils/workaround.js');
-    const webutils = require('../utils/webutils.js');
+    const optimization = require('../optimization');
 
     const RULES_SEPARATOR = "\r\n";
-
-    const OPTIMIZATION_STATS_DOWNLOAD_URL = 'https://chrome.adtidy.org/filters/{0}/stats.json?key=4DDBE80A3DA94D819A00523252FB6380';
-
     const filterIdsPool = [];
     const metadataFilterIdsPool = [];
 
@@ -464,11 +461,7 @@ module.exports = (() => {
         const revisionFilePath = path.join(filterDir, revisionFile);
         const header = makeHeader(metadataFilePath, revisionFilePath);
 
-        let optimizationConfig;
-        if (optimizationEnabled) {
-            optimizationConfig = webutils.downloadFile(OPTIMIZATION_STATS_DOWNLOAD_URL.replace('{0}', filterId));
-            optimizationConfig = JSON.parse(optimizationConfig);
-        }
+        let optimizationConfig = optimization.getFilterOptimizationConfig(filterId);
 
         for (let platform in platformPathsConfig) {
 
