@@ -6,7 +6,7 @@ module.exports = (() => {
 
     const fs = require('fs');
     const path = require('path');
-    const md5 = require('md5');
+    const crypto = require('crypto');
     const moment = require('moment');
 
     const logger = require("../utils/log.js");
@@ -83,7 +83,7 @@ module.exports = (() => {
      */
     const stripEnd = function (string, char) {
         if (string.endsWith(char)) {
-            return stripEnd(string.substring(0, string.length - 1));
+            return stripEnd(string.substring(0, string.length - 1), char);
         } else {
             return string;
         }
@@ -113,9 +113,23 @@ module.exports = (() => {
      * @param rules  Rules lines
      */
     const calculateChecksum = function (header, rules) {
-        const content = header.concat(rules).join("\n");
-        const checksum = new Buffer(md5(content, {asString: true})).toString('base64');
+        let content = header.concat(rules).join("\n");
+        content = normalizeData(content);
+        const checksum = crypto.createHash('md5').update(content).digest("base64");
+
         return "! Checksum: " + stripEnd(checksum.trim(), "=");
+    };
+
+    /**
+     * Replaces newlines
+     *
+     * @param message
+     * @returns {XML|string|*}
+     */
+    const normalizeData = function (message) {
+        message = message.replace(/\r/g, "");
+        message = message.replace(/\n+/g, "\n");
+        return message;
     };
 
     /**
