@@ -56,7 +56,9 @@ module.exports = (function () {
         'protobuf',
         'collapse', '~collapse',
         'ping',
-        'app'];
+        'app',
+        'badfilter'
+    ];
 
     /**
      * The problem with pseudo-classes is that any unknown pseudo-class makes browser ignore the whole CSS rule,
