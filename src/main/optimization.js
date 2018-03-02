@@ -10,7 +10,7 @@ module.exports = (() => {
     const OPTIMIZATION_PERCENT_URL = 'https://chrome.adtidy.org/optimization_config/percent.json?key=4DDBE80A3DA94D819A00523252FB6380';
     const OPTIMIZATION_STATS_URL = 'https://chrome.adtidy.org/filters/{0}/stats.json?key=4DDBE80A3DA94D819A00523252FB6380';
 
-    const optimizationEnabled = true;
+    let optimizationEnabled = true;
 
     let filtersOptimizationPercent = null;
 
@@ -18,12 +18,18 @@ module.exports = (() => {
      * Downloads and caches filters optimization percentages configuration
      */
     const getFiltersOptimizationPercent = () => {
+        if (!optimizationEnabled) {
+            return null;
+        }
+
         if (filtersOptimizationPercent === null) {
             filtersOptimizationPercent = JSON.parse(webutils.downloadFile(OPTIMIZATION_PERCENT_URL));
         }
+
         if (filtersOptimizationPercent.config.length === 0) {
             throw 'Invalid configuration';
         }
+
         return filtersOptimizationPercent;
     };
 
@@ -31,6 +37,9 @@ module.exports = (() => {
      * Downloads filter optimization config for the filter
      */
     const getFilterOptimizationConfig = (filterId) => {
+        if (!optimizationEnabled) {
+            return null;
+        }
 
         // config: [{filterId: 1, percent: 45}, ...]
         const filterOptimizationPercent = getFiltersOptimizationPercent().config.find(function (config) {
@@ -41,9 +50,10 @@ module.exports = (() => {
         if (optimizationEnabled && filterOptimizationPercent) {
             optimizationConfig = JSON.parse(webutils.downloadFile(OPTIMIZATION_STATS_URL.replace('{0}', filterId)));
             if (!optimizationConfig || !optimizationConfig.groups || optimizationConfig.groups.length === 0) {
-                throw new `Unable to retrieve optimization stats for ${filterId}`;
+                throw new Error(`Unable to retrieve optimization stats for ${filterId}`);
             }
         }
+
         return optimizationConfig;
     };
 
@@ -68,9 +78,17 @@ module.exports = (() => {
         return false;
     };
 
+    /**
+     * Disables optimized filter builds
+     */
+    const disableOptimization = function () {
+        optimizationEnabled = false;
+    };
+
     return {
         getFiltersOptimizationPercent: getFiltersOptimizationPercent,
         getFilterOptimizationConfig: getFilterOptimizationConfig,
-        skipRuleWithOptimization: skipRuleWithOptimization
-    }
+        skipRuleWithOptimization: skipRuleWithOptimization,
+        disableOptimization: disableOptimization
+    };
 })();

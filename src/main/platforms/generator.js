@@ -25,7 +25,6 @@ module.exports = (() => {
     let filterFile = null;
     let metadataFile = null;
     let revisionFile = null;
-    let optimizationEnabled = true;
 
     /**
      * Sync reads file content
@@ -553,16 +552,8 @@ module.exports = (() => {
         writeFiltersMetadata(platformsPath, filtersDir, filtersMetadata);
     };
 
-    /**
-     * Disables optimized filter builds
-     */
-    const disableOptimization = function () {
-        optimizationEnabled = false;
-    };
-
     return {
         init: init,
-        generate: generate,
-        disableOptimization: disableOptimization
+        generate: generate
     };
 })();
