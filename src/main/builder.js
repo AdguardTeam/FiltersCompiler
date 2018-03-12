@@ -309,8 +309,6 @@ module.exports = (function () {
             throw new Error(`Error handling include from: ${options.url}`);
         }
 
-        result = converter.convert(result, excluded);
-
         logger.log(`Inclusion lines: ${result.length}`);
 
         return result;
@@ -339,6 +337,8 @@ module.exports = (function () {
                 result.push(line.trim());
             }
         }
+
+        result = converter.convert(result, excluded);
 
         result = exclude(result, EXCLUDE_FILE, excluded);
         result = removeRuleDuplicates(result, excluded);
