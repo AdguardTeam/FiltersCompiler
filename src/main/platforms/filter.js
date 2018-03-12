@@ -154,12 +154,14 @@ module.exports = (() => {
 
         // Omit rules by filtration settings
         if (!config.configuration.ignoreRuleHints && !isPlatformSupported(rule, config.platform)) {
+            logger.log(`${ruleText} removed with platform hint ${rule.hint}`);
             return true;
         }
 
         if (config.configuration.removeRulePatterns) {
             for (let pattern of config.configuration.removeRulePatterns) {
                 if (ruleText.match(new RegExp(pattern))) {
+                    logger.log(`${ruleText} removed with removeRulePattern ${pattern}`);
                     return true;
                 }
             }
