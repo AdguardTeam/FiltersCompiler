@@ -180,7 +180,8 @@
         "important,protobuf",
         "#%#",
         "#@%#"],
-      "ignoreRuleHints": false
+      "ignoreRuleHints": false,
+      "adbHeader": "![Adblock Plus 2.0]"
     }
   }
 }

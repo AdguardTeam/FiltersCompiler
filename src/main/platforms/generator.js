@@ -418,26 +418,37 @@ module.exports = (() => {
     /**
      * Writes filter platform build
      */
-    const writeFilterRules = function (filterId, dir, platform, rulesHeader, rules, optimized) {
-        const filterFile = path.join(dir, `${filterId}${optimized ? '_optimized' : ''}.txt`);
-
-        const data = rulesHeader.concat(rules).join(RULES_SEPARATOR);
+    const writeFilterRules = function (filterId, dir, config, rulesHeader, rules, optimized) {
 
         createDir(dir);
 
+        let header = rulesHeader;
+        const filterFile = path.join(dir, `${filterId}${optimized ? '_optimized' : ''}.txt`);
+
+        //Add Adb Plus compatibility header
+        if (config.configuration.adbHeader) {
+            header = [config.configuration.adbHeader].concat(rulesHeader);
+        }
+
+        const data = header.concat(rules).join(RULES_SEPARATOR);
+
+        fs.writeFileSync(filterFile, data, 'utf8');
+
         // For English filter only we should provide additional filter version.
-        if (filterId == 2 && platform === 'ext_ublock' && !optimized) {
+        if (filterId == 2 && config.platform === 'ext_ublock' && !optimized) {
             const correctedFile = path.join(dir, `${filterId}_without_easylist.txt`);
 
             let correctedHeader = workaround.rewriteHeader(rulesHeader);
             let correctedRules = workaround.rewriteRules(rules);
-            const header = [calculateChecksum(correctedHeader, correctedRules)].concat(correctedHeader);
+            let header = [calculateChecksum(correctedHeader, correctedRules)].concat(correctedHeader);
+            if (config.configuration.adbHeader) {
+                header = [config.configuration.adbHeader].concat(rulesHeader);
+            }
+
             const correctedData = header.concat(correctedRules).join(RULES_SEPARATOR);
 
             fs.writeFileSync(correctedFile, correctedData, 'utf8');
         }
-
-        fs.writeFileSync(filterFile, data, 'utf8');
     };
 
     /**
@@ -474,8 +485,8 @@ module.exports = (() => {
             logger.log(`Filter ${filterId}. Rules ${originalRules.length} => ${rules.length} => ${optimizedRules.length}. PlatformPath: '${config.path}'`);
 
             const platformDir = path.join(platformsPath, config.path, 'filters');
-            writeFilterRules(filterId, platformDir, config.platform, platformHeader, rules, false);
-            writeFilterRules(filterId, platformDir, config.platform, platformOptimizedHeader, optimizedRules, true);
+            writeFilterRules(filterId, platformDir, config, platformHeader, rules, false);
+            writeFilterRules(filterId, platformDir, config, platformOptimizedHeader, optimizedRules, true);
         }
     };
 
