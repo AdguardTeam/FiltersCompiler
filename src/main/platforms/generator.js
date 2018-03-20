@@ -422,33 +422,42 @@ module.exports = (() => {
 
         createDir(dir);
 
-        let header = rulesHeader;
         const filterFile = path.join(dir, `${filterId}${optimized ? '_optimized' : ''}.txt`);
-
-        //Add Adb Plus compatibility header
-        if (config.configuration.adbHeader) {
-            header = [config.configuration.adbHeader].concat(rulesHeader);
-        }
-
-        const data = header.concat(rules).join(RULES_SEPARATOR);
-
-        fs.writeFileSync(filterFile, data, 'utf8');
+        writeFilterFile(filterFile, config.configuration.adbHeader, rulesHeader, rules);
 
         // For English filter only we should provide additional filter version.
         if (filterId == 2 && config.platform === 'ext_ublock' && !optimized) {
+            const correctedHeader = workaround.rewriteHeader(rulesHeader);
+            const correctedRules = workaround.rewriteRules(rules);
+
             const correctedFile = path.join(dir, `${filterId}_without_easylist.txt`);
-
-            let correctedHeader = workaround.rewriteHeader(rulesHeader);
-            let correctedRules = workaround.rewriteRules(rules);
-            let header = [calculateChecksum(correctedHeader, correctedRules)].concat(correctedHeader);
-            if (config.configuration.adbHeader) {
-                header = [config.configuration.adbHeader].concat(rulesHeader);
-            }
-
-            const correctedData = header.concat(correctedRules).join(RULES_SEPARATOR);
-
-            fs.writeFileSync(correctedFile, correctedData, 'utf8');
+            writeFilterFile(correctedFile, config.configuration.adbHeader, correctedHeader, correctedRules);
         }
+    };
+
+    /**
+     * Calculates checksum and writes filter file
+     *
+     * @param filterFile
+     * @param adbHeader
+     * @param rulesHeader
+     * @param rules
+     */
+    const writeFilterFile = function (filterFile, adbHeader, rulesHeader, rules) {
+        let header = rulesHeader;
+        if (adbHeader) {
+            // Add Adb Plus compatibility header
+            header = [adbHeader].concat(rulesHeader);
+        }
+
+        const checksum = calculateChecksum(header, rules);
+
+        let data = [checksum].concat(rulesHeader).concat(rules);
+        if (adbHeader) {
+            data = [adbHeader].concat(data);
+        }
+
+        fs.writeFileSync(filterFile, data.join(RULES_SEPARATOR), 'utf8');
     };
 
     /**
@@ -479,14 +488,11 @@ module.exports = (() => {
             const rules = filter.cleanupRules(originalRules, config);
             const optimizedRules = filter.cleanupAndOptimizeRules(originalRules, config, optimizationConfig, filterId);
 
-            const platformHeader = [calculateChecksum(header, rules)].concat(header);
-            const platformOptimizedHeader = [calculateChecksum(header, optimizedRules)].concat(header);
-
             logger.log(`Filter ${filterId}. Rules ${originalRules.length} => ${rules.length} => ${optimizedRules.length}. PlatformPath: '${config.path}'`);
 
             const platformDir = path.join(platformsPath, config.path, 'filters');
-            writeFilterRules(filterId, platformDir, config, platformHeader, rules, false);
-            writeFilterRules(filterId, platformDir, config, platformOptimizedHeader, optimizedRules, true);
+            writeFilterRules(filterId, platformDir, config, header, rules, false);
+            writeFilterRules(filterId, platformDir, config, header, optimizedRules, true);
         }
     };
 
