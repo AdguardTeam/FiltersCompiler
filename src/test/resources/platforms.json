@@ -4,7 +4,8 @@
     "path": "test",
     "configuration": {
       "removeRulePatterns": false,
-      "ignoreRuleHints": false
+      "ignoreRuleHints": false,
+      "adbHeader": "![Adblock Plus 2.0]"
     }
   },
   "TEST_COMMENTS": {

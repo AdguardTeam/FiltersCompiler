@@ -123,8 +123,9 @@ QUnit.test("Test builder - platforms", (assert) => {
     assert.ok(filterContent);
 
     let filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 32);
+    assert.equal(filterLines.length, 33);
 
+    assert.ok(filterLines.indexOf('![Adblock Plus 2.0]') >= 0);
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
     assert.ok(filterLines.indexOf('test-common-1-rule.com') >= 0);
     assert.ok(filterLines.indexOf('! some common rules could be places here') >= 0);
