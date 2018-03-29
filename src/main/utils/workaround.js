@@ -123,14 +123,17 @@ module.exports = (() => {
         const result = {};
 
         result.groups = metadata.groups.slice(0);
-        result.filters = metadata.filters.slice(0);
+        result.filters = [];
 
-        if (result.filters && result.filters.length > 0) {
-            for (let f of result.filters) {
-                if (f.tags) {
-                    delete f.tags;
-                    delete f.timeAdded;
-                }
+        for (let f of metadata.filters) {
+            if (f.tags) {
+                let copy = Object.assign({}, f);
+                delete copy.tags;
+                delete copy.timeAdded;
+
+                result.filters.push(copy);
+            } else {
+                result.filters.push(f);
             }
         }
 

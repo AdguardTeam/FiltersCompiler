@@ -19,17 +19,17 @@
       "ignoreRuleHints": true
     }
   },
-  "TEST_HINTS": {
-    "platform": "test",
-    "path": "hints",
+  "MAC": {
+    "platform": "mac",
+    "path": "mac",
     "configuration": {
       "removeRulePatterns": false,
       "ignoreRuleHints": false
     }
   },
-  "MAC": {
-    "platform": "mac",
-    "path": "mac",
+  "TEST_HINTS": {
+    "platform": "test",
+    "path": "hints",
     "configuration": {
       "removeRulePatterns": false,
       "ignoreRuleHints": false
