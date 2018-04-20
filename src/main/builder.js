@@ -34,6 +34,8 @@ module.exports = (function () {
     const workaround = require('./utils/workaround.js');
     const webutils = require('./utils/webutils.js');
 
+    const FilterDownloader = require('./lib/filter-downloader.js');
+
     const TEMPLATE_FILE = 'template.txt';
     const FILTER_FILE = 'filter.txt';
     const REVISION_FILE = 'revision.json';
@@ -319,7 +321,7 @@ module.exports = (function () {
      *
      * @param template
      */
-    const compile = function (template) {
+     const compile = function (template) {
         let result = [];
         let excluded = [];
 
@@ -337,6 +339,9 @@ module.exports = (function () {
                 result.push(line.trim());
             }
         }
+
+        // result = await FilterDownloader.compile(result, null, {adguard:true});
+        // logger.log(result);
 
         result = converter.convert(result, excluded);
 

@@ -1,0 +1,8 @@
+! Homepage: http://adguard.com/filters.html#english
+! License: http://creativecommons.org/licenses/by-sa/3.0/
+!
+!-------------------------------------------------------------------------------!
+!------------------ General JS API ---------------------------------------------!
+!-------------------------------------------------------------------------------!
+!#if (!adguard)
+if_adguard_included_rule
