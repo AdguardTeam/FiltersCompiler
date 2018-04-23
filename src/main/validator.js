@@ -1,4 +1,4 @@
-/* globals module, require, console */
+/* globals module, require, console, global */
 
 module.exports = (function () {
 
@@ -9,13 +9,17 @@ module.exports = (function () {
      * @property {function} readFileSync
      */
     const fs = require('fs');
-    const CssSelectorParser = require('css-selector-parser').CssSelectorParser;
 
     const logger = require("./utils/log.js");
     const ruleParser = require("./rule/rule-parser.js");
     const RuleTypes = require("./rule/rule-types.js");
     const RuleMasks = require("./rule/rule-masks.js");
     const Rule = require("./rule/rule.js");
+
+    const DOMParser = require('xmldom').DOMParser;
+    global.window = {};
+    global.window.document = new DOMParser().parseFromString(`<!DOCTYPE html><html><body></body></html>`, "text/html");
+    const sizzle = require('sizzle');
 
     const VALID_OPTIONS = [
         // Basic modifiers
@@ -85,7 +89,6 @@ module.exports = (function () {
         ":matches-css(", ":matches-css-before(", ":matches-css-after(", ":-abp-has(", ":-abp-contains("];
 
     let domainsBlacklist = [];
-    let cssParser;
 
     /**
      * Initializes validator
@@ -103,44 +106,19 @@ module.exports = (function () {
         } catch (e) {
             domainsBlacklist = [];
         }
-
-        cssParser = new CssSelectorParser();
-
-        cssParser.registerSelectorPseudos('has');
-        cssParser.registerNestingOperators('>', '+', '~');
-        cssParser.registerAttrEqualityMods('^', '$', '*', '~');
-        cssParser.enableSubstitutes();
     };
 
     /**
-     * Parses css rule selector
-     *
-     * @param selector
-     */
-    const parseCssSelector = function (selector) {
-
-        try {
-            return cssParser.parse(selector);
-        } catch (e) {
-            return null;
-        }
-    };
-
-    /**
-     * Recursively validates pseudo classes in css selector parse result object
+     * Validates pseudo classes in css selector parse result object
      */
     const validatePseudoClasses = function (obj) {
-        if (obj.type === 'selectors') {
-            return obj.selectors.every((s) => {
-                return validatePseudoClasses(s);
-            });
-        } else if (obj.type === 'ruleSet') {
-            return validatePseudoClasses(obj.rule);
-        } else if (obj.type === 'rule') {
-            if (obj.pseudos) {
-                return obj.pseudos.every((p) => {
-                    return SUPPORTED_PSEUDO_CLASSES.indexOf(':' + p.name) >= 0;
-                });
+        for (const group of obj) {
+            for (const token of group) {
+                if (token.type === 'PSEUDO') {
+                    if (SUPPORTED_PSEUDO_CLASSES.indexOf(':' + token.matches[0]) < 0) {
+                        return false;
+                    }
+                }
             }
         }
 
@@ -247,6 +225,48 @@ module.exports = (function () {
     };
 
     /**
+     * Validates that the tokens correspond to a valid selector.
+     * Sizzle is different from browsers and some selectors that it tolerates aren't actually valid.
+     * For instance, "div >" won't work in a browser, but it will in Sizzle (it'd be the same as "div > *").
+     *
+     * @param {*} groups
+     * @returns {boolean} false if any of the groups are invalid
+     */
+    const validateSelectorGroups = function (groups) {
+
+        if (!groups) {
+            return false;
+        }
+
+        let iGroups = groups.length;
+
+        while (iGroups--) {
+            let tokens = groups[iGroups];
+            let lastToken = tokens[tokens.length - 1];
+            if (sizzle.selectors.relative[lastToken.type]) {
+                return false;
+            }
+        }
+
+        return true;
+    };
+
+    /**
+     * Parses ccs selector
+     *
+     * @param selector
+     * @returns {*}
+     */
+    const parseCssSelector = function (selector) {
+        try {
+            return sizzle.tokenize(selector, false);
+        } catch (ex) {
+            logger.error(`Error parsing selector: ${ex}`);
+            return null;
+        }
+    };
+
+    /**
      * Validates list of rules
      *
      * @param list
@@ -271,26 +291,24 @@ module.exports = (function () {
                     return false;
                 }
 
-                const isExtendedCss = EXTENDED_CSS_MARKERS.some((m) => rule.contentPart.includes(m));
-                if (isExtendedCss) {
-                    //TODO: Some extended css selector couldn't be parsed yet, so we cannot validate pseudos
-                    // if (!validatePseudoClasses(cssSelector)) {
-                    //     logger.error(`Invalid pseudo class: ${s}`);
-                    //     return false;
-                    // }
-
-                    return true;
-                }
-
-                let cssSelector = parseCssSelector(rule.contentPart);
-                if (!cssSelector) {
+                let parseResult = parseCssSelector(rule.contentPart);
+                if (!validateSelectorGroups(parseResult)) {
                     logger.error(`Invalid selector: ${s}`);
 
                     if (excluded) {
                         excluded.push('! Invalid selector:');
                         excluded.push(rule.ruleText);
                     }
+
                     return false;
+                } else {
+                    const isExtendedCss = EXTENDED_CSS_MARKERS.some((m) => rule.contentPart.includes(m));
+                    if (isExtendedCss) {
+                        if (!validatePseudoClasses(parseResult)) {
+                            logger.error(`Invalid pseudo class: ${s}`);
+                            return false;
+                        }
+                    }
                 }
 
             } else if (rule.ruleType === RuleTypes.UrlBlocking) {
