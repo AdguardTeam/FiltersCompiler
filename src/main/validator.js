@@ -19,7 +19,12 @@ module.exports = (function () {
     const DOMParser = require('xmldom').DOMParser;
     global.window = {};
     global.window.document = new DOMParser().parseFromString(`<!DOCTYPE html><html><body></body></html>`, "text/html");
-    const sizzle = require('sizzle');
+    global.window.getComputedStyle = function () {};
+    global.document = global.window.document;
+    global.navigator = {};
+    global.Element = function () {};
+
+    const ExtendedCss = require('./utils/extended-css.js');
 
     const VALID_OPTIONS = [
         // Basic modifiers
@@ -106,23 +111,6 @@ module.exports = (function () {
         } catch (e) {
             domainsBlacklist = [];
         }
-    };
-
-    /**
-     * Validates pseudo classes in css selector parse result object
-     */
-    const validatePseudoClasses = function (obj) {
-        for (const group of obj) {
-            for (const token of group) {
-                if (token.type === 'PSEUDO') {
-                    if (SUPPORTED_PSEUDO_CLASSES.indexOf(':' + token.matches[0]) < 0) {
-                        return false;
-                    }
-                }
-            }
-        }
-
-        return true;
     };
 
     /**
@@ -225,44 +213,17 @@ module.exports = (function () {
     };
 
     /**
-     * Validates that the tokens correspond to a valid selector.
-     * Sizzle is different from browsers and some selectors that it tolerates aren't actually valid.
-     * For instance, "div >" won't work in a browser, but it will in Sizzle (it'd be the same as "div > *").
+     * Validates css selector
      *
-     * @param {*} groups
-     * @returns {boolean} false if any of the groups are invalid
+     * @param selectorText
+     * @returns {boolean}
      */
-    const validateSelectorGroups = function (groups) {
-
-        if (!groups) {
-            return false;
-        }
-
-        let iGroups = groups.length;
-
-        while (iGroups--) {
-            let tokens = groups[iGroups];
-            let lastToken = tokens[tokens.length - 1];
-            if (sizzle.selectors.relative[lastToken.type]) {
-                return false;
-            }
-        }
-
-        return true;
-    };
-
-    /**
-     * Parses ccs selector
-     *
-     * @param selector
-     * @returns {*}
-     */
-    const parseCssSelector = function (selector) {
+    const validateCssSelector = function (selectorText) {
         try {
-            return sizzle.tokenize(selector, false);
+            ExtendedCss.query(selectorText, true);
+            return true;
         } catch (ex) {
-            logger.error(`Error parsing selector: ${ex}`);
-            return null;
+            return false;
         }
     };
 
@@ -291,8 +252,16 @@ module.exports = (function () {
                     return false;
                 }
 
-                let parseResult = parseCssSelector(rule.contentPart);
-                if (!validateSelectorGroups(parseResult)) {
+                // const isExtendedCss = EXTENDED_CSS_MARKERS.some((m) => rule.contentPart.includes(m));
+                // if (isExtendedCss) {
+                //     // if (!validatePseudoClasses(parseResult)) {
+                //     //     logger.error(`Invalid pseudo class: ${s}`);
+                //     //     return false;
+                //     // }
+                //     return true;
+                // }
+
+                if (!validateCssSelector(rule.contentPart)) {
                     logger.error(`Invalid selector: ${s}`);
 
                     if (excluded) {
@@ -301,14 +270,6 @@ module.exports = (function () {
                     }
 
                     return false;
-                } else {
-                    const isExtendedCss = EXTENDED_CSS_MARKERS.some((m) => rule.contentPart.includes(m));
-                    if (isExtendedCss) {
-                        if (!validatePseudoClasses(parseResult)) {
-                            logger.error(`Invalid pseudo class: ${s}`);
-                            return false;
-                        }
-                    }
                 }
 
             } else if (rule.ruleType === RuleTypes.UrlBlocking) {
