@@ -16,13 +16,13 @@ module.exports = (function () {
     const RuleMasks = require("./rule/rule-masks.js");
     const Rule = require("./rule/rule.js");
 
-    const DOMParser = require('xmldom').DOMParser;
-    global.window = {};
-    global.window.document = new DOMParser().parseFromString(`<!DOCTYPE html><html><body></body></html>`, "text/html");
-    global.window.getComputedStyle = function () {};
+    const jsdom = require("jsdom");
+    const { JSDOM } = jsdom;
+    const dom = new JSDOM(`<!DOCTYPE html><p>Empty</p>`);
+    global.window = dom.window;
     global.document = global.window.document;
-    global.navigator = {};
-    global.Element = function () {};
+    global.navigator = global.window.navigator;
+    global.Element = global.window.Element;
 
     const ExtendedCss = require('./utils/extended-css.js');
 

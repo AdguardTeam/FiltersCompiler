@@ -10,7 +10,7 @@
     "moment": ">=2.20.1",
     "qunit": "1.0.0",
     "utf8": "^3.0.0",
-    "xmldom": "0.1.27"
+    "jsdom": "11.9.0"
   },
   "main": "index.js",
   "engines": {
