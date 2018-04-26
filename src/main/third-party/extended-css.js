@@ -4573,6 +4573,3 @@ ExtendedCss.query = function (selectorText, noTiming) {
 // EXPOSE
 return ExtendedCss;
 })(window);
-
-// Node export
-module.exports = ExtendedCss;

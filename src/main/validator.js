@@ -15,16 +15,7 @@ module.exports = (function () {
     const RuleTypes = require("./rule/rule-types.js");
     const RuleMasks = require("./rule/rule-masks.js");
     const Rule = require("./rule/rule.js");
-
-    const jsdom = require("jsdom");
-    const { JSDOM } = jsdom;
-    const dom = new JSDOM(`<!DOCTYPE html><p>Empty</p>`);
-    global.window = dom.window;
-    global.document = global.window.document;
-    global.navigator = global.window.navigator;
-    global.Element = global.window.Element;
-
-    const ExtendedCss = require('./utils/extended-css.js');
+    const extendedCssValidator = require('./utils/extended-css-validator.js');
 
     const VALID_OPTIONS = [
         // Basic modifiers
@@ -213,21 +204,6 @@ module.exports = (function () {
     };
 
     /**
-     * Validates css selector
-     *
-     * @param selectorText
-     * @returns {boolean}
-     */
-    const validateCssSelector = function (selectorText) {
-        try {
-            ExtendedCss.query(selectorText, true);
-            return true;
-        } catch (ex) {
-            return false;
-        }
-    };
-
-    /**
      * Validates list of rules
      *
      * @param list
@@ -261,7 +237,7 @@ module.exports = (function () {
                 //     return true;
                 // }
 
-                if (!validateCssSelector(rule.contentPart)) {
+                if (!extendedCssValidator.validateCssSelector(rule.contentPart)) {
                     logger.error(`Invalid selector: ${s}`);
 
                     if (excluded) {

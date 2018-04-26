@@ -12,6 +12,27 @@
 
     const testRunner = require("qunit");
 
+    testRunner.setup({
+        log: {
+            // log assertions overview
+            assertions: false,
+            // log expected and actual values for failed tests
+            errors: true,
+            // log tests overview
+            tests: false,
+            // log summary
+            summary: true,
+            // log global summary (all files)
+            globalSummary: true,
+            // log coverage
+            coverage: true,
+            // log global coverage (all files)
+            globalCoverage: true,
+            // log currently testing code file
+            testing: false
+        }
+    });
+
     const testCallback = function (err, report) {
         if (err) {
             console.error(err);
@@ -59,7 +80,6 @@
     }, testCallback);
 
     testRunner.run({
-        deps: ["./src/main/utils/version.js", "./src/main/converter.js"],
         code: "./src/main/builder.js",
         tests: "./src/test/test-builder.js"
     }, testCallback);
