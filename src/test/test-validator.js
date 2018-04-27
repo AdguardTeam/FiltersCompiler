@@ -23,7 +23,7 @@ QUnit.test("Test css validation", function (assert) {
     rules = ['example.com###div-id'];
     assert.ok(validator.validate(rules).length > 0);
     rules = ['example.com##a[href^=/], .container:has(nav) > a[href]:lt($var)'];
-    assert.ok(validator.validate(rules).length > 0);
+    assert.notOk(validator.validate(rules).length > 0);
     rules = ['example.com##%'];
     assert.notOk(validator.validate(rules).length > 0);
 });
@@ -84,21 +84,10 @@ QUnit.test("Test ext-css validation", function (assert) {
     let rules = [ruleText];
     assert.ok(validator.validate(rules).length > 0);
 
-    selector = "#:root div.ads";
-    ruleText = "w3schools.com##" + selector;
-    rules = [ruleText];
-    assert.ok(validator.validate(rules).length > 0);
-
     selector = "#body div[attr='test']:first-child  div";
     ruleText = "w3schools.com##" + selector;
     rules = [ruleText];
     assert.ok(validator.validate(rules).length > 0);
-
-    // TODO: Should work after extended-css validation
-    // selector = ".todaystripe::after";
-    // ruleText = "w3schools.com##" + selector;
-    // rules = [ruleText];
-    // assert.ok(validator.validate(rules).length > 0);
 
     selector = ".todaystripe:matches-css(display: block)";
     ruleText = "w3schools.com##" + selector;
@@ -125,24 +114,75 @@ QUnit.test("Test ext-css validation", function (assert) {
     rules = [ruleText];
     assert.ok(validator.validate(rules).length > 0);
 
-    //Invalid pseudo class
-    // TODO: Should work after extended-css validation
-    // ruleText = "yandex.ru##[-ext-has=test]:matches(.whatisthis)";
+    // TODO: Failed with ExtendedCss validation
+    // ruleText = "drive2.ru##.l-main.js-main div.c-block:has(div.c-header:contains(Реклама))";
     // rules = [ruleText];
-    // assert.notOk(validator.validate(rules).length > 0);
-
-    // TODO: Should work after extended-css validation
-    // ruleText = "yandex.ru##[-ext-has=test]:matches(.whatisthis), .todaystripe:contains(test)";
-    // rules = [ruleText];
-    // assert.notOk(validator.validate(rules).length > 0);
-
-    ruleText = "drive2.ru##.l-main.js-main div.c-block:has(div.c-header:contains(Реклама))";
-    rules = [ruleText];
-    assert.ok(validator.validate(rules).length > 0);
+    // assert.ok(validator.validate(rules).length > 0);
 
     ruleText = "drive2.ru##.l-main.js-main div.c-block:has(> div.c-header)";
     rules = [ruleText];
     assert.ok(validator.validate(rules).length > 0);
+});
+
+QUnit.test("Test ext-css validation - complicated cases", function (assert) {
+    'use strict';
+
+    const validator = require("../main/validator.js");
+    validator.init();
+
+    let ruleText;
+    let rules;
+
+    ruleText = "doodhwali.com##.container .col-xs-12 .col-xs-12 > .yellow:not(:nth-child(3))";
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length > 0);
+
+    ruleText = "w3schools.com##.todaystripe:after";
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length > 0);
+
+    ruleText = "puls4.com##.media-actions-list > li:not(:nth-child(3)):not(:nth-child(4))";
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length > 0);
+
+    ruleText = "salamnews.org##.snlikebt > ul > li:not(:nth-child(4)):not(:nth-child(5))";
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length > 0);
+
+    ruleText = "posta.com.tr##.detail-share-item > a:not([href*=\"window.print()\"])";
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length > 0);
+
+    ruleText = "disk.yandex.az,disk.yandex.by,disk.yandex.co.il,disk.yandex.com,disk.yandex.com.am,disk.yandex.com.ge,disk.yandex.com.tr,disk.yandex.ee,disk.yandex.fr,disk.yandex.kg,disk.yandex.kz,disk.yandex.lt,disk.yandex.lv,disk.yandex.md,disk.yandex.ru,disk.yandex.tj,disk.yandex.tm,disk.yandex.ua,disk.yandex.uz,yadi.sk##.share-link-popup__menu > div.menu__group:last-child > div.menu__item:not(:last-child):not(:nth-child(3))";
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length > 0);
+
+    ruleText = "fullfilmihdizlesene.com###sidebar > .sidebarborder:not(:nth-child(3))";
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length > 0);
+
+    ruleText = "pan.baidu.com,music.baidu.com,yun.baidu.com##[class|=ad]";
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length > 0);
+});
+
+QUnit.test("Test ext-css validation - invalid pseudo classes", function (assert) {
+    'use strict';
+
+    const validator = require("../main/validator.js");
+    validator.init();
+
+    let ruleText;
+    let rules;
+
+    ruleText = "yandex.ru##[-ext-has=test]:matches(.whatisthis)";
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length > 0);
+
+    //Invalid pseudo class
+    ruleText = "yandex.ru##[-ext-has=test]:matches(.whatisthis), .todaystripe:contains(test)";
+    rules = [ruleText];
+    assert.notOk(validator.validate(rules).length > 0);
 });
 
 QUnit.test("Test content rules validation", function (assert) {

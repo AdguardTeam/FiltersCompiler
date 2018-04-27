@@ -1,4 +1,4 @@
-/* globals module, require, console */
+/* globals module, require, console, global */
 
 module.exports = (function () {
 
@@ -9,13 +9,13 @@ module.exports = (function () {
      * @property {function} readFileSync
      */
     const fs = require('fs');
-    const CssSelectorParser = require('css-selector-parser').CssSelectorParser;
 
     const logger = require("./utils/log.js");
     const ruleParser = require("./rule/rule-parser.js");
     const RuleTypes = require("./rule/rule-types.js");
     const RuleMasks = require("./rule/rule-masks.js");
     const Rule = require("./rule/rule.js");
+    const extendedCssValidator = require('./utils/extended-css-validator.js');
 
     const VALID_OPTIONS = [
         // Basic modifiers
@@ -60,32 +60,7 @@ module.exports = (function () {
         'badfilter'
     ];
 
-    /**
-     * The problem with pseudo-classes is that any unknown pseudo-class makes browser ignore the whole CSS rule,
-     * which contains a lot more selectors. So, if CSS selector contains a pseudo-class, we should try to validate it.
-     * <p>
-     * One more problem with pseudo-classes is that they are actively used in uBlock, hence it may mess AG styles.
-     */
-    const SUPPORTED_PSEUDO_CLASSES = [":active",
-        ":checked", ":disabled", ":empty", ":enabled", ":first-child", ":first-of-type",
-        ":focus", ":hover", ":in-range", ":invalid", ":lang", ":last-child", ":last-of-type",
-        ":link", ":not", ":nth-child", ":nth-last-child", ":nth-last-of-type", ":nth-of-type",
-        ":only-child", ":only-of-type", ":optional", ":out-of-range", ":read-only",
-        ":read-write", ":required", ":root", ":target", ":valid", ":visited", ":has", ":has-text", ":contains",
-        ":matches-css", ":matches-css-before", ":matches-css-after", ":-abp-has", ":-abp-contains"];
-
-    /**
-     * The problem with it is that ":has" and ":contains" pseudo classes are not a valid pseudo classes,
-     * hence using it may break old versions of AG.
-     *
-     * @type {string[]}
-     */
-    const EXTENDED_CSS_MARKERS = ["[-ext-has=", "[-ext-contains=", "[-ext-has-text=", "[-ext-matches-css=",
-        "[-ext-matches-css-before=", "[-ext-matches-css-after=", ":has(", ":has-text(", ":contains(",
-        ":matches-css(", ":matches-css-before(", ":matches-css-after(", ":-abp-has(", ":-abp-contains("];
-
     let domainsBlacklist = [];
-    let cssParser;
 
     /**
      * Initializes validator
@@ -103,48 +78,6 @@ module.exports = (function () {
         } catch (e) {
             domainsBlacklist = [];
         }
-
-        cssParser = new CssSelectorParser();
-
-        cssParser.registerSelectorPseudos('has');
-        cssParser.registerNestingOperators('>', '+', '~');
-        cssParser.registerAttrEqualityMods('^', '$', '*', '~');
-        cssParser.enableSubstitutes();
-    };
-
-    /**
-     * Parses css rule selector
-     *
-     * @param selector
-     */
-    const parseCssSelector = function (selector) {
-
-        try {
-            return cssParser.parse(selector);
-        } catch (e) {
-            return null;
-        }
-    };
-
-    /**
-     * Recursively validates pseudo classes in css selector parse result object
-     */
-    const validatePseudoClasses = function (obj) {
-        if (obj.type === 'selectors') {
-            return obj.selectors.every((s) => {
-                return validatePseudoClasses(s);
-            });
-        } else if (obj.type === 'ruleSet') {
-            return validatePseudoClasses(obj.rule);
-        } else if (obj.type === 'rule') {
-            if (obj.pseudos) {
-                return obj.pseudos.every((p) => {
-                    return SUPPORTED_PSEUDO_CLASSES.indexOf(':' + p.name) >= 0;
-                });
-            }
-        }
-
-        return true;
     };
 
     /**
@@ -271,25 +204,14 @@ module.exports = (function () {
                     return false;
                 }
 
-                const isExtendedCss = EXTENDED_CSS_MARKERS.some((m) => rule.contentPart.includes(m));
-                if (isExtendedCss) {
-                    //TODO: Some extended css selector couldn't be parsed yet, so we cannot validate pseudos
-                    // if (!validatePseudoClasses(cssSelector)) {
-                    //     logger.error(`Invalid pseudo class: ${s}`);
-                    //     return false;
-                    // }
-
-                    return true;
-                }
-
-                let cssSelector = parseCssSelector(rule.contentPart);
-                if (!cssSelector) {
+                if (!extendedCssValidator.validateCssSelector(rule.contentPart)) {
                     logger.error(`Invalid selector: ${s}`);
 
                     if (excluded) {
                         excluded.push('! Invalid selector:');
                         excluded.push(rule.ruleText);
                     }
+
                     return false;
                 }
 
