@@ -22,8 +22,8 @@ QUnit.test("Test css validation", function (assert) {
     assert.ok(validator.validate(rules).length > 0);
     rules = ['example.com###div-id'];
     assert.ok(validator.validate(rules).length > 0);
-    // rules = ['example.com##a[href^=/], .container:has(nav) > a[href]:lt($var)'];
-    // assert.ok(validator.validate(rules).length > 0);
+    rules = ['example.com##a[href^=/], .container:has(nav) > a[href]:lt($var)'];
+    assert.notOk(validator.validate(rules).length > 0);
     rules = ['example.com##%'];
     assert.notOk(validator.validate(rules).length > 0);
 });
