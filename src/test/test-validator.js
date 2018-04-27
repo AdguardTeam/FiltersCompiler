@@ -84,11 +84,6 @@ QUnit.test("Test ext-css validation", function (assert) {
     let rules = [ruleText];
     assert.ok(validator.validate(rules).length > 0);
 
-    // selector = "#:root div.ads";
-    // ruleText = "w3schools.com##" + selector;
-    // rules = [ruleText];
-    // assert.ok(validator.validate(rules).length > 0);
-
     selector = "#body div[attr='test']:first-child  div";
     ruleText = "w3schools.com##" + selector;
     rules = [ruleText];
@@ -180,11 +175,9 @@ QUnit.test("Test ext-css validation - invalid pseudo classes", function (assert)
     let ruleText;
     let rules;
 
-    //Invalid pseudo class
-    // TODO: Failed with ExtendedCss validation
-    // ruleText = "yandex.ru##[-ext-has=test]:matches(.whatisthis)";
-    // rules = [ruleText];
-    // assert.notOk(validator.validate(rules).length > 0);
+    ruleText = "yandex.ru##[-ext-has=test]:matches(.whatisthis)";
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length > 0);
 
     //Invalid pseudo class
     ruleText = "yandex.ru##[-ext-has=test]:matches(.whatisthis), .todaystripe:contains(test)";
