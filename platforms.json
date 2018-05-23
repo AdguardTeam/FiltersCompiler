@@ -51,7 +51,16 @@
         "\\$app",
         "\\$protobuf",
         "important,protobuf",
-        "\\[-ext-"],
+        "\\[-ext-",
+        ":has\\(",
+        ":has-text\\(",
+        ":contains\\(",
+        ":matches-css\\(",
+        ":matches-css-before\\(",
+        ":matches-css-after\\(",
+        ":-abp-has\\(",
+        ":-abp-contains\\("
+      ],
       "ignoreRuleHints": false
     }
   },
@@ -159,7 +168,15 @@
         "\\$protobuf",
         "important,protobuf",
         "\\[-ext-",
-        "\\$csp"],
+        "\\$csp",
+        ":has\\(",
+        ":has-text\\(",
+        ":contains\\(",
+        ":matches-css\\(",
+        ":matches-css-before\\(",
+        ":matches-css-after\\(",
+        ":-abp-has\\(",
+        ":-abp-contains\\("],
       "ignoreRuleHints": false
     }
   },
