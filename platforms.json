@@ -59,7 +59,11 @@
         ":matches-css-before\\(",
         ":matches-css-after\\(",
         ":-abp-has\\(",
-        ":-abp-contains\\("
+        ":-abp-contains\\(",
+        "#\\?#",
+        "#\\?\\$#",
+        "#@\\?#",
+        "#@\\?\\$#"
       ],
       "ignoreRuleHints": false
     }
@@ -176,7 +180,12 @@
         ":matches-css-before\\(",
         ":matches-css-after\\(",
         ":-abp-has\\(",
-        ":-abp-contains\\("],
+        ":-abp-contains\\(",
+        "#\\?#",
+        "#\\?\\$#",
+        "#@\\?#",
+        "#@\\?\\$#"
+      ],
       "ignoreRuleHints": false
     }
   },
