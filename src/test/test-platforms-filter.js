@@ -108,3 +108,38 @@ QUnit.test("Test optimization hints", (assert) => {
     assert.notOk(after.indexOf('###optimized') >= 0);
     assert.ok(after.indexOf('not_optimized') >= 0);
 });
+
+QUnit.test("Test remove rule patterns", (assert) => {
+    'use strict';
+
+    const filter = require('../main/platforms/filter.js');
+
+    const config = {
+        "platform": "test",
+        "path": "hints",
+        "configuration": {
+            "removeRulePatterns": [
+                "\\[-ext-",
+                ":has\\(",
+                "\\$stealth"
+            ],
+            "ignoreRuleHints": false
+        }
+    };
+
+    const before = [
+        "! Comment",
+        "example.com",
+        "example.com$stealth",
+        "javarchive.com##.sidebar_list > .widget_text:has(a[title = \"ads\"])",
+        "aranzulla.it##body > div[id][class][-ext-has=\"a[href^='/locked-no-script.php']\"]"
+    ];
+
+    const after = filter.cleanupRules(before, config);
+
+    assert.ok(after);
+    assert.equal(after.length, 2);
+
+    assert.ok(after.indexOf('! Comment') >= 0);
+    assert.ok(after.indexOf('example.com') >= 0);
+});
