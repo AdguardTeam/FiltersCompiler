@@ -30,7 +30,9 @@
             globalCoverage: true,
             // log currently testing code file
             testing: false
-        }
+        },
+        // max amount of ms child can be blocked, after that we assume running an infinite loop
+        maxBlockDuration: 50000
     });
 
     const testCallback = function (err, report) {
