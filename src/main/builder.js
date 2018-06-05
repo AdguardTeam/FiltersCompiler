@@ -414,7 +414,6 @@ module.exports = (function () {
         logger.log('Compiling..');
         const result = await compile(template);
         const compiled = result.lines;
-        logger.log(compiled);
         const excluded = result.excluded;
         logger.log('Compiled length:' + compiled.length);
         logger.log('Excluded length:' + excluded.length);
