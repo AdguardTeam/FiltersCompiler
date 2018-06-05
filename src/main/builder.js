@@ -34,7 +34,7 @@ module.exports = (function () {
     const workaround = require('./utils/workaround.js');
     const webutils = require('./utils/webutils.js');
 
-    const FilterDownloader = require('./lib/filter-downloader.js');
+    const FilterDownloader = require('filters-downloader');
 
     const TEMPLATE_FILE = 'template.txt';
     const FILTER_FILE = 'filter.txt';

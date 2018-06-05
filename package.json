@@ -10,7 +10,8 @@
     "md5": "2.2.1",
     "moment": ">=2.20.1",
     "qunit": "1.0.0",
-    "utf8": "^3.0.0"
+    "utf8": "^3.0.0",
+    "filters-downloader": "git+https://github.com/AdguardTeam/FiltersDownloader.git"
   },
   "main": "index.js",
   "engines": {
