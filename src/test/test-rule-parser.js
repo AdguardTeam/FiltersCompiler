@@ -245,5 +245,12 @@ QUnit.test("Test rule parser - options parsing", (assert) => {
     assert.equal(rule.ruleType, RuleTypes.UrlBlocking);
     assert.equal(rule.url, '/\\.party\\/[0-9]{2,9}\\/$/');
 
+    line = 'http://www.tgcom24.mediaset.it/bin/418.\\$plit/C_0_strillo6x4_263_GroupPublitalia_fotobanner.gif';
+    rule = ruleParser.parseRule(line);
+    assert.ok(rule);
+    assert.equal(rule.ruleText, line);
+    assert.equal(rule.ruleType, RuleTypes.UrlBlocking);
+    assert.equal(rule.url, 'http://www.tgcom24.mediaset.it/bin/418.\\$plit/C_0_strillo6x4_263_GroupPublitalia_fotobanner.gif');
+
 });
 

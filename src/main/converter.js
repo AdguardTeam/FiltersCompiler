@@ -64,7 +64,7 @@ module.exports = (() => {
         for (let rule of rulesList) {
             if (rule.includes(':style')) {
                 let parts;
-                if (rule.includes(RuleMasks.MASK_ELEMENT_HIDING) && !rule.includes("###")) {
+                if (rule.includes(RuleMasks.MASK_ELEMENT_HIDING)) {
                     parts = rule.split(RuleMasks.MASK_ELEMENT_HIDING, 2);
                     rule = executeConversion(rule, parts, RuleMasks.MASK_CSS, excluded);
                 } else if (rule.includes(RuleMasks.MASK_ELEMENT_HIDING_EXCEPTION)) {
