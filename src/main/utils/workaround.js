@@ -45,9 +45,9 @@ module.exports = (() => {
         const result = [];
         header.forEach((line) => {
             if (line.startsWith("! Title: ")) {
-                line = "! Title: AdGuard English filter";
+                line = "! Title: AdGuard Base filter";
             } else if (line.startsWith("! Description: ")) {
-                line = "! Description: Filter list that specifically removes adverts on English language websites. English filter is supposed to work along with EasyList.";
+                line = "! Description: This filter is necessary for quality ad blocking.";
             }
 
             result.push(line);

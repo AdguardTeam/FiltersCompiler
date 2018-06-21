@@ -19,5 +19,8 @@ QUnit.test("Test converter", (assert) => {
 
     c = converter.convert(['apkmirror.com##body .google-ad-square-sidebar:style(position: absolute!important; left: -4000px!important; display:block!important;)']);
     assert.equal(c[0], 'apkmirror.com#$#body .google-ad-square-sidebar { position: absolute!important; left: -4000px!important; display:block!important; }');
+
+    c = converter.convert(['benchmark.pl###bannerDBB:style(height: 10px !important;)']);
+    assert.equal(c[0], 'benchmark.pl#$##bannerDBB { height: 10px !important; }');
 });
 
