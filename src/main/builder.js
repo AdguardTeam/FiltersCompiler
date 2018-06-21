@@ -321,7 +321,7 @@ module.exports = (function () {
      *
      * @param template
      */
-     const compile = async function (template) {
+     const compile = async function (template, platformsConfigFile) {
         let result = [];
         let excluded = [];
 
@@ -340,7 +340,11 @@ module.exports = (function () {
             }
         }
 
-        result = await FilterDownloader.compile(result, null, {adguard:true});
+        const platforms = JSON.parse(readFile(platformsConfigFile));
+
+        for (const platform in platforms) {
+            result = await FilterDownloader.compile(result, null, platforms[platform].platform);
+        }
 
         result = converter.convert(result, excluded);
 
@@ -349,7 +353,6 @@ module.exports = (function () {
 
         result = validator.validate(result, excluded);
         result = validator.blacklistDomains(result, excluded);
-        // result = sorter.sort(result);
 
         return {
             lines: result,
@@ -397,7 +400,7 @@ module.exports = (function () {
      *
      * @param filterDir
      */
-    const buildFilter = async function (filterDir) {
+    const buildFilter = async function (filterDir, platformsConfigFile) {
         currentDir = filterDir;
 
         const template = readFile(path.join(currentDir, TEMPLATE_FILE));
@@ -411,8 +414,8 @@ module.exports = (function () {
             return;
         }
 
-        logger.log('Compiling..');
-        const result = await compile(template);
+        logger.log('Compiling...');
+        const result = await compile(template, platformsConfigFile);
         const compiled = result.lines;
         const excluded = result.excluded;
         logger.log('Compiled length:' + compiled.length);
@@ -437,7 +440,7 @@ module.exports = (function () {
      *
      * @param filtersDir
      */
-    const parseDirectory = async function (filtersDir) {
+    const parseDirectory = async function (filtersDir, platformsConfigFile) {
         const items = fs.readdirSync(filtersDir);
 
         for (let directory of items) {
@@ -447,7 +450,7 @@ module.exports = (function () {
                 let template = path.join(filterDir, TEMPLATE_FILE);
                 if (fs.existsSync(template)) {
                     logger.log(`Building filter: ${directory}`);
-                    await buildFilter(filterDir);
+                    await buildFilter(filterDir, platformsConfigFile);
                     logger.log(`Building filter: ${directory} ok`);
                 } else {
                     await parseDirectory(filterDir);
@@ -469,7 +472,7 @@ module.exports = (function () {
         validator.init(domainBlacklistFile);
         generator.init(FILTER_FILE, METADATA_FILE, REVISION_FILE, platformsConfigFile);
 
-        await parseDirectory(filtersDir);
+        await parseDirectory(filtersDir, platformsConfigFile);
 
         logger.log(`Generating platforms`);
         generator.generate(filtersDir, platformsPath);
