@@ -343,7 +343,8 @@ module.exports = (function () {
         const platforms = JSON.parse(readFile(platformsConfigFile));
 
         for (const platform in platforms) {
-            result = await FilterDownloader.compile(result, null, platforms[platform].platform);
+            let platformName = platforms[platform].platform;
+            result = await FilterDownloader.compile(result, null, {platformName: true});
         }
 
         result = converter.convert(result, excluded);
