@@ -1,6 +1,6 @@
 /* globals require, QUnit, __dirname */
 
-QUnit.test("Test builder", (assert) => {
+QUnit.test("Test builder", async (assert) => {
     'use strict';
 
     const path = require('path');
@@ -23,7 +23,7 @@ QUnit.test("Test builder", (assert) => {
 
     const filtersDir = path.join(__dirname, './resources/filters');
     const logFile = path.join(__dirname, './resources/log.txt');
-    builder.build(filtersDir, logFile);
+    await builder.build(filtersDir, logFile);
 
     let revision = readFile(path.join(filtersDir, 'filter_2_English', 'revision.json'));
     assert.ok(revision);
@@ -62,9 +62,16 @@ QUnit.test("Test builder", (assert) => {
     assert.notOk(filterLines.indexOf('||test.com^$replace=') >= 0);
     assert.notOk(filterLines.indexOf('regularexpressionexcluded') >= 0);
     assert.ok(filterLines.indexOf('regularexpression_not_excluded') >= 0);
+
+    //Check includes
+    assert.notOk(filterLines.indexOf('!#include') >= 0);
+
+    //Check conditions
+    assert.notOk(filterLines.indexOf('!#if adguard') >= 0);
+    assert.notOk(filterLines.indexOf('!#endif') >= 0);
 });
 
-QUnit.test("Test builder - platforms", (assert) => {
+QUnit.test("Test builder - platforms", async (assert) => {
     'use strict';
 
     const path = require('path');
@@ -88,7 +95,7 @@ QUnit.test("Test builder - platforms", (assert) => {
     const logFile = path.join(__dirname, './resources/log_platforms.txt');
     const platforms = path.join(__dirname, './resources/platforms');
     const platformsConfig = path.join(__dirname, './resources/platforms.json');
-    builder.build(filtersDir, logFile, null, platforms, platformsConfig);
+    await builder.build(filtersDir, logFile, null, platforms, platformsConfig);
 
     const filterText = readFile(path.join(filtersDir, 'filter_2_English', 'filter.txt'));
     assert.ok(filterText);
