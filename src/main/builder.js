@@ -321,7 +321,7 @@ module.exports = (function () {
      *
      * @param template
      */
-     const compile = async function (template, platformsConfigFile) {
+     const compile = async function (template) {
         let result = [];
         let excluded = [];
 
@@ -340,13 +340,7 @@ module.exports = (function () {
             }
         }
 
-        const platforms = JSON.parse(readFile(platformsConfigFile));
-
-        for (const platform in platforms) {
-            let platformName = {};
-            platformName[platforms[platform].platform] = true;
-            result = await FilterDownloader.compile(result, null, platformName);
-        }
+        result = await FilterDownloader.resolveIncludes(result);
 
         result = converter.convert(result, excluded);
 

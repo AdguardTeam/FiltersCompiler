@@ -14,7 +14,6 @@ QUnit.test("Test builder", async (assert) => {
         }
     };
 
-    const generator = require("../main/platforms/generator.js");
     const optimization = require("../main/optimization.js");
     optimization.disableOptimization();
 
@@ -62,13 +61,6 @@ QUnit.test("Test builder", async (assert) => {
     assert.notOk(filterLines.indexOf('||test.com^$replace=') >= 0);
     assert.notOk(filterLines.indexOf('regularexpressionexcluded') >= 0);
     assert.ok(filterLines.indexOf('regularexpression_not_excluded') >= 0);
-
-    //Check includes
-    assert.notOk(filterLines.indexOf('!#include') >= 0);
-
-    //Check conditions
-    assert.notOk(filterLines.indexOf('!#if adguard') >= 0);
-    assert.notOk(filterLines.indexOf('!#endif') >= 0);
 });
 
 QUnit.test("Test builder - platforms", async (assert) => {
@@ -85,7 +77,6 @@ QUnit.test("Test builder - platforms", async (assert) => {
         }
     };
 
-    const generator = require("../main/platforms/generator.js");
     const optimization = require("../main/optimization.js");
     optimization.disableOptimization();
 
@@ -210,4 +201,28 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.ok(filtersMetadataMAC.groups);
     assert.equal(filtersMetadataMAC.tags, undefined);
     assert.ok(filtersMetadataMAC.filters);
+
+    //Check includes
+    assert.notOk(filterLines.indexOf('!#include') >= 0);
+
+    //Check conditions
+    assert.notOk(filterLines.indexOf('!#if mac') >= 0);
+    assert.notOk(filterLines.indexOf('!#endif') >= 0);
+});
+
+QUnit.test("Test platforms conditions", (assert) => {
+    'use strict';
+
+    const generator = require("../main/platforms/generator.js");
+
+    const platformsPath = path.join(__dirname, './resources/platforms');
+
+    const filtersDir = path.join(__dirname, './resources/filters');
+
+    const generate = generator.generate(filtersDir, platformsPath);
+
+    assert.ok(generate);
+
+    assert.notOk(generate.indexOf('!#if adguard') >= 0);
+    assert.notOk(generate.indexOf('!#endif') >= 0);
 });
