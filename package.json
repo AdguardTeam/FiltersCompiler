@@ -14,9 +14,6 @@
     "filters-downloader": "git+https://github.com/AdguardTeam/FiltersDownloader.git"
   },
   "main": "index.js",
-  "engines": {
-    "node": ">= 0.4.1"
-  },
   "scripts": {
     "test": "node ./src/test/testrunner.js"
   }

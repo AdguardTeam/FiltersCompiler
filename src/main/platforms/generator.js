@@ -486,7 +486,7 @@ module.exports = (() => {
 
         for (let platform in platformPathsConfig) {
             const config = platformPathsConfig[platform];
-            let rules = FilterDownloader.resolveConditions(originalRules, config);
+            let rules = FilterDownloader.resolveConditions(originalRules, config.defines);
             rules = filter.cleanupRules(rules, config);
             const optimizedRules = filter.cleanupAndOptimizeRules(originalRules, config, optimizationConfig, filterId);
 
@@ -548,8 +548,8 @@ module.exports = (() => {
     /**
      * Generates platforms builds
      *
-     * @param filtersDir
-     * @param platformsPath
+     * @param {String} filtersDir
+     * @param {String} platformsPath
      */
     const generate = function (filtersDir, platformsPath) {
         if (!platformsPath) {

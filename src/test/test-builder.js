@@ -1,10 +1,11 @@
 /* globals require, QUnit, __dirname */
 
+
+const path = require('path');
+const fs = require('fs');
+
 QUnit.test("Test builder", async (assert) => {
     'use strict';
-
-    const path = require('path');
-    const fs = require('fs');
 
     const readFile = function (path) {
         try {
@@ -24,18 +25,20 @@ QUnit.test("Test builder", async (assert) => {
     const logFile = path.join(__dirname, './resources/log.txt');
     await builder.build(filtersDir, logFile);
 
-    let revision = readFile(path.join(filtersDir, 'filter_2_English', 'revision.json'));
+    let revision = readFile(path.join(filtersDir, 'filter_3_Test', 'revision.json'));
     assert.ok(revision);
     //
     revision = JSON.parse(revision);
     assert.ok(revision.version);
     assert.ok(revision.timeUpdated);
 
-    const filterText = readFile(path.join(filtersDir, 'filter_2_English', 'filter.txt'));
+    const filterText = readFile(path.join(filtersDir, 'filter_3_Test', 'filter.txt')).trim();
     assert.ok(filterText);
 
-    const filterLines = filterText.split('\r\n');
-    assert.equal(filterLines.length, 27);
+    const os = require('os');
+
+    const filterLines = filterText.split(os.EOL);
+    assert.equal(filterLines.length, 23);
 
     //Common include
     assert.ok(filterLines.indexOf('! some common rules could be places here') >= 0);
@@ -81,6 +84,7 @@ QUnit.test("Test builder - platforms", async (assert) => {
     optimization.disableOptimization();
 
     const builder = require("../main/builder.js");
+    const generator = require("../main/platforms/generator.js");
 
     const filtersDir = path.join(__dirname, './resources/filters');
     const logFile = path.join(__dirname, './resources/log_platforms.txt');
@@ -88,7 +92,7 @@ QUnit.test("Test builder - platforms", async (assert) => {
     const platformsConfig = path.join(__dirname, './resources/platforms.json');
     await builder.build(filtersDir, logFile, null, platforms, platformsConfig);
 
-    const filterText = readFile(path.join(filtersDir, 'filter_2_English', 'filter.txt'));
+    const filterText = readFile(path.join(filtersDir, 'filter_3_Test', 'filter.txt'));
     assert.ok(filterText);
 
     let filtersMetadata = readFile(path.join(platforms, 'test', 'filters.json'));
@@ -121,7 +125,7 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.ok(filterContent);
 
     let filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 33);
+    assert.equal(filterLines.length, 34);
 
     assert.ok(filterLines.indexOf('![Adblock Plus 2.0]') >= 0);
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
@@ -134,7 +138,7 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.ok(filterContent);
 
     filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 15);
+    assert.equal(filterLines.length, 16);
 
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
     assert.notOk(filterLines.indexOf('test-common-1-rule.com') >= 0);
@@ -147,7 +151,7 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.ok(filterContent);
 
     filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 28);
+    assert.equal(filterLines.length, 29);
 
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
     assert.ok(filterLines.indexOf('test-common-1-rule.com') >= 0);
@@ -202,27 +206,24 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.equal(filtersMetadataMAC.tags, undefined);
     assert.ok(filtersMetadataMAC.filters);
 
-    //Check includes
-    assert.notOk(filterLines.indexOf('!#include') >= 0);
-
     //Check conditions
-    assert.notOk(filterLines.indexOf('!#if mac') >= 0);
-    assert.notOk(filterLines.indexOf('!#endif') >= 0);
-});
+    assert.ok(filterLines.indexOf('!#if adguard') < 0);
+    assert.ok(filterLines.indexOf('!#endif') < 0);
+    assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
+    assert.ok(filterLines.indexOf('test-common-rule.com$xmlhttprequest') >= 0);
 
-QUnit.test("Test platforms conditions", (assert) => {
-    'use strict';
+    // wrong condition
+    assert.notOk(filterLines.indexOf('wrong-condition') >= 0);
 
-    const generator = require("../main/platforms/generator.js");
+    //Check includes
+    assert.ok(filterLines.indexOf('!#include') < 0);
 
-    const platformsPath = path.join(__dirname, './resources/platforms');
+    // platform specify includes
+    filterContent = readFile(path.join(platforms, 'mac', 'filters', '4_optimized.txt'));
+    assert.ok(filterContent);
 
-    const filtersDir = path.join(__dirname, './resources/filters');
-
-    const generate = generator.generate(filtersDir, platformsPath);
-
-    assert.ok(generate);
-
-    assert.notOk(generate.indexOf('!#if adguard') >= 0);
-    assert.notOk(generate.indexOf('!#endif') >= 0);
+    filterLines = filterContent.split('\r\n');
+    assert.equal(filterLines.length, 14);
+    assert.ok(filterLines.indexOf('test-mac-rule.com#$#h1 { color: red }') >= 0);
+    assert.ok(filterLines.indexOf('test-adguard-rule.com#$#h1 { color: red }') >= 0);
 });
