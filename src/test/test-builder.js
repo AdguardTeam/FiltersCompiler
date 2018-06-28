@@ -228,6 +228,6 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.equal(filterLines.length, 13);
     assert.ok(filterLines.indexOf('if_mac_included_rule') >= 0);
 
-    // stripped comment do not remove directives
+    // do not remove directives while stripped comment. `directives_not_stripped` rule should not remain
     assert.notOk(filterLines.indexOf('directives_not_stripped') >= 0);
 });
