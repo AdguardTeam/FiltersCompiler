@@ -9,7 +9,7 @@
         },
         "defines": {
             "adguard": true,
-            "adguard_app_windows": true
+            "ublock": true
         }
     },
     "TEST_COMMENTS": {

@@ -52,6 +52,7 @@ QUnit.test("Test builder", async (assert) => {
 
     //Common_1 include
     assert.ok(filterLines.indexOf('test-common-1-rule.com') >= 0);
+
     //Exclude_1
     assert.notOk(filterLines.indexOf('test-common-1-rule.com$xmlhttprequest') >= 0);
     //Strip comments
@@ -125,7 +126,7 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.ok(filterContent);
 
     let filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 34);
+    assert.equal(filterLines.length, 35);
 
     assert.ok(filterLines.indexOf('![Adblock Plus 2.0]') >= 0);
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
@@ -138,7 +139,7 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.ok(filterContent);
 
     filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 16);
+    assert.equal(filterLines.length, 17);
 
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
     assert.notOk(filterLines.indexOf('test-common-1-rule.com') >= 0);
@@ -151,7 +152,7 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.ok(filterContent);
 
     filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 29);
+    assert.equal(filterLines.length, 30);
 
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
     assert.ok(filterLines.indexOf('test-common-1-rule.com') >= 0);
@@ -207,23 +208,26 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.ok(filtersMetadataMAC.filters);
 
     //Check conditions
-    assert.ok(filterLines.indexOf('!#if adguard') < 0);
-    assert.ok(filterLines.indexOf('!#endif') < 0);
-    assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
-    assert.ok(filterLines.indexOf('test-common-rule.com$xmlhttprequest') >= 0);
+    assert.notOk(filterLines.indexOf('!#if adguard') >= 0);
+    assert.notOk(filterLines.indexOf('!#endif') >= 0);
+    assert.notOk(filterLines.indexOf('if_not_adguard_rule') >= 0);
+    assert.ok(filterLines.indexOf('if_adguard_included_rule') >= 0);
+    assert.ok(filterLines.indexOf('if_adguard_rule') >= 0);
 
     // wrong condition
-    assert.notOk(filterLines.indexOf('wrong-condition') >= 0);
+    assert.notOk(filterLines.indexOf('wrong_condition') >= 0);
 
     //Check includes
-    assert.ok(filterLines.indexOf('!#include') < 0);
+    assert.notOk(filterLines.indexOf('!#include') >= 0);
 
     // platform specify includes
     filterContent = readFile(path.join(platforms, 'mac', 'filters', '4_optimized.txt'));
     assert.ok(filterContent);
 
     filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 14);
-    assert.ok(filterLines.indexOf('test-mac-rule.com#$#h1 { color: red }') >= 0);
-    assert.ok(filterLines.indexOf('test-adguard-rule.com#$#h1 { color: red }') >= 0);
+    assert.equal(filterLines.length, 13);
+    assert.ok(filterLines.indexOf('if_mac_included_rule') >= 0);
+
+    // stripped comment do not remove directives
+    assert.notOk(filterLines.indexOf('directives_not_stripped') >= 0);
 });

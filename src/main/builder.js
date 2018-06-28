@@ -92,7 +92,7 @@ module.exports = (function () {
                 return true;
             }
 
-            if (line.startsWith(RuleMasks.MASK_HINT)) {
+            if (line.startsWith(RuleMasks.MASK_HINT) || line.startsWith(RuleMasks.MASK_DIRECTIVES)) {
                 return true;
             }
 
@@ -396,7 +396,7 @@ module.exports = (function () {
      *
      * @param filterDir
      */
-    const buildFilter = async function (filterDir, platformsConfigFile) {
+    const buildFilter = async function (filterDir) {
         currentDir = filterDir;
 
         const template = readFile(path.join(currentDir, TEMPLATE_FILE));
@@ -411,7 +411,7 @@ module.exports = (function () {
         }
 
         logger.log('Compiling...');
-        const result = await compile(template, platformsConfigFile);
+        const result = await compile(template);
         const compiled = result.lines;
         const excluded = result.excluded;
         logger.log('Compiled length:' + compiled.length);
@@ -436,7 +436,7 @@ module.exports = (function () {
      *
      * @param filtersDir
      */
-    const parseDirectory = async function (filtersDir, platformsConfigFile) {
+    const parseDirectory = async function (filtersDir) {
         const items = fs.readdirSync(filtersDir);
 
         for (let directory of items) {
@@ -446,7 +446,7 @@ module.exports = (function () {
                 let template = path.join(filterDir, TEMPLATE_FILE);
                 if (fs.existsSync(template)) {
                     logger.log(`Building filter: ${directory}`);
-                    await buildFilter(filterDir, platformsConfigFile);
+                    await buildFilter(filterDir);
                     logger.log(`Building filter: ${directory} ok`);
                 } else {
                     await parseDirectory(filterDir);
@@ -468,7 +468,7 @@ module.exports = (function () {
         validator.init(domainBlacklistFile);
         generator.init(FILTER_FILE, METADATA_FILE, REVISION_FILE, platformsConfigFile);
 
-        await parseDirectory(filtersDir, platformsConfigFile);
+        await parseDirectory(filtersDir);
 
         logger.log(`Generating platforms`);
         generator.generate(filtersDir, platformsPath);

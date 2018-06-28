@@ -4,14 +4,4 @@
 !-------------------------------------------------------------------------------!
 !------------------ General JS API ---------------------------------------------!
 !-------------------------------------------------------------------------------!
-!#if (!adguard)
-if_adguard_included_rule
-!#endif
-!#if adguard
-test-common-rule.com
-!#endif
-!#if wrong-condition
-wrong-condition
-!#endif
-!
 !#include ../../../../src/test/resources/filters/common.txt

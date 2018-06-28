@@ -6,8 +6,11 @@ test-common-rule.com
 test-common-rule.com$xmlhttprequest
 example.com##h1:style(background-color: blue !important)
 !#if adguard
-test-adguard-rule.com##h1:style(color: red)
+if_adguard_included_rule
 !#endif
 !#if adguard_app_mac
-test-mac-rule.com##h1:style(color: red)
+if_mac_included_rule
+!#endif
+!#if adguard
+if_adguard_rule
 !#endif
