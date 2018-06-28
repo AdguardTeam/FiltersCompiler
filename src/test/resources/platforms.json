@@ -1,38 +1,52 @@
 {
-  "TEST": {
-    "platform": "ext_ublock",
-    "path": "test",
-    "configuration": {
-      "removeRulePatterns": false,
-      "ignoreRuleHints": false,
-      "adbHeader": "![Adblock Plus 2.0]"
+    "TEST": {
+        "platform": "ext_ublock",
+        "path": "test",
+        "configuration": {
+            "removeRulePatterns": false,
+            "ignoreRuleHints": false,
+            "adbHeader": "![Adblock Plus 2.0]"
+        },
+        "defines": {
+            "adguard": true,
+            "ublock": true
+        }
+    },
+    "TEST_COMMENTS": {
+        "platform": "test",
+        "path": "config/test",
+        "configuration": {
+            "removeRulePatterns": [
+                "^\\!",
+                "\\$\\$|\\$\\@\\$",
+                "test-common-1-rule"
+            ],
+            "ignoreRuleHints": true
+        },
+        "defines": {
+            "adguard": true
+        }
+    },
+    "MAC": {
+        "platform": "mac",
+        "path": "mac",
+        "configuration": {
+            "removeRulePatterns": false,
+            "ignoreRuleHints": false
+        },
+        "defines": {
+            "adguard": true
+        }
+    },
+    "TEST_HINTS": {
+        "platform": "test",
+        "path": "hints",
+        "configuration": {
+            "removeRulePatterns": false,
+            "ignoreRuleHints": false
+        },
+        "defines": {
+            "adguard": true
+        }
     }
-  },
-  "TEST_COMMENTS": {
-    "platform": "test",
-    "path": "config/test",
-    "configuration": {
-      "removeRulePatterns": [
-        "^\\!",
-        "\\$\\$|\\$\\@\\$",
-        "test-common-1-rule"],
-      "ignoreRuleHints": true
-    }
-  },
-  "MAC": {
-    "platform": "mac",
-    "path": "mac",
-    "configuration": {
-      "removeRulePatterns": false,
-      "ignoreRuleHints": false
-    }
-  },
-  "TEST_HINTS": {
-    "platform": "test",
-    "path": "hints",
-    "configuration": {
-      "removeRulePatterns": false,
-      "ignoreRuleHints": false
-    }
-  }
 }

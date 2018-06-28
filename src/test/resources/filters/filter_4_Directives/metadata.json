@@ -1,0 +1,12 @@
+{
+  "filterId": 4,
+  "name": "Directives Filter",
+  "description": "Directives Filter description",
+  "timeAdded": 1404115015843,
+  "homepage": "https://example.com/",
+  "expires": "2 days",
+  "displayNumber": 101,
+  "groupId": 2,
+  "subscriptionUrl": "https://example.com/",
+  "tags": []
+}

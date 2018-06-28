@@ -34,6 +34,8 @@ module.exports = (function () {
     const workaround = require('./utils/workaround.js');
     const webutils = require('./utils/webutils.js');
 
+    const FilterDownloader = require('filters-downloader');
+
     const TEMPLATE_FILE = 'template.txt';
     const FILTER_FILE = 'filter.txt';
     const REVISION_FILE = 'revision.json';
@@ -90,7 +92,7 @@ module.exports = (function () {
                 return true;
             }
 
-            if (line.startsWith(RuleMasks.MASK_HINT)) {
+            if (line.startsWith(RuleMasks.MASK_HINT) || line.startsWith(RuleMasks.MASK_DIRECTIVES)) {
                 return true;
             }
 
@@ -319,7 +321,7 @@ module.exports = (function () {
      *
      * @param template
      */
-    const compile = function (template) {
+     const compile = async function (template) {
         let result = [];
         let excluded = [];
 
@@ -338,6 +340,8 @@ module.exports = (function () {
             }
         }
 
+        result = await FilterDownloader.resolveIncludes(result);
+
         result = converter.convert(result, excluded);
 
         result = exclude(result, EXCLUDE_FILE, excluded);
@@ -345,7 +349,6 @@ module.exports = (function () {
 
         result = validator.validate(result, excluded);
         result = validator.blacklistDomains(result, excluded);
-        //result = sorter.sort(result);
 
         return {
             lines: result,
@@ -393,7 +396,7 @@ module.exports = (function () {
      *
      * @param filterDir
      */
-    const buildFilter = function (filterDir) {
+    const buildFilter = async function (filterDir) {
         currentDir = filterDir;
 
         const template = readFile(path.join(currentDir, TEMPLATE_FILE));
@@ -407,8 +410,8 @@ module.exports = (function () {
             return;
         }
 
-        logger.log('Compiling..');
-        const result = compile(template);
+        logger.log('Compiling...');
+        const result = await compile(template);
         const compiled = result.lines;
         const excluded = result.excluded;
         logger.log('Compiled length:' + compiled.length);
@@ -433,7 +436,7 @@ module.exports = (function () {
      *
      * @param filtersDir
      */
-    const parseDirectory = function (filtersDir) {
+    const parseDirectory = async function (filtersDir) {
         const items = fs.readdirSync(filtersDir);
 
         for (let directory of items) {
@@ -443,10 +446,10 @@ module.exports = (function () {
                 let template = path.join(filterDir, TEMPLATE_FILE);
                 if (fs.existsSync(template)) {
                     logger.log(`Building filter: ${directory}`);
-                    buildFilter(filterDir);
+                    await buildFilter(filterDir);
                     logger.log(`Building filter: ${directory} ok`);
                 } else {
-                    parseDirectory(filterDir);
+                    await parseDirectory(filterDir);
                 }
             }
         }
@@ -460,12 +463,12 @@ module.exports = (function () {
      * @param domainBlacklistFile
      * @param platformsPath
      */
-    const build = function (filtersDir, logFile, domainBlacklistFile, platformsPath, platformsConfigFile) {
+    const build = async function (filtersDir, logFile, domainBlacklistFile, platformsPath, platformsConfigFile) {
         logger.initialize(logFile);
         validator.init(domainBlacklistFile);
         generator.init(FILTER_FILE, METADATA_FILE, REVISION_FILE, platformsConfigFile);
 
-        parseDirectory(filtersDir);
+        await parseDirectory(filtersDir);
 
         logger.log(`Generating platforms`);
         generator.generate(filtersDir, platformsPath);
@@ -476,4 +479,3 @@ module.exports = (function () {
         build: build
     };
 })();
-

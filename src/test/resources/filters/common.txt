@@ -5,3 +5,12 @@ test-common-rule.com
 ||test-common-rule.com^$replace=
 test-common-rule.com$xmlhttprequest
 example.com##h1:style(background-color: blue !important)
+!#if adguard
+if_adguard_included_rule
+!#endif
+!#if adguard_app_mac
+if_mac_included_rule
+!#endif
+!#if adguard
+if_adguard_rule
+!#endif

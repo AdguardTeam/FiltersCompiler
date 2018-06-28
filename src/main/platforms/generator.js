@@ -14,6 +14,8 @@ module.exports = (() => {
     const workaround = require('../utils/workaround.js');
     const optimization = require('../optimization');
 
+    const FilterDownloader = require('filters-downloader');
+
     const RULES_SEPARATOR = "\r\n";
     const filterIdsPool = [];
     const metadataFilterIdsPool = [];
@@ -483,9 +485,9 @@ module.exports = (() => {
         const optimizationConfig = optimization.getFilterOptimizationConfig(filterId);
 
         for (let platform in platformPathsConfig) {
-
             const config = platformPathsConfig[platform];
-            const rules = filter.cleanupRules(originalRules, config);
+            let rules = FilterDownloader.resolveConditions(originalRules, config.defines);
+            rules = filter.cleanupRules(rules, config);
             const optimizedRules = filter.cleanupAndOptimizeRules(originalRules, config, optimizationConfig, filterId);
 
             logger.log(`Filter ${filterId}. Rules ${originalRules.length} => ${rules.length} => ${optimizedRules.length}. PlatformPath: '${config.path}'`);
@@ -546,8 +548,8 @@ module.exports = (() => {
     /**
      * Generates platforms builds
      *
-     * @param filtersDir
-     * @param platformsPath
+     * @param {String} filtersDir
+     * @param {String} platformsPath
      */
     const generate = function (filtersDir, platformsPath) {
         if (!platformsPath) {

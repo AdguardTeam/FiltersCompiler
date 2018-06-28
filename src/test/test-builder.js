@@ -1,10 +1,11 @@
 /* globals require, QUnit, __dirname */
 
-QUnit.test("Test builder", (assert) => {
-    'use strict';
 
-    const path = require('path');
-    const fs = require('fs');
+const path = require('path');
+const fs = require('fs');
+
+QUnit.test("Test builder", async (assert) => {
+    'use strict';
 
     const readFile = function (path) {
         try {
@@ -14,7 +15,6 @@ QUnit.test("Test builder", (assert) => {
         }
     };
 
-    const generator = require("../main/platforms/generator.js");
     const optimization = require("../main/optimization.js");
     optimization.disableOptimization();
 
@@ -23,20 +23,22 @@ QUnit.test("Test builder", (assert) => {
 
     const filtersDir = path.join(__dirname, './resources/filters');
     const logFile = path.join(__dirname, './resources/log.txt');
-    builder.build(filtersDir, logFile);
+    await builder.build(filtersDir, logFile);
 
-    let revision = readFile(path.join(filtersDir, 'filter_2_English', 'revision.json'));
+    let revision = readFile(path.join(filtersDir, 'filter_3_Test', 'revision.json'));
     assert.ok(revision);
     //
     revision = JSON.parse(revision);
     assert.ok(revision.version);
     assert.ok(revision.timeUpdated);
 
-    const filterText = readFile(path.join(filtersDir, 'filter_2_English', 'filter.txt'));
+    const filterText = readFile(path.join(filtersDir, 'filter_3_Test', 'filter.txt')).trim();
     assert.ok(filterText);
 
-    const filterLines = filterText.split('\r\n');
-    assert.equal(filterLines.length, 27);
+    const os = require('os');
+
+    const filterLines = filterText.split(os.EOL);
+    assert.equal(filterLines.length, 23);
 
     //Common include
     assert.ok(filterLines.indexOf('! some common rules could be places here') >= 0);
@@ -50,6 +52,7 @@ QUnit.test("Test builder", (assert) => {
 
     //Common_1 include
     assert.ok(filterLines.indexOf('test-common-1-rule.com') >= 0);
+
     //Exclude_1
     assert.notOk(filterLines.indexOf('test-common-1-rule.com$xmlhttprequest') >= 0);
     //Strip comments
@@ -64,7 +67,7 @@ QUnit.test("Test builder", (assert) => {
     assert.ok(filterLines.indexOf('regularexpression_not_excluded') >= 0);
 });
 
-QUnit.test("Test builder - platforms", (assert) => {
+QUnit.test("Test builder - platforms", async (assert) => {
     'use strict';
 
     const path = require('path');
@@ -78,19 +81,19 @@ QUnit.test("Test builder - platforms", (assert) => {
         }
     };
 
-    const generator = require("../main/platforms/generator.js");
     const optimization = require("../main/optimization.js");
     optimization.disableOptimization();
 
     const builder = require("../main/builder.js");
+    const generator = require("../main/platforms/generator.js");
 
     const filtersDir = path.join(__dirname, './resources/filters');
     const logFile = path.join(__dirname, './resources/log_platforms.txt');
     const platforms = path.join(__dirname, './resources/platforms');
     const platformsConfig = path.join(__dirname, './resources/platforms.json');
-    builder.build(filtersDir, logFile, null, platforms, platformsConfig);
+    await builder.build(filtersDir, logFile, null, platforms, platformsConfig);
 
-    const filterText = readFile(path.join(filtersDir, 'filter_2_English', 'filter.txt'));
+    const filterText = readFile(path.join(filtersDir, 'filter_3_Test', 'filter.txt'));
     assert.ok(filterText);
 
     let filtersMetadata = readFile(path.join(platforms, 'test', 'filters.json'));
@@ -123,7 +126,7 @@ QUnit.test("Test builder - platforms", (assert) => {
     assert.ok(filterContent);
 
     let filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 33);
+    assert.equal(filterLines.length, 35);
 
     assert.ok(filterLines.indexOf('![Adblock Plus 2.0]') >= 0);
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
@@ -136,7 +139,7 @@ QUnit.test("Test builder - platforms", (assert) => {
     assert.ok(filterContent);
 
     filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 15);
+    assert.equal(filterLines.length, 17);
 
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
     assert.notOk(filterLines.indexOf('test-common-1-rule.com') >= 0);
@@ -149,7 +152,7 @@ QUnit.test("Test builder - platforms", (assert) => {
     assert.ok(filterContent);
 
     filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 28);
+    assert.equal(filterLines.length, 30);
 
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
     assert.ok(filterLines.indexOf('test-common-1-rule.com') >= 0);
@@ -203,4 +206,28 @@ QUnit.test("Test builder - platforms", (assert) => {
     assert.ok(filtersMetadataMAC.groups);
     assert.equal(filtersMetadataMAC.tags, undefined);
     assert.ok(filtersMetadataMAC.filters);
+
+    //Check conditions
+    assert.notOk(filterLines.indexOf('!#if adguard') >= 0);
+    assert.notOk(filterLines.indexOf('!#endif') >= 0);
+    assert.notOk(filterLines.indexOf('if_not_adguard_rule') >= 0);
+    assert.ok(filterLines.indexOf('if_adguard_included_rule') >= 0);
+    assert.ok(filterLines.indexOf('if_adguard_rule') >= 0);
+
+    // wrong condition
+    assert.notOk(filterLines.indexOf('wrong_condition') >= 0);
+
+    //Check includes
+    assert.notOk(filterLines.indexOf('!#include') >= 0);
+
+    // platform specify includes
+    filterContent = readFile(path.join(platforms, 'mac', 'filters', '4_optimized.txt'));
+    assert.ok(filterContent);
+
+    filterLines = filterContent.split('\r\n');
+    assert.equal(filterLines.length, 13);
+    assert.ok(filterLines.indexOf('if_mac_included_rule') >= 0);
+
+    // do not remove directives while stripped comment. `directives_not_stripped` rule should not remain
+    assert.notOk(filterLines.indexOf('directives_not_stripped') >= 0);
 });

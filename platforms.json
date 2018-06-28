@@ -1,213 +1,267 @@
 {
-  "WINDOWS": {
-    "platform": "windows",
-    "path": "windows",
-    "configuration": {
-      "removeRulePatterns": false,
-      "ignoreRuleHints": false
-    }
-  },
-  "MAC": {
-    "platform": "mac",
-    "path": "mac",
-    "configuration": {
-      "removeRulePatterns": false,
-      "ignoreRuleHints": false
-    }
-  },
-  "MAC_V2": {
-    "platform": "mac",
-    "path": "mac_v2",
-    "configuration": {
-      "removeRulePatterns": false,
-      "ignoreRuleHints": false
-    }
-  },
+    "WINDOWS": {
+        "platform": "windows",
+        "path": "windows",
+        "configuration": {
+            "removeRulePatterns": false,
+            "ignoreRuleHints": false
+        },
+        "defines": {
+            "adguard": true,
+            "adguard_app_windows": true
+        }
+    },
+    "MAC": {
+        "platform": "mac",
+        "path": "mac",
+        "configuration": {
+            "removeRulePatterns": false,
+            "ignoreRuleHints": false
+        },
+        "defines": {
+            "adguard": true,
+            "adguard_app_mac": true
+        }
+    },
+    "MAC_V2": {
+        "platform": "mac",
+        "path": "mac_v2",
+        "configuration": {
+            "removeRulePatterns": false,
+            "ignoreRuleHints": false
+        },
+        "defines": {
+            "adguard": true,
+            "adguard_app_mac": true
+        }
+    },
 
-  "ANDROID": {
-    "platform": "android",
-    "path": "android",
-    "configuration": {
-      "removeRulePatterns": ["\\$stealth"],
-      "ignoreRuleHints": false
-    }
-  },
+    "ANDROID": {
+        "platform": "android",
+        "path": "android",
+        "configuration": {
+            "removeRulePatterns": ["\\$stealth"],
+            "ignoreRuleHints": false
+        },
+        "defines": {
+            "adguard": true,
+            "adguard_app_android": true
+        }
+    },
 
-  "IOS": {
-    "platform": "ios",
-    "path": "ios",
-    "configuration": {
-      "removeRulePatterns": [
-        "\\$\\$|\\$\\@\\$",
-        "#%#",
-        "#@%#",
-        "#\\$#",
-        "#@\\$#",
-        "\\$mp4",
-        "\\$replace=",
-        "\\$stealth",
-        "\\$empty",
-        "important,replace=",
-        "\\$app",
-        "\\$protobuf",
-        "important,protobuf",
-        "\\[-ext-",
-        ":has\\(",
-        ":has-text\\(",
-        ":contains\\(",
-        ":matches-css\\(",
-        ":matches-css-before\\(",
-        ":matches-css-after\\(",
-        ":-abp-has\\(",
-        ":-abp-contains\\(",
-        "#\\?#",
-        "#\\?\\$#",
-        "#@\\?#",
-        "#@\\?\\$#"
-      ],
-      "ignoreRuleHints": false
-    }
-  },
+    "IOS": {
+        "platform": "ios",
+        "path": "ios",
+        "configuration": {
+            "removeRulePatterns": [
+                "\\$\\$|\\$\\@\\$",
+                "#%#",
+                "#@%#",
+                "#\\$#",
+                "#@\\$#",
+                "\\$mp4",
+                "\\$replace=",
+                "\\$stealth",
+                "\\$empty",
+                "important,replace=",
+                "\\$app",
+                "\\$protobuf",
+                "important,protobuf",
+                "\\[-ext-",
+                ":has\\(",
+                ":has-text\\(",
+                ":contains\\(",
+                ":matches-css\\(",
+                ":matches-css-before\\(",
+                ":matches-css-after\\(",
+                ":-abp-has\\(",
+                ":-abp-contains\\(",
+                "#\\?#",
+                "#\\?\\$#",
+                "#@\\?#",
+                "#@\\?\\$#"
+            ],
+            "ignoreRuleHints": false
+        },
+        "defines": {
+            "adguard": true,
+            "adguard_app_ios": true
+        }
+    },
 
-  "EXTENSION_CHROMIUM": {
-    "platform": "ext_chromium",
-    "path": "extension/chromium",
-    "configuration": {
-      "removeRulePatterns": [
-        "\\$\\$|\\$\\@\\$",
-        "\\$mp4",
-        "\\$replace=",
-        "\\$stealth",
-        "important,replace=",
-        "\\$app",
-        "\\$network",
-        "\\$protobuf",
-        "important,protobuf"],
-      "ignoreRuleHints": false
-    }
-  },
-  "EXTENSION_FIREFOX": {
-    "platform": "ext_ff",
-    "path": "extension/firefox",
-    "configuration": {
-      "removeRulePatterns": [
-        "\\$mp4",
-        "\\$stealth",
-        "\\$app",
-        "\\$network",
-        "\\$protobuf",
-        "important,protobuf"],
-      "ignoreRuleHints": false
-    }
-  },
-  "EXTENSION_SAFARI": {
-    "platform": "ext_safari",
-    "path": "extension/safari",
-    "configuration": {
-      "removeRulePatterns": [
-        "\\$\\$|\\$\\@\\$",
-        "\\$mp4",
-        "\\$replace=",
-        "\\$stealth",
-        "important,replace=",
-        "\\$app",
-        "\\$network",
-        "\\$protobuf",
-        "important,protobuf",
-        "\\$csp"],
-      "ignoreRuleHints": false
-    }
-  },
-  "EXTENSION_EDGE": {
-    "platform": "ext_edge",
-    "path": "extension/edge",
-    "configuration": {
-      "removeRulePatterns": [
-        "\\$\\$|\\$\\@\\$",
-        "\\$mp4",
-        "\\$replace=",
-        "\\$stealth",
-        "important,replace=",
-        "\\$app",
-        "\\$network",
-        "\\$protobuf",
-        "important,protobuf"],
-      "ignoreRuleHints": false
-    }
-  },
-  "EXTENSION_OPERA": {
-    "platform": "ext_opera",
-    "path": "extension/opera",
-    "configuration": {
-      "removeRulePatterns": [
-        "\\$\\$|\\$\\@\\$",
-        "\\$mp4",
-        "\\$replace=",
-        "\\$stealth",
-        "important,replace=",
-        "\\$app",
-        "\\$network",
-        "\\$protobuf",
-        "important,protobuf"],
-      "ignoreRuleHints": false
-    }
-  },
+    "EXTENSION_CHROMIUM": {
+        "platform": "ext_chromium",
+        "path": "extension/chromium",
+        "configuration": {
+            "removeRulePatterns": [
+                "\\$\\$|\\$\\@\\$",
+                "\\$mp4",
+                "\\$replace=",
+                "\\$stealth",
+                "important,replace=",
+                "\\$app",
+                "\\$network",
+                "\\$protobuf",
+                "important,protobuf"
+            ],
+            "ignoreRuleHints": false
+        },
+        "defines": {
+            "adguard": true,
+            "adguard_ext_chromium": true
+        }
+    },
+    "EXTENSION_FIREFOX": {
+        "platform": "ext_ff",
+        "path": "extension/firefox",
+        "configuration": {
+            "removeRulePatterns": [
+                "\\$mp4",
+                "\\$stealth",
+                "\\$app",
+                "\\$network",
+                "\\$protobuf",
+                "important,protobuf"
+            ],
+            "ignoreRuleHints": false
+        },
+        "defines": {
+            "adguard": true,
+            "adguard_ext_firefox": true
+        }
+    },
+    "EXTENSION_SAFARI": {
+        "platform": "ext_safari",
+        "path": "extension/safari",
+        "configuration": {
+            "removeRulePatterns": [
+                "\\$\\$|\\$\\@\\$",
+                "\\$mp4",
+                "\\$replace=",
+                "\\$stealth",
+                "important,replace=",
+                "\\$app",
+                "\\$network",
+                "\\$protobuf",
+                "important,protobuf",
+                "\\$csp"
+            ],
+            "ignoreRuleHints": false
+        },
+        "defines": {
+            "adguard": true,
+            "adguard_ext_safari": true
+        }
+    },
+    "EXTENSION_EDGE": {
+        "platform": "ext_edge",
+        "path": "extension/edge",
+        "configuration": {
+            "removeRulePatterns": [
+                "\\$\\$|\\$\\@\\$",
+                "\\$mp4",
+                "\\$replace=",
+                "\\$stealth",
+                "important,replace=",
+                "\\$app",
+                "\\$network",
+                "\\$protobuf",
+                "important,protobuf"
+            ],
+            "ignoreRuleHints": false
+        },
+        "defines": {
+            "adguard": true,
+            "adguard_ext_edge": true
+        }
+    },
+    "EXTENSION_OPERA": {
+        "platform": "ext_opera",
+        "path": "extension/opera",
+        "configuration": {
+            "removeRulePatterns": [
+                "\\$\\$|\\$\\@\\$",
+                "\\$mp4",
+                "\\$replace=",
+                "\\$stealth",
+                "important,replace=",
+                "\\$app",
+                "\\$network",
+                "\\$protobuf",
+                "important,protobuf"
+            ],
+            "ignoreRuleHints": false
+        },
+        "defines": {
+            "adguard": true,
+            "adguard_ext_opera": true
+        }
+    },
 
-  "EXTENSION_ANDROID_CONTENT_BLOCKER": {
-    "platform": "ext_android_cb",
-    "path": "extension/android-content-blocker",
-    "configuration": {
-      "removeRulePatterns": [
-        "\\$\\$|\\$\\@\\$",
-        "#%#",
-        "#@%#",
-        "#\\$#",
-        "#@\\$#",
-        "\\$mp4",
-        "\\$replace=",
-        "\\$stealth",
-        "\\$empty",
-        "important,replace=",
-        "\\$app",
-        "\\$protobuf",
-        "important,protobuf",
-        "\\[-ext-",
-        "\\$csp",
-        ":has\\(",
-        ":has-text\\(",
-        ":contains\\(",
-        ":matches-css\\(",
-        ":matches-css-before\\(",
-        ":matches-css-after\\(",
-        ":-abp-has\\(",
-        ":-abp-contains\\(",
-        "#\\?#",
-        "#\\?\\$#",
-        "#@\\?#",
-        "#@\\?\\$#"
-      ],
-      "ignoreRuleHints": false
-    }
-  },
+    "EXTENSION_ANDROID_CONTENT_BLOCKER": {
+        "platform": "ext_android_cb",
+        "path": "extension/android-content-blocker",
+        "configuration": {
+            "removeRulePatterns": [
+                "\\$\\$|\\$\\@\\$",
+                "#%#",
+                "#@%#",
+                "#\\$#",
+                "#@\\$#",
+                "\\$mp4",
+                "\\$replace=",
+                "\\$stealth",
+                "\\$empty",
+                "important,replace=",
+                "\\$app",
+                "\\$protobuf",
+                "important,protobuf",
+                "\\[-ext-",
+                "\\$csp",
+                ":has\\(",
+                ":has-text\\(",
+                ":contains\\(",
+                ":matches-css\\(",
+                ":matches-css-before\\(",
+                ":matches-css-after\\(",
+                ":-abp-has\\(",
+                ":-abp-contains\\(",
+                "#\\?#",
+                "#\\?\\$#",
+                "#@\\?#",
+                "#@\\?\\$#"
+            ],
+            "ignoreRuleHints": false
+        },
+        "defines": {
+            "adguard": true,
+            "adguard_ext_android_cb": true
+        }
+    },
 
-  "EXTENSION_UBLOCK": {
-    "platform": "ext_ublock",
-    "path": "extension/ublock",
-    "configuration": {
-      "removeRulePatterns": [
-        "\\$\\$|\\$\\@\\$",
-        "\\$mp4",
-        "\\$replace=",
-        "\\$stealth",
-        "important,replace=",
-        "\\$app",
-        "\\$network",
-        "\\$protobuf",
-        "important,protobuf",
-        "#%#",
-        "#@%#"],
-      "ignoreRuleHints": false,
-      "adbHeader": "![Adblock Plus 2.0]"
+    "EXTENSION_UBLOCK": {
+        "platform": "ext_ublock",
+        "path": "extension/ublock",
+        "configuration": {
+            "removeRulePatterns": [
+                "\\$\\$|\\$\\@\\$",
+                "\\$mp4",
+                "\\$replace=",
+                "\\$stealth",
+                "important,replace=",
+                "\\$app",
+                "\\$network",
+                "\\$protobuf",
+                "important,protobuf",
+                "#%#",
+                "#@%#"
+            ],
+            "ignoreRuleHints": false,
+            "adbHeader": "![Adblock Plus 2.0]"
+        },
+        "defines": {
+            "adguard": true,
+            "ublock": true
+        }
     }
-  }
 }
