@@ -340,7 +340,7 @@ module.exports = (function () {
             }
         }
 
-        result = await FilterDownloader.resolveIncludes(result);
+        result = await FilterDownloader.resolveIncludes(result, currentDir);
 
         result = converter.convert(result, excluded);
 
