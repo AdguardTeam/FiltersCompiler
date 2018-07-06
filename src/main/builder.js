@@ -293,8 +293,6 @@ module.exports = (function () {
             readFile(path.join(currentDir, options.url));
 
         if (included) {
-            let originUrl = FilterDownloader.getFilterUrlOrigin(options.url);
-            result = await FilterDownloader.resolveIncludes(result, originUrl);
             result = workaround.removeAdblockVersion(included);
             result = splitLines(result);
 
@@ -309,12 +307,15 @@ module.exports = (function () {
             }
 
             result = workaround.fixVersionComments(result);
+
+            // resolved includes
+            let originUrl = externalInclude ? FilterDownloader.getFilterUrlOrigin(options.url) : currentDir;
+            result = await FilterDownloader.resolveIncludes(result, originUrl);
         } else {
             throw new Error(`Error handling include from: ${options.url}`);
         }
 
         logger.log(`Inclusion lines: ${result.length}`);
-
         return result;
     };
 
@@ -330,7 +331,7 @@ module.exports = (function () {
          const lines = splitLines(template);
          for (let line of lines) {
              if (line.startsWith('@include ')) {
-                 const inc = include(line.trim(), excluded);
+                 const inc = await include(line.trim(), excluded);
 
                  let k = 0;
                  while (k < inc.length) {
