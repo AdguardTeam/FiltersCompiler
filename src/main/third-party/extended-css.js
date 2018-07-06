@@ -4559,10 +4559,6 @@ ExtendedCss.query = function (selectorText, noTiming) {
     var start = now();
 
     try {
-        // jsdom is crashing when selector is a script
-        if (selectorText.contains('script:contains') || selectorText.contains('script:inject')) {
-            return null;
-        }
         return ExtendedSelectorFactory.createSelector(selectorText).querySelectorAll();
     } finally {
         StyleObserver.clear();

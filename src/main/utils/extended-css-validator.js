@@ -43,6 +43,10 @@ module.exports = (function () {
      */
     const validateCssSelector = function (selectorText) {
         try {
+            // jsdom is crashing when selector is a script
+            if (selectorText.contains('script:contains') || selectorText.contains('script:inject')) {
+                return null;
+            }
             ExtendedCss.query(selectorText, true);
             return true;
         } catch (ex) {

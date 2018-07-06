@@ -11,7 +11,7 @@
     "moment": ">=2.20.1",
     "qunit": "1.0.0",
     "utf8": "^3.0.0",
-    "filters-downloader": "git+https://github.com/AdguardTeam/FiltersDownloader.git#50e6059"
+    "filters-downloader": "git+https://github.com/AdguardTeam/FiltersDownloader.git#bc2889a"
   },
   "main": "index.js",
   "scripts": {
