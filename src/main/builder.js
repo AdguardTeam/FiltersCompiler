@@ -298,6 +298,10 @@ module.exports = (function () {
 
             checkRedirects(result, options.url);
 
+            // resolved includes
+            let originUrl = externalInclude ? FilterDownloader.getFilterUrlOrigin(options.url) : currentDir;
+            result = await FilterDownloader.resolveIncludes(result, originUrl);
+
             if (options.exclude) {
                 result = exclude(result, options.exclude, excluded);
             }
@@ -307,10 +311,6 @@ module.exports = (function () {
             }
 
             result = workaround.fixVersionComments(result);
-
-            // resolved includes
-            let originUrl = externalInclude ? FilterDownloader.getFilterUrlOrigin(options.url) : currentDir;
-            result = await FilterDownloader.resolveIncludes(result, originUrl);
         } else {
             throw new Error(`Error handling include from: ${options.url}`);
         }
