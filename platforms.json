@@ -260,8 +260,7 @@
             "adbHeader": "![Adblock Plus 2.0]"
         },
         "defines": {
-            "adguard": true,
-            "ublock": true
+            "ext_ublock": true
         }
     }
 }
