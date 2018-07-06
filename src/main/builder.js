@@ -275,7 +275,7 @@ module.exports = (function () {
      * @param excluded
      * @returns {Array}
      */
-    const include = async function (line, excluded) {
+    const include = async function(line, excluded) {
         let result = [];
 
         const options = parseIncludeLine(line);
@@ -324,40 +324,40 @@ module.exports = (function () {
      *
      * @param template
      */
-     const compile = async function(template) {
-         let result = [];
-         let excluded = [];
+    const compile = async function(template) {
+        let result = [];
+        let excluded = [];
 
-         const lines = splitLines(template);
-         for (let line of lines) {
-             if (line.startsWith('@include ')) {
-                 const inc = await include(line.trim(), excluded);
+        const lines = splitLines(template);
+        for (let line of lines) {
+            if (line.startsWith('@include ')) {
+                const inc = await include(line.trim(), excluded);
 
-                 let k = 0;
-                 while (k < inc.length) {
-                     result.push(inc[k].trim());
-                     k++;
-                 }
-             } else {
-                 result.push(line.trim());
-             }
-         }
+                let k = 0;
+                while (k < inc.length) {
+                    result.push(inc[k].trim());
+                    k++;
+                }
+            } else {
+                result.push(line.trim());
+            }
+        }
 
-         result = await FilterDownloader.resolveIncludes(result, currentDir);
+        result = await FilterDownloader.resolveIncludes(result, currentDir);
 
-         result = converter.convert(result, excluded);
+        result = converter.convert(result, excluded);
 
-         result = exclude(result, EXCLUDE_FILE, excluded);
-         result = removeRuleDuplicates(result, excluded);
+        result = exclude(result, EXCLUDE_FILE, excluded);
+        result = removeRuleDuplicates(result, excluded);
 
-         result = validator.validate(result, excluded);
-         result = validator.blacklistDomains(result, excluded);
+        result = validator.validate(result, excluded);
+        result = validator.blacklistDomains(result, excluded);
 
-         return {
-             lines: result,
-             excluded: excluded
-         };
-     };
+        return {
+            lines: result,
+            excluded: excluded
+        };
+    };
 
     /**
      * Creates revision object,
@@ -367,7 +367,7 @@ module.exports = (function () {
      * @param hash
      * @returns {{version: string, timeUpdated: number}}
      */
-    const makeRevision = function (path, hash) {
+    const makeRevision = function(path, hash) {
         const result = {
             "version": "1.0.0.0",
             "timeUpdated": new Date().getTime(),
