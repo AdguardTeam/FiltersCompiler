@@ -45,7 +45,7 @@ module.exports = (function () {
         try {
             // jsdom is crashing when selector is a script
             if (selectorText.contains('script:contains') || selectorText.contains('script:inject')) {
-                return null;
+                return false;
             }
             ExtendedCss.query(selectorText, true);
             return true;
