@@ -7,11 +7,11 @@ module.exports = (function () {
     const fs = require('fs');
 
     let fd;
-    let logLevel = "DEBUG";
+    let logLevel = "LOG";
 
     const Levels = {
-        "DEBUG": 0,
-        "LOG": 1,
+        "LOG": 0,
+        "INFO": 1,
         "WARN": 2,
         "ERROR": 3
     };
@@ -54,8 +54,19 @@ module.exports = (function () {
      */
     const log = function (message) {
         if (isLevelIncluded(Levels.LOG)) {
-            console.log(message);
             appendFile(message, 'LOG');
+        }
+    };
+
+    /**
+     * Writes log message
+     *
+     * @param message
+     */
+    const info = function (message) {
+        if (isLevelIncluded(Levels.INFO)) {
+            console.info(message);
+            appendFile(message, 'INFO');
         }
     };
 
@@ -86,6 +97,7 @@ module.exports = (function () {
     return {
         initialize: initialize,
         log: log,
+        info: info,
         warn: warn,
         error: error
     };
