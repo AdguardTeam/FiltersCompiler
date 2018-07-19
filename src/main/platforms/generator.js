@@ -248,7 +248,7 @@ module.exports = (() => {
      * Writes metadata files
      */
     const writeFiltersMetadata = function (platformsPath, filtersDir, filtersMetadata) {
-        logger.log('Writing filters metadata');
+        logger.info('Writing filters metadata');
 
         const groups = JSON.parse(readFile(path.join(filtersDir, '../groups', 'metadata.json')));
         if (!groups) {
@@ -273,7 +273,7 @@ module.exports = (() => {
             const platformDir = path.join(platformsPath, config.path);
             createDir(platformDir);
 
-            logger.log('Writing filters metadata: ' + config.path);
+            logger.info('Writing filters metadata: ' + config.path);
             const filtersFile = path.join(platformDir, 'filters.json');
             let metadata = {groups: groups, tags: tags, filters: filtersMetadata};
             if (platform === 'MAC') {
@@ -282,7 +282,7 @@ module.exports = (() => {
 
             fs.writeFileSync(filtersFile, JSON.stringify(metadata, null, '\t'), 'utf8');
 
-            logger.log('Writing filters localizations: ' + config.path);
+            logger.info('Writing filters localizations: ' + config.path);
             const filtersI18nFile = path.join(platformDir, 'filters_i18n.json');
             let i18nMetadata = {groups: localizations.groups, tags: localizations.tags, filters: localizations.filters};
             if (platform === 'MAC') {
@@ -292,7 +292,7 @@ module.exports = (() => {
             fs.writeFileSync(filtersI18nFile, JSON.stringify(i18nMetadata, null, '\t'), 'utf8');
         }
 
-        logger.log('Writing filters metadata done');
+        logger.info('Writing filters metadata done');
     };
 
     /**
@@ -533,9 +533,9 @@ module.exports = (() => {
 
                 let metadataFilePath = path.join(filterDir, metadataFile);
                 if (fs.existsSync(metadataFilePath)) {
-                    logger.log(`Building filter platforms: ${directory}`);
+                    logger.info(`Building filter platforms: ${directory}`);
                     buildFilter(filterDir, platformsPath);
-                    logger.log(`Building filter platforms: ${directory} done`);
+                    logger.info(`Building filter platforms: ${directory} done`);
 
                     filtersMetadata.push(loadFilterMetadata(filterDir));
                 } else {

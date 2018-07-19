@@ -139,7 +139,7 @@ module.exports = (function () {
      */
     const exclude = function (lines, exclusionsFileName, excluded) {
 
-        logger.log('Applying exclusions..');
+        logger.info('Applying exclusions..');
 
         const exclusionsFile = path.join(currentDir, exclusionsFileName);
         let exclusions = readFile(exclusionsFile);
@@ -190,7 +190,7 @@ module.exports = (function () {
      * @returns {*}
      */
     const removeRuleDuplicates = function (list, excluded) {
-        logger.log('Removing duplicates..');
+        logger.info('Removing duplicates..');
 
         return list.filter((item, pos) => {
             if (pos > 0) {
@@ -413,20 +413,20 @@ module.exports = (function () {
             return;
         }
 
-        logger.log('Compiling...');
+        logger.info('Compiling...');
         const result = await compile(template);
         const compiled = result.lines;
         const excluded = result.excluded;
-        logger.log('Compiled length:' + compiled.length);
-        logger.log('Excluded length:' + excluded.length);
+        logger.info('Compiled length:' + compiled.length);
+        logger.info('Excluded length:' + excluded.length);
 
         const compiledData = compiled.join('\r\n');
 
-        logger.log('Writing filter file, lines:' + compiled.length);
+        logger.info('Writing filter file, lines:' + compiled.length);
         writeFile(path.join(currentDir, FILTER_FILE), compiledData);
-        logger.log('Writing excluded file, lines:' + excluded.length);
+        logger.info('Writing excluded file, lines:' + excluded.length);
         writeFile(path.join(currentDir, EXCLUDED_LINES_FILE), excluded.join('\r\n'));
-        logger.log('Writing revision file..');
+        logger.info('Writing revision file..');
 
         const hash = new Buffer(md5(compiledData, {asString: true})).toString('base64').trim();
         const revisionFile = path.join(currentDir, REVISION_FILE);
@@ -448,9 +448,9 @@ module.exports = (function () {
 
                 let template = path.join(filterDir, TEMPLATE_FILE);
                 if (fs.existsSync(template)) {
-                    logger.log(`Building filter: ${directory}`);
+                    logger.info(`Building filter: ${directory}`);
                     await buildFilter(filterDir);
-                    logger.log(`Building filter: ${directory} ok`);
+                    logger.info(`Building filter: ${directory} ok`);
                 } else {
                     await parseDirectory(filterDir);
                 }
@@ -473,9 +473,9 @@ module.exports = (function () {
 
         await parseDirectory(filtersDir);
 
-        logger.log(`Generating platforms`);
+        logger.info(`Generating platforms`);
         generator.generate(filtersDir, platformsPath);
-        logger.log(`Generating platforms done`);
+        logger.info(`Generating platforms done`);
     };
 
     return {
