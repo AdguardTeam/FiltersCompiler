@@ -482,6 +482,12 @@ module.exports = (() => {
         const revisionFilePath = path.join(filterDir, revisionFile);
         const header = makeHeader(metadataFilePath, revisionFilePath);
 
+        const metadata = JSON.parse(readFile(metadataFilePath));
+        if (metadata.disabled) {
+            logger.warn('Filter skipped');
+            return;
+        }
+
         const optimizationConfig = optimization.getFilterOptimizationConfig(filterId);
 
         for (let platform in platformPathsConfig) {
