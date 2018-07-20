@@ -183,45 +183,6 @@ module.exports = (function () {
     };
 
     /**
-     * Removes rules array duplicates,
-     * ignores comments and hinted rules
-     *
-     * @param list
-     * @returns {*}
-     */
-    const removeRuleDuplicates = function (list, excluded) {
-        logger.info('Removing duplicates..');
-
-        return list.filter((item, pos) => {
-            if (pos > 0) {
-                let previous = list[pos - 1];
-                if (previous && previous.startsWith(RuleMasks.MASK_HINT)) {
-                    return true;
-                }
-            }
-
-            let duplicatePosition = list.indexOf(item);
-            if (duplicatePosition !== pos && duplicatePosition > 0) {
-                let duplicate = list[duplicatePosition - 1];
-                if (duplicate && duplicate.startsWith(RuleMasks.MASK_HINT)) {
-                    return true;
-                }
-            }
-
-            const result = item.startsWith(RuleMasks.MASK_COMMENT) ||
-                duplicatePosition === pos;
-
-            if (!result) {
-                logger.log(`${item} removed as duplicate`);
-                excluded.push('! Duplicated:');
-                excluded.push(item);
-            }
-
-            return result;
-        });
-    };
-
-    /**
      * Parses include line
      *
      * @param line
@@ -348,7 +309,6 @@ module.exports = (function () {
         result = converter.convert(result, excluded);
 
         result = exclude(result, EXCLUDE_FILE, excluded);
-        result = removeRuleDuplicates(result, excluded);
 
         result = validator.validate(result, excluded);
         result = validator.blacklistDomains(result, excluded);

@@ -463,6 +463,43 @@ module.exports = (() => {
     };
 
     /**
+     * Removes rules array duplicates,
+     * ignores comments and hinted rules
+     *
+     * @param list a list of rules to filter
+     * @returns {*} a list of ruls without duplicate
+     */
+    const removeRuleDuplicates = function (list) {
+        logger.info('Removing duplicates..');
+
+        return list.filter((item, pos) => {
+            if (pos > 0) {
+                let previous = list[pos - 1];
+                if (previous && previous.startsWith(RuleMasks.MASK_HINT)) {
+                    return true;
+                }
+            }
+
+            let duplicatePosition = list.indexOf(item);
+            if (duplicatePosition !== pos && duplicatePosition > 0) {
+                let duplicate = list[duplicatePosition - 1];
+                if (duplicate && duplicate.startsWith(RuleMasks.MASK_HINT)) {
+                    return true;
+                }
+            }
+
+            const result = item.startsWith(RuleMasks.MASK_COMMENT) ||
+                duplicatePosition === pos;
+
+            if (!result) {
+                logger.log(`${item} removed as duplicate`);
+            }
+
+            return result;
+        });
+    };
+
+    /**
      * Builds platforms for filter
      *
      * @param filterDir
@@ -494,7 +531,10 @@ module.exports = (() => {
             const config = platformPathsConfig[platform];
             let rules = FilterDownloader.resolveConditions(originalRules, config.defines);
             rules = filter.cleanupRules(rules, config);
-            const optimizedRules = filter.cleanupAndOptimizeRules(originalRules, config, optimizationConfig, filterId);
+            let optimizedRules = filter.cleanupAndOptimizeRules(originalRules, config, optimizationConfig, filterId);
+
+            rules = removeRuleDuplicates(rules);
+            optimizedRules = removeRuleDuplicates(rules);
 
             logger.log(`Filter ${filterId}. Rules ${originalRules.length} => ${rules.length} => ${optimizedRules.length}. PlatformPath: '${config.path}'`);
 
