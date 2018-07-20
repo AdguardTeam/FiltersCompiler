@@ -14,6 +14,7 @@ module.exports = (() => {
     const workaround = require('../utils/workaround.js');
     const optimization = require('../optimization');
 
+    const RuleMasks = require('../rule/rule-masks.js');
     const FilterDownloader = require('filters-downloader');
 
     const RULES_SEPARATOR = "\r\n";
