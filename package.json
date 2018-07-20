@@ -1,6 +1,6 @@
 {
   "name": "adguard-filters-compiler",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "description": "Adguard filters compiler",
   "homepage": "http://adguard.com",
   "dependencies": {
@@ -11,7 +11,7 @@
     "moment": ">=2.20.1",
     "qunit": "1.0.0",
     "utf8": "^3.0.0",
-    "filters-downloader": "git+https://github.com/AdguardTeam/FiltersDownloader.git#bc2889a"
+    "filters-downloader": "git+https://github.com/AdguardTeam/FiltersDownloader.git#a7d2177"
   },
   "main": "index.js",
   "scripts": {
