@@ -532,12 +532,9 @@ module.exports = (() => {
             const config = platformPathsConfig[platform];
             let rules = FilterDownloader.resolveConditions(originalRules, config.defines);
             rules = filter.cleanupRules(rules, config);
-            let optimizedRules = filter.cleanupAndOptimizeRules(originalRules, config, optimizationConfig, filterId);
-
             rules = removeRuleDuplicates(rules);
-            optimizedRules = removeRuleDuplicates(rules);
-
-            logger.log(`Filter ${filterId}. Rules ${originalRules.length} => ${rules.length} => ${optimizedRules.length}. PlatformPath: '${config.path}'`);
+            const optimizedRules = filter.cleanupAndOptimizeRules(originalRules, config, optimizationConfig, filterId);
+            logger.info(`Filter ${filterId}. Rules ${originalRules.length} => ${rules.length} => ${optimizedRules.length}. PlatformPath: '${config.path}'`);
 
             const platformDir = path.join(platformsPath, config.path, 'filters');
             writeFilterRules(filterId, platformDir, config, header, rules, false);
