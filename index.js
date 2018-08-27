@@ -9,7 +9,6 @@ module.exports = (function () {
     const platformsConfig = path.join(__dirname, './platforms.json');
 
     process.on('unhandledRejection', error => {
-        //console.log('unhandledRejection', error.message);
         throw error;
     });
 

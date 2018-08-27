@@ -527,8 +527,6 @@ module.exports = (() => {
         }
 
         const optimizationConfig = optimization.getFilterOptimizationConfig(filterId);
-        //TODO: Remove test
-        throw new Error('test');
 
         for (let platform in platformPathsConfig) {
             const config = platformPathsConfig[platform];
