@@ -122,11 +122,25 @@ QUnit.test("Test builder - platforms", async (assert) => {
     let filtersI18nMetadata = readFile(path.join(platforms, 'test', 'filters_i18n.json'));
     assert.ok(filtersI18nMetadata);
 
+    let localScriptRules = readFile(path.join(platforms, 'test', 'local_script_rules.txt'));
+    assert.ok(localScriptRules);
+    let localScriptRulesLines = localScriptRules.split('\r\n');
+    assert.ok(localScriptRulesLines.indexOf('test_domain#%#testScript();') >= 0);
+
+    let localScriptRulesJson = readFile(path.join(platforms, 'test', 'local_script_rules.json'));
+    assert.ok(localScriptRulesJson);
+    localScriptRulesJson = JSON.parse(localScriptRulesJson);
+    assert.ok(localScriptRulesJson.comment);
+    assert.ok(localScriptRulesJson.rules);
+    assert.ok(localScriptRulesJson.rules[0]);
+    assert.equal(localScriptRulesJson.rules[0].domains, 'test_domain');
+    assert.equal(localScriptRulesJson.rules[0].script, 'testScript();');
+
     let filterContent = readFile(path.join(platforms, 'test', 'filters', '2.txt'));
     assert.ok(filterContent);
 
     let filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 35);
+    assert.equal(filterLines.length, 36);
 
     assert.ok(filterLines.indexOf('![Adblock Plus 2.0]') >= 0);
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
@@ -134,31 +148,34 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.ok(filterLines.indexOf('! some common rules could be places here') >= 0);
     assert.ok(filterLines.indexOf('~nigma.ru,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]') >= 0);
     assert.ok(filterLines.indexOf('excluded_platform') >= 0);
+    assert.ok(filterLines.indexOf('test_domain#%#testScript();') >= 0);
 
     filterContent = readFile(path.join(platforms, 'config/test', 'filters', '2.txt'));
     assert.ok(filterContent);
 
     filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 17);
+    assert.equal(filterLines.length, 20);
 
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
     assert.notOk(filterLines.indexOf('test-common-1-rule.com') >= 0);
     assert.notOk(filterLines.indexOf('! some common rules could be places here') >= 0);
     assert.notOk(filterLines.indexOf('~nigma.ru,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]') >= 0);
     assert.ok(filterLines.indexOf('excluded_platform') >= 0);
+    assert.ok(filterLines.indexOf('test_domain#%#testScript();') >= 0);
 
 
     filterContent = readFile(path.join(platforms, 'hints', 'filters', '2.txt'));
     assert.ok(filterContent);
 
     filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 30);
+    assert.equal(filterLines.length, 31);
 
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
     assert.ok(filterLines.indexOf('test-common-1-rule.com') >= 0);
     assert.ok(filterLines.indexOf('! some common rules could be places here') >= 0);
     assert.ok(filterLines.indexOf('~nigma.ru,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]') >= 0);
     assert.ok(filterLines.indexOf('excluded_platform') >= 0);
+    assert.ok(filterLines.indexOf('test_domain#%#testScript();') >= 0);
 
     //Check MAC platform
     let filtersMetadataMAC = readFile(path.join(platforms, 'mac', 'filters.json'));
