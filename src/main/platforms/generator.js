@@ -341,7 +341,7 @@ module.exports = (() => {
                     if (rule && rule[0] !== '!' && rule.indexOf(RuleMasks.MASK_SCRIPT) > 0) {
                         rules.push(rule);
 
-                        let m = rule.split('#%#');
+                        let m = rule.split(RuleMasks.MASK_SCRIPT);
                         rulesJson.rules.push({
                             'domains': m[0],
                             'script': m[1]
