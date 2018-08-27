@@ -1,5 +1,4 @@
 ! Exluding rules that looks like JS/CSS injections and $replace rules:
-#%#
 #@%#
 replace=
 ! Example of a broken website: http://tv.naver.com/v/1691094

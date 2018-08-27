@@ -21,6 +21,20 @@ module.exports = (() => {
     const filterIdsPool = [];
     const metadataFilterIdsPool = [];
 
+    const PLATFORM_FILTERS_DIR = 'filters';
+    const FILTERS_METADATA_FILE = 'filters.json';
+    const FILTERS_I18N_METADATA_FILE = 'filters_i18n.json';
+
+    const LAST_ADGUARD_FILTER_ID = 14;
+    const LOCAL_SCRIPT_RULES_FILE = 'local_script_rules.txt';
+    const LOCAL_SCRIPT_RULES_FILE_JSON = 'local_script_rules.json';
+
+    const LOCAL_SCRIPT_RULES_COMMENT = 'By the rules of AMO and addons.opera.com we cannot use remote scripts (and our JS injection rules could be counted as remote scripts).\r\n' +
+        'So what we do:\r\n' +
+        '1. We gather all current JS rules in the DEFAULT_SCRIPT_RULES object (see lib/utils/local-script-rules.js)\r\n' +
+        '2. We disable JS rules got from remote server\r\n' +
+        '3. We allow only custom rules got from the User filter (which user creates manually) or from this DEFAULT_SCRIPT_RULES object';
+
     /**
      * Platforms configurations
      */
@@ -275,7 +289,7 @@ module.exports = (() => {
             createDir(platformDir);
 
             logger.info('Writing filters metadata: ' + config.path);
-            const filtersFile = path.join(platformDir, 'filters.json');
+            const filtersFile = path.join(platformDir, FILTERS_METADATA_FILE);
             let metadata = {groups: groups, tags: tags, filters: filtersMetadata};
             if (platform === 'MAC') {
                 metadata = workaround.rewriteMetadataForOldMac(metadata);
@@ -284,7 +298,7 @@ module.exports = (() => {
             fs.writeFileSync(filtersFile, JSON.stringify(metadata, null, '\t'), 'utf8');
 
             logger.info('Writing filters localizations: ' + config.path);
-            const filtersI18nFile = path.join(platformDir, 'filters_i18n.json');
+            const filtersI18nFile = path.join(platformDir, FILTERS_I18N_METADATA_FILE);
             let i18nMetadata = {groups: localizations.groups, tags: localizations.tags, filters: localizations.filters};
             if (platform === 'MAC') {
                 delete i18nMetadata.tags;
@@ -294,6 +308,54 @@ module.exports = (() => {
         }
 
         logger.info('Writing filters metadata done');
+    };
+
+    /**
+     * Separates script rules from AG filters into specified file.
+     *
+     * @param platformsPath
+     */
+    const writeLocalScriptRules = function (platformsPath) {
+        logger.info('Writing local script rules');
+
+        for (let platform in platformPathsConfig) {
+            const config = platformPathsConfig[platform];
+            const platformDir = path.join(platformsPath, config.path);
+
+            const rules = [];
+            const rulesJson = {
+                comment: LOCAL_SCRIPT_RULES_COMMENT,
+                rules: []
+            };
+
+            for (let i = 1; i <= LAST_ADGUARD_FILTER_ID; i++) {
+                const filterRules = readFile(path.join(platformDir, PLATFORM_FILTERS_DIR, `${i}.txt`));
+                if (!filterRules) {
+                    continue;
+                }
+
+                const lines = filterRules.split('\n');
+                for (let rule of lines) {
+                    rule = rule.trim();
+
+                    if (rule && rule[0] !== '!' && rule.indexOf(RuleMasks.MASK_SCRIPT) > 0) {
+                        rules.push(rule);
+
+                        let m = rule.split('#%#');
+                        rulesJson.rules.push({
+                            'domains': m[0],
+                            'script': m[1]
+                        });
+                    }
+                }
+            }
+
+            fs.writeFileSync(path.join(platformDir, LOCAL_SCRIPT_RULES_FILE), rules.join(RULES_SEPARATOR), 'utf8');
+            fs.writeFileSync(path.join(platformDir, LOCAL_SCRIPT_RULES_FILE_JSON), JSON.stringify(rulesJson, null, 4), 'utf8');
+        }
+
+        logger.info('Writing local script rules done');
+
     };
 
     /**
@@ -536,7 +598,7 @@ module.exports = (() => {
             const optimizedRules = filter.cleanupAndOptimizeRules(originalRules, config, optimizationConfig, filterId);
             logger.info(`Filter ${filterId}. Rules ${originalRules.length} => ${rules.length} => ${optimizedRules.length}. PlatformPath: '${config.path}'`);
 
-            const platformDir = path.join(platformsPath, config.path, 'filters');
+            const platformDir = path.join(platformsPath, config.path, PLATFORM_FILTERS_DIR);
             writeFilterRules(filterId, platformDir, config, header, rules, false);
             writeFilterRules(filterId, platformDir, config, header, optimizedRules, true);
         }
@@ -613,6 +675,7 @@ module.exports = (() => {
         parseDirectory(filtersDir, filtersMetadata, platformsPath);
 
         writeFiltersMetadata(platformsPath, filtersDir, filtersMetadata);
+        writeLocalScriptRules(platformsPath);
     };
 
     return {
