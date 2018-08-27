@@ -131,7 +131,7 @@ QUnit.test("Test ext-css validation", function (assert) {
     selector = "[-ext-has='script:inject(var banner)']";
     ruleText = "w3schools.com##" + selector;
     rules = [ruleText];
-    assert.ok(validator.validate(rules).length > 0);
+    assert.ok(validator.validate(rules).length === 0);
 });
 
 QUnit.test("Test ext-css validation - complicated cases", function (assert) {
