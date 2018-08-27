@@ -122,6 +122,16 @@ QUnit.test("Test ext-css validation", function (assert) {
     ruleText = "drive2.ru##.l-main.js-main div.c-block:has(> div.c-header)";
     rules = [ruleText];
     assert.ok(validator.validate(rules).length > 0);
+
+    selector = "[-ext-has='script:contains(var banner)']";
+    ruleText = "w3schools.com##" + selector;
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length > 0);
+
+    selector = "[-ext-has='script:inject(var banner)']";
+    ruleText = "w3schools.com##" + selector;
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length > 0);
 });
 
 QUnit.test("Test ext-css validation - complicated cases", function (assert) {
