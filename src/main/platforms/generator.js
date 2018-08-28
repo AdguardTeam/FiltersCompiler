@@ -25,7 +25,12 @@ module.exports = (() => {
     const FILTERS_METADATA_FILE = 'filters.json';
     const FILTERS_I18N_METADATA_FILE = 'filters_i18n.json';
 
-    const LAST_ADGUARD_FILTER_ID = 16;
+    /**
+     * From 1 to 99 we have AdGuard filters
+     *
+     * @type {number}
+     */
+    const LAST_ADGUARD_FILTER_ID = 99;
     const LOCAL_SCRIPT_RULES_FILE = 'local_script_rules.txt';
     const LOCAL_SCRIPT_RULES_FILE_JSON = 'local_script_rules.json';
 
