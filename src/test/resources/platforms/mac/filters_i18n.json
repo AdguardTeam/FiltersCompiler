@@ -1,0 +1,50 @@
+{
+	"groups": {
+		"1": {
+			"en": {
+				"name": "Adguard Filters"
+			},
+			"ru": {
+				"name": "Localized Adguard Filters"
+			}
+		},
+		"2": {
+			"en": {
+				"name": "EasyList"
+			},
+			"ru": {
+				"name": "Localized EasyList"
+			}
+		},
+		"3": {
+			"en": {
+				"name": "Other"
+			},
+			"ru": {
+				"name": "Localized Other"
+			}
+		}
+	},
+	"filters": {
+		"1": {
+			"en": {
+				"name": "Russian filter",
+				"description": "Adguard Russian filter. Filter that enables blocking of ads on websites in Russian."
+			},
+			"ru": {
+				"name": "Localized Russian filter",
+				"description": "Localized Adguard Russian filter. Filter that enables blocking of ads on websites in Russian."
+			}
+		},
+		"2": {
+			"en": {
+				"name": "English filter",
+				"description": "EasyList + Adguard English filter. Filter list that specifically removes adverts on English language websites."
+			},
+			"ru": {
+				"name": "Localized English filter",
+				"description": "Localized EasyList + Adguard English filter. Filter list that specifically removes adverts on English language websites."
+			}
+		}
+	}
+}

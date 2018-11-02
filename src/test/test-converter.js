@@ -22,5 +22,12 @@ QUnit.test("Test converter", (assert) => {
 
     c = converter.convert(['benchmark.pl###bannerDBB:style(height: 10px !important;)']);
     assert.equal(c[0], 'benchmark.pl#$##bannerDBB { height: 10px !important; }');
+
+    // https://github.com/AdguardTeam/FiltersCompiler/issues/24
+    c = converter.convert(['720hd.club#?##all:style(margin-top: 0 !important)']);
+    assert.equal(c[0], '720hd.club#$?##all { margin-top: 0 !important }');
+
+    c = converter.convert(['720hd.club#@?##all:style(margin-top: 0 !important)']);
+    assert.equal(c[0], '720hd.club#@$?##all { margin-top: 0 !important }');
 });
 

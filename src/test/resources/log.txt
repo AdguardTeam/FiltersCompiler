@@ -1,0 +1,42 @@
+[1:18:38 PM][ERROR]:Platforms config file is invalid: undefined
+[1:18:38 PM][INFO]:Building filter: filter_2_English
+[1:18:38 PM][INFO]:Compiling...
+[1:18:38 PM][LOG]:Applying inclusion from: ../common.txt
+[1:18:38 PM][LOG]:Inclusion lines: 16
+[1:18:38 PM][LOG]:Applying inclusion from: ../common_1.txt
+[1:18:38 PM][INFO]:Applying exclusions..
+[1:18:38 PM][LOG]:test-common-1-rule.com$xmlhttprequest is excluded by: $xmlhttprequest
+[1:18:38 PM][LOG]:regularexpressionexcluded is excluded by: /^regularexpression[a-z]+$/
+[1:18:38 PM][LOG]:###adsbox is excluded by: /^##.adsbox$/
+[1:18:38 PM][LOG]:Stripping comments..
+[1:18:38 PM][LOG]:Inclusion lines: 8
+[1:18:38 PM][LOG]:Rule "example.com##h1:style(background-color: blue !important)" converted to: example.com#$#h1 { background-color: blue !important }
+[1:18:38 PM][INFO]:Applying exclusions..
+[1:18:38 PM][LOG]:||test-common-rule.com^$replace= is excluded by: replace=
+[1:18:38 PM][LOG]:||test-common-1-rule.com^$replace= is excluded by: replace=
+[1:18:38 PM][LOG]:||test.com^$third-party is excluded by: ||test.com^$third-party
+[1:18:38 PM][LOG]:||test.com^$replace= is excluded by: replace=
+[1:18:38 PM][LOG]:||news.yandex.*/*/*-*-*-*-$replace=/Ya\[([0-9]{10\,15})\]\([\s\S]*\)\$/,script,important,domain=news.yandex.by|news.yandex.com|news.yandex.fr|news.yandex.kz|news.yandex.ru|news.yandex.ua is excluded by: replace=
+[1:18:38 PM][ERROR]:Invalid rule options: invalid_options$invalid_opt
+[1:18:38 PM][INFO]:Compiled length:43
+[1:18:38 PM][INFO]:Excluded length:20
+[1:18:38 PM][INFO]:Writing filter file, lines:43
+[1:18:38 PM][INFO]:Writing excluded file, lines:20
+[1:18:38 PM][INFO]:Writing revision file..
+[1:18:38 PM][INFO]:Building filter: filter_2_English ok
+[1:18:38 PM][INFO]:Building filter: filter_3_Test
+[1:18:38 PM][WARN]:Filter skipped
+[1:18:38 PM][INFO]:Building filter: filter_3_Test ok
+[1:18:38 PM][INFO]:Building filter: filter_4_Directives
+[1:18:38 PM][INFO]:Compiling...
+[1:18:38 PM][LOG]:Rule "example.com##h1:style(background-color: blue !important)" converted to: example.com#$#h1 { background-color: blue !important }
+[1:18:38 PM][INFO]:Applying exclusions..
+[1:18:38 PM][INFO]:Compiled length:23
+[1:18:38 PM][INFO]:Excluded length:2
+[1:18:38 PM][INFO]:Writing filter file, lines:23
+[1:18:38 PM][INFO]:Writing excluded file, lines:2
+[1:18:38 PM][INFO]:Writing revision file..
+[1:18:38 PM][INFO]:Building filter: filter_4_Directives ok
+[1:18:38 PM][INFO]:Generating platforms
+[1:18:38 PM][WARN]:Platforms build output path is not specified
+[1:18:38 PM][INFO]:Generating platforms done
