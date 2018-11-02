@@ -337,3 +337,32 @@ QUnit.test("Test validation - various rules", function (assert) {
     let rules = ['||onedrive.su/code/bshow.php$empty,important,~websocket'];
     assert.ok(validator.validate(rules).length > 0);
 });
+
+
+QUnit.test("Test validation - validate redirect option", function (assert) {
+    'use strict';
+
+    const validator = require("../main/validator.js");
+    validator.init();
+
+
+    const validRedirectRule1 = 'onedrive.su/code/bshow.php$redirect';
+    const validRedirectRule2 = 'onedrive.su/code/bshow.php$important,redirect';
+    const validImportantRule3 = 'onedrive.su/code/bshow.php$important';
+    const nonValidRule = 'onedrive.su/code/bshow.php$nonvalid';
+
+    const rules = [
+        validRedirectRule1,
+        validRedirectRule2,
+        validImportantRule3,
+        nonValidRule
+    ];
+
+    const validateRules = validator.validate(rules);
+
+    assert.ok(validateRules.indexOf(validRedirectRule1) >= 0);
+    assert.ok(validateRules.indexOf(validRedirectRule2) >= 0);
+    assert.ok(validateRules.indexOf(validImportantRule3) >= 0);
+    assert.ok(validateRules.indexOf(nonValidRule) === -1);
+    assert.ok(validator.validate(rules).length === 3);
+});
