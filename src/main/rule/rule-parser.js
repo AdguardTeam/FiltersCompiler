@@ -200,7 +200,7 @@ module.exports = (() => {
         } else if (ruleText.includes(RuleMasks.MASK_CSS) || ruleText.includes(RuleMasks.MASK_CSS_EXCEPTION)) {
             return RuleTypes.Css;
         } else if (ruleText.includes(RuleMasks.MASK_CSS_EXTENDED_CSS_RULE) ||
-            ruleText.includes(RuleMasks.MASK_CSS_EXTENDED_CSS_RULE) ||
+            ruleText.includes(RuleMasks.MASK_CSS_EXCEPTION_EXTENDED_CSS_RULE) ||
             ruleText.includes(RuleMasks.MASK_CSS_INJECT_EXTENDED_CSS_RULE) ||
             ruleText.includes(RuleMasks.MASK_CSS_EXCEPTION_INJECT_EXTENDED_CSS_RULE)
         ) {

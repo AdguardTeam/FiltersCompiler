@@ -58,6 +58,8 @@ module.exports = (function () {
         'ping',
         'app',
         'badfilter',
+        // UBlock extension has redirect options
+        // https://github.com/AdguardTeam/FiltersCompiler/issues/23
         'redirect',
     ];
 
