@@ -3,7 +3,10 @@
         "platform": "windows",
         "path": "windows",
         "configuration": {
-            "removeRulePatterns": false,
+            "removeRulePatterns": [
+                "\\$redirect=",
+                ",redirect="
+            ],
             "ignoreRuleHints": false
         },
         "defines": {
@@ -15,7 +18,10 @@
         "platform": "mac",
         "path": "mac",
         "configuration": {
-            "removeRulePatterns": false,
+            "removeRulePatterns": [
+                "\\$redirect=",
+                ",redirect="
+            ],
             "ignoreRuleHints": false
         },
         "defines": {
@@ -27,7 +33,10 @@
         "platform": "mac",
         "path": "mac_v2",
         "configuration": {
-            "removeRulePatterns": false,
+            "removeRulePatterns": [
+                "\\$redirect=",
+                ",redirect="
+            ],
             "ignoreRuleHints": false
         },
         "defines": {
@@ -40,7 +49,11 @@
         "platform": "android",
         "path": "android",
         "configuration": {
-            "removeRulePatterns": ["\\$stealth"],
+            "removeRulePatterns": [
+                "\\$stealth",
+                "\\$redirect=",
+                ",redirect="
+            ],
             "ignoreRuleHints": false
         },
         "defines": {
@@ -79,7 +92,9 @@
                 "#\\?#",
                 "#\\?\\$#",
                 "#@\\?#",
-                "#@\\?\\$#"
+                "#@\\?\\$#",
+                "\\$redirect=",
+                ",redirect="
             ],
             "ignoreRuleHints": false
         },
@@ -102,7 +117,10 @@
                 "\\$app",
                 "\\$network",
                 "\\$protobuf",
-                "important,protobuf"
+                "important,protobuf",
+                "\\$extension",
+                "\\$redirect=",
+                ",redirect="
             ],
             "ignoreRuleHints": false
         },
@@ -121,7 +139,10 @@
                 "\\$app",
                 "\\$network",
                 "\\$protobuf",
-                "important,protobuf"
+                "important,protobuf",
+                "\\$extension",
+                "\\$redirect=",
+                ",redirect="
             ],
             "ignoreRuleHints": false
         },
@@ -144,7 +165,10 @@
                 "\\$network",
                 "\\$protobuf",
                 "important,protobuf",
-                "\\$csp"
+                "\\$csp",
+                "\\$extension",
+                "\\$redirect=",
+                ",redirect="
             ],
             "ignoreRuleHints": false
         },
@@ -166,7 +190,10 @@
                 "\\$app",
                 "\\$network",
                 "\\$protobuf",
-                "important,protobuf"
+                "important,protobuf",
+                "\\$extension",
+                "\\$redirect=",
+                ",redirect="
             ],
             "ignoreRuleHints": false
         },
@@ -188,7 +215,10 @@
                 "\\$app",
                 "\\$network",
                 "\\$protobuf",
-                "important,protobuf"
+                "important,protobuf",
+                "\\$extension",
+                "\\$redirect=",
+                ",redirect="
             ],
             "ignoreRuleHints": false
         },
@@ -229,7 +259,9 @@
                 "#\\?#",
                 "#\\?\\$#",
                 "#@\\?#",
-                "#@\\?\\$#"
+                "#@\\?\\$#",
+                "\\$redirect=",
+                ",redirect="
             ],
             "ignoreRuleHints": false
         },
@@ -254,7 +286,8 @@
                 "\\$protobuf",
                 "important,protobuf",
                 "#%#",
-                "#@%#"
+                "#@%#",
+                "\\$extension"
             ],
             "ignoreRuleHints": false,
             "adbHeader": "![Adblock Plus 2.0]"

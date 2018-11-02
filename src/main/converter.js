@@ -57,6 +57,7 @@ module.exports = (() => {
      * example.com#@$#h1 { background-color: blue !important }
      *
      * @param rulesList Array of rules
+     * @param excluded
      */
     const convert = function (rulesList, excluded) {
         const result = [];
@@ -64,7 +65,13 @@ module.exports = (() => {
         for (let rule of rulesList) {
             if (rule.includes(':style')) {
                 let parts;
-                if (rule.includes(RuleMasks.MASK_ELEMENT_HIDING)) {
+                if (rule.includes(RuleMasks.MASK_CSS_EXTENDED_CSS_RULE)) {
+                    parts = rule.split(RuleMasks.MASK_CSS_EXTENDED_CSS_RULE, 2);
+                    rule = executeConversion(rule, parts, RuleMasks.MASK_CSS_INJECT_EXTENDED_CSS_RULE, excluded);
+                } else if (rule.includes(RuleMasks.MASK_CSS_EXCEPTION_EXTENDED_CSS_RULE)) {
+                    parts = rule.split(RuleMasks.MASK_CSS_EXCEPTION_EXTENDED_CSS_RULE, 2);
+                    rule = executeConversion(rule, parts, RuleMasks.MASK_CSS_EXCEPTION_INJECT_EXTENDED_CSS_RULE, excluded);
+                } else if (rule.includes(RuleMasks.MASK_ELEMENT_HIDING)) {
                     parts = rule.split(RuleMasks.MASK_ELEMENT_HIDING, 2);
                     rule = executeConversion(rule, parts, RuleMasks.MASK_CSS, excluded);
                 } else if (rule.includes(RuleMasks.MASK_ELEMENT_HIDING_EXCEPTION)) {

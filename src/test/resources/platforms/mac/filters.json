@@ -1,0 +1,63 @@
+{
+	"groups": [
+		{
+			"groupId": 1,
+			"groupName": "Adguard Filters",
+			"displayNumber": 1
+		},
+		{
+			"groupId": 2,
+			"groupName": "EasyList",
+			"displayNumber": 2
+		},
+		{
+			"groupId": 3,
+			"groupName": "Other",
+			"displayNumber": 100
+		}
+	],
+	"filters": [
+		{
+			"filterId": 2,
+			"name": "English Filter",
+			"description": "English Filter description",
+			"homepage": "https://easylist.adblockplus.org/",
+			"expires": 172800,
+			"displayNumber": 101,
+			"groupId": 2,
+			"subscriptionUrl": "https://easylist-downloads.adblockplus.org/easylist.txt",
+			"version": "1.0.0.0",
+			"timeUpdated": "2018-11-02T11:55:59+0300",
+			"languages": [
+				"en",
+				"pl"
+			]
+		},
+		{
+			"filterId": 3,
+			"name": "Test Filter",
+			"description": "Test Filter description",
+			"homepage": "https://easylist.adblockplus.org/",
+			"expires": 172800,
+			"displayNumber": 101,
+			"groupId": 2,
+			"subscriptionUrl": "https://easylist-downloads.adblockplus.org/easylist.txt",
+			"version": "1.0.7.34",
+			"timeUpdated": "2018-01-22T20:37:00+0300",
+			"languages": []
+		},
+		{
+			"filterId": 4,
+			"name": "Directives Filter",
+			"description": "Directives Filter description",
+			"homepage": "https://example.com/",
+			"expires": 172800,
+			"displayNumber": 101,
+			"groupId": 2,
+			"subscriptionUrl": "https://example.com/",
+			"version": "1.0.0.0",
+			"timeUpdated": "2018-11-02T11:55:59+0300",
+			"languages": []
+		}
+	]
+}

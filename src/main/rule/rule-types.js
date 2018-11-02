@@ -29,6 +29,10 @@ module.exports = (() => {
         /**
          * Cosmetic css rules
          */
-        Css: 6
+        Css: 6,
+        /**
+         * Extended css rules
+         */
+        ExtCss: 7
     };
 })();

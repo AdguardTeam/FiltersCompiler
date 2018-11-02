@@ -57,7 +57,10 @@ module.exports = (function () {
         'collapse', '~collapse',
         'ping',
         'app',
-        'badfilter'
+        'badfilter',
+        // UBlock extension has redirect options
+        // https://github.com/AdguardTeam/FiltersCompiler/issues/23
+        'redirect',
     ];
 
     let domainsBlacklist = [];
@@ -225,7 +228,7 @@ module.exports = (function () {
                 let modifiers = rule.modifiers;
                 for (let name in modifiers) {
                     if (!validateOptionName(name)) {
-                        logger.error(`Invalid rule options: ${s}`);
+                        logger.error(`Invalid rule: ${s} option: ${name}`);
 
                         if (excluded) {
                             excluded.push('! Invalid rule options:');

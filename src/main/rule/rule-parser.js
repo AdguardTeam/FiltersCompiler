@@ -191,6 +191,7 @@ module.exports = (() => {
      *
      * @param ruleText
      */
+
     const parseRuleType = function (ruleText) {
         if (ruleText.startsWith(RuleMasks.MASK_WHITE_LIST)) {
             return RuleTypes.UrlBlocking;
@@ -198,6 +199,12 @@ module.exports = (() => {
             return RuleTypes.Comment;
         } else if (ruleText.includes(RuleMasks.MASK_CSS) || ruleText.includes(RuleMasks.MASK_CSS_EXCEPTION)) {
             return RuleTypes.Css;
+        } else if (ruleText.includes(RuleMasks.MASK_CSS_EXTENDED_CSS_RULE) ||
+            ruleText.includes(RuleMasks.MASK_CSS_EXCEPTION_EXTENDED_CSS_RULE) ||
+            ruleText.includes(RuleMasks.MASK_CSS_INJECT_EXTENDED_CSS_RULE) ||
+            ruleText.includes(RuleMasks.MASK_CSS_EXCEPTION_INJECT_EXTENDED_CSS_RULE)
+        ) {
+            return RuleTypes.ExtCss;
         } else if (ruleText.includes(RuleMasks.MASK_ELEMENT_HIDING) || ruleText.includes(RuleMasks.MASK_ELEMENT_HIDING_EXCEPTION)) {
             return RuleTypes.ElementHiding;
         } else if (ruleText.includes(RuleMasks.MASK_CONTENT) || ruleText.includes(RuleMasks.MASK_CONTENT_EXCEPTION)) {
@@ -214,6 +221,7 @@ module.exports = (() => {
      *
      * @param ruleText
      */
+
     const parseRuleMask = function (ruleText) {
         if (ruleText.startsWith(RuleMasks.MASK_COMMENT)) {
             return RuleMasks.MASK_COMMENT;
@@ -221,6 +229,14 @@ module.exports = (() => {
             return RuleMasks.MASK_CSS;
         } else if (ruleText.includes(RuleMasks.MASK_CSS_EXCEPTION)) {
             return RuleMasks.MASK_CSS_EXCEPTION;
+        } else if (ruleText.includes(RuleMasks.MASK_CSS_EXTENDED_CSS_RULE)) {
+            return RuleMasks.MASK_CSS_EXTENDED_CSS_RULE;
+        } else if (ruleText.includes(RuleMasks.MASK_CSS_EXCEPTION_EXTENDED_CSS_RULE)) {
+            return RuleMasks.MASK_CSS_EXCEPTION_EXTENDED_CSS_RULE;
+        } else if (ruleText.includes(RuleMasks.MASK_CSS_INJECT_EXTENDED_CSS_RULE)) {
+            return RuleMasks.MASK_CSS_INJECT_EXTENDED_CSS_RULE;
+        } else if (ruleText.includes(RuleMasks.MASK_CSS_EXCEPTION_INJECT_EXTENDED_CSS_RULE)) {
+            return RuleMasks.MASK_CSS_EXCEPTION_INJECT_EXTENDED_CSS_RULE;
         } else if (ruleText.includes(RuleMasks.MASK_ELEMENT_HIDING_EXCEPTION)) {
             return RuleMasks.MASK_ELEMENT_HIDING_EXCEPTION;
         } else if (ruleText.includes(RuleMasks.MASK_ELEMENT_HIDING)) {
@@ -255,7 +271,7 @@ module.exports = (() => {
             rule.url = parseResult.urlRuleText;
             rule.whiteList = parseResult.whiteList;
         } else if (ruleType === RuleTypes.ElementHiding || ruleType === RuleTypes.Css ||
-            ruleType === RuleTypes.Content || ruleType === RuleTypes.Script) {
+            ruleType === RuleTypes.Content || ruleType === RuleTypes.Script || ruleType === RuleTypes.ExtCss) {
 
             rule.contentPart = ruleText.substring(ruleText.indexOf(mask) + mask.length);
             rule.domains = ruleText.substring(0, ruleText.indexOf(mask)).split(',');

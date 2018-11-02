@@ -1,0 +1,25 @@
+! Checksum: wHLq12stepMb0qnPLsbfMQ
+! Title: English Filter
+! Description: English Filter description
+! Version: 1.0.0.0
+! TimeUpdated: 2018-11-02T11:55:59+03:00
+! Expires: 2 days (update frequency)
+test-common-rule.com
+test-common-rule.com$xmlhttprequest
+example.com#$#h1 { background-color: blue !important }
+if_adguard_included_rule
+if_mac_included_rule
+if_adguard_rule
+test-common-1-rule.com
+regularexpression_not_excluded
+###adsbox-not-excluded
+directives_not_stripped
+||test.com^
+||test.com^
+!+ NOT_PLATFORM(test, windows)
+#%#test.com^$third-party
+~nigma.ru,google.com$$div[id="ad_text"][wildcard="*teasernet*tararar*"]
+!+ NOT_PLATFORM(test, windows)
+excluded_platform
+excluded_platform
+test_domain#%#testScript();

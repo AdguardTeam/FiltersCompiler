@@ -1,0 +1,2 @@
+! Rule "example.com##h1:style(background-color: blue !important)" converted to: example.com#$#h1 { background-color: blue !important }
+example.com##h1:style(background-color: blue !important)
