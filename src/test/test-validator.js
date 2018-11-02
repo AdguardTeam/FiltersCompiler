@@ -366,3 +366,23 @@ QUnit.test("Test validation - validate redirect option", function (assert) {
     assert.ok(validateRules.indexOf(nonValidRule) === -1);
     assert.ok(validator.validate(rules).length === 3);
 });
+
+
+QUnit.test("Test validation - validate rules with $", function (assert) {
+    'use strict';
+
+    const validator = require("../main/validator.js");
+    validator.init();
+
+
+    const validRedirectRule1 = 'zen.yandex.by,zen.yandex.com,zen.yandex.com.tr,zen.yandex.fr,zen.yandex.kz,zen.yandex.ru,zen.yandex.ua#?#.feed__item:-abp-has(*:-abp-contains(/^реклама$/i))';
+
+    const rules = [
+        validRedirectRule1,
+    ];
+
+    const validateRules = validator.validate(rules);
+
+    assert.ok(validateRules.indexOf(validRedirectRule1) !== -1);
+    assert.ok(validateRules.length > 0);
+});
