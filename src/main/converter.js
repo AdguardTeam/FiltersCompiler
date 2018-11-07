@@ -67,7 +67,7 @@ module.exports = (() => {
      */
     const convert = function (rulesList, excluded) {
         const result = [];
-        const firstPartyRegex = /([\$,])first-party/gi;
+        const firstPartyRegex = /([\$,])first-party/i;
         const firstPartyReplacement = `$1~third-party`;
 
         for (let rule of rulesList) {

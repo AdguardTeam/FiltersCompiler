@@ -1,253 +1,253 @@
-[9:38:42 AM][INFO]:Building filter: filter_2_English
-[9:38:42 AM][INFO]:Compiling...
-[9:38:42 AM][LOG]:Applying inclusion from: ../common.txt
-[9:38:42 AM][LOG]:Inclusion lines: 16
-[9:38:42 AM][LOG]:Applying inclusion from: ../common_1.txt
-[9:38:42 AM][INFO]:Applying exclusions..
-[9:38:42 AM][LOG]:test-common-1-rule.com$xmlhttprequest is excluded by: $xmlhttprequest
-[9:38:42 AM][LOG]:regularexpressionexcluded is excluded by: /^regularexpression[a-z]+$/
-[9:38:42 AM][LOG]:###adsbox is excluded by: /^##.adsbox$/
-[9:38:42 AM][LOG]:Stripping comments..
-[9:38:42 AM][LOG]:Inclusion lines: 8
-[9:38:42 AM][LOG]:Rule "example.com##h1:style(background-color: blue !important)" converted to: example.com#$#h1 { background-color: blue !important }
-[9:38:42 AM][INFO]:Applying exclusions..
-[9:38:42 AM][LOG]:||test-common-rule.com^$replace= is excluded by: replace=
-[9:38:42 AM][LOG]:||test-common-1-rule.com^$replace= is excluded by: replace=
-[9:38:42 AM][LOG]:||test.com^$third-party is excluded by: ||test.com^$third-party
-[9:38:42 AM][LOG]:||test.com^$replace= is excluded by: replace=
-[9:38:42 AM][LOG]:||news.yandex.*/*/*-*-*-*-$replace=/Ya\[([0-9]{10\,15})\]\([\s\S]*\)\$/,script,important,domain=news.yandex.by|news.yandex.com|news.yandex.fr|news.yandex.kz|news.yandex.ru|news.yandex.ua is excluded by: replace=
-[9:38:42 AM][ERROR]:Invalid rule: invalid_options$invalid_opt option: invalid_opt
-[9:38:42 AM][INFO]:Compiled length:43
-[9:38:42 AM][INFO]:Excluded length:20
-[9:38:42 AM][INFO]:Writing filter file, lines:43
-[9:38:42 AM][INFO]:Writing excluded file, lines:20
-[9:38:42 AM][INFO]:Writing revision file..
-[9:38:42 AM][INFO]:Building filter: filter_2_English ok
-[9:38:42 AM][INFO]:Building filter: filter_3_Test
-[9:38:42 AM][WARN]:Filter skipped
-[9:38:42 AM][INFO]:Building filter: filter_3_Test ok
-[9:38:42 AM][INFO]:Building filter: filter_4_Directives
-[9:38:42 AM][INFO]:Compiling...
-[9:38:42 AM][LOG]:Rule "example.com##h1:style(background-color: blue !important)" converted to: example.com#$#h1 { background-color: blue !important }
-[9:38:42 AM][INFO]:Applying exclusions..
-[9:38:42 AM][INFO]:Compiled length:23
-[9:38:42 AM][INFO]:Excluded length:2
-[9:38:42 AM][INFO]:Writing filter file, lines:23
-[9:38:42 AM][INFO]:Writing excluded file, lines:2
-[9:38:42 AM][INFO]:Writing revision file..
-[9:38:42 AM][INFO]:Building filter: filter_4_Directives ok
-[9:38:42 AM][INFO]:Generating platforms
-[9:38:42 AM][INFO]:Building filter platforms: filter_2_English
-[9:38:42 AM][INFO]:Removing duplicates..
-[9:38:42 AM][LOG]:||test.com^ removed as duplicate
-[9:38:42 AM][LOG]:! Homepage: http://adguard.com/filters.html#english removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! License: http://creativecommons.org/licenses/by-sa/3.0/ removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!------------------ General JS API ---------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! OriginalVersion: 11.9090.19.19 removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! some common rules could be places here removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#endif removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#if adguard_app_mac removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#endif removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#endif removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#if test-not-stripped-directives removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#endif removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!------------------ EasyList rules ---------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!@include "https://easylist.github.io/easylist/easylist.txt" /stripComments removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! Some test rules removed with removeRulePattern ^\!
-[9:38:42 AM][INFO]:Filter 2. Rules 43 => 29 => 19. PlatformPath: 'test'
-[9:38:42 AM][LOG]:! Homepage: http://adguard.com/filters.html#english removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! License: http://creativecommons.org/licenses/by-sa/3.0/ removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!------------------ General JS API ---------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! OriginalVersion: 11.9090.19.19 removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! some common rules could be places here removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:test-common-1-rule.com removed with removeRulePattern test-common-1-rule
-[9:38:42 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!------------------ EasyList rules ---------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!@include "https://easylist.github.io/easylist/easylist.txt" /stripComments removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! Some test rules removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:~nigma.ru,google.com$$div[id="ad_text"][wildcard="*teasernet*tararar*"] removed with removeRulePattern \$\$|\$\@\$
-[9:38:42 AM][INFO]:Removing duplicates..
-[9:38:42 AM][LOG]:||test.com^ removed as duplicate
-[9:38:42 AM][LOG]:! Homepage: http://adguard.com/filters.html#english removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! License: http://creativecommons.org/licenses/by-sa/3.0/ removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!------------------ General JS API ---------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! OriginalVersion: 11.9090.19.19 removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! some common rules could be places here removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#endif removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#if adguard_app_mac removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#endif removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#endif removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:test-common-1-rule.com removed with removeRulePattern test-common-1-rule
-[9:38:42 AM][LOG]:!#if test-not-stripped-directives removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#endif removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!------------------ EasyList rules ---------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!@include "https://easylist.github.io/easylist/easylist.txt" /stripComments removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! Some test rules removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:~nigma.ru,google.com$$div[id="ad_text"][wildcard="*teasernet*tararar*"] removed with removeRulePattern \$\$|\$\@\$
-[9:38:42 AM][INFO]:Filter 2. Rules 43 => 14 => 17. PlatformPath: 'config/test'
-[9:38:42 AM][INFO]:Removing duplicates..
-[9:38:42 AM][LOG]:||test.com^ removed as duplicate
-[9:38:42 AM][LOG]:! Homepage: http://adguard.com/filters.html#english removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! License: http://creativecommons.org/licenses/by-sa/3.0/ removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!------------------ General JS API ---------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! OriginalVersion: 11.9090.19.19 removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! some common rules could be places here removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#endif removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#if adguard_app_mac removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#endif removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#endif removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#if test-not-stripped-directives removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#endif removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!------------------ EasyList rules ---------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!@include "https://easylist.github.io/easylist/easylist.txt" /stripComments removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! Some test rules removed with removeRulePattern ^\!
-[9:38:42 AM][INFO]:Filter 2. Rules 43 => 29 => 19. PlatformPath: 'mac'
-[9:38:42 AM][LOG]:#%#test.com^$third-party removed with platform hint !+ NOT_PLATFORM(test, windows)
-[9:38:42 AM][LOG]:excluded_platform removed with platform hint !+ NOT_PLATFORM(test, windows)
-[9:38:42 AM][INFO]:Removing duplicates..
-[9:38:42 AM][LOG]:||test.com^ removed as duplicate
-[9:38:42 AM][LOG]:! Homepage: http://adguard.com/filters.html#english removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! License: http://creativecommons.org/licenses/by-sa/3.0/ removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!------------------ General JS API ---------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! OriginalVersion: 11.9090.19.19 removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! some common rules could be places here removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#endif removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#if adguard_app_mac removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#endif removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#endif removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#if test-not-stripped-directives removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#endif removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!------------------ EasyList rules ---------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!@include "https://easylist.github.io/easylist/easylist.txt" /stripComments removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! Some test rules removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:#%#test.com^$third-party removed with platform hint !+ NOT_PLATFORM(test, windows)
-[9:38:42 AM][LOG]:excluded_platform removed with platform hint !+ NOT_PLATFORM(test, windows)
-[9:38:42 AM][INFO]:Filter 2. Rules 43 => 25 => 15. PlatformPath: 'hints'
-[9:38:42 AM][INFO]:Building filter platforms: filter_2_English done
-[9:38:42 AM][INFO]:Building filter platforms: filter_3_Test
-[9:38:42 AM][WARN]:Filter skipped
-[9:38:42 AM][INFO]:Building filter platforms: filter_3_Test done
-[9:38:42 AM][INFO]:Building filter platforms: filter_4_Directives
-[9:38:42 AM][INFO]:Removing duplicates..
-[9:38:42 AM][LOG]:! Homepage: http://adguard.com/filters.html#english removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! License: http://creativecommons.org/licenses/by-sa/3.0/ removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!------------------ General JS API ---------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! Version: 11.9090.19.19 removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! [Adblock Plus 2.0] removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! some common rules could be places here removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#endif removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#if adguard_app_mac removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#endif removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#endif removed with removeRulePattern ^\!
-[9:38:42 AM][INFO]:Filter 4. Rules 23 => 15 => 7. PlatformPath: 'test'
-[9:38:42 AM][LOG]:! Homepage: http://adguard.com/filters.html#english removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! License: http://creativecommons.org/licenses/by-sa/3.0/ removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!------------------ General JS API ---------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! Version: 11.9090.19.19 removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! [Adblock Plus 2.0] removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! some common rules could be places here removed with removeRulePattern ^\!
-[9:38:42 AM][INFO]:Removing duplicates..
-[9:38:42 AM][LOG]:! Homepage: http://adguard.com/filters.html#english removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! License: http://creativecommons.org/licenses/by-sa/3.0/ removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!------------------ General JS API ---------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! Version: 11.9090.19.19 removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! [Adblock Plus 2.0] removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! some common rules could be places here removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#endif removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#if adguard_app_mac removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#endif removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#endif removed with removeRulePattern ^\!
-[9:38:42 AM][INFO]:Filter 4. Rules 23 => 6 => 7. PlatformPath: 'config/test'
-[9:38:42 AM][INFO]:Removing duplicates..
-[9:38:42 AM][LOG]:! Homepage: http://adguard.com/filters.html#english removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! License: http://creativecommons.org/licenses/by-sa/3.0/ removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!------------------ General JS API ---------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! Version: 11.9090.19.19 removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! [Adblock Plus 2.0] removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! some common rules could be places here removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#endif removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#if adguard_app_mac removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#endif removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#endif removed with removeRulePattern ^\!
-[9:38:42 AM][INFO]:Filter 4. Rules 23 => 15 => 7. PlatformPath: 'mac'
-[9:38:42 AM][INFO]:Removing duplicates..
-[9:38:42 AM][LOG]:! Homepage: http://adguard.com/filters.html#english removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! License: http://creativecommons.org/licenses/by-sa/3.0/ removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!------------------ General JS API ---------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! Version: 11.9090.19.19 removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! [Adblock Plus 2.0] removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:! some common rules could be places here removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#endif removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#if adguard_app_mac removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#endif removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
-[9:38:42 AM][LOG]:!#endif removed with removeRulePattern ^\!
-[9:38:42 AM][INFO]:Filter 4. Rules 23 => 15 => 7. PlatformPath: 'hints'
-[9:38:42 AM][INFO]:Building filter platforms: filter_4_Directives done
-[9:38:42 AM][INFO]:Writing filters metadata
-[9:38:42 AM][INFO]:Writing filters metadata: test
-[9:38:42 AM][INFO]:Writing filters localizations: test
-[9:38:42 AM][INFO]:Writing filters metadata: config/test
-[9:38:42 AM][INFO]:Writing filters localizations: config/test
-[9:38:42 AM][INFO]:Writing filters metadata: mac
-[9:38:42 AM][INFO]:Writing filters localizations: mac
-[9:38:42 AM][INFO]:Writing filters metadata: hints
-[9:38:42 AM][INFO]:Writing filters localizations: hints
-[9:38:42 AM][INFO]:Writing filters metadata done
-[9:38:42 AM][INFO]:Writing local script rules
-[9:38:42 AM][INFO]:Writing local script rules done
-[9:38:42 AM][INFO]:Generating platforms done
+[11:23:38 AM][INFO]:Building filter: filter_2_English
+[11:23:38 AM][INFO]:Compiling...
+[11:23:38 AM][LOG]:Applying inclusion from: ../common.txt
+[11:23:38 AM][LOG]:Inclusion lines: 16
+[11:23:38 AM][LOG]:Applying inclusion from: ../common_1.txt
+[11:23:38 AM][INFO]:Applying exclusions..
+[11:23:38 AM][LOG]:test-common-1-rule.com$xmlhttprequest is excluded by: $xmlhttprequest
+[11:23:38 AM][LOG]:regularexpressionexcluded is excluded by: /^regularexpression[a-z]+$/
+[11:23:38 AM][LOG]:###adsbox is excluded by: /^##.adsbox$/
+[11:23:38 AM][LOG]:Stripping comments..
+[11:23:38 AM][LOG]:Inclusion lines: 8
+[11:23:38 AM][LOG]:Rule "example.com##h1:style(background-color: blue !important)" converted to: example.com#$#h1 { background-color: blue !important }
+[11:23:38 AM][INFO]:Applying exclusions..
+[11:23:38 AM][LOG]:||test-common-rule.com^$replace= is excluded by: replace=
+[11:23:38 AM][LOG]:||test-common-1-rule.com^$replace= is excluded by: replace=
+[11:23:38 AM][LOG]:||test.com^$third-party is excluded by: ||test.com^$third-party
+[11:23:38 AM][LOG]:||test.com^$replace= is excluded by: replace=
+[11:23:38 AM][LOG]:||news.yandex.*/*/*-*-*-*-$replace=/Ya\[([0-9]{10\,15})\]\([\s\S]*\)\$/,script,important,domain=news.yandex.by|news.yandex.com|news.yandex.fr|news.yandex.kz|news.yandex.ru|news.yandex.ua is excluded by: replace=
+[11:23:38 AM][ERROR]:Invalid rule: invalid_options$invalid_opt option: invalid_opt
+[11:23:38 AM][INFO]:Compiled length:43
+[11:23:38 AM][INFO]:Excluded length:20
+[11:23:38 AM][INFO]:Writing filter file, lines:43
+[11:23:38 AM][INFO]:Writing excluded file, lines:20
+[11:23:38 AM][INFO]:Writing revision file..
+[11:23:38 AM][INFO]:Building filter: filter_2_English ok
+[11:23:38 AM][INFO]:Building filter: filter_3_Test
+[11:23:38 AM][WARN]:Filter skipped
+[11:23:38 AM][INFO]:Building filter: filter_3_Test ok
+[11:23:38 AM][INFO]:Building filter: filter_4_Directives
+[11:23:38 AM][INFO]:Compiling...
+[11:23:38 AM][LOG]:Rule "example.com##h1:style(background-color: blue !important)" converted to: example.com#$#h1 { background-color: blue !important }
+[11:23:38 AM][INFO]:Applying exclusions..
+[11:23:38 AM][INFO]:Compiled length:23
+[11:23:38 AM][INFO]:Excluded length:2
+[11:23:38 AM][INFO]:Writing filter file, lines:23
+[11:23:38 AM][INFO]:Writing excluded file, lines:2
+[11:23:38 AM][INFO]:Writing revision file..
+[11:23:38 AM][INFO]:Building filter: filter_4_Directives ok
+[11:23:38 AM][INFO]:Generating platforms
+[11:23:38 AM][INFO]:Building filter platforms: filter_2_English
+[11:23:38 AM][INFO]:Removing duplicates..
+[11:23:38 AM][LOG]:||test.com^ removed as duplicate
+[11:23:38 AM][LOG]:! Homepage: http://adguard.com/filters.html#english removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! License: http://creativecommons.org/licenses/by-sa/3.0/ removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!------------------ General JS API ---------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! OriginalVersion: 11.9090.19.19 removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! some common rules could be places here removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#endif removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#if adguard_app_mac removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#endif removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#endif removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#if test-not-stripped-directives removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#endif removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!------------------ EasyList rules ---------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!@include "https://easylist.github.io/easylist/easylist.txt" /stripComments removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! Some test rules removed with removeRulePattern ^\!
+[11:23:38 AM][INFO]:Filter 2. Rules 43 => 29 => 19. PlatformPath: 'test'
+[11:23:38 AM][LOG]:! Homepage: http://adguard.com/filters.html#english removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! License: http://creativecommons.org/licenses/by-sa/3.0/ removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!------------------ General JS API ---------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! OriginalVersion: 11.9090.19.19 removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! some common rules could be places here removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:test-common-1-rule.com removed with removeRulePattern test-common-1-rule
+[11:23:38 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!------------------ EasyList rules ---------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!@include "https://easylist.github.io/easylist/easylist.txt" /stripComments removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! Some test rules removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:~nigma.ru,google.com$$div[id="ad_text"][wildcard="*teasernet*tararar*"] removed with removeRulePattern \$\$|\$\@\$
+[11:23:38 AM][INFO]:Removing duplicates..
+[11:23:38 AM][LOG]:||test.com^ removed as duplicate
+[11:23:38 AM][LOG]:! Homepage: http://adguard.com/filters.html#english removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! License: http://creativecommons.org/licenses/by-sa/3.0/ removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!------------------ General JS API ---------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! OriginalVersion: 11.9090.19.19 removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! some common rules could be places here removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#endif removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#if adguard_app_mac removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#endif removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#endif removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:test-common-1-rule.com removed with removeRulePattern test-common-1-rule
+[11:23:38 AM][LOG]:!#if test-not-stripped-directives removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#endif removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!------------------ EasyList rules ---------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!@include "https://easylist.github.io/easylist/easylist.txt" /stripComments removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! Some test rules removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:~nigma.ru,google.com$$div[id="ad_text"][wildcard="*teasernet*tararar*"] removed with removeRulePattern \$\$|\$\@\$
+[11:23:38 AM][INFO]:Filter 2. Rules 43 => 14 => 17. PlatformPath: 'config/test'
+[11:23:38 AM][INFO]:Removing duplicates..
+[11:23:38 AM][LOG]:||test.com^ removed as duplicate
+[11:23:38 AM][LOG]:! Homepage: http://adguard.com/filters.html#english removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! License: http://creativecommons.org/licenses/by-sa/3.0/ removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!------------------ General JS API ---------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! OriginalVersion: 11.9090.19.19 removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! some common rules could be places here removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#endif removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#if adguard_app_mac removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#endif removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#endif removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#if test-not-stripped-directives removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#endif removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!------------------ EasyList rules ---------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!@include "https://easylist.github.io/easylist/easylist.txt" /stripComments removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! Some test rules removed with removeRulePattern ^\!
+[11:23:38 AM][INFO]:Filter 2. Rules 43 => 29 => 19. PlatformPath: 'mac'
+[11:23:38 AM][LOG]:#%#test.com^$third-party removed with platform hint !+ NOT_PLATFORM(test, windows)
+[11:23:38 AM][LOG]:excluded_platform removed with platform hint !+ NOT_PLATFORM(test, windows)
+[11:23:38 AM][INFO]:Removing duplicates..
+[11:23:38 AM][LOG]:||test.com^ removed as duplicate
+[11:23:38 AM][LOG]:! Homepage: http://adguard.com/filters.html#english removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! License: http://creativecommons.org/licenses/by-sa/3.0/ removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!------------------ General JS API ---------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! OriginalVersion: 11.9090.19.19 removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! some common rules could be places here removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#endif removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#if adguard_app_mac removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#endif removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#endif removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#if test-not-stripped-directives removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#endif removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!------------------ EasyList rules ---------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!@include "https://easylist.github.io/easylist/easylist.txt" /stripComments removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! Some test rules removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:#%#test.com^$third-party removed with platform hint !+ NOT_PLATFORM(test, windows)
+[11:23:38 AM][LOG]:excluded_platform removed with platform hint !+ NOT_PLATFORM(test, windows)
+[11:23:38 AM][INFO]:Filter 2. Rules 43 => 25 => 15. PlatformPath: 'hints'
+[11:23:38 AM][INFO]:Building filter platforms: filter_2_English done
+[11:23:38 AM][INFO]:Building filter platforms: filter_3_Test
+[11:23:38 AM][WARN]:Filter skipped
+[11:23:38 AM][INFO]:Building filter platforms: filter_3_Test done
+[11:23:38 AM][INFO]:Building filter platforms: filter_4_Directives
+[11:23:38 AM][INFO]:Removing duplicates..
+[11:23:38 AM][LOG]:! Homepage: http://adguard.com/filters.html#english removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! License: http://creativecommons.org/licenses/by-sa/3.0/ removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!------------------ General JS API ---------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! Version: 11.9090.19.19 removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! [Adblock Plus 2.0] removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! some common rules could be places here removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#endif removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#if adguard_app_mac removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#endif removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#endif removed with removeRulePattern ^\!
+[11:23:38 AM][INFO]:Filter 4. Rules 23 => 15 => 7. PlatformPath: 'test'
+[11:23:38 AM][LOG]:! Homepage: http://adguard.com/filters.html#english removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! License: http://creativecommons.org/licenses/by-sa/3.0/ removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!------------------ General JS API ---------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! Version: 11.9090.19.19 removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! [Adblock Plus 2.0] removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! some common rules could be places here removed with removeRulePattern ^\!
+[11:23:38 AM][INFO]:Removing duplicates..
+[11:23:38 AM][LOG]:! Homepage: http://adguard.com/filters.html#english removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! License: http://creativecommons.org/licenses/by-sa/3.0/ removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!------------------ General JS API ---------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! Version: 11.9090.19.19 removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! [Adblock Plus 2.0] removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! some common rules could be places here removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#endif removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#if adguard_app_mac removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#endif removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#endif removed with removeRulePattern ^\!
+[11:23:38 AM][INFO]:Filter 4. Rules 23 => 6 => 7. PlatformPath: 'config/test'
+[11:23:38 AM][INFO]:Removing duplicates..
+[11:23:38 AM][LOG]:! Homepage: http://adguard.com/filters.html#english removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! License: http://creativecommons.org/licenses/by-sa/3.0/ removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!------------------ General JS API ---------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! Version: 11.9090.19.19 removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! [Adblock Plus 2.0] removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! some common rules could be places here removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#endif removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#if adguard_app_mac removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#endif removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#endif removed with removeRulePattern ^\!
+[11:23:38 AM][INFO]:Filter 4. Rules 23 => 15 => 7. PlatformPath: 'mac'
+[11:23:38 AM][INFO]:Removing duplicates..
+[11:23:38 AM][LOG]:! Homepage: http://adguard.com/filters.html#english removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! License: http://creativecommons.org/licenses/by-sa/3.0/ removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!------------------ General JS API ---------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!-------------------------------------------------------------------------------! removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! Version: 11.9090.19.19 removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! [Adblock Plus 2.0] removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:! some common rules could be places here removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#endif removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#if adguard_app_mac removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#endif removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#if adguard removed with removeRulePattern ^\!
+[11:23:38 AM][LOG]:!#endif removed with removeRulePattern ^\!
+[11:23:38 AM][INFO]:Filter 4. Rules 23 => 15 => 7. PlatformPath: 'hints'
+[11:23:38 AM][INFO]:Building filter platforms: filter_4_Directives done
+[11:23:38 AM][INFO]:Writing filters metadata
+[11:23:38 AM][INFO]:Writing filters metadata: test
+[11:23:38 AM][INFO]:Writing filters localizations: test
+[11:23:38 AM][INFO]:Writing filters metadata: config/test
+[11:23:38 AM][INFO]:Writing filters localizations: config/test
+[11:23:38 AM][INFO]:Writing filters metadata: mac
+[11:23:38 AM][INFO]:Writing filters localizations: mac
+[11:23:38 AM][INFO]:Writing filters metadata: hints
+[11:23:38 AM][INFO]:Writing filters localizations: hints
+[11:23:38 AM][INFO]:Writing filters metadata done
+[11:23:38 AM][INFO]:Writing local script rules
+[11:23:38 AM][INFO]:Writing local script rules done
+[11:23:38 AM][INFO]:Generating platforms done

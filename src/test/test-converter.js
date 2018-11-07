@@ -52,5 +52,10 @@ QUnit.test('Test first-party replaced by ~third-party', (assert) => {
     actual = converter.convert(['||zive.cz^*+$first-party']);
     expected = '||zive.cz^*+$~third-party';
     assert.equal(actual, expected);
+
+    actual = converter.convert(['||www.ynet.co.il^$important,websocket,first-party', '||zive.cz^*+$script,first-party']);
+    expected = ['||www.ynet.co.il^$important,websocket,~third-party', '||zive.cz^*+$script,~third-party'];
+    assert.equal(actual[0], expected[0]);
+    assert.equal(actual[1], expected[1]);
 });
 
