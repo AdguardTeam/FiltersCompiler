@@ -5,6 +5,7 @@ module.exports = (function () {
     'use strict';
 
     const fs = require('fs');
+    const os = require('os');
 
     let fd;
     let logLevel = "LOG";
@@ -18,7 +19,7 @@ module.exports = (function () {
 
     const appendFile = function (message, level) {
         if (fd) {
-            message = `[${new Date().toLocaleTimeString()}][${level}]:${message}\r\n`;
+            message = `[${new Date().toLocaleTimeString()}][${level}]:${message}${os.EOL}`;
 
             fs.appendFileSync(fd, message, 'utf8');
         }

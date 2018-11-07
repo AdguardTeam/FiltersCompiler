@@ -31,3 +31,26 @@ QUnit.test("Test converter", (assert) => {
     assert.equal(c[0], '720hd.club#@$?##all { margin-top: 0 !important }');
 });
 
+QUnit.test('Test first-party replaced by ~third-party', (assert) => {
+    const converter = require('../main/converter');
+    let actual = converter.convert(['||www.ynet.co.il^$important,websocket,first-party']);
+    let expected = '||www.ynet.co.il^$important,websocket,~third-party';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['||zive.cz^*+$script,first-party']);
+    expected = '||zive.cz^*+$script,~third-party';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['||zive.cz^*+$script,first-party']);
+    expected = '||zive.cz^*+$script,~third-party';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['||zive.cz^*+$first-party,script']);
+    expected = '||zive.cz^*+$~third-party,script';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['||zive.cz^*+$first-party']);
+    expected = '||zive.cz^*+$~third-party';
+    assert.equal(actual, expected);
+});
+
