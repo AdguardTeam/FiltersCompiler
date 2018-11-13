@@ -46,6 +46,12 @@ module.exports = (() => {
     };
 
     /**
+     * Function to which converts rules with different markers
+     *
+     * First-party conversion:
+     * $first-party -> $~third-party
+     * ,first-party -> ,~third-party
+     *
      * CSS injection conversion:
      * example.com##h1:style(background-color: blue !important)
      * into
@@ -61,6 +67,8 @@ module.exports = (() => {
      */
     const convert = function (rulesList, excluded) {
         const result = [];
+        const firstPartyRegex = /([\$,])first-party/i;
+        const firstPartyReplacement = `$1~third-party`;
 
         for (let rule of rulesList) {
             if (rule.includes(':style')) {
@@ -78,6 +86,14 @@ module.exports = (() => {
                     parts = rule.split(RuleMasks.MASK_ELEMENT_HIDING_EXCEPTION, 2);
                     rule = executeConversion(rule, parts, RuleMasks.MASK_CSS_EXCEPTION, excluded);
                 }
+            }
+
+            // If rule includes first-party option, than we replace it
+            if (firstPartyRegex.test(rule)) {
+                let replacedRule = rule.replace(firstPartyRegex, firstPartyReplacement);
+                let message = `Rule "${rule}" converted to: ${result}`;
+                logger.log(message);
+                rule = replacedRule;
             }
 
             result.push(rule);
