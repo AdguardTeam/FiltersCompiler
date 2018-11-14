@@ -123,6 +123,7 @@
                 "\\$protobuf",
                 "important,protobuf",
                 "\\$extension",
+                ",extension",
                 "\\$redirect=",
                 ",redirect="
             ],
@@ -145,6 +146,7 @@
                 "\\$protobuf",
                 "important,protobuf",
                 "\\$extension",
+                ",extension",
                 "\\$redirect=",
                 ",redirect="
             ],
@@ -171,6 +173,7 @@
                 "important,protobuf",
                 "\\$csp",
                 "\\$extension",
+                ",extension",
                 "\\$redirect=",
                 ",redirect=",
                 "\\$empty",
@@ -199,6 +202,7 @@
                 "\\$protobuf",
                 "important,protobuf",
                 "\\$extension",
+                ",extension",
                 "\\$redirect=",
                 ",redirect="
             ],
@@ -224,6 +228,7 @@
                 "\\$protobuf",
                 "important,protobuf",
                 "\\$extension",
+                ",extension",
                 "\\$redirect=",
                 ",redirect="
             ],
@@ -294,7 +299,8 @@
                 "important,protobuf",
                 "#%#",
                 "#@%#",
-                "\\$extension"
+                "\\$extension",
+                ",extension"
             ],
             "ignoreRuleHints": false,
             "adbHeader": "![Adblock Plus 2.0]"
