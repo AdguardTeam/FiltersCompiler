@@ -575,12 +575,6 @@ module.exports = (() => {
      */
     const buildFilter = function (filterDir, platformsPath) {
 
-        const mask = 'filter_';
-        const start = filterDir.lastIndexOf(mask) + mask.length;
-        const filterId = filterDir.substring(start, filterDir.indexOf('_', start));
-
-        checkFilterId(filterIdsPool, filterId);
-
         const originalRules = readFile(path.join(filterDir, filterFile)).split('\r\n');
 
         const metadataFilePath = path.join(filterDir, metadataFile);
@@ -588,6 +582,9 @@ module.exports = (() => {
         const header = makeHeader(metadataFilePath, revisionFilePath);
 
         const metadata = JSON.parse(readFile(metadataFilePath));
+        const filterId = metadata.filterId;
+        checkFilterId(filterIdsPool, filterId);
+
         if (metadata.disabled) {
             logger.warn('Filter skipped');
             return;

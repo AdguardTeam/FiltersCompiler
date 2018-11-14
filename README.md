@@ -11,8 +11,8 @@ This package is suggested to be used with filters repository with directory stru
 The package could be run with the following command:
 
 ```
- const whitelist = ['1', '3'];
- const blacklist = ['2'];
+ const whitelist = [1, 3];
+ const blacklist = [2];
  
  const path = require('path');
  const compiler = require("adguard-filters-compiler");

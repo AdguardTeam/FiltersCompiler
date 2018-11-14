@@ -364,10 +364,18 @@ module.exports = (function () {
     const buildFilter = async function (filterDir, whitelist, blacklist) {
         currentDir = filterDir;
 
-        const mask = 'filter_';
-        const start = filterDir.lastIndexOf(mask) + mask.length;
-        const filterId = filterDir.substring(start, filterDir.indexOf('_', start));
+        const template = readFile(path.join(currentDir, TEMPLATE_FILE));
+        if (!template) {
+            throw new Error('Invalid template');
+        }
 
+        const metadata = JSON.parse(readFile(path.join(currentDir, METADATA_FILE)));
+        if (metadata.disabled) {
+            logger.warn('Filter skipped');
+            return;
+        }
+
+        const filterId = metadata.filterId;
         if (whitelist && whitelist.length > 0 && whitelist.indexOf(filterId) < 0) {
             logger.info(`Filter ${filterId} skipped with whitelist`);
             return;
@@ -375,17 +383,6 @@ module.exports = (function () {
 
         if (blacklist && blacklist.length > 0 && blacklist.indexOf(filterId) >= 0) {
             logger.info(`Filter ${filterId} skipped with blacklist`);
-            return;
-        }
-
-        const template = readFile(path.join(currentDir, TEMPLATE_FILE));
-        if (!template) {
-            throw new Error('Invalid template');
-        }
-
-        const metadata = readFile(path.join(currentDir, METADATA_FILE));
-        if (JSON.parse(metadata).disabled) {
-            logger.warn('Filter skipped');
             return;
         }
 

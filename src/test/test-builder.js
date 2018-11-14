@@ -87,17 +87,17 @@ QUnit.test("Test builder - build lists", async (assert) => {
     const filtersDir = path.join(__dirname, './resources/filters');
     const logFile = path.join(__dirname, './resources/log.txt');
 
-    await builder.build(filtersDir, logFile, null, null, null, ['2', '3']);
+    await builder.build(filtersDir, logFile, null, null, null, [2, 3]);
 
     let revision = readFile(path.join(filtersDir, 'filter_2_English', 'revision.json'));
     assert.ok(revision);
 
-    await builder.build(filtersDir, logFile, null, null, null, null, ['3', '4']);
+    await builder.build(filtersDir, logFile, null, null, null, null, [3, 4]);
 
     revision = readFile(path.join(filtersDir, 'filter_2_English', 'revision.json'));
     assert.ok(revision);
 
-    await builder.build(filtersDir, logFile, null, null, null, ['2', '3'], ['3', '4']);
+    await builder.build(filtersDir, logFile, null, null, null, [2, 3], [3, 4]);
 
     revision = readFile(path.join(filtersDir, 'filter_2_English', 'revision.json'));
     assert.ok(revision);
