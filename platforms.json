@@ -75,7 +75,6 @@
                 "\\$mp4",
                 "\\$replace=",
                 "\\$stealth",
-                "\\$empty",
                 "important,replace=",
                 "\\$app",
                 "\\$protobuf",
@@ -94,7 +93,12 @@
                 "#@\\?#",
                 "#@\\?\\$#",
                 "\\$redirect=",
-                ",redirect="
+                ",redirect=",
+                "\\$empty",
+                ",empty",
+                "\\$webrtc",
+                "\\$csp=",
+                "\\$network"
             ],
             "ignoreRuleHints": false
         },
@@ -168,7 +172,10 @@
                 "\\$csp",
                 "\\$extension",
                 "\\$redirect=",
-                ",redirect="
+                ",redirect=",
+                "\\$empty",
+                ",empty",
+                "\\$webrtc"
             ],
             "ignoreRuleHints": false
         },
