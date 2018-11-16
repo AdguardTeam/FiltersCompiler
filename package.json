@@ -6,7 +6,7 @@
   "dependencies": {
     "child_process": ">=1.0.2",
     "crypto": "1.0.1",
-    "jsdom": "11.9.0",
+    "jsdom": "13.0.0",
     "md5": "2.2.1",
     "moment": ">=2.20.1",
     "qunit": "1.0.0",
