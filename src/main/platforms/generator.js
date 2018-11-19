@@ -575,8 +575,10 @@ module.exports = (() => {
      *
      * @param filterDir
      * @param platformsPath
+     * @param whitelist
+     * @param blacklist
      */
-    const buildFilter = function (filterDir, platformsPath) {
+    const buildFilter = function (filterDir, platformsPath, whitelist, blacklist) {
 
         const originalRules = readFile(path.join(filterDir, filterFile)).split('\r\n');
 
@@ -590,6 +592,16 @@ module.exports = (() => {
 
         if (metadata.disabled) {
             logger.warn('Filter skipped');
+            return;
+        }
+
+        if (whitelist && whitelist.length > 0 && whitelist.indexOf(filterId) < 0) {
+            logger.info(`Filter ${filterId} skipped with whitelist`);
+            return;
+        }
+
+        if (blacklist && blacklist.length > 0 && blacklist.indexOf(filterId) >= 0) {
+            logger.info(`Filter ${filterId} skipped with blacklist`);
             return;
         }
 
@@ -635,8 +647,11 @@ module.exports = (() => {
      *
      * @param filtersDir
      * @param filtersMetadata
+     * @param platformsPath
+     * @param whitelist
+     * @param blacklist
      */
-    const parseDirectory = function (filtersDir, filtersMetadata, platformsPath) {
+    const parseDirectory = function (filtersDir, filtersMetadata, platformsPath, whitelist, blacklist) {
         const items = fs.readdirSync(filtersDir);
         for (let directory of items) {
             const filterDir = path.join(filtersDir, directory);
@@ -645,12 +660,12 @@ module.exports = (() => {
                 let metadataFilePath = path.join(filterDir, metadataFile);
                 if (fs.existsSync(metadataFilePath)) {
                     logger.info(`Building filter platforms: ${directory}`);
-                    buildFilter(filterDir, platformsPath);
+                    buildFilter(filterDir, platformsPath, whitelist, blacklist);
                     logger.info(`Building filter platforms: ${directory} done`);
 
                     filtersMetadata.push(loadFilterMetadata(filterDir));
                 } else {
-                    parseDirectory(filterDir, filtersMetadata, platformsPath);
+                    parseDirectory(filterDir, filtersMetadata, platformsPath, whitelist, blacklist);
                 }
             }
         }
@@ -661,8 +676,10 @@ module.exports = (() => {
      *
      * @param {String} filtersDir
      * @param {String} platformsPath
+     * @param whitelist
+     * @param blacklist
      */
-    const generate = function (filtersDir, platformsPath) {
+    const generate = function (filtersDir, platformsPath, whitelist, blacklist) {
         if (!platformsPath) {
             logger.warn('Platforms build output path is not specified');
             return;
@@ -677,7 +694,7 @@ module.exports = (() => {
 
         const filtersMetadata = [];
 
-        parseDirectory(filtersDir, filtersMetadata, platformsPath);
+        parseDirectory(filtersDir, filtersMetadata, platformsPath, whitelist, blacklist);
 
         writeFiltersMetadata(platformsPath, filtersDir, filtersMetadata);
         writeLocalScriptRules(platformsPath);

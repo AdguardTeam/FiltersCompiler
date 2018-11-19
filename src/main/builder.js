@@ -451,7 +451,7 @@ module.exports = (function () {
         await parseDirectory(filtersDir, whitelist, blacklist);
 
         logger.info(`Generating platforms`);
-        generator.generate(filtersDir, platformsPath);
+        generator.generate(filtersDir, platformsPath, whitelist, blacklist);
         logger.info(`Generating platforms done`);
     };
 
