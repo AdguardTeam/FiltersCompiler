@@ -541,6 +541,8 @@ module.exports = (() => {
         logger.info('Removing duplicates..');
 
         return list.filter((item, pos) => {
+
+            // Do not remove hinted duplicates
             if (pos > 0) {
                 let previous = list[pos - 1];
                 if (previous && previous.startsWith(RuleMasks.MASK_HINT)) {
@@ -548,7 +550,8 @@ module.exports = (() => {
                 }
             }
 
-            let duplicatePosition = list.indexOf(item);
+            // Do not remove hinted duplicates
+            let duplicatePosition = list.indexOf(item, pos > 0 ? pos - 1 : pos);
             if (duplicatePosition !== pos && duplicatePosition > 0) {
                 let duplicate = list[duplicatePosition - 1];
                 if (duplicate && duplicate.startsWith(RuleMasks.MASK_HINT)) {
@@ -556,8 +559,8 @@ module.exports = (() => {
                 }
             }
 
-            const result = item.startsWith(RuleMasks.MASK_COMMENT) ||
-                duplicatePosition === pos;
+            // Do not remove commented duplicates
+            const result = item.startsWith(RuleMasks.MASK_COMMENT) || duplicatePosition === pos;
 
             if (!result) {
                 logger.log(`${item} removed as duplicate`);
