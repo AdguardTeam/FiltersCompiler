@@ -243,8 +243,24 @@ QUnit.test("Test builder - platforms", async (assert) => {
 
     filterLines = filterContent.split('\r\n');
     assert.equal(filterLines.length, 13);
-    assert.ok(filterLines.indexOf('if_mac_included_rule') >= 0);
+    assert.ok(filterLines.indexOf('if_mac_included_rule') < 0);
 
     // do not remove directives while stripped comment. `directives_not_stripped` rule should not remain
     assert.notOk(filterLines.indexOf('directives_not_stripped') >= 0);
+
+    //Check condition directives for platforms
+    filterContent = readFile(path.join(platforms, 'test', 'filters', '4.txt'));
+    assert.ok(filterContent);
+
+    filterLines = filterContent.split('\r\n');
+    assert.equal(filterLines.length, 23);
+    assert.ok(filterLines.indexOf('if_not_ublock') < 0);
+
+    filterContent = readFile(path.join(platforms, 'test', 'filters', '4_optimized.txt'));
+    assert.ok(filterContent);
+
+    filterLines = filterContent.split('\r\n');
+    assert.equal(filterLines.length, 13);
+    assert.ok(filterLines.indexOf('if_not_ublock') < 0);
+
 });

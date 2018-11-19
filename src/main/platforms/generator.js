@@ -600,7 +600,7 @@ module.exports = (() => {
             let rules = FilterDownloader.resolveConditions(originalRules, config.defines);
             rules = filter.cleanupRules(rules, config);
             rules = removeRuleDuplicates(rules);
-            const optimizedRules = filter.cleanupAndOptimizeRules(originalRules, config, optimizationConfig, filterId);
+            const optimizedRules = filter.cleanupAndOptimizeRules(rules, config, optimizationConfig, filterId);
             logger.info(`Filter ${filterId}. Rules ${originalRules.length} => ${rules.length} => ${optimizedRules.length}. PlatformPath: '${config.path}'`);
 
             const platformDir = path.join(platformsPath, config.path, PLATFORM_FILTERS_DIR);
