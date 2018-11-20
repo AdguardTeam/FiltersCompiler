@@ -67,6 +67,42 @@ QUnit.test("Test builder", async (assert) => {
     assert.ok(filterLines.indexOf('regularexpression_not_excluded') >= 0);
 });
 
+QUnit.test("Test builder - build lists", async (assert) => {
+    'use strict';
+
+    const readFile = function (path) {
+        try {
+            return fs.readFileSync(path, {encoding: 'utf-8'});
+        } catch (e) {
+            return null;
+        }
+    };
+
+    const optimization = require("../main/optimization.js");
+    optimization.disableOptimization();
+
+    const builder = require("../main/builder.js");
+    assert.ok(builder);
+
+    const filtersDir = path.join(__dirname, './resources/filters');
+    const logFile = path.join(__dirname, './resources/log.txt');
+
+    await builder.build(filtersDir, logFile, null, null, null, [2, 3]);
+
+    let revision = readFile(path.join(filtersDir, 'filter_2_English', 'revision.json'));
+    assert.ok(revision);
+
+    await builder.build(filtersDir, logFile, null, null, null, null, [3, 4]);
+
+    revision = readFile(path.join(filtersDir, 'filter_2_English', 'revision.json'));
+    assert.ok(revision);
+
+    await builder.build(filtersDir, logFile, null, null, null, [2, 3], [3, 4]);
+
+    revision = readFile(path.join(filtersDir, 'filter_2_English', 'revision.json'));
+    assert.ok(revision);
+});
+
 QUnit.test("Test builder - platforms", async (assert) => {
     'use strict';
 

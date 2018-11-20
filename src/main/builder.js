@@ -358,8 +358,10 @@ module.exports = (function () {
      * Builds filter txt file from directory contents
      *
      * @param filterDir
+     * @param whitelist
+     * @param blacklist
      */
-    const buildFilter = async function (filterDir) {
+    const buildFilter = async function (filterDir, whitelist, blacklist) {
         currentDir = filterDir;
 
         const template = readFile(path.join(currentDir, TEMPLATE_FILE));
@@ -367,9 +369,20 @@ module.exports = (function () {
             throw new Error('Invalid template');
         }
 
-        const metadata = readFile(path.join(currentDir, METADATA_FILE));
-        if (JSON.parse(metadata).disabled) {
+        const metadata = JSON.parse(readFile(path.join(currentDir, METADATA_FILE)));
+        if (metadata.disabled) {
             logger.warn('Filter skipped');
+            return;
+        }
+
+        const filterId = metadata.filterId;
+        if (whitelist && whitelist.length > 0 && whitelist.indexOf(filterId) < 0) {
+            logger.info(`Filter ${filterId} skipped with whitelist`);
+            return;
+        }
+
+        if (blacklist && blacklist.length > 0 && blacklist.indexOf(filterId) >= 0) {
+            logger.info(`Filter ${filterId} skipped with blacklist`);
             return;
         }
 
@@ -398,8 +411,10 @@ module.exports = (function () {
      * Parses directory recursive
      *
      * @param filtersDir
+     * @param whitelist
+     * @param blacklist
      */
-    const parseDirectory = async function (filtersDir) {
+    const parseDirectory = async function (filtersDir, whitelist, blacklist) {
         const items = fs.readdirSync(filtersDir);
 
         for (let directory of items) {
@@ -409,10 +424,10 @@ module.exports = (function () {
                 let template = path.join(filterDir, TEMPLATE_FILE);
                 if (fs.existsSync(template)) {
                     logger.info(`Building filter: ${directory}`);
-                    await buildFilter(filterDir);
+                    await buildFilter(filterDir, whitelist, blacklist);
                     logger.info(`Building filter: ${directory} ok`);
                 } else {
-                    await parseDirectory(filterDir);
+                    await parseDirectory(filterDir, whitelist, blacklist);
                 }
             }
         }
@@ -425,16 +440,18 @@ module.exports = (function () {
      * @param logFile
      * @param domainBlacklistFile
      * @param platformsPath
+     * @param whitelist
+     * @param blacklist
      */
-    const build = async function (filtersDir, logFile, domainBlacklistFile, platformsPath, platformsConfigFile) {
+    const build = async function (filtersDir, logFile, domainBlacklistFile, platformsPath, platformsConfigFile, whitelist, blacklist) {
         logger.initialize(logFile);
         validator.init(domainBlacklistFile);
         generator.init(FILTER_FILE, METADATA_FILE, REVISION_FILE, platformsConfigFile);
 
-        await parseDirectory(filtersDir);
+        await parseDirectory(filtersDir, whitelist, blacklist);
 
         logger.info(`Generating platforms`);
-        generator.generate(filtersDir, platformsPath);
+        generator.generate(filtersDir, platformsPath, whitelist, blacklist);
         logger.info(`Generating platforms done`);
     };
 

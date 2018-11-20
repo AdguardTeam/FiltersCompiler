@@ -12,8 +12,8 @@ module.exports = (function () {
         throw error;
     });
 
-    let compile = function (path, logPath, domainBlacklistFile, platformsPath) {
-        return builder.build(path, logPath, domainBlacklistFile, platformsPath, platformsConfig);
+    let compile = function (path, logPath, domainBlacklistFile, platformsPath, whitelist, blacklist) {
+        return builder.build(path, logPath, domainBlacklistFile, platformsPath, platformsConfig, whitelist, blacklist);
     };
 
     return {
