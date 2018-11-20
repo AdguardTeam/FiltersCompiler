@@ -156,20 +156,33 @@ module.exports = (() => {
      * @param dir
      */
     const createDir = (dir) => {
-        const splitPath = dir.split('/');
-        splitPath.reduce((path, subPath) => {
-            let currentPath;
-            if (subPath !== '.') {
-                currentPath = path + '/' + subPath;
-                if (!fs.existsSync(currentPath)) {
-                    fs.mkdirSync(currentPath);
+
+        const sep = path.sep;
+        const initDir = path.isAbsolute(dir) ? sep : '';
+        const baseDir = __dirname;
+
+        return dir.split(sep).reduce((parentDir, childDir) => {
+            const curDir = path.resolve(baseDir, parentDir, childDir);
+            try {
+                fs.mkdirSync(curDir);
+            } catch (err) {
+                if (err.code === 'EEXIST') { // curDir already exists!
+                    return curDir;
                 }
-            } else {
-                currentPath = subPath;
+
+                // To avoid `EISDIR` error on Mac and `EACCES`-->`ENOENT` and `EPERM` on Windows.
+                if (err.code === 'ENOENT') { // Throw the original parentDir error on curDir `ENOENT` failure.
+                    throw new Error(`EACCES: permission denied, mkdir '${parentDir}'`);
+                }
+
+                const caughtErr = ['EACCES', 'EPERM', 'EISDIR'].indexOf(err.code) > -1;
+                if (!caughtErr || caughtErr && curDir === path.resolve(dir)) {
+                    throw err; // Throw if it's just the last created dir.
+                }
             }
 
-            return currentPath;
-        }, '');
+            return curDir;
+        }, initDir);
     };
 
     /**
