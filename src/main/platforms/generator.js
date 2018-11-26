@@ -603,11 +603,6 @@ module.exports = (() => {
         const filterId = metadata.filterId;
         checkFilterId(filterIdsPool, filterId);
 
-        if (metadata.disabled) {
-            logger.warn('Filter skipped');
-            return;
-        }
-
         if (whitelist && whitelist.length > 0 && whitelist.indexOf(filterId) < 0) {
             logger.info(`Filter ${filterId} skipped with whitelist`);
             return;
