@@ -6,7 +6,7 @@ module.exports = (function () {
 
     const path = require('path');
     const builder = require("./src/main/builder.js");
-    const schemaValidator = require('./src/json-validator.js');
+    const schemaValidator = require('./src/main/json-validator.js');
     const platformsConfig = path.join(__dirname, './platforms.json');
     const jsonSchemasConfigDir = path.join(__dirname, './schemas/');
 
