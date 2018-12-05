@@ -4,12 +4,6 @@ module.exports = (function () {
 
     'use strict';
 
-    /**
-     * Minimum required filters length in filters.json
-     * @type {number}
-     */
-    const FILTERS_REQUIRED_IN_JSON = 80;
-
     const path = require('path');
     const builder = require("./src/main/builder.js");
     const schemaValidator = require('./src/json-validator.js');
@@ -24,8 +18,8 @@ module.exports = (function () {
         return builder.build(path, logPath, domainBlacklistFile, platformsPath, platformsConfig, whitelist, blacklist);
     };
 
-    const validateJSONSchema = function (platformsPath) {
-        return schemaValidator.validate(platformsPath, jsonSchemasConfigDir, FILTERS_REQUIRED_IN_JSON);
+    const validateJSONSchema = function (platformsPath, requiredFiltersAmount) {
+        return schemaValidator.validate(platformsPath, jsonSchemasConfigDir, requiredFiltersAmount);
     };
 
     return {
