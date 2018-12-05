@@ -278,6 +278,39 @@ module.exports = (() => {
     };
 
     /**
+     * Rewrites subscription urls for specified platform config
+     *
+     * @param metadata
+     * @param config
+     */
+    const rewriteSubscriptionUrls = (metadata, config) => {
+        const SERVER_URL = 'https://filters.adtidy.org/';
+        const OPTIMIZED_PLATFORMS = ['ext_safari', 'android', 'ios'];
+
+        const useOptimized = OPTIMIZED_PLATFORMS.indexOf(config.platform) >= 0;
+
+        const result = {};
+
+        result.groups = metadata.groups.slice(0);
+        result.tags = metadata.tags.slice(0);
+        result.filters = [];
+
+        for (let f of metadata.filters) {
+            let copy = Object.assign({}, f);
+
+            if (copy.subscriptionUrl && copy.subscriptionUrl.startsWith(SERVER_URL)) {
+                const fileName = `${copy.filterId}${useOptimized ? '_optimized' : ''}.txt`;
+                const platformPath = config.path;
+                copy.subscriptionUrl = `${SERVER_URL}${platformPath}/filters/${fileName}`;
+            }
+
+            result.filters.push(copy);
+        }
+
+        return result;
+    };
+
+    /**
      * Writes metadata files
      */
     const writeFiltersMetadata = function (platformsPath, filtersDir, filtersMetadata) {
@@ -309,6 +342,7 @@ module.exports = (() => {
             logger.info('Writing filters metadata: ' + config.path);
             const filtersFile = path.join(platformDir, FILTERS_METADATA_FILE);
             let metadata = {groups: groups, tags: tags, filters: filtersMetadata};
+            metadata = rewriteSubscriptionUrls(metadata, config);
             if (platform === 'MAC') {
                 metadata = workaround.rewriteMetadataForOldMac(metadata);
             }
