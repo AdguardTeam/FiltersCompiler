@@ -42,6 +42,7 @@ module.exports = (function () {
     const EXCLUDE_FILE = 'exclude.txt';
     const EXCLUDED_LINES_FILE = 'diff.txt';
     const METADATA_FILE = 'metadata.json';
+    const ADGUARD_FILTERS_SERVER_URL = 'https://filters.adtidy.org/';
 
 
     let currentDir;
@@ -446,7 +447,7 @@ module.exports = (function () {
     const build = async function (filtersDir, logFile, domainBlacklistFile, platformsPath, platformsConfigFile, whitelist, blacklist) {
         logger.initialize(logFile);
         validator.init(domainBlacklistFile);
-        generator.init(FILTER_FILE, METADATA_FILE, REVISION_FILE, platformsConfigFile);
+        generator.init(FILTER_FILE, METADATA_FILE, REVISION_FILE, platformsConfigFile, ADGUARD_FILTERS_SERVER_URL);
 
         await parseDirectory(filtersDir, whitelist, blacklist);
 

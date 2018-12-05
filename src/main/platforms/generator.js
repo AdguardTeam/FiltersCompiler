@@ -47,6 +47,7 @@ module.exports = (() => {
     let filterFile = null;
     let metadataFile = null;
     let revisionFile = null;
+    let adguardFiltersServerUrl = null;
 
     /**
      * Sync reads file content
@@ -284,7 +285,6 @@ module.exports = (() => {
      * @param config
      */
     const rewriteSubscriptionUrls = (metadata, config) => {
-        const SERVER_URL = 'https://filters.adtidy.org/';
         const OPTIMIZED_PLATFORMS = ['ext_safari', 'android', 'ios'];
 
         const useOptimized = OPTIMIZED_PLATFORMS.indexOf(config.platform) >= 0;
@@ -298,10 +298,10 @@ module.exports = (() => {
         for (let f of metadata.filters) {
             let copy = Object.assign({}, f);
 
-            if (copy.subscriptionUrl && copy.subscriptionUrl.startsWith(SERVER_URL)) {
+            if (copy.subscriptionUrl && copy.subscriptionUrl.startsWith(adguardFiltersServerUrl)) {
                 const fileName = `${copy.filterId}${useOptimized ? '_optimized' : ''}.txt`;
                 const platformPath = config.path;
-                copy.subscriptionUrl = `${SERVER_URL}${platformPath}/filters/${fileName}`;
+                copy.subscriptionUrl = `${adguardFiltersServerUrl}${platformPath}/filters/${fileName}`;
             }
 
             result.filters.push(copy);
@@ -669,11 +669,15 @@ module.exports = (() => {
      * @param filterFileName
      * @param metadataFileName
      * @param revisionFileName
+     * @param platformsConfigFile
+     * @param adguardFiltersServer
      */
-    const init = function (filterFileName, metadataFileName, revisionFileName, platformsConfigFile) {
+    const init = function (filterFileName, metadataFileName, revisionFileName, platformsConfigFile, adguardFiltersServer) {
         filterFile = filterFileName;
         metadataFile = metadataFileName;
         revisionFile = revisionFileName;
+
+        adguardFiltersServerUrl = adguardFiltersServer;
 
         const config = readFile(platformsConfigFile);
         if (!config) {
