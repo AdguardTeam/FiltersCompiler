@@ -11,6 +11,6 @@ QUnit.test("Test json validator", (assert) => {
     const platformsPath = path.join(__dirname, './resources/platforms');
     const jsonSchemasConfigDir = path.join(__dirname, './resources/schemas');
 
-    assert.ok(schemaValidator.validate(platformsPath, jsonSchemasConfigDir));
+    assert.ok(schemaValidator.validate(platformsPath, jsonSchemasConfigDir, 3));
 });
 

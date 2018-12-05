@@ -44,9 +44,10 @@ module.exports = (() => {
      * @param validator
      * @param schemas
      * @param oldSchemas
+     * @param filtersRequiredAmount
      * @returns {boolean}
      */
-    const validateDir = (dir, validator, schemas, oldSchemas) => {
+    const validateDir = (dir, validator, schemas, oldSchemas, filtersRequiredAmount) => {
         const items = fs.readdirSync(dir);
         for (let f of items) {
             const item = path.join(dir, f);
@@ -69,6 +70,14 @@ module.exports = (() => {
 
                     const json = JSON.parse(fs.readFileSync(item));
 
+                    // Validate filters amount
+                    if (fileName === 'filters') {
+                        if (json.filters.length < filtersRequiredAmount) {
+                            logger.error(`Invalid filters amount in ${item}`);
+                            return false;
+                        }
+                    }
+
                     let validate = validator.compile(schema);
                     let valid = validate(json);
                     if (!valid) {
@@ -88,8 +97,9 @@ module.exports = (() => {
      *
      * @param platformsPath
      * @param jsonSchemasConfigDir
+     * @param filtersRequiredAmount
      */
-    const validate = (platformsPath, jsonSchemasConfigDir) => {
+    const validate = (platformsPath, jsonSchemasConfigDir, filtersRequiredAmount) => {
         logger.info(`Validating json schemas for platforms`);
 
         const schemas = loadSchemas(jsonSchemasConfigDir);
@@ -97,7 +107,7 @@ module.exports = (() => {
 
         const ajv = new Ajv();
 
-        const result = validateDir(platformsPath, ajv, schemas, oldSchemas);
+        const result = validateDir(platformsPath, ajv, schemas, oldSchemas, filtersRequiredAmount);
 
         logger.info(`Validating json schemas for platforms - done`);
         logger.info(`Validation result: ${result}`);
