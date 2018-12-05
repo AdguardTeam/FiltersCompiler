@@ -145,7 +145,7 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.equal(filtersMetadata.filters[0].expires, 172800);
     assert.equal(filtersMetadata.filters[0].displayNumber, 101);
     assert.equal(filtersMetadata.filters[0].groupId, 2);
-    assert.equal(filtersMetadata.filters[0].subscriptionUrl, 'https://easylist-downloads.adblockplus.org/easylist.txt');
+    assert.equal(filtersMetadata.filters[0].subscriptionUrl, 'https://filters.adtidy.org/test/filters/2.txt');
     assert.ok(filtersMetadata.filters[0].version);
     assert.ok(filtersMetadata.filters[0].timeUpdated);
     assert.ok(/\d\d-\d\d-\d\dT\d\d:\d\d:\d\d[+-]\d\d\d\d/.test(filtersMetadata.filters[0].timeUpdated));
@@ -242,7 +242,7 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.equal(englishFilter.expires, 172800);
     assert.equal(englishFilter.displayNumber, 101);
     assert.equal(englishFilter.groupId, 2);
-    assert.equal(englishFilter.subscriptionUrl, 'https://easylist-downloads.adblockplus.org/easylist.txt');
+    assert.equal(englishFilter.subscriptionUrl, 'https://filters.adtidy.org/mac/filters/2.txt');
     assert.ok(englishFilter.version);
     assert.ok(englishFilter.timeUpdated);
     assert.equal(englishFilter.languages.length, 2);
