@@ -1,0 +1,111 @@
+/* globals require */
+
+module.exports = (() => {
+
+    'use strict';
+
+    const logger = require("./utils/log.js");
+
+    const fs = require("fs");
+    const path = require("path");
+    const Ajv = require('ajv');
+
+    const OLD_MAC_SCHEMAS_SUBDIR = 'mac';
+    const SCHEMA_EXTENSION = '.schema.json';
+
+    const OLD_MAC_PLATFORMS_DIR = 'mac';
+
+    /**
+     * Loads all available schemas from dir
+     *
+     * @param dir
+     * @returns {{}}
+     */
+    const loadSchemas = (dir) => {
+        const schemas = {};
+
+        const items = fs.readdirSync(dir);
+        for (let f of items) {
+            if (f.endsWith(SCHEMA_EXTENSION)) {
+                let validationFileName = f.substr(0, f.indexOf(SCHEMA_EXTENSION));
+
+                logger.info(`Loading schema for ${validationFileName}`);
+                schemas[validationFileName] = JSON.parse(fs.readFileSync(path.join(dir, f)));
+            }
+        }
+
+        return schemas;
+    };
+
+    /**
+     * Recursively validates dir content with provided schemas
+     *
+     * @param dir
+     * @param validator
+     * @param schemas
+     * @param oldSchemas
+     * @returns {boolean}
+     */
+    const validateDir = (dir, validator, schemas, oldSchemas) => {
+        const items = fs.readdirSync(dir);
+        for (let f of items) {
+            const item = path.join(dir, f);
+            if (fs.lstatSync(item).isDirectory()) {
+                if (!validateDir(item, validator, schemas, oldSchemas)) {
+                    return false;
+                }
+            } else {
+                const fileName = path.basename(item, '.json');
+                let schema = schemas[fileName];
+
+                // Validate mac dir with old schemas
+                if (path.basename(path.dirname(item)) === OLD_MAC_PLATFORMS_DIR) {
+                    logger.log('Look up old schemas for mac directory');
+                    schema = oldSchemas[fileName];
+                }
+
+                if (schema) {
+                    logger.info(`Validating ${item}`);
+
+                    const json = JSON.parse(fs.readFileSync(item));
+
+                    let validate = validator.compile(schema);
+                    let valid = validate(json);
+                    if (!valid) {
+                        logger.error(`Invalid json in ${item}, errors:`);
+                        logger.error(validate.errors);
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    };
+
+    /**
+     * Validates json schemas for all the filters.json and filters_i18n.json found in platforms path
+     *
+     * @param platformsPath
+     * @param jsonSchemasConfigDir
+     */
+    const validate = (platformsPath, jsonSchemasConfigDir) => {
+        logger.info(`Validating json schemas for platforms`);
+
+        const schemas = loadSchemas(jsonSchemasConfigDir);
+        const oldSchemas = loadSchemas(path.join(jsonSchemasConfigDir, OLD_MAC_SCHEMAS_SUBDIR));
+
+        const ajv = new Ajv();
+
+        const result = validateDir(platformsPath, ajv, schemas, oldSchemas);
+
+        logger.info(`Validating json schemas for platforms - done`);
+        logger.info(`Validation result: ${result}`);
+
+        return result;
+    };
+
+    return {
+        validate: validate
+    };
+})();

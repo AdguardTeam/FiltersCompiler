@@ -1,0 +1,184 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://adguard.com/mac/filters.json",
+  "type": "object",
+  "title": "The Root Schema",
+  "required": [
+    "groups",
+    "filters"
+  ],
+  "properties": {
+    "groups": {
+      "$id": "#/properties/groups",
+      "type": "array",
+      "title": "The Groups Schema",
+      "items": {
+        "$id": "#/properties/groups/items",
+        "type": "object",
+        "title": "The Items Schema",
+        "required": [
+          "groupId",
+          "groupName",
+          "displayNumber"
+        ],
+        "properties": {
+          "groupId": {
+            "$id": "#/properties/groups/items/properties/groupId",
+            "type": "integer",
+            "title": "The Groupid Schema",
+            "default": 0,
+            "examples": [
+              1
+            ]
+          },
+          "groupName": {
+            "$id": "#/properties/groups/items/properties/groupName",
+            "type": "string",
+            "title": "The Groupname Schema",
+            "default": "",
+            "examples": [
+              "Ad Blocking"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "displayNumber": {
+            "$id": "#/properties/groups/items/properties/displayNumber",
+            "type": "integer",
+            "title": "The Displaynumber Schema",
+            "default": 0,
+            "examples": [
+              1
+            ]
+          }
+        }
+      }
+    },
+    "filters": {
+      "$id": "#/properties/filters",
+      "type": "array",
+      "title": "The Filters Schema",
+      "items": {
+        "$id": "#/properties/filters/items",
+        "type": "object",
+        "title": "The Items Schema",
+        "required": [
+          "filterId",
+          "name",
+          "description",
+          "homepage",
+          "expires",
+          "displayNumber",
+          "groupId",
+          "subscriptionUrl",
+          "version",
+          "timeUpdated",
+          "languages"
+        ],
+        "properties": {
+          "filterId": {
+            "$id": "#/properties/filters/items/properties/filterId",
+            "type": "integer",
+            "title": "The Filterid Schema",
+            "default": 0,
+            "examples": [
+              101
+            ]
+          },
+          "name": {
+            "$id": "#/properties/filters/items/properties/name",
+            "type": "string",
+            "title": "The Name Schema",
+            "default": "",
+            "examples": [
+              "EasyList"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "description": {
+            "$id": "#/properties/filters/items/properties/description",
+            "type": "string",
+            "title": "The Description Schema",
+            "default": "",
+            "examples": [
+              "EasyList is the primary subscription that removes adverts from web pages in English language."
+            ],
+            "pattern": "^(.*)$"
+          },
+          "homepage": {
+            "$id": "#/properties/filters/items/properties/homepage",
+            "type": "string",
+            "title": "The Homepage Schema",
+            "default": "",
+            "examples": [
+              "https://easylist.to/"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "expires": {
+            "$id": "#/properties/filters/items/properties/expires",
+            "type": "integer",
+            "title": "The Expires Schema",
+            "default": 0,
+            "examples": [
+              172800
+            ]
+          },
+          "displayNumber": {
+            "$id": "#/properties/filters/items/properties/displayNumber",
+            "type": "integer",
+            "title": "The Displaynumber Schema",
+            "default": 0,
+            "examples": [
+              3
+            ]
+          },
+          "groupId": {
+            "$id": "#/properties/filters/items/properties/groupId",
+            "type": "integer",
+            "title": "The Groupid Schema",
+            "default": 0,
+            "examples": [
+              1
+            ]
+          },
+          "subscriptionUrl": {
+            "$id": "#/properties/filters/items/properties/subscriptionUrl",
+            "type": "string",
+            "title": "The Subscriptionurl Schema",
+            "default": "",
+            "examples": [
+              "https://easylist.to/easylist/easylist.txt"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "version": {
+            "$id": "#/properties/filters/items/properties/version",
+            "type": "string",
+            "title": "The Version Schema",
+            "default": "",
+            "examples": [
+              "2.0.20.32"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "timeUpdated": {
+            "$id": "#/properties/filters/items/properties/timeUpdated",
+            "type": "string",
+            "title": "The Timeupdated Schema",
+            "default": "",
+            "examples": [
+              "2018-12-04T16:00:16+0300"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "languages": {
+            "$id": "#/properties/filters/items/properties/languages",
+            "type": "array",
+            "title": "The Languages Schema"
+          }
+        }
+      }
+    }
+  }
+}

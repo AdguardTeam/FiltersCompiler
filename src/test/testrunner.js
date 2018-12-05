@@ -85,4 +85,9 @@
         code: "./src/main/builder.js",
         tests: "./src/test/test-builder.js"
     }, testCallback);
+
+    testRunner.run({
+        code: "./src/main/json-validator.js",
+        tests: "./src/test/test-json-validator.js"
+    }, testCallback);
 })();
