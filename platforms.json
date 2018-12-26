@@ -116,7 +116,6 @@
                 "\\$\\$|\\$\\@\\$",
                 "\\$mp4",
                 "\\$replace=",
-                "\\$stealth",
                 "important,replace=",
                 "\\$app",
                 "\\$network",
@@ -140,7 +139,6 @@
         "configuration": {
             "removeRulePatterns": [
                 "\\$mp4",
-                "\\$stealth",
                 "\\$app",
                 "\\$network",
                 "\\$protobuf",
@@ -195,7 +193,6 @@
                 "\\$\\$|\\$\\@\\$",
                 "\\$mp4",
                 "\\$replace=",
-                "\\$stealth",
                 "important,replace=",
                 "\\$app",
                 "\\$network",
@@ -221,7 +218,6 @@
                 "\\$\\$|\\$\\@\\$",
                 "\\$mp4",
                 "\\$replace=",
-                "\\$stealth",
                 "important,replace=",
                 "\\$app",
                 "\\$network",
