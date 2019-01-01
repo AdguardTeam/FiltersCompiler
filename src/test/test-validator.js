@@ -336,6 +336,12 @@ QUnit.test("Test validation - various rules", function (assert) {
 
     let rules = ['||onedrive.su/code/bshow.php$empty,important,~websocket'];
     assert.ok(validator.validate(rules).length > 0);
+
+    rules = ['||onedrive.su/code/bshow.php$cookie=cookie_name'];
+    assert.ok(validator.validate(rules).length > 0);
+
+    rules = ['||onedrive.su/code/bshow.php$empty,important,stealth'];
+    assert.ok(validator.validate(rules).length > 0);
 });
 
 
