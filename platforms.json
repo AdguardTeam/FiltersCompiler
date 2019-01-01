@@ -51,6 +51,7 @@
         "configuration": {
             "removeRulePatterns": [
                 "\\$stealth",
+                ",stealth",
                 "\\$redirect=",
                 ",redirect="
             ],
@@ -75,6 +76,7 @@
                 "\\$mp4",
                 "\\$replace=",
                 "\\$stealth",
+                ",stealth",
                 "important,replace=",
                 "\\$app",
                 "\\$protobuf",
@@ -164,6 +166,7 @@
                 "\\$mp4",
                 "\\$replace=",
                 "\\$stealth",
+                ",stealth",
                 "important,replace=",
                 "\\$app",
                 "\\$network",
@@ -249,6 +252,7 @@
                 "\\$mp4",
                 "\\$replace=",
                 "\\$stealth",
+                ",stealth",
                 "\\$empty",
                 "important,replace=",
                 "\\$app",
@@ -288,6 +292,7 @@
                 "\\$mp4",
                 "\\$replace=",
                 "\\$stealth",
+                ",stealth",
                 "important,replace=",
                 "\\$app",
                 "\\$network",
