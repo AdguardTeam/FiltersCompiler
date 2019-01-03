@@ -45,6 +45,7 @@ module.exports = (function () {
         'urlblock',
         'document', '~document',
         'stealth',
+        'cookie',
         'generichide',
         'genericblock',
         'important',
