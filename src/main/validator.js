@@ -237,6 +237,18 @@ module.exports = (function () {
                         }
                         return false;
                     }
+
+                    if (name === 'domain' || name === '~domain') {
+                        if (rule.modifiers[name].filter(x => x === '').length > 0) {
+                            logger.error(`Invalid rule: ${s} incorrect option value: ${rule.modifiers[name]}`);
+
+                            if (excluded) {
+                                excluded.push('! Invalid rule options:');
+                                excluded.push(rule.ruleText);
+                            }
+                            return false;
+                        }
+                    }
                 }
             }
 
