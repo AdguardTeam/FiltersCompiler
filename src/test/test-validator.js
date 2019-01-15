@@ -344,7 +344,6 @@ QUnit.test("Test validation - various rules", function (assert) {
     assert.ok(validator.validate(rules).length > 0);
 });
 
-
 QUnit.test("Test validation - validate redirect option", function (assert) {
     'use strict';
 
@@ -373,7 +372,6 @@ QUnit.test("Test validation - validate redirect option", function (assert) {
     assert.ok(validator.validate(rules).length === 3);
 });
 
-
 QUnit.test("Test validation - validate rules with $", function (assert) {
     'use strict';
 
@@ -391,4 +389,20 @@ QUnit.test("Test validation - validate rules with $", function (assert) {
 
     assert.ok(validateRules.indexOf(validRedirectRule1) !== -1);
     assert.ok(validateRules.length > 0);
+});
+
+QUnit.test("Test validation - incorrect domain option", function (assert) {
+    'use strict';
+
+    const validator = require("../main/validator.js");
+    validator.init();
+
+    let rules = ['|http*$domain='];
+    assert.ok(validator.validate(rules).length === 0);
+
+    rules = ['|http*$~domain=|example.org'];
+    assert.ok(validator.validate(rules).length === 0);
+
+    rules = ['|http*$script,domain=|example.org'];
+    assert.ok(validator.validate(rules).length === 0);
 });
