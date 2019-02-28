@@ -44,6 +44,13 @@ module.exports = (function () {
     const METADATA_FILE = 'metadata.json';
     const ADGUARD_FILTERS_SERVER_URL = 'https://filters.adtidy.org/';
 
+    const INCLUDE_DIRECTIVE = "@include ";
+    const INCLUDE_OPTION_COMMENTS = "/stripComments";
+    const INCLUDE_OPTION_NOT_OPTIMIZED = "/notOptimized";
+    const INCLUDE_OPTION_EXCLUDE = "/exclude=";
+
+    const NOT_OPTIMIZED_HINT = "!+ NOT_OPTIMIZED";
+
 
     let currentDir;
 
@@ -99,6 +106,26 @@ module.exports = (function () {
 
             return !line.startsWith(RuleMasks.MASK_COMMENT);
         });
+    };
+
+    /**
+     * Adds not optimized hints
+     *
+     * @param lines
+     */
+    const addNotOptimizedHints = function (lines) {
+        logger.log('Adding hints..');
+
+        let result = [];
+
+        lines.forEach(function (v) {
+            if (v) {
+                result.push(NOT_OPTIMIZED_HINT);
+                result.push(v);
+            }
+        });
+
+        return result;
     };
 
     /**
@@ -187,7 +214,7 @@ module.exports = (function () {
      * Parses include line
      *
      * @param line
-     * @returns {{url: string, stripComments: boolean, exclude: *}}
+     * @returns {{url: string, stripComments: boolean, notOptimized: boolean, exclude: *}}
      */
     const parseIncludeLine = function (line) {
         const parts = line.split(' ');
@@ -197,22 +224,26 @@ module.exports = (function () {
         url = stripEndQuotes(url);
 
         let stripComments = false;
+        let notOptimized = false;
         let exclude = null;
 
         for (let i = 1; i < parts.length; i++) {
             let attribute = parts[i].trim();
-            if (attribute.startsWith("/stripComments")) {
+            if (attribute.startsWith(INCLUDE_OPTION_COMMENTS)) {
                 stripComments = true;
-            } else if (attribute.startsWith("/exclude=")) {
+            } else if (attribute.startsWith(INCLUDE_OPTION_NOT_OPTIMIZED)) {
+                notOptimized = true;
+            } else if (attribute.startsWith(INCLUDE_OPTION_EXCLUDE)) {
                 exclude = attribute.substring(attribute.indexOf('=') + 1);
                 exclude = stripEndQuotes(exclude);
             }
         }
 
         return {
-            url: url,
-            stripComments: stripComments,
-            exclude: exclude
+            url,
+            stripComments,
+            notOptimized,
+            exclude
         };
     };
 
@@ -272,6 +303,10 @@ module.exports = (function () {
                 result = stripComments(result);
             }
 
+            if (options.notOptimized) {
+                result = addNotOptimizedHints(result);
+            }
+
             result = workaround.fixVersionComments(result);
         } else {
             throw new Error(`Error handling include from: ${options.url}`);
@@ -292,7 +327,7 @@ module.exports = (function () {
 
         const lines = splitLines(template);
         for (let line of lines) {
-            if (line.startsWith('@include ')) {
+            if (line.startsWith(INCLUDE_DIRECTIVE)) {
                 const inc = await include(line.trim(), excluded);
 
                 let k = 0;

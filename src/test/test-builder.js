@@ -176,7 +176,7 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.ok(filterContent);
 
     let filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 36);
+    assert.equal(filterLines.length, 40);
 
     assert.ok(filterLines.indexOf('![Adblock Plus 2.0]') >= 0);
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
@@ -185,12 +185,14 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.ok(filterLines.indexOf('~nigma.ru,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]') >= 0);
     assert.ok(filterLines.indexOf('excluded_platform') >= 0);
     assert.ok(filterLines.indexOf('test_domain#%#testScript();') >= 0);
+    assert.ok(filterLines.indexOf('!+ NOT_OPTIMIZED') >= 0);
+    assert.ok(filterLines.indexOf('test-common-2-rule.com') >= 0);
 
     filterContent = readFile(path.join(platforms, 'config/test', 'filters', '2.txt'));
     assert.ok(filterContent);
 
     filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 20);
+    assert.equal(filterLines.length, 24);
 
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
     assert.notOk(filterLines.indexOf('test-common-1-rule.com') >= 0);
@@ -204,7 +206,7 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.ok(filterContent);
 
     filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 31);
+    assert.equal(filterLines.length, 35);
 
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
     assert.ok(filterLines.indexOf('test-common-1-rule.com') >= 0);

@@ -1,0 +1,2 @@
+test-common-2-rule.com
+test-common-2-rule.com$xmlhttprequest
