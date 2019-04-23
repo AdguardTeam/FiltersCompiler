@@ -9,6 +9,18 @@ module.exports = (() => {
 
     const CSS_RULE_REPLACE_PATTERN = /(.*):style\((.*)\)/g;
 
+    const FIRST_PARTY_REGEX = /([\$,])first-party/i;
+    const FIRST_PARTY_REPLACEMENT = `$1~third-party`;
+
+    const XHR_REGEX = /([\$,])xhr/i;
+    const XHR_REPLACEMENT = `$1xmlhttprequest`;
+
+    const CSS_REGEX = /([\$,])css/i;
+    const CSS_REPLACEMENT = `$1stylesheet`;
+
+    const FRAME_REGEX = /([\$,])frame/i;
+    const FRAME_REPLACEMENT = `$1subdocument`;
+
     /**
      * Executes rule css conversion
      *
@@ -52,6 +64,14 @@ module.exports = (() => {
      * $first-party -> $~third-party
      * ,first-party -> ,~third-party
      *
+     * options conversion:
+     * $xhr -> $xmlhttprequest
+     * ,xhr -> ,xmlhttprequest
+     * $css -> $stylesheet
+     * ,css -> ,stylesheet
+     * $frame -> $subdocument
+     * ,frame -> ,subdocument
+     *
      * CSS injection conversion:
      * example.com##h1:style(background-color: blue !important)
      * into
@@ -67,8 +87,6 @@ module.exports = (() => {
      */
     const convert = function (rulesList, excluded) {
         const result = [];
-        const firstPartyRegex = /([\$,])first-party/i;
-        const firstPartyReplacement = `$1~third-party`;
 
         for (let rule of rulesList) {
             if (rule.includes(':style')) {
@@ -88,9 +106,15 @@ module.exports = (() => {
                 }
             }
 
-            // If rule includes first-party option, than we replace it
-            if (firstPartyRegex.test(rule)) {
-                let replacedRule = rule.replace(firstPartyRegex, firstPartyReplacement);
+            // Some options will be replaced
+            if (FIRST_PARTY_REGEX.test(rule) ||
+                XHR_REGEX.test(rule) ||
+                CSS_REGEX.test(rule) ||
+                FRAME_REGEX.test(rule)) {
+                let replacedRule = rule.replace(FIRST_PARTY_REGEX, FIRST_PARTY_REPLACEMENT)
+                    .replace(XHR_REGEX, XHR_REPLACEMENT)
+                    .replace(CSS_REGEX, CSS_REPLACEMENT)
+                    .replace(FRAME_REGEX, FRAME_REPLACEMENT);
                 let message = `Rule "${rule}" converted to: ${result}`;
                 logger.log(message);
                 rule = replacedRule;

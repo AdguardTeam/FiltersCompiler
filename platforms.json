@@ -50,8 +50,6 @@
         "path": "android",
         "configuration": {
             "removeRulePatterns": [
-                "\\$stealth",
-                ",stealth",
                 "\\$redirect=",
                 ",redirect="
             ],

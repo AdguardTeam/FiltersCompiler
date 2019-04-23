@@ -59,3 +59,30 @@ QUnit.test('Test first-party replaced by ~third-party', (assert) => {
     assert.equal(actual[1], expected[1]);
 });
 
+QUnit.test('Test options replacement', (assert) => {
+    const converter = require('../main/converter');
+    let actual = converter.convert(['||www.ynet.co.il^$xhr,websocket']);
+    let expected = '||www.ynet.co.il^$xmlhttprequest,websocket';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['||zive.cz^*+$script,xhr']);
+    expected = '||zive.cz^*+$script,xmlhttprequest';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['||zive.cz^*+$script,css']);
+    expected = '||zive.cz^*+$script,stylesheet';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['||zive.cz^*+$css,script']);
+    expected = '||zive.cz^*+$stylesheet,script';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['||zive.cz^*+$frame']);
+    expected = '||zive.cz^*+$subdocument';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['||zive.cz^*+$xhr,frame']);
+    expected = '||zive.cz^*+$xmlhttprequest,subdocument';
+    assert.equal(actual, expected);
+});
+
