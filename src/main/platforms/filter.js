@@ -17,6 +17,8 @@ module.exports = (() => {
 
     const NOT_OPTIMIZED_HINT = "NOT_OPTIMIZED";
 
+    const SUPPRESS_INCORRECT_OPTIMIZATION_FILTER_ID = 208; // 'Malware Domains' filter
+
     /**
      * Parses rule hints
      *
@@ -234,7 +236,7 @@ module.exports = (() => {
         const tooLow = resultOptimizationPercent < getOptimizationPercentLowBound(expectedOptimizationPercent);
         const tooHigh = resultOptimizationPercent > getOptimizationPercentUpperBound(expectedOptimizationPercent);
 
-        const incorrect = tooLow || tooHigh;
+        const incorrect = filterId !== SUPPRESS_INCORRECT_OPTIMIZATION_FILTER_ID && (tooLow || tooHigh);
 
         if (incorrect) {
             throw new Error(`We want to get optimized mobile filter ${filterId} which less than original on ${expectedOptimizationPercent}%, but on practice we have ${resultOptimizationPercent}%! ` +
