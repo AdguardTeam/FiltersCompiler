@@ -4,6 +4,15 @@ module.exports = (() => {
 
     'use strict';
 
+    /**
+     * @typedef {object} OptimizationConfig
+     * @property {number} filterId - Filter identifier
+     * @property {number} percent - Expected optimization percent `~= (rules count in optimized filter) / (rules count in original filter) * 100`
+     * @property {number} minPercent - Lower bound of `percent` value
+     * @property {number} maxPercent - Upper bound of `percent` value
+     * @property {boolean} strict - If `percent < minPercent || percent  > maxPercent` and strict mode is on then filter compilation should fail, otherwise original rules must be used
+     */
+
     const logger = require("../utils/log.js");
     const Workaround = require('../utils/workaround.js');
     const RuleMasks = require('../rule/rule-masks.js');
@@ -16,8 +25,6 @@ module.exports = (() => {
     const NOT_PLATFORM_HINT_REGEXP = /(.*)NOT_PLATFORM\(([^)]+)\)/g;
 
     const NOT_OPTIMIZED_HINT = "NOT_OPTIMIZED";
-
-    const SUPPRESS_INCORRECT_OPTIMIZATION_FILTER_ID = 208; // 'Malware Domains' filter
 
     /**
      * Parses rule hints
@@ -174,7 +181,7 @@ module.exports = (() => {
      * Checks if rule should be omitted with specified configuration
      *
      * @param ruleLine
-     * @param optimizationConfig
+     * @param {OptimizationConfig} optimizationConfig
      */
     const shouldOmitRuleWithOptimization = function (ruleLine, optimizationConfig) {
         const ruleText = ruleLine.rule;
@@ -191,59 +198,41 @@ module.exports = (() => {
     };
 
     /**
-     * low bound = percent - 20. For some filters: low bound = percent - 30
-     * <p>
-     * Calculation of low bound depends on filter
-     *
-     * @param expectedOptimizationPercent Expected optimization percent
-     * @return int bound after which optimization is incorrect
-     */
-    const getOptimizationPercentLowBound = function (expectedOptimizationPercent) {
-        return Math.max(expectedOptimizationPercent - 20, 25);
-    };
-
-    /**
-     * upper bound = percent + 10
-     * <p>
-     * Calculation of upper bound doesn't depend on filter
-     *
-     * @param expectedOptimizationPercent Expected optimization percent
-     * @return int upper bound after which optimization is incorrect
-     */
-    const getOptimizationPercentUpperBound = function (expectedOptimizationPercent) {
-        return Math.min(expectedOptimizationPercent + 10, 100);
-    };
-
-    /**
      * We want to be sure that our mobile optimization is correct and didn't remove valuable rules
      *
      * @param filterId
      * @param rules
      * @param optimizedRules
-     * @param optimizationConfig
+     * @param {OptimizationConfig} optimizationConfig
      */
     const isOptimizationCorrect = function (filterId, rules, optimizedRules, optimizationConfig) {
-        if (optimizationConfig.percent === null) {
-            return true;
-        }
 
         const filterRulesCount = rules.length;
         const optimizedRulesCount = optimizedRules.length;
 
         const resultOptimizationPercent = optimizedRulesCount / filterRulesCount * 100;
+
         const expectedOptimizationPercent = optimizationConfig.percent;
+        const minOptimizationPercent = optimizationConfig.minPercent;
+        const maxOptimizationPercent = optimizationConfig.maxPercent;
+        const strict = optimizationConfig.strict;
 
-        const tooLow = resultOptimizationPercent < getOptimizationPercentLowBound(expectedOptimizationPercent);
-        const tooHigh = resultOptimizationPercent > getOptimizationPercentUpperBound(expectedOptimizationPercent);
+        const tooLow = resultOptimizationPercent < minOptimizationPercent;
+        const tooHigh = resultOptimizationPercent > maxOptimizationPercent;
 
-        const incorrect = filterId !== SUPPRESS_INCORRECT_OPTIMIZATION_FILTER_ID && (tooLow || tooHigh);
+        const incorrect = tooLow || tooHigh;
 
         if (incorrect) {
-            throw new Error(`We want to get optimized mobile filter ${filterId} which less than original on ${expectedOptimizationPercent}%, but on practice we have ${resultOptimizationPercent}%! ` +
-                `Filter rules count: ${filterRulesCount}. Optimized rules count: ${optimizedRulesCount}.`);
+            let message = `Unable to optimize filter ${filterId} with configuration [~=${expectedOptimizationPercent}%, min=${minOptimizationPercent}%, max=${maxOptimizationPercent}%], calculated = ${resultOptimizationPercent.toFixed(2)}%! ` +
+                `Filter rules count: ${filterRulesCount}. Optimized rules count: ${optimizedRulesCount}.`;
+            if (strict) {
+                throw new Error(message);
+            } else {
+                logger.error(message);
+            }
         }
 
-        logger.log(`Filter ${filterId} optimization: ${filterRulesCount} => ${optimizedRulesCount}, ${expectedOptimizationPercent}% => ${resultOptimizationPercent}%.`);
+        logger.info(`Filter ${filterId} optimization: ${filterRulesCount} => ${optimizedRulesCount}, ${expectedOptimizationPercent}% => ${resultOptimizationPercent}%.`);
 
         return !incorrect;
     };
@@ -269,7 +258,7 @@ module.exports = (() => {
      *
      * @param rules
      * @param config
-     * @param optimizationConfig
+     * @param {OptimizationConfig} optimizationConfig
      * @param filterId
      */
     const cleanupAndOptimizeRules = function (rules, config, optimizationConfig, filterId) {
