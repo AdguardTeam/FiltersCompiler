@@ -66,28 +66,28 @@
         tests: "./src/test/test-validator.js"
     }, testCallback);
 
-    // testRunner.run({
-    //     code: "./src/main/sorting.js",
-    //     tests: "./src/test/test-sorting.js"
-    // }, testCallback);
-    //
-    // testRunner.run({
-    //     code: "./src/main/optimization.js",
-    //     tests: "./src/test/test-optimization.js"
-    // }, testCallback);
-    //
-    // testRunner.run({
-    //     code: "./src/main/platforms/filter.js",
-    //     tests: "./src/test/test-platforms-filter.js"
-    // }, testCallback);
-    //
-    // testRunner.run({
-    //     code: "./src/main/builder.js",
-    //     tests: "./src/test/test-builder.js"
-    // }, testCallback);
-    //
-    // testRunner.run({
-    //     code: "./src/main/json-validator.js",
-    //     tests: "./src/test/test-json-validator.js"
-    // }, testCallback);
+    testRunner.run({
+        code: "./src/main/sorting.js",
+        tests: "./src/test/test-sorting.js"
+    }, testCallback);
+
+    testRunner.run({
+        code: "./src/main/optimization.js",
+        tests: "./src/test/test-optimization.js"
+    }, testCallback);
+
+    testRunner.run({
+        code: "./src/main/platforms/filter.js",
+        tests: "./src/test/test-platforms-filter.js"
+    }, testCallback);
+
+    testRunner.run({
+        code: "./src/main/builder.js",
+        tests: "./src/test/test-builder.js"
+    }, testCallback);
+
+    testRunner.run({
+        code: "./src/main/json-validator.js",
+        tests: "./src/test/test-json-validator.js"
+    }, testCallback);
 })();
