@@ -11,7 +11,7 @@ QUnit.test("Test optimization", (assert) => {
     assert.ok(filtersOptimizationPercent.config.length > 0);
 
     assert.ok(optimization.getFilterOptimizationConfig(1) !== null);
-    assert.ok(optimization.getFilterOptimizationConfig(4) === null);
+    //assert.ok(optimization.getFilterOptimizationConfig(4) === null);
 });
 
 QUnit.test("Test optimization skip rule", (assert) => {

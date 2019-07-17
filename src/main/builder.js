@@ -119,10 +119,15 @@ module.exports = (function () {
         let result = [];
 
         lines.forEach(function (v) {
-            if (v) {
-                result.push(NOT_OPTIMIZED_HINT);
-                result.push(v);
+            if (!v) {
+                return;
             }
+
+            if (!v.startsWith("! ")) {
+                result.push(NOT_OPTIMIZED_HINT);
+            }
+
+            result.push(v);
         });
 
         return result;
