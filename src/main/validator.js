@@ -250,6 +250,18 @@ module.exports = (function () {
                         }
                     }
                 }
+            } else if (rule.ruleType === RuleTypes.Css) {
+                if (rule.contentPart &&
+                    rule.contentPart.toLowerCase().indexOf('url(') >= 0 ||
+                    rule.contentPart.indexOf('\\') >= 0) {
+                    logger.error(`Invalid rule: ${s} incorrect style: ${rule.contentPart}`);
+
+                    if (excluded) {
+                        excluded.push('! Incorrect style:');
+                        excluded.push(rule.ruleText);
+                    }
+                    return false;
+                }
             }
 
             //TODO: Check js rules validation

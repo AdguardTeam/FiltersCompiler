@@ -406,3 +406,17 @@ QUnit.test("Test validation - incorrect domain option", function (assert) {
     rules = ['|http*$script,domain=|example.org'];
     assert.ok(validator.validate(rules).length === 0);
 });
+
+QUnit.test("Test validation - cosmetic css rules", function (assert) {
+    const validator = require("../main/validator.js");
+    validator.init();
+
+    let rules = ['example.com#$#body { background: black; }'];
+    assert.ok(validator.validate(rules).length === 1);
+
+    rules = ['example.com#$#body { background: url("https://some.jpg"); }'];
+    assert.ok(validator.validate(rules).length === 0);
+
+    rules = ['example.com#$#body { background: \\75 rl("https://some.jpg"); }'];
+    assert.ok(validator.validate(rules).length === 0);
+});
