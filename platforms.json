@@ -140,7 +140,6 @@
         "path": "extension/firefox",
         "configuration": {
             "removeRulePatterns": [
-                "\\$mp4",
                 "\\$app",
                 "\\$network",
                 "\\$protobuf",
