@@ -116,7 +116,6 @@
         "configuration": {
             "removeRulePatterns": [
                 "\\$\\$|\\$\\@\\$",
-                "\\$mp4",
                 "\\$replace=",
                 "important,replace=",
                 "\\$app",
