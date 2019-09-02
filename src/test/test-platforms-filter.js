@@ -94,19 +94,26 @@ QUnit.test("Test optimization hints", (assert) => {
         "optimized.com",
         "###optimized",
         "!+ NOT_OPTIMIZED",
-        "not_optimized"
+        "not_optimized",
+        "!#safari_cb_affinity(general)",
+        "some.affinity.ru#@#.ad-zone",
+        "!",
+        "!#safari_cb_affinity"
     ];
 
     const after = filter.cleanupAndOptimizeRules(before, config, optimizationConfig, 0);
 
     assert.ok(after);
-    assert.equal(after.length, 3);
+    assert.equal(after.length, 6);
 
     assert.notOk(after.indexOf('! Comment') >= 0);
     assert.ok(after.indexOf('example.com') >= 0);
     assert.notOk(after.indexOf('optimized.com') >= 0);
     assert.notOk(after.indexOf('###optimized') >= 0);
     assert.ok(after.indexOf('not_optimized') >= 0);
+    assert.ok(after.indexOf('!#safari_cb_affinity(general)') >= 0);
+    assert.ok(after.indexOf('some.affinity.ru#@#.ad-zone') >= 0);
+    assert.ok(after.indexOf('!#safari_cb_affinity') >= 0);
 });
 
 QUnit.test("Test remove rule patterns", (assert) => {
