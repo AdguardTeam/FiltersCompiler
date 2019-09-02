@@ -49,6 +49,12 @@ module.exports = (function () {
                 return false;
             }
 
+            // skip :before and :after selectors
+            if (selectorText.indexOf(':before') > 0 ||
+                selectorText.indexOf(':after') > 0) {
+                return true;
+            }
+
             ExtendedCss.query(selectorText, true);
             return true;
         } catch (ex) {

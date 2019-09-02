@@ -419,4 +419,9 @@ QUnit.test("Test validation - cosmetic css rules", function (assert) {
 
     rules = ['example.com#$#body { background: \\75 rl("https://some.jpg"); }'];
     assert.ok(validator.validate(rules).length === 0);
+
+    rules = ['hotline.ua#$#body.reset-scroll:before { z-index: -9999!important; display: none!important; }',
+        'hotline.ua##body.reset-scroll::before',
+        'hotline.ua##body.reset-scroll::after'];
+    assert.ok(validator.validate(rules).length === 3);
 });
