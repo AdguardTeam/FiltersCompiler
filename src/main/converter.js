@@ -126,7 +126,56 @@ module.exports = (() => {
         return result;
     };
 
+    const scriptletsCompatibility = {
+        // AG: uBO
+        'abort-current-inline-script': 'abort-current-inline-script.js',
+        'abort-on-property-read': 'abort-on-property-read.js',
+        'abort-on-property-write': 'abort-on-property-write.js',
+        'adjust-setInterval': 'nano-setInterval-booster.js',
+        'adjust-setTimeout': 'nano-setTimeout-booster.js',
+        'disable-newtab-links': 'disable-newtab-links.js',
+        'json-prune': 'json-prune.js',
+        'json-prune-new': 'json-prune.js',
+        'log-addEventListener': 'addEventListener-logger.js',
+        'nowebrtc': 'nowebrtc.js',
+        'prevent-addEventListener': 'addEventListener-defuser.js',
+        'prevent-adfly': 'adfly-defuser.js',
+        'prevent-eval-if': 'noeval-if.js',
+        'prevent-setInterval': 'setInterval-defuser.js',
+        'prevent-setTimeout': 'setTimeout-defuser.js',
+        'remove-attr': 'remove-attr.js',
+        'remove-cookie': 'cookie-remover.js',
+        'set-constant': 'set-constant.js',
+    };
+
+    const parseScriptlet = (scriptlet) => {
+        const regex = /(.+)#%#\/\/scriptlet\((.+?)(,.+?)?(,.+?)?\)/g;
+        const elms = regex.exec(scriptlet);
+
+        const domains = elms[1];
+        const scriptletName = elms[2].replace(/'|"/g, '');
+        const firstArgument = elms[3] ? elms[3].replace(/'|"/g, '') : '';
+        const secondArgument = elms[4] ? elms[4].replace(/'|"/g, '') : '';
+        
+        return {
+            domains: domains,
+            scriptletName: scriptletName,
+            firstArgument: firstArgument,
+            secondArgument: secondArgument
+        };
+    };
+
+    /**
+     * Convert Adguard scriptlets to UBlock syntax
+     * https://github.com/AdguardTeam/FiltersCompiler/issues/56
+     */
+    const convertScriptletToUblockSyntax = (ruleText) => {
+        const { domains, scriptletName, firstArgument, secondArgument} = parseScriptlet(ruleText);
+        return `${domains}##script:inject(${scriptletsCompatibility[scriptletName]}${firstArgument}${secondArgument})`
+    };
+
     return {
-        convert: convert
+        convert: convert,
+        convertScriptletToUblockSyntax: convertScriptletToUblockSyntax
     };
 })();

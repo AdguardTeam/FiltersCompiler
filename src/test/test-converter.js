@@ -86,3 +86,18 @@ QUnit.test('Test options replacement', (assert) => {
     assert.equal(actual, expected);
 });
 
+QUnit.test('Test convert scriptlets to UBlock syntax', (assert) => {
+    const { convertScriptletToUblockSyntax } = require('../main/converter');
+    let actual = convertScriptletToUblockSyntax('example.org#%#//scriptlet("abort-on-property-read", "alert")');
+    let expected = 'example.org##script:inject(abort-on-property-read.js, alert)';
+    assert.equal(actual, expected);
+
+    actual = convertScriptletToUblockSyntax("example.org#%#//scriptlet('set-constant', 'firstConst', 'false')");
+    expected = 'example.org##script:inject(set-constant.js, firstConst, false)';
+    assert.equal(actual, expected);
+
+    actual = convertScriptletToUblockSyntax("example1.org,example2.com,some-domain.dom#%#//scriptlet('prevent-adfly')");
+    expected = 'example1.org,example2.com,some-domain.dom##script:inject(adfly-defuser.js)';
+    assert.equal(actual, expected);
+});
+

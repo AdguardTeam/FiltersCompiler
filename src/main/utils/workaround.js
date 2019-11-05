@@ -5,6 +5,7 @@ module.exports = (() => {
     'use strict';
 
     const RuleMasks = require('../rule/rule-masks.js');
+    const convertScriptletToUblockSyntax = require('../converter.js');
 
     /**
      * CSS rules with width and height attributes break SVG rendering
@@ -24,60 +25,6 @@ module.exports = (() => {
         }
 
         return ruleText;
-    };
-
-    const scriptletsCompatibility = {
-        // AG: uBO
-        'abort-current-inline-script': 'abort-current-inline-script.js',
-        'abort-on-property-read': 'abort-on-property-read.js',
-        'abort-on-property-write': 'abort-on-property-write.js',
-        'adjust-setInterval': 'nano-setInterval-booster.js',
-        'adjust-setTimeout': 'nano-setTimeout-booster.js',
-        'disable-newtab-links': 'disable-newtab-links.js',
-        'json-prune': 'json-prune.js',
-        'log-addEventListener': 'addEventListener-logger.js',
-        'nowebrtc': 'nowebrtc.js',
-        'prevent-addEventListener': 'addEventListener-defuser.js',
-        'prevent-adfly': 'adfly-defuser.js',
-        'prevent-eval-if': 'noeval-if.js',
-        'prevent-setInterval': 'setInterval-defuser.js',
-        'prevent-setTimeout': 'setTimeout-defuser.js',
-        'remove-attr': 'remove-attr.js',
-        'remove-cookie': 'cookie-remover.js',
-        'set-constant': 'set-constant.js',
-    };
-    
-    const parseScriptlet = (scriptlet) => {
-        const domains = scriptlet.slice(0, scriptlet.indexOf('#%#//'));
-        const firstDividerPosition = scriptlet.indexOf("', '") !== -1 ? scriptlet.indexOf("', '") : scriptlet.indexOf('", "');
-        const secondDividerPosition = scriptlet.lastIndexOf("', '") !== -1 ? scriptlet.lastIndexOf("', '") : scriptlet.lastIndexOf('", "');
-        const endPosition = scriptlet.length - 2;
-        let firstArgument = '';
-        let secondArgument = '';
-    
-        if (scriptlet.slice(firstDividerPosition !== -1) 
-        && firstDividerPosition !== secondDividerPosition) {
-            firstArgument = ', ' + scriptlet.slice(firstDividerPosition + 4, secondDividerPosition);
-            secondArgument = ', ' + scriptlet.slice(secondDividerPosition + 4, endPosition);
-        } else if (firstDividerPosition !== -1 
-            && firstDividerPosition === secondDividerPosition) {
-            firstArgument = ', ' + scriptlet.slice(firstDividerPosition + 4, endPosition);
-        }
-        return {
-            domains: domains,
-            firstArgument: firstArgument,
-            secondArgument: secondArgument
-        };
-    }
-
-    const convertScriptletToUblockSyntax = (ruleText) => {
-        const { domains, firstArgument, secondArgument} = parseScriptlet(ruleText);
-    
-        for (let scriptlet in scriptletsCompatibility) {
-            if (ruleText.includes(scriptlet)) {
-                return `${domains}##script:inject(${scriptletsCompatibility[scriptlet]}${firstArgument}${secondArgument})`
-            }
-        }
     };
 
     /**
