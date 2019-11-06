@@ -154,8 +154,8 @@ module.exports = (() => {
 
         const domains = elms[1];
         const scriptletName = elms[2].replace(/'|"/g, '');
-        const firstArgument = elms[3] ? elms[3].replace(/'|"/g, '') : '';
-        const secondArgument = elms[4] ? elms[4].replace(/'|"/g, '') : '';
+        const firstArgument = elms[3] ? elms[3].replace(/, '|, "/g, ', ').slice(0, -1) : '';
+        const secondArgument = elms[4] ? elms[4].replace(/, '|, "/g, ', ').slice(0, -1) : '';
         
         return {
             domains: domains,
@@ -171,7 +171,10 @@ module.exports = (() => {
      */
     const convertScriptletToUblockSyntax = (ruleText) => {
         const { domains, scriptletName, firstArgument, secondArgument} = parseScriptlet(ruleText);
-        return `${domains}##script:inject(${scriptletsCompatibility[scriptletName]}${firstArgument}${secondArgument})`
+        if (scriptletsCompatibility[scriptletName]) {
+            return `${domains}##script:inject(${scriptletsCompatibility[scriptletName]}${firstArgument}${secondArgument})`
+        }
+        return '';
     };
 
     return {

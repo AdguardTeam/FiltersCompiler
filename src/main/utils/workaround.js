@@ -5,7 +5,7 @@ module.exports = (() => {
     'use strict';
 
     const RuleMasks = require('../rule/rule-masks.js');
-    const convertScriptletToUblockSyntax = require('../converter.js');
+    const { convertScriptletToUblockSyntax } = require('../converter.js');
 
     /**
      * CSS rules with width and height attributes break SVG rendering
