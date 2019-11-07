@@ -174,6 +174,7 @@ module.exports = (() => {
         if (scriptletsCompatibility[scriptletName]) {
             return `${domains}##script:inject(${scriptletsCompatibility[scriptletName]}${firstArgument}${secondArgument})`
         }
+        logger.warn(`Cannot convert scriptlet ${ruleText} to UBlock syntax`);
         return '';
     };
 
