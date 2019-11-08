@@ -171,11 +171,11 @@ module.exports = (() => {
      */
     const convertScriptletToUblockSyntax = (ruleText) => {
         const { domains, scriptletName, firstArgument, secondArgument} = parseScriptlet(ruleText);
-        if (scriptletsCompatibility[scriptletName]) {
-            return `${domains}##script:inject(${scriptletsCompatibility[scriptletName]}${firstArgument}${secondArgument})`
+        if (!scriptletsCompatibility[scriptletName]) {
+            logger.warn(`Cannot convert scriptlet ${ruleText} to UBlock syntax`);
+            return '';
         }
-        logger.warn(`Cannot convert scriptlet ${ruleText} to UBlock syntax`);
-        return '';
+        return `${domains}##script:inject(${scriptletsCompatibility[scriptletName]}${firstArgument}${secondArgument})`
     };
 
     return {
