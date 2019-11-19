@@ -1,13 +1,13 @@
 {
   "name": "adguard-filters-compiler",
-  "version": "1.0.36",
+  "version": "1.0.37",
   "description": "Adguard filters compiler",
   "homepage": "http://adguard.com",
   "dependencies": {
     "ajv": "^6.6.1",
     "child_process": ">=1.0.2",
     "crypto": "1.0.1",
-    "filters-downloader": "git+https://github.com/AdguardTeam/FiltersDownloader.git##v1.0.11",
+    "filters-downloader": "git+https://github.com/AdguardTeam/FiltersDownloader.git#v1.0.11",
     "jsdom": "13.0.0",
     "md5": "2.2.1",
     "moment": ">=2.20.1",
