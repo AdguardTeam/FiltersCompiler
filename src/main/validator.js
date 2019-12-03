@@ -38,6 +38,7 @@ module.exports = (function () {
         'subdocument', '~subdocument',
         'xmlhttprequest', '~xmlhttprequest',
         'other', '~other',
+        'all', '~all',
         // Exception rules modifiers
         'elemhide',
         'content',
