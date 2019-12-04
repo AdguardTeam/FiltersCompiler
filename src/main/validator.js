@@ -57,7 +57,7 @@ module.exports = (function () {
         'replace',
         'protobuf',
         'collapse', '~collapse',
-        'ping',
+        // 'ping',
         'app',
         'badfilter',
         // UBlock extension has redirect options
