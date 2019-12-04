@@ -63,6 +63,8 @@ module.exports = (function () {
         // UBlock extension has redirect options
         // https://github.com/AdguardTeam/FiltersCompiler/issues/23
         'redirect',
+        // https://github.com/AdguardTeam/FiltersCompiler/issues/53
+        'rewrite',
     ];
 
     let domainsBlacklist = [];
