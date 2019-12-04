@@ -119,16 +119,13 @@
                 "\\$replace=",
                 "\\$stealth",
                 ",stealth",
-                "\\$mp4",
                 "important,replace=",
                 "\\$app",
                 "\\$network",
                 "\\$protobuf",
                 "important,protobuf",
                 "\\$extension",
-                ",extension",
-                "\\$redirect=",
-                ",redirect="
+                ",extension"
             ],
             "ignoreRuleHints": false
         },
@@ -146,13 +143,10 @@
                 "\\$network",
                 "\\$stealth",
                 ",stealth",
-                "\\$mp4",
                 "\\$protobuf",
                 "important,protobuf",
                 "\\$extension",
-                ",extension",
-                "\\$redirect=",
-                ",redirect="
+                ",extension"
             ],
             "ignoreRuleHints": false
         },
@@ -210,9 +204,7 @@
                 "\\$protobuf",
                 "important,protobuf",
                 "\\$extension",
-                ",extension",
-                "\\$redirect=",
-                ",redirect="
+                ",extension"
             ],
             "ignoreRuleHints": false
         },
@@ -227,7 +219,6 @@
         "configuration": {
             "removeRulePatterns": [
                 "\\$\\$|\\$\\@\\$",
-                "\\$mp4",
                 "\\$replace=",
                 "\\$stealth",
                 ",stealth",
@@ -237,9 +228,7 @@
                 "\\$protobuf",
                 "important,protobuf",
                 "\\$extension",
-                ",extension",
-                "\\$redirect=",
-                ",redirect="
+                ",extension"
             ],
             "ignoreRuleHints": false
         },
