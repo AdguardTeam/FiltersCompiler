@@ -342,6 +342,22 @@ QUnit.test("Test validation - various rules", function (assert) {
 
     rules = ['||onedrive.su/code/bshow.php$empty,important,stealth'];
     assert.ok(validator.validate(rules).length > 0);
+
+    rules = ['samdan.com.tr,esquire.com.tr##div[data-mbzone="Textlink" i] > div#id_d_textlink'];
+    assert.ok(validator.validate(rules).length > 0);
+
+    rules = ["example.com##div[class^='textLink' i]"];
+    assert.ok(validator.validate(rules).length > 0);
+
+    rules = ['example.com#?#section:has(div[class^="textLink" i])'];
+    assert.ok(validator.validate(rules).length > 0);
+
+    rules = ['example.com##div[class^="textLink"i]',
+        'example.com##div[class^=textLink i]',
+        'example.com##div[class name="textLink" i]',
+        'example.com##div[class^="textLink" "textColor" i]'];
+    assert.ok(validator.validate(rules).length === 0);
+
 });
 
 QUnit.test("Test validation - validate redirect option", function (assert) {
