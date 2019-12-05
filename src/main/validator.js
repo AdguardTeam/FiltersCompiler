@@ -231,17 +231,17 @@ module.exports = (function () {
 
                 let modifiers = rule.modifiers;
 
-                const checkOptionRewriteValue = (name) => {
-                    if (name === 'rewrite') {
-                        if (modifiers[name]) {
-                            return !modifiers[name][0].startsWith('abp-resource:');
-                        }
+                // 'rewrite' modifier should be used only with 'abp-resource:' value 
+                const validateRewriteOption = (name) => {
+                    const modifierOptions = modifiers[name];
+                    if (modifierOptions && modifierOptions.length !== 0) {
+                        return modifierOptions[0].startsWith('abp-resource:');
                     }
                     return false;
                 }
                 
                 for (let name in modifiers) {
-                    if (!validateOptionName(name) || checkOptionRewriteValue(name)) {
+                    if (!validateOptionName(name) || (name === 'rewrite' && !validateRewriteOption(name))) {
                             logger.error(`Invalid rule: ${s} option: ${name}`);
 
                         if (excluded) {
