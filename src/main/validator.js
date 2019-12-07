@@ -233,15 +233,18 @@ module.exports = (function () {
 
                 // 'rewrite' modifier should be used only with 'abp-resource:' value 
                 const validateRewriteOption = (name) => {
-                    const modifierOptions = modifiers[name];
-                    if (modifierOptions && modifierOptions.length !== 0) {
-                        return modifierOptions[0].startsWith('abp-resource:');
+                    if (name !== 'rewrite') {
+                        return true;
                     }
-                    return false;
+                    const modifierOptions = modifiers[name];
+                    if (!modifierOptions || modifierOptions.length === 0) {
+                        return false;
+                    }
+                    return modifierOptions[0].startsWith('abp-resource:');
                 }
                 
                 for (let name in modifiers) {
-                    if (!validateOptionName(name) || (name === 'rewrite' && !validateRewriteOption(name))) {
+                    if (!validateOptionName(name) || !validateRewriteOption(name)) {
                             logger.error(`Invalid rule: ${s} option: ${name}`);
 
                         if (excluded) {
