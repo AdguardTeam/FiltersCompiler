@@ -63,6 +63,8 @@ module.exports = (function () {
         // UBlock extension has redirect options
         // https://github.com/AdguardTeam/FiltersCompiler/issues/23
         'redirect',
+        // https://github.com/AdguardTeam/FiltersCompiler/issues/53
+        'rewrite',
     ];
 
     let domainsBlacklist = [];
@@ -228,9 +230,22 @@ module.exports = (function () {
                 // }
 
                 let modifiers = rule.modifiers;
+
+                // 'rewrite' modifier should be used only with 'abp-resource:' value 
+                const validateRewriteOption = (name) => {
+                    if (name !== 'rewrite') {
+                        return true;
+                    }
+                    const modifierOptions = modifiers[name];
+                    if (!modifierOptions || modifierOptions.length === 0) {
+                        return false;
+                    }
+                    return modifierOptions[0].startsWith('abp-resource:');
+                }
+                
                 for (let name in modifiers) {
-                    if (!validateOptionName(name)) {
-                        logger.error(`Invalid rule: ${s} option: ${name}`);
+                    if (!validateOptionName(name) || !validateRewriteOption(name)) {
+                            logger.error(`Invalid rule: ${s} option: ${name}`);
 
                         if (excluded) {
                             excluded.push('! Invalid rule options:');
