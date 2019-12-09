@@ -117,15 +117,15 @@
             "removeRulePatterns": [
                 "\\$\\$|\\$\\@\\$",
                 "\\$replace=",
+                "\\$stealth",
+                ",stealth",
                 "important,replace=",
                 "\\$app",
                 "\\$network",
                 "\\$protobuf",
                 "important,protobuf",
                 "\\$extension",
-                ",extension",
-                "\\$redirect=",
-                ",redirect="
+                ",extension"
             ],
             "ignoreRuleHints": false
         },
@@ -141,12 +141,12 @@
             "removeRulePatterns": [
                 "\\$app",
                 "\\$network",
+                "\\$stealth",
+                ",stealth",
                 "\\$protobuf",
                 "important,protobuf",
                 "\\$extension",
-                ",extension",
-                "\\$redirect=",
-                ",redirect="
+                ",extension"
             ],
             "ignoreRuleHints": false
         },
@@ -196,15 +196,15 @@
                 "\\$\\$|\\$\\@\\$",
                 "\\$mp4",
                 "\\$replace=",
+                "\\$stealth",
+                ",stealth",
                 "important,replace=",
                 "\\$app",
                 "\\$network",
                 "\\$protobuf",
                 "important,protobuf",
                 "\\$extension",
-                ",extension",
-                "\\$redirect=",
-                ",redirect="
+                ",extension"
             ],
             "ignoreRuleHints": false
         },
@@ -219,17 +219,16 @@
         "configuration": {
             "removeRulePatterns": [
                 "\\$\\$|\\$\\@\\$",
-                "\\$mp4",
                 "\\$replace=",
+                "\\$stealth",
+                ",stealth",
                 "important,replace=",
                 "\\$app",
                 "\\$network",
                 "\\$protobuf",
                 "important,protobuf",
                 "\\$extension",
-                ",extension",
-                "\\$redirect=",
-                ",redirect="
+                ",extension"
             ],
             "ignoreRuleHints": false
         },

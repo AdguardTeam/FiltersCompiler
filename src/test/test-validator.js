@@ -337,6 +337,9 @@ QUnit.test("Test validation - various rules", function (assert) {
     let rules = ['||onedrive.su/code/bshow.php$empty,important,~websocket'];
     assert.ok(validator.validate(rules).length > 0);
 
+    rules = ['||4ksport.pl^$all'];
+    assert.ok(validator.validate(rules).length > 0);
+
     rules = ['||onedrive.su/code/bshow.php$cookie=cookie_name'];
     assert.ok(validator.validate(rules).length > 0);
 
@@ -358,6 +361,12 @@ QUnit.test("Test validation - various rules", function (assert) {
         'example.com##div[class^="textLink" "textColor" i]'];
     assert.ok(validator.validate(rules).length === 0);
 
+    rules = ['||delivery.tf1.fr/pub$media,rewrite=abp-resource:blank-mp3,domain=tf1.fr'];
+    assert.ok(validator.validate(rules).length > 0);
+
+    rules = ['||delivery.tf1.fr/pub$media,rewrite=resource:blank-mp3,domain=tf1.fr',
+        '||delivery.tf1.fr/pub$media,rewrite,domain=tf1.fr'];
+    assert.ok(validator.validate(rules).length === 0);
 });
 
 QUnit.test("Test validation - validate redirect option", function (assert) {
