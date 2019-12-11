@@ -50,8 +50,7 @@ module.exports = (function () {
             }
 
             // skip :before and :after selectors
-            if (selectorText.indexOf(':before') > 0 ||
-                selectorText.indexOf(':after') > 0) {
+            if (selectorText.match(/[^:\s]([:]{1,2}before(\s|$))|[^:\s]([:]{1,2}after(\s|$))/ig)) {
                 return true;
             }
 

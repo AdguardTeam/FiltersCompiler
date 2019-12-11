@@ -449,4 +449,12 @@ QUnit.test("Test validation - cosmetic css rules", function (assert) {
         'hotline.ua##body.reset-scroll::before',
         'hotline.ua##body.reset-scroll::after'];
     assert.ok(validator.validate(rules).length === 3);
+
+    rules = ['sleazyneasy.com##.video-holder > .video-options::after',
+        'northumberlandgazette.co.uk##div[class^="sc-"]::before'];
+    assert.ok(validator.validate(rules).length === 2);
+
+    rules = ['sleazyneasy.com##.video-holder > .video-options ::after',
+        'northumberlandgazette.co.uk##div[class^="sc-"]:::before'];
+    assert.ok(validator.validate(rules).length === 0);
 });
