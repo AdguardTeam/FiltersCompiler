@@ -21,6 +21,9 @@ module.exports = (() => {
     const FRAME_REGEX = /([\$,])frame/i;
     const FRAME_REPLACEMENT = `$1subdocument`;
 
+    const SCRIPT_HAS_TEXT_REGEX = /##\^script\:has\-text\(/i;
+    const SCRIPT_HAS_TEXT_REPLACEMENT = '$$$script[tag-containts="';
+
     /**
      * Executes rule css conversion
      *
@@ -103,6 +106,9 @@ module.exports = (() => {
                 } else if (rule.includes(RuleMasks.MASK_ELEMENT_HIDING_EXCEPTION)) {
                     parts = rule.split(RuleMasks.MASK_ELEMENT_HIDING_EXCEPTION, 2);
                     rule = executeConversion(rule, parts, RuleMasks.MASK_CSS_EXCEPTION, excluded);
+                } else if (rule.includes(RuleMasks.MASK_UBO_SCRIPT)) {
+                    parts = rule.split(RuleMasks.MASK_UBO_SCRIPT, 2);
+                    rule = executeConversion(rule, parts, RuleMasks.MASK_SCRIPT, excluded);
                 }
             }
 
@@ -116,6 +122,14 @@ module.exports = (() => {
                     .replace(CSS_REGEX, CSS_REPLACEMENT)
                     .replace(FRAME_REGEX, FRAME_REPLACEMENT);
                 let message = `Rule "${rule}" converted to: ${result}`;
+                logger.log(message);
+                rule = replacedRule;
+            }
+
+            // Convert ##^script:has-text to $$script[tag-containts]
+            if (SCRIPT_HAS_TEXT_REGEX.test(rule)) {
+                const replacedRule = rule.replace(SCRIPT_HAS_TEXT_REGEX, SCRIPT_HAS_TEXT_REPLACEMENT).slice(0, -1) + '"]';
+                const message = `Rule "${rule}" converted to: ${result}`;
                 logger.log(message);
                 rule = replacedRule;
             }
