@@ -106,9 +106,6 @@ module.exports = (() => {
                 } else if (rule.includes(RuleMasks.MASK_ELEMENT_HIDING_EXCEPTION)) {
                     parts = rule.split(RuleMasks.MASK_ELEMENT_HIDING_EXCEPTION, 2);
                     rule = executeConversion(rule, parts, RuleMasks.MASK_CSS_EXCEPTION, excluded);
-                } else if (rule.includes(RuleMasks.MASK_UBO_SCRIPT)) {
-                    parts = rule.split(RuleMasks.MASK_UBO_SCRIPT, 2);
-                    rule = executeConversion(rule, parts, RuleMasks.MASK_SCRIPT, excluded);
                 }
             }
 
