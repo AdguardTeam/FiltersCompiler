@@ -23,6 +23,7 @@ module.exports = (() => {
 
     const SCRIPT_HAS_TEXT_REGEX = /##\^script\:has\-text\(/i;
     const SCRIPT_HAS_TEXT_REPLACEMENT = '$$$script[tag-containts="';
+    const REGEX_MASK = /\(\/.+\/\)/;
 
     /**
      * Executes rule css conversion
@@ -123,12 +124,20 @@ module.exports = (() => {
                 rule = replacedRule;
             }
 
-            // Convert ##^script:has-text to $$script[tag-containts]
+            // Convert ##^script:has-text to $$script[tag-containts] only if it has no regex
             if (SCRIPT_HAS_TEXT_REGEX.test(rule)) {
-                const replacedRule = rule.replace(SCRIPT_HAS_TEXT_REGEX, SCRIPT_HAS_TEXT_REPLACEMENT).slice(0, -1) + '"]';
-                const message = `Rule "${rule}" converted to: ${result}`;
-                logger.log(message);
-                rule = replacedRule;
+                if (!REGEX_MASK.test(rule)) {
+                    const replacedRule = rule.replace(SCRIPT_HAS_TEXT_REGEX, SCRIPT_HAS_TEXT_REPLACEMENT).slice(0, -1) + '"]';
+                    const message = `Rule "${rule}" converted to: ${result}`;
+                    logger.log(message);
+                    rule = replacedRule;
+                } else {
+                    logger.error(`Invalid rule: ${rule} uses unsupported value: regex`);
+                    if (excluded) {
+                        excluded.push(`! Unsupported type of value: regex`);
+                        excluded.push(rule);
+                    }
+                }
             }
 
             result.push(rule);
