@@ -126,6 +126,9 @@ module.exports = (() => {
         return result;
     };
 
+    // It is temporary solution
+    // TODO: Add scriptlets converter
+    // https://github.com/AdguardTeam/Scriptlets/issues/63
     const scriptletsCompatibility = {
         // AG: uBO
         'abort-current-inline-script': 'abort-current-inline-script.js',
@@ -175,7 +178,7 @@ module.exports = (() => {
             logger.warn(`Cannot convert scriptlet ${ruleText} to UBlock syntax`);
             return '';
         }
-        return `${domains}##script:inject(${scriptletsCompatibility[scriptletName]}${firstArgument}${secondArgument})`
+        return `${domains}##+js(${scriptletsCompatibility[scriptletName]}${firstArgument}${secondArgument})`
     };
 
     return {
