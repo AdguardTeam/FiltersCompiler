@@ -119,7 +119,7 @@ module.exports = (() => {
                     .replace(XHR_REGEX, XHR_REPLACEMENT)
                     .replace(CSS_REGEX, CSS_REPLACEMENT)
                     .replace(FRAME_REGEX, FRAME_REPLACEMENT);
-                let message = `Rule "${rule}" converted to: ${result}`;
+                let message = `Rule "${rule}" converted to: ${replacedRule}`;
                 logger.log(message);
                 rule = replacedRule;
             }
@@ -128,7 +128,7 @@ module.exports = (() => {
             if (SCRIPT_HAS_TEXT_REGEX.test(rule)) {
                 if (!REGEX_MASK.test(rule)) {
                     const replacedRule = rule.replace(SCRIPT_HAS_TEXT_REGEX, SCRIPT_HAS_TEXT_REPLACEMENT).slice(0, -1) + '"]';
-                    const message = `Rule "${rule}" converted to: ${result}`;
+                    const message = `Rule "${rule}" converted to: ${replacedRule}`;
                     logger.log(message);
                     rule = replacedRule;
                 } else {
