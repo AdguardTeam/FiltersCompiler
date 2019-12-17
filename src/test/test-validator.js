@@ -450,3 +450,14 @@ QUnit.test("Test validation - cosmetic css rules", function (assert) {
         'hotline.ua##body.reset-scroll::after'];
     assert.ok(validator.validate(rules).length === 3);
 });
+
+QUnit.test('Test ##^script:has-text and $$script[tag-containts] rules', (assert) => {
+    const validator = require("../main/validator.js");
+    validator.init();
+
+    let rules = ['example.com##^script:contains(/.+banner/)'];
+    assert.ok(validator.validate(rules).length === 0);
+
+    let rules = ['example.com##^script:has-text(/\.advert/)'];
+    assert.ok(validator.validate(rules).length === 0);
+});
