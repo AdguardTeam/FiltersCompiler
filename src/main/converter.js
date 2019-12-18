@@ -162,13 +162,16 @@ module.exports = (() => {
     };
 
     const parseScriptlet = (scriptlet) => {
-        const regex = /(.+)#%#\/\/scriptlet\(('|")(.+?)('|")(,\s('|")(.+?)('|")(,\s('|")(.+?)('|"))?)?\)/gi;
+        const regex = /(.+)#%#\/\/scriptlet\(('|")(.+?)('|")((, )?(('|").+('|")))?\)/gi;
         const elms = regex.exec(scriptlet);
+        let args = [];
+        if (elms[5]) {
+            args = elms[5].replace(/('|")/g, '').split(',');
+        }
         return {
             domains: elms[1],
             scriptletName: elms[3],
-            firstArgument: elms[7],
-            secondArgument: elms[11]
+            args: args,
         };
     };
 
@@ -177,15 +180,12 @@ module.exports = (() => {
      * https://github.com/AdguardTeam/FiltersCompiler/issues/56
      */
     const convertScriptletToUblockSyntax = (ruleText) => {
-        let { domains, scriptletName, firstArgument, secondArgument} = parseScriptlet(ruleText);
+        let { domains, scriptletName, args } = parseScriptlet(ruleText);
         if (!scriptletsCompatibility[scriptletName]) {
             logger.warn(`Cannot convert scriptlet ${ruleText} to UBlock syntax`);
             return '';
         }
-        firstArgument = firstArgument ? `, ${firstArgument}` : '';
-        secondArgument = secondArgument ? `, ${secondArgument}` : '';
-
-        return `${domains}##+js(${scriptletsCompatibility[scriptletName]}${firstArgument}${secondArgument})`
+        return `${domains}##+js(${scriptletsCompatibility[scriptletName]}${[...args]})`
     };
 
     return {
