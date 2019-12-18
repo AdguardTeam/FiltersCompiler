@@ -86,3 +86,22 @@ QUnit.test('Test options replacement', (assert) => {
     assert.equal(actual, expected);
 });
 
+QUnit.test('Test ##^script:has-text to $$script[tag-containts] replacement', (assert) => {
+    const converter = require('../main/converter');
+    let actual = converter.convert(['example.com##^script:has-text(12313)']);
+    let expected = 'example.com$$script[tag-contains="12313"]';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['example.com##^script:has-text(/\.advert/)']);
+    expected = 'example.com##^script:has-text(/\.advert/)';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['example.com##^script:contains(banner)']);
+    expected = 'example.com$$script[tag-contains="banner"]';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['example.com##^script:contains(/.+banner/)']);
+    expected = 'example.com##^script:contains(/.+banner/)';
+    assert.equal(actual, expected);
+});
+

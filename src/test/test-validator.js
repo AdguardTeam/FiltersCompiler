@@ -458,3 +458,14 @@ QUnit.test("Test validation - cosmetic css rules", function (assert) {
         'northumberlandgazette.co.uk##div[class^="sc-"]:::before'];
     assert.ok(validator.validate(rules).length === 0);
 });
+
+QUnit.test('Test ##^script:has-text and $$script[tag-containts] rules', (assert) => {
+    const validator = require("../main/validator.js");
+    validator.init();
+
+    let rules = ['example.com##^script:contains(/.+banner/)'];
+    assert.ok(validator.validate(rules).length === 0);
+
+    let rules = ['example.com##^script:has-text(/\.advert/)'];
+    assert.ok(validator.validate(rules).length === 0);
+});
