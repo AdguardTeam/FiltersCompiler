@@ -311,9 +311,9 @@ fast-levenshtein@~2.0.4:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/fast-levenshtein/-/fast-levenshtein-2.0.6.tgz#3d8a5c66883a16a30ca8643e851f19baa7797917"
 
-"filters-downloader@git+https://github.com/AdguardTeam/FiltersDownloader.git#aa4a5bb":
-  version "1.0.10"
-  resolved "git+https://github.com/AdguardTeam/FiltersDownloader.git#aa4a5bb7ceb68dc73e25125a31c4598f405138ee"
+"filters-downloader@git+https://github.com/AdguardTeam/FiltersDownloader.git#v1.0.11":
+  version "1.0.11"
+  resolved "git+https://github.com/AdguardTeam/FiltersDownloader.git#42ffb08fadfa07cdf1d92d53c654bdf39b9186f9"
   dependencies:
     axios "^0.18.0"
 

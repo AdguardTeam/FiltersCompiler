@@ -337,11 +337,36 @@ QUnit.test("Test validation - various rules", function (assert) {
     let rules = ['||onedrive.su/code/bshow.php$empty,important,~websocket'];
     assert.ok(validator.validate(rules).length > 0);
 
+    rules = ['||4ksport.pl^$all'];
+    assert.ok(validator.validate(rules).length > 0);
+
     rules = ['||onedrive.su/code/bshow.php$cookie=cookie_name'];
     assert.ok(validator.validate(rules).length > 0);
 
     rules = ['||onedrive.su/code/bshow.php$empty,important,stealth'];
     assert.ok(validator.validate(rules).length > 0);
+
+    rules = ['samdan.com.tr,esquire.com.tr##div[data-mbzone="Textlink" i] > div#id_d_textlink'];
+    assert.ok(validator.validate(rules).length > 0);
+
+    rules = ["example.com##div[class^='textLink' i]"];
+    assert.ok(validator.validate(rules).length > 0);
+
+    rules = ['example.com#?#section:has(div[class^="textLink" i])'];
+    assert.ok(validator.validate(rules).length > 0);
+
+    rules = ['example.com##div[class^="textLink"i]',
+        'example.com##div[class^=textLink i]',
+        'example.com##div[class name="textLink" i]',
+        'example.com##div[class^="textLink" "textColor" i]'];
+    assert.ok(validator.validate(rules).length === 0);
+
+    rules = ['||delivery.tf1.fr/pub$media,rewrite=abp-resource:blank-mp3,domain=tf1.fr'];
+    assert.ok(validator.validate(rules).length > 0);
+
+    rules = ['||delivery.tf1.fr/pub$media,rewrite=resource:blank-mp3,domain=tf1.fr',
+        '||delivery.tf1.fr/pub$media,rewrite,domain=tf1.fr'];
+    assert.ok(validator.validate(rules).length === 0);
 });
 
 QUnit.test("Test validation - validate redirect option", function (assert) {
@@ -424,4 +449,23 @@ QUnit.test("Test validation - cosmetic css rules", function (assert) {
         'hotline.ua##body.reset-scroll::before',
         'hotline.ua##body.reset-scroll::after'];
     assert.ok(validator.validate(rules).length === 3);
+
+    rules = ['sleazyneasy.com##.video-holder > .video-options::after',
+        'northumberlandgazette.co.uk##div[class^="sc-"]::before'];
+    assert.ok(validator.validate(rules).length === 2);
+
+    rules = ['sleazyneasy.com##.video-holder > .video-options ::after',
+        'northumberlandgazette.co.uk##div[class^="sc-"]:::before'];
+    assert.ok(validator.validate(rules).length === 0);
+});
+
+QUnit.test('Test ##^script:has-text and $$script[tag-containts] rules', (assert) => {
+    const validator = require("../main/validator.js");
+    validator.init();
+
+    let rules = ['example.com##^script:contains(/.+banner/)'];
+    assert.ok(validator.validate(rules).length === 0);
+
+    let rules = ['example.com##^script:has-text(/\.advert/)'];
+    assert.ok(validator.validate(rules).length === 0);
 });

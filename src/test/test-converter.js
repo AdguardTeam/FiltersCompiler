@@ -112,6 +112,24 @@ QUnit.test('Test convert scriptlets to UBlock syntax', (assert) => {
     // scriptlet argument includes quotes
     actual = convertScriptletToUblockSyntax("example.org#%#//scriptlet('set-constant', 'constName', 'value'12345'')");
     expected = 'example.org##+js(set-constant.js, constName, value\'12345\')';
+});
+
+QUnit.test('Test ##^script:has-text to $$script[tag-containts] replacement', (assert) => {
+    const converter = require('../main/converter');
+    let actual = converter.convert(['example.com##^script:has-text(12313)']);
+    let expected = 'example.com$$script[tag-contains="12313"]';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['example.com##^script:has-text(/\.advert/)']);
+    expected = 'example.com##^script:has-text(/\.advert/)';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['example.com##^script:contains(banner)']);
+    expected = 'example.com$$script[tag-contains="banner"]';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['example.com##^script:contains(/.+banner/)']);
+    expected = 'example.com##^script:contains(/.+banner/)';
     assert.equal(actual, expected);
 });
 
