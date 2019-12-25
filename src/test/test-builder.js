@@ -154,6 +154,7 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.equal(filtersMetadata.filters[0].languages[1], 'pl');
     assert.equal(filtersMetadata.filters[0].tags.length, 4);
     assert.equal(filtersMetadata.filters[0].tags[0], 1);
+    assert.equal(filtersMetadata.filters[0].trustLevel, 'full');
 
     let filtersI18nMetadata = readFile(path.join(platforms, 'test', 'filters_i18n.json'));
     assert.ok(filtersI18nMetadata);
@@ -234,7 +235,7 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.ok(filtersMetadataMAC.filters);
     let englishFilter = filtersMetadataMAC.filters[0];
     assert.ok(englishFilter);
-    assert.equal(Object.keys(englishFilter).length, 11);
+    assert.equal(Object.keys(englishFilter).length, 12);
 
     assert.equal(englishFilter.filterId, 2);
     assert.equal(englishFilter.name, 'English Filter');

@@ -33,6 +33,7 @@ module.exports = (function () {
     const RuleMasks = require("./rule/rule-masks");
     const workaround = require('./utils/workaround.js');
     const webutils = require('./utils/webutils.js');
+    const trustLevelSettings = require('./utils/trust-level-settings.js');
 
     const FilterDownloader = require('filters-downloader');
 
@@ -267,6 +268,31 @@ module.exports = (function () {
     };
 
     /**
+     * Filters rules using the concept of a "trust" level
+     *
+     * @param lines
+     * @param trustLevel
+     */
+    const trustLevelFilter = (lines, trustLevel) => {
+        logger.info('Applying trustLevel filter..');
+
+        const result = [];
+        const trustLevelList = [...new Set(Object.values(trustLevelSettings).flat(Infinity))];
+        const allowedRulesMasks = trustLevelSettings[trustLevel];
+
+        lines.forEach((line) => {
+            if (trustLevelList.some(ruleMask => line.includes(ruleMask))
+                && !allowedRulesMasks.some(ruleMask => line.includes(ruleMask))) {
+                result.push(`${RuleMasks.MASK_COMMENT} [excluded by ${trustLevel} trust level] ${line}`);
+            } else {
+                result.push(line);
+            }
+        });
+
+        return result;
+    }
+
+    /**
      * Creates content from include line
      *
      * @param line
@@ -326,7 +352,7 @@ module.exports = (function () {
      *
      * @param template
      */
-    const compile = async function(template) {
+    const compile = async function(template, trustLevel) {
         let result = [];
         let excluded = [];
 
@@ -350,6 +376,8 @@ module.exports = (function () {
         result = converter.convert(result, excluded);
 
         result = exclude(result, EXCLUDE_FILE, excluded);
+
+        result = trustLevelFilter(result, trustLevel);
 
         result = validator.validate(result, excluded);
         result = validator.blacklistDomains(result, excluded);
@@ -427,8 +455,10 @@ module.exports = (function () {
             return;
         }
 
+        const trustLevel = metadata.trustLevel ? metadata.trustLevel : 'low';
+
         logger.info('Compiling...');
-        const result = await compile(template);
+        const result = await compile(template, trustLevel);
         const compiled = result.lines;
         const excluded = result.excluded;
         logger.info('Compiled length:' + compiled.length);
