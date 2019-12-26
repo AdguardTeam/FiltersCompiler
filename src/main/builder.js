@@ -268,31 +268,6 @@ module.exports = (function () {
     };
 
     /**
-     * Filters rules using the concept of a "trust" level
-     *
-     * @param lines
-     * @param trustLevel
-     */
-    const trustLevelFilter = (lines, trustLevel) => {
-        logger.info('Applying trustLevel filter..');
-
-        const result = [];
-        const trustLevelList = [...new Set(Object.values(trustLevelSettings).flat(Infinity))];
-        const allowedRulesMasks = trustLevelSettings[trustLevel];
-
-        lines.forEach((line) => {
-            if (trustLevelList.some(ruleMask => line.includes(ruleMask))
-                && !allowedRulesMasks.some(ruleMask => line.includes(ruleMask))) {
-                result.push(`${RuleMasks.MASK_COMMENT} [excluded by ${trustLevel} trust level] ${line}`);
-            } else {
-                result.push(line);
-            }
-        });
-
-        return result;
-    }
-
-    /**
      * Creates content from include line
      *
      * @param line
@@ -377,7 +352,8 @@ module.exports = (function () {
 
         result = exclude(result, EXCLUDE_FILE, excluded);
 
-        result = trustLevelFilter(result, trustLevel);
+        const trustLevelSettings = `../trust-levels/exclusions-${trustLevel}.txt`
+        result = exclude(result, trustLevelSettings, excluded);
 
         result = validator.validate(result, excluded);
         result = validator.blacklistDomains(result, excluded);
