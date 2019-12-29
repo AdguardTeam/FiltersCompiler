@@ -33,7 +33,6 @@ module.exports = (function () {
     const RuleMasks = require("./rule/rule-masks");
     const workaround = require('./utils/workaround.js');
     const webutils = require('./utils/webutils.js');
-    const trustLevelSettings = require('./utils/trust-level-settings.js');
 
     const FilterDownloader = require('filters-downloader');
 
@@ -44,6 +43,7 @@ module.exports = (function () {
     const EXCLUDED_LINES_FILE = 'diff.txt';
     const METADATA_FILE = 'metadata.json';
     const ADGUARD_FILTERS_SERVER_URL = 'https://filters.adtidy.org/';
+    const TRUST_LEVEL_DIR = 'trust-levels';
 
     const INCLUDE_DIRECTIVE = "@include ";
     const INCLUDE_OPTION_COMMENTS = "/stripComments";
@@ -171,11 +171,10 @@ module.exports = (function () {
      * @param excluded
      * @returns {*}
      */
-    const exclude = function (lines, exclusionsFileName, excluded) {
+    const exclude = function (lines, exclusionsFile, excluded) {
 
         logger.info('Applying exclusions..');
 
-        const exclusionsFile = path.join(currentDir, exclusionsFileName);
         let exclusions = readFile(exclusionsFile);
         if (!exclusions) {
             return lines;
@@ -302,7 +301,8 @@ module.exports = (function () {
             result = await FilterDownloader.resolveIncludes(result, originUrl);
 
             if (options.exclude) {
-                result = exclude(result, options.exclude, excluded);
+                const optionsExcludePath = path.join(currentDir, options.exclude);
+                result = exclude(result, optionsExcludePath, excluded);
             }
 
             if (options.stripComments) {
@@ -327,7 +327,7 @@ module.exports = (function () {
      *
      * @param template
      */
-    const compile = async function(template, trustLevel) {
+    const compile = async function(template, trustLevelSettings) {
         let result = [];
         let excluded = [];
 
@@ -350,9 +350,10 @@ module.exports = (function () {
 
         result = converter.convert(result, excluded);
 
-        result = exclude(result, EXCLUDE_FILE, excluded);
+        const excludeFilePath = path.join(currentDir, EXCLUDE_FILE);
+        result = exclude(result, excludeFilePath, excluded);
 
-        const trustLevelSettings = `../trust-levels/exclusions-${trustLevel}.txt`
+        console.log('\x1b[31m%s\x1b[0m', `Applying trust-level exclusions..\n${trustLevelSettings}\n`);
         result = exclude(result, trustLevelSettings, excluded);
 
         result = validator.validate(result, excluded);
@@ -406,7 +407,7 @@ module.exports = (function () {
      * @param whitelist
      * @param blacklist
      */
-    const buildFilter = async function (filterDir, whitelist, blacklist) {
+    const buildFilter = async function (filtersDir, filterDir, whitelist, blacklist) {
         currentDir = filterDir;
 
         const template = readFile(path.join(currentDir, TEMPLATE_FILE));
@@ -432,9 +433,10 @@ module.exports = (function () {
         }
 
         const trustLevel = metadata.trustLevel ? metadata.trustLevel : 'low';
+        const trustLevelSettings = path.resolve(filtersDir, TRUST_LEVEL_DIR, `exclusions-${trustLevel}.txt`);
 
         logger.info('Compiling...');
-        const result = await compile(template, trustLevel);
+        const result = await compile(template, trustLevelSettings);
         const compiled = result.lines;
         const excluded = result.excluded;
         logger.info('Compiled length:' + compiled.length);
@@ -471,7 +473,7 @@ module.exports = (function () {
                 let template = path.join(filterDir, TEMPLATE_FILE);
                 if (fs.existsSync(template)) {
                     logger.info(`Building filter: ${directory}`);
-                    await buildFilter(filterDir, whitelist, blacklist);
+                    await buildFilter(filtersDir, filterDir, whitelist, blacklist);
                     logger.info(`Building filter: ${directory} ok`);
                 } else {
                     await parseDirectory(filterDir, whitelist, blacklist);
