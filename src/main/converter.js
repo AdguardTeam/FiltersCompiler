@@ -123,12 +123,12 @@ module.exports = (() => {
                 rule = replacedRule;
             }
 
-            // Convert ##^script:has-text and ##^script:contains to $$script[tag-content]
+            // Convert ##^script:has-text and ##^script:contains to $$script[tag-content="..."][max-length="262144"]
             if (SCRIPT_HAS_TEXT_REGEX.test(rule)) {
                 const replacedRule = rule.replace(SCRIPT_HAS_TEXT_REGEX, SCRIPT_HAS_TEXT_REPLACEMENT).slice(0, -1) + '"]';
                 const message = `Rule "${rule}" converted to: ${replacedRule}`;
                 logger.log(message);
-                rule = replacedRule;
+                rule = `${replacedRule}[max-length="262144"]`;
             }
             result.push(rule);
         }
