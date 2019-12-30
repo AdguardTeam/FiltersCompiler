@@ -353,7 +353,7 @@ module.exports = (function () {
         const excludeFilePath = path.join(currentDir, EXCLUDE_FILE);
         result = exclude(result, excludeFilePath, excluded);
 
-        console.log('\x1b[31m%s\x1b[0m', `Applying trust-level exclusions..\n${trustLevelSettings}\n`);
+        logger.info('Applying trust-level exclusions..');
         result = exclude(result, trustLevelSettings, excluded);
 
         result = validator.validate(result, excluded);
