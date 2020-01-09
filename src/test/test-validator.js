@@ -466,6 +466,6 @@ QUnit.test('Test ##^script:has-text and $$script[tag-containts] rules', (assert)
     let rules = ['example.com##^script:contains(/.+banner/)'];
     assert.ok(validator.validate(rules).length === 0);
 
-    let rules = ['example.com##^script:has-text(/\.advert/)'];
+    rules = ['example.com##^script:has-text(/\.advert/)'];
     assert.ok(validator.validate(rules).length === 0);
 });
