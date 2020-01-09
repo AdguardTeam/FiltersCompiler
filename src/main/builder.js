@@ -44,6 +44,7 @@ module.exports = (function () {
     const METADATA_FILE = 'metadata.json';
     const ADGUARD_FILTERS_SERVER_URL = 'https://filters.adtidy.org/';
     const TRUST_LEVEL_DIR = 'trust-levels';
+    const DEFAULT_TRUST_LEVEL = 'low';
 
     const INCLUDE_DIRECTIVE = "@include ";
     const INCLUDE_OPTION_COMMENTS = "/stripComments";
@@ -432,7 +433,7 @@ module.exports = (function () {
             return;
         }
 
-        const trustLevel = metadata.trustLevel ? metadata.trustLevel : 'low';
+        const trustLevel = metadata.trustLevel ? metadata.trustLevel : DEFAULT_TRUST_LEVEL;
         const trustLevelSettings = path.resolve(filtersDir, TRUST_LEVEL_DIR, `exclusions-${trustLevel}.txt`);
 
         logger.info('Compiling...');
