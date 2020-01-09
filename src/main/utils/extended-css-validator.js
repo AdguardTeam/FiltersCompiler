@@ -55,7 +55,7 @@ module.exports = (function () {
             }
 
             // skip selectors with case-insensitive attribute, for example: div[class^="Abc_123" i]
-            if (selectorText.match(/((\[([a-z]|\d|-|_)+(\^|\$)?=("|')([a-z]|\s|\d|-|_)*("|')\si\]))+/ig)) {
+            if (selectorText.match(/\[[a-z\d-_]+[\^$*]?=["'].+["']\si]/g)) {
                 return true;
             }
 

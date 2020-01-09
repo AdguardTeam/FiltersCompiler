@@ -352,13 +352,16 @@ QUnit.test("Test validation - various rules", function (assert) {
     rules = ["example.com##div[class^='textLink' i]"];
     assert.ok(validator.validate(rules).length > 0);
 
-    rules = ['example.com#?#section:has(div[class^="textLink" i])'];
-    assert.ok(validator.validate(rules).length > 0);
+    rules = ['example.com#?#section:has(div[class^="textLink" i])',
+        '##img[alt*="example.org" i]',
+        '##img[alt*="QQ998" i]',
+        '##[href*="35.200.169.1" i] > img',
+        'aszdziennik.pl##a[href*="/aszdziennik" i] > img[src^="/static/media/"]'];
+    assert.ok(validator.validate(rules).length === 5);
 
     rules = ['example.com##div[class^="textLink"i]',
         'example.com##div[class^=textLink i]',
-        'example.com##div[class name="textLink" i]',
-        'example.com##div[class^="textLink" "textColor" i]'];
+        'example.com##div[class name="textLink" i]'];
     assert.ok(validator.validate(rules).length === 0);
 
     rules = ['||delivery.tf1.fr/pub$media,rewrite=abp-resource:blank-mp3,domain=tf1.fr'];
@@ -466,6 +469,6 @@ QUnit.test('Test ##^script:has-text and $$script[tag-containts] rules', (assert)
     let rules = ['example.com##^script:contains(/.+banner/)'];
     assert.ok(validator.validate(rules).length === 0);
 
-    let rules = ['example.com##^script:has-text(/\.advert/)'];
+    rules = ['example.com##^script:has-text(/\.advert/)'];
     assert.ok(validator.validate(rules).length === 0);
 });
