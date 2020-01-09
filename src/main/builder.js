@@ -43,7 +43,7 @@ module.exports = (function () {
     const EXCLUDED_LINES_FILE = 'diff.txt';
     const METADATA_FILE = 'metadata.json';
     const ADGUARD_FILTERS_SERVER_URL = 'https://filters.adtidy.org/';
-    const TRUST_LEVEL_DIR = 'trust-levels';
+    const TRUST_LEVEL_DIR = './utils/trust-levels';
     const DEFAULT_TRUST_LEVEL = 'low';
 
     const INCLUDE_DIRECTIVE = "@include ";
@@ -434,7 +434,7 @@ module.exports = (function () {
         }
 
         const trustLevel = metadata.trustLevel ? metadata.trustLevel : DEFAULT_TRUST_LEVEL;
-        const trustLevelSettings = path.resolve(filtersDir, TRUST_LEVEL_DIR, `exclusions-${trustLevel}.txt`);
+        const trustLevelSettings = path.resolve(__dirname, TRUST_LEVEL_DIR, `exclusions-${trustLevel}.txt`);
 
         logger.info('Compiling...');
         const result = await compile(template, trustLevelSettings);
