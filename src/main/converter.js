@@ -24,6 +24,12 @@ module.exports = (() => {
     const SCRIPT_HAS_TEXT_REGEX = /(##\^script\:(has\-text|contains))\((?!\/.+\/\))/i;
     const SCRIPT_HAS_TEXT_REPLACEMENT = '$$$$script[tag-content="';
 
+    const THIRD_PARTY_1P_3P_REGEX = /\$[^#]?(.*,)?(1p|3p)/;
+    const THIRD_PARTY_1P = '1p';
+    const THIRD_PARTY_1P_REPLACEMENT = '~third-party';
+    const THIRD_PARTY_3P = '3p';
+    const THIRD_PARTY_3P_REPLACEMENT = 'third-party';
+
     /**
      * Executes rule css conversion
      *
@@ -129,6 +135,15 @@ module.exports = (() => {
                 const message = `Rule "${rule}" converted to: ${replacedRule}`;
                 logger.log(message);
                 rule = `${replacedRule}[max-length="262144"]`;
+            }
+
+            // Convert $1p to $~third-party and $3p to $third-party
+            if (THIRD_PARTY_1P_3P_REGEX.test(rule)) {
+                const replacedRule = rule.replace(THIRD_PARTY_1P, THIRD_PARTY_1P_REPLACEMENT)
+                    .replace(THIRD_PARTY_3P, THIRD_PARTY_3P_REPLACEMENT);
+                const message = `Rule "${rule}" converted to: ${replacedRule}`;
+                logger.log(message);
+                rule = replacedRule;
             }
             result.push(rule);
         }
