@@ -361,7 +361,8 @@ QUnit.test("Test validation - various rules", function (assert) {
 
     rules = ['example.com##div[class^="textLink"i]',
         'example.com##div[class^=textLink i]',
-        'example.com##div[class name="textLink" i]'];
+        'example.com##div[class name="textLink" i]',
+        'example.com##div[class^="textLink" "textColor" i]'];
     assert.ok(validator.validate(rules).length === 0);
 
     rules = ['||delivery.tf1.fr/pub$media,rewrite=abp-resource:blank-mp3,domain=tf1.fr'];
