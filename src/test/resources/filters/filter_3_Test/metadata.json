@@ -11,5 +11,6 @@
   "tags": [
     "purpose:ads", "lang:en", "lang:pl"
   ],
-  "disabled": true
+  "disabled": true,
+  "trustLevel": "low"
 }

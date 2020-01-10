@@ -9,4 +9,3 @@
 ! #@%#
 !
 ! The following rules should be excluded:
-#%#//scriptlet

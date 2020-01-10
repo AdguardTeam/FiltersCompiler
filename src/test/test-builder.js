@@ -37,7 +37,7 @@ QUnit.test("Test builder", async (assert) => {
 
     const os = require('os');
 
-    const filterLines = filterText.split(os.EOL);
+    let filterLines = filterText.split(os.EOL);
     assert.equal(filterLines.length, 23);
 
     //Common include
@@ -65,6 +65,18 @@ QUnit.test("Test builder", async (assert) => {
     assert.notOk(filterLines.indexOf('||test.com^$replace=') >= 0);
     assert.notOk(filterLines.indexOf('regularexpressionexcluded') >= 0);
     assert.ok(filterLines.indexOf('regularexpression_not_excluded') >= 0);
+
+    const filterContent = readFile(path.join(__dirname, 'resources/platforms/test', 'filters', '5.txt'));
+    filterLines = filterContent.split('\r\n');
+    assert.equal(filterLines.length, 17);
+
+    // Trust-level exclusions
+    assert.ok(filterLines.indexOf('||adsnet.com/*/700x350.gif$domain=example.com') >= 0);
+    assert.ok(filterLines.indexOf('example.com#%#//scriptlet("set-constant", "ads", "false")') ===  -1);
+    assert.ok(filterLines.indexOf('test.com#%#AG_setConstant("ads", "false");') ===  -1);
+    assert.ok(filterLines.indexOf('||example.com/api/v1/ad/*/json$replace=/html/abcd\\,/i') ===  -1);
+    assert.ok(filterLines.indexOf('||adsnet.com/*/700x350.gif$domain=example.com') >= 0);
+
 });
 
 QUnit.test("Test builder - build lists", async (assert) => {
@@ -177,7 +189,7 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.ok(filterContent);
 
     let filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 42);
+    assert.equal(filterLines.length, 40);
 
     assert.ok(filterLines.indexOf('![Adblock Plus 2.0]') >= 0);
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
@@ -189,15 +201,11 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.ok(filterLines.indexOf('!+ NOT_OPTIMIZED') >= 0);
     assert.ok(filterLines.indexOf('test-common-2-rule.com') >= 0);
 
-    // Trust-level exclusions
-    assert.notOk(filterLines.indexOf('example.com#%#//scriptlet("set-constant", "ads", "false")') >= 0);
-    assert.ok(filterLines.indexOf('example.com#%#AG_setConstant("ads", "false");') >= 0);
-
     filterContent = readFile(path.join(platforms, 'config/test', 'filters', '2.txt'));
     assert.ok(filterContent);
 
     filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 25);
+    assert.equal(filterLines.length, 24);
 
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
     assert.notOk(filterLines.indexOf('test-common-1-rule.com') >= 0);
@@ -211,7 +219,7 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.ok(filterContent);
 
     filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 37);
+    assert.equal(filterLines.length, 35);
 
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
     assert.ok(filterLines.indexOf('test-common-1-rule.com') >= 0);

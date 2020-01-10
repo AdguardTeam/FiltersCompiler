@@ -26,6 +26,3 @@ excluded_platform
 ||news.yandex.*/*/*-*-*-*-$replace=/Ya\[([0-9]{10\,15})\]\([\s\S]*\)\$/,script,important,domain=news.yandex.by|news.yandex.com|news.yandex.fr|news.yandex.kz|news.yandex.ru|news.yandex.ua
 invalid_options$invalid_opt
 test_domain#%#testScript();
-!
-example.com#%#//scriptlet("set-constant", "ads", "false")
-example.com#%#AG_setConstant("ads", "false");
