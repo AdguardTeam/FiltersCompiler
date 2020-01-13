@@ -105,3 +105,26 @@ QUnit.test('Test ##^script:has-text to $$script[tag-containts] replacement', (as
     assert.equal(actual, expected);
 });
 
+QUnit.test('Test UBO to Adguard scriptlet converter', (assert) => {
+    const converter = require('../main/converter');
+    let actual = converter.convert(['test.com##+js(abort-current-inline-script.js, Math.random, adbDetect)']);
+    let expected = "test.com#%#//scriptlet('abort-current-inline-script', 'Math.random', 'adbDetect')";
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['example.com##+js(disable-newtab-links.js)']);
+    expected = "example.com#%#//scriptlet('disable-newtab-links')";
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['example.com##+js(nano-setInterval-booster.js, some.example, 1000)']);
+    expected = "example.com#%#//scriptlet('adjust-setInterval', 'some.example', '1000')";
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['example.com##+js(nano-setInterval-booster.js, some.example, 1000)']);
+    expected = "example.com#%#//scriptlet('adjust-setInterval', 'some.example', '1000')";
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['test.com##+js(invalid-name.js, some.example, 1000)']);
+    expected = "test.com##+js(invalid-name.js, some.example, 1000)";
+    assert.equal(actual, expected);
+});
+

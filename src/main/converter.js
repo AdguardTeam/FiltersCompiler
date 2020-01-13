@@ -6,6 +6,7 @@ module.exports = (() => {
 
     const logger = require("./utils/log.js");
     const RuleMasks = require('./rule/rule-masks.js');
+    const compatibility = require("./third-party/scriptlets.corelibs.json");
 
     const CSS_RULE_REPLACE_PATTERN = /(.*):style\((.*)\)/g;
 
@@ -58,6 +59,38 @@ module.exports = (() => {
         }
 
         return result;
+    };
+
+
+    /**
+     * Parse UBO scriptlet
+     *
+     * @param scriptlet
+     */
+    const parseUboScriptlet = (scriptlet) => {
+        const regex = /(.*)##\+js\((.+\.js)(,\s(.+))?\)/gi;
+        const groups = regex.exec(scriptlet);
+        const args = groups[4] ? groups[4].split(', ') : '';
+        return {
+            domains: groups[1],
+            scriptletName: groups[2],
+            args: args,
+        };
+    };
+
+    /**
+     * Replace UBO scriptlet name by Adguard
+     *
+     * @param scriptletName
+     */
+    const uboToAdguardCompatibility = (scriptletName) => {
+        let adguardScriptletName = '';
+        compatibility.scriptlets.forEach(scriptlet => {
+            if (scriptlet.names[1] === scriptletName) {
+                adguardScriptletName = scriptlet.names[0];
+            }
+        });
+        return adguardScriptletName;
     };
 
     /**
@@ -121,6 +154,25 @@ module.exports = (() => {
                 let message = `Rule "${rule}" converted to: ${replacedRule}`;
                 logger.log(message);
                 rule = replacedRule;
+            }
+
+            // Convert uBO scriptlets to AdGuard scriptlets
+            if (rule.includes(RuleMasks.MASK_UBO_SCRIPTLETS) || rule.includes(RuleMasks.MASK_UBO_SCRIPTLETS_EXCEPTION)) {
+                let { domains, scriptletName, args } = parseUboScriptlet(rule);
+                const compatibility = uboToAdguardCompatibility(scriptletName);
+                if (!compatibility) {
+                    const message = `Rule "${rule}" is invalid`;
+                    logger.log(message);
+                    return rule;
+                }
+                scriptletName = `'${compatibility}'`;
+                if (args) {
+                    args = `, '${args.join("', '")}'`;
+                }
+                const convertedRule = `${domains}${RuleMasks.MASK_SCRIPTLET}(${scriptletName}${args})`;
+                const message = `Rule "${rule}" converted to: ${convertedRule}`;
+                logger.log(message);
+                rule = convertedRule;
             }
 
             // Convert ##^script:has-text and ##^script:contains to $$script[tag-content="..."][max-length="262144"]

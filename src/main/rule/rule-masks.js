@@ -18,10 +18,12 @@ module.exports = (() => {
         MASK_CSS_EXCEPTION_INJECT_EXTENDED_CSS_RULE: "#@$?#",
         MASK_SCRIPT: "#%#",
         MASK_SCRIPT_EXCEPTION: "#@%#",
+        MASK_SCRIPTLET: "#%#//scriptlet",
         MASK_CONTENT: "$$",
         MASK_CONTENT_EXCEPTION: "$@$",
         MASK_COMMENT: "!",
         MASK_HINT: "!+",
-        MASK_DIRECTIVES: "!#"
+        MASK_DIRECTIVES: "!#",
+        MASK_UBO_SCRIPTLETS: "##+js"
     };
 })();
