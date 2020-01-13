@@ -327,6 +327,7 @@ module.exports = (function () {
      * Compiles filter lines
      *
      * @param template
+     *  @param trustLevelSettings
      */
     const compile = async function(template, trustLevelSettings) {
         let result = [];
@@ -408,7 +409,7 @@ module.exports = (function () {
      * @param whitelist
      * @param blacklist
      */
-    const buildFilter = async function (filtersDir, filterDir, whitelist, blacklist) {
+    const buildFilter = async function (filterDir, whitelist, blacklist) {
         currentDir = filterDir;
 
         const template = readFile(path.join(currentDir, TEMPLATE_FILE));
@@ -474,7 +475,7 @@ module.exports = (function () {
                 let template = path.join(filterDir, TEMPLATE_FILE);
                 if (fs.existsSync(template)) {
                     logger.info(`Building filter: ${directory}`);
-                    await buildFilter(filtersDir, filterDir, whitelist, blacklist);
+                    await buildFilter(filterDir, whitelist, blacklist);
                     logger.info(`Building filter: ${directory} ok`);
                 } else {
                     await parseDirectory(filterDir, whitelist, blacklist);
