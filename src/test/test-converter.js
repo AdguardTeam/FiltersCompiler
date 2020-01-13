@@ -105,7 +105,7 @@ QUnit.test('Test ##^script:has-text to $$script[tag-containts] replacement', (as
     assert.equal(actual, expected);
 });
 
-QUnit.test('Test ##^script:has-text to $$script[tag-containts] replacement', (assert) => {
+QUnit.test('Test $1p to $~third-party and $3p to $third-party replacement', (assert) => {
     const converter = require('../main/converter');
     let actual = converter.convert(['||www.ynet.co.il^$important,websocket,1p,domain=www.ynet.co.il']);
     let expected = '||www.ynet.co.il^$important,websocket,~third-party,domain=www.ynet.co.il';
@@ -117,6 +117,10 @@ QUnit.test('Test ##^script:has-text to $$script[tag-containts] replacement', (as
 
     actual = converter.convert(['||vidads.gr^$3p']);
     expected = '||vidads.gr^$third-party';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['@@.com/ads.js|$3p,domain=~3ppt.com']);
+    expected = '@@.com/ads.js|$third-party,domain=~3ppt.com';
     assert.equal(actual, expected);
 
     actual = converter.convert(['@@.com/ads.js|$~third-party,domain=~3ppt.com']);
