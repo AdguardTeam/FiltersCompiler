@@ -327,7 +327,7 @@ module.exports = (function () {
      * Compiles filter lines
      *
      * @param template
-     *  @param trustLevelSettings
+     * @param trustLevelSettings
      */
     const compile = async function(template, trustLevelSettings) {
         let result = [];
