@@ -6,7 +6,6 @@ module.exports = (() => {
 
     const logger = require("./utils/log.js");
     const RuleMasks = require('./rule/rule-masks.js');
-    const compatibility = require("./third-party/scriptlets.corelibs.json");
 
     const CSS_RULE_REPLACE_PATTERN = /(.*):style\((.*)\)/g;
 
@@ -21,6 +20,11 @@ module.exports = (() => {
 
     const FRAME_REGEX = /([\$,])frame/i;
     const FRAME_REPLACEMENT = `$1subdocument`;
+
+    const UBO_SCRIPTLET_REGEX = /(.*)(#@?#script:inject|#@?#\s*\+js)\((.+\.js)(,\s(.+))?\)/i;
+
+    const ADG_CSS_MASK_REGEX = /#@?\$#.+?\s*{.*}\s*$/;
+    const ABP_SNIPPET_REGEX = /(.*)(#@?\$#)(.+)/;
 
     const SCRIPT_HAS_TEXT_REGEX = /(##\^script\:(has\-text|contains))\((?!\/.+\/\))/i;
     const SCRIPT_HAS_TEXT_REPLACEMENT = '$$$$script[tag-content="';
@@ -61,36 +65,62 @@ module.exports = (() => {
         return result;
     };
 
-
     /**
      * Parse UBO scriptlet
-     *
-     * @param scriptlet
+     * @param {string} scriptlet
      */
     const parseUboScriptlet = (scriptlet) => {
-        const regex = /(.*)##\+js\((.+\.js)(,\s(.+))?\)/gi;
-        const groups = regex.exec(scriptlet);
-        const args = groups[4] ? groups[4].split(', ') : '';
+        const groups = UBO_SCRIPTLET_REGEX.exec(scriptlet);
+        const args = groups[5] ? groups[5].split(', ') : '';
         return {
             domains: groups[1],
-            scriptletName: groups[2],
+            mask: groups[2],
+            scriptletName: groups[3],
             args: args,
         };
     };
 
     /**
-     * Replace UBO scriptlet name by Adguard
-     *
-     * @param scriptletName
+     * Convert UBO scriptlet to AdGuard scriptlet
+     * @param {string} rule
      */
-    const uboToAdguardCompatibility = (scriptletName) => {
-        let adguardScriptletName = '';
-        compatibility.scriptlets.forEach(scriptlet => {
-            if (scriptlet.names[1] === scriptletName) {
-                adguardScriptletName = scriptlet.names[0];
-            }
-        });
-        return adguardScriptletName;
+    const convertUboScriptlet = (rule) => {
+        let { domains, mask, scriptletName, args } = parseUboScriptlet(rule);
+        const scriptletMask = mask.includes('@') ? RuleMasks.MASK_SCRIPTLET_EXCEPTION : RuleMasks.MASK_SCRIPTLET;
+        scriptletName = `'ubo-${scriptletName}'`;
+        if (args) {
+            args = `, '${args.join("', '")}'`;
+        }
+        return `${domains}${scriptletMask}(${scriptletName}${args})`;
+    };
+
+    /**
+     * Parse ABP snippet
+     * @param {string} snippet
+     */
+    const parseAbpSnippet = (snippet) => {
+        const groups = ABP_SNIPPET_REGEX.exec(snippet);
+        const elements = groups[3].split(' ');
+        return {
+            domains: groups[1],
+            mask: groups[2],
+            scriptletName: elements[0],
+            args: elements.slice(1),
+        };
+    };
+
+    /**
+     * Convert ABP snippet to AdGuard scriptlet
+     * @param {string} rule
+     */
+    const convertAbpSnippet = (rule) => {
+        let { domains, mask, scriptletName, args } = parseAbpSnippet(rule);
+        const scriptletMask = mask.includes('@') ? RuleMasks.MASK_SCRIPTLET_EXCEPTION : RuleMasks.MASK_SCRIPTLET;
+        scriptletName = `'abp-${scriptletName}'`;
+        if (args) {
+            args = `, '${args.join("', '")}'`;
+        }
+        return `${domains}${scriptletMask}(${scriptletName}${args})`;
     };
 
     /**
@@ -156,20 +186,17 @@ module.exports = (() => {
                 rule = replacedRule;
             }
 
-            // Convert uBO scriptlets to AdGuard scriptlets
-            if (rule.includes(RuleMasks.MASK_UBO_SCRIPTLETS) || rule.includes(RuleMasks.MASK_UBO_SCRIPTLETS_EXCEPTION)) {
-                let { domains, scriptletName, args } = parseUboScriptlet(rule);
-                const compatibility = uboToAdguardCompatibility(scriptletName);
-                if (!compatibility) {
-                    const message = `Rule "${rule}" is invalid`;
-                    logger.log(message);
-                    return rule;
-                }
-                scriptletName = `'${compatibility}'`;
-                if (args) {
-                    args = `, '${args.join("', '")}'`;
-                }
-                const convertedRule = `${domains}${RuleMasks.MASK_SCRIPTLET}(${scriptletName}${args})`;
+            // Convert UBO scriptlets to AdGuard scriptlets
+            if (UBO_SCRIPTLET_REGEX.test(rule)) {
+                const convertedRule = convertUboScriptlet(rule);
+                const message = `Rule "${rule}" converted to: ${convertedRule}`;
+                logger.log(message);
+                rule = convertedRule;
+            }
+
+            // Convert ABP snippets to AdGuard scriptlets
+            if (ABP_SNIPPET_REGEX.test(rule) && !(ADG_CSS_MASK_REGEX.test(rule))) {
+                const convertedRule = convertAbpSnippet(rule);
                 const message = `Rule "${rule}" converted to: ${convertedRule}`;
                 logger.log(message);
                 rule = convertedRule;
