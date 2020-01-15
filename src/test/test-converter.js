@@ -126,6 +126,14 @@ QUnit.test('Test UBO to Adguard scriptlet converter', (assert) => {
     actual = converter.convert(['test.com#@#script:inject(abort-on-property-read.js, some.prop)']);
     expected = "test.com#@%#//scriptlet('ubo-abort-on-property-read.js', 'some.prop')";
     assert.equal(actual, expected);
+
+    actual = converter.convert(['example.com#@#+js(disablenewtablinks.js)']);
+    expected = "example.com#@%#//scriptlet('ubo-disablenewtablinks.js')";
+    assert.notEqual(actual, expected);
+
+    actual = converter.convert(['test.com#@#script:inject(json-prune-123.js)']);
+    expected = "test.com#@%#//scriptlet('ubo-json-prune-123.js')";
+    assert.notEqual(actual, expected);
 });
 
 QUnit.test('Test ABP to Adguard scriptlet converter', (assert) => {
@@ -141,4 +149,8 @@ QUnit.test('Test ABP to Adguard scriptlet converter', (assert) => {
     actual = converter.convert(['example.com#@$#abort-on-property-write adblock.check']);
     expected = "example.com#@%#//scriptlet('abp-abort-on-property-write', 'adblock.check')";
     assert.equal(actual, expected);
+
+    actual = converter.convert(['example.com#$#abort-currentinlinescript console.log Hello']);
+    expected = "example.com#%#//scriptlet('abp-abort-currentinlinescript', 'console.log', 'Hello')";
+    assert.notEqual(actual, expected);
 });
