@@ -1,0 +1,11 @@
+! Allowed rules by FULL trust level:
+! $redirect
+! $rewrite:abp-resource
+! #%#//scriptlet
+! ##+js
+! #$#
+! $replace
+! #%#
+! #@%#
+!
+! The following rules should be excluded:

@@ -8,5 +8,6 @@
   "displayNumber": 101,
   "groupId": 2,
   "subscriptionUrl": "https://example.com/",
-  "tags": []
+  "tags": [],
+  "trustLevel": "full"
 }
