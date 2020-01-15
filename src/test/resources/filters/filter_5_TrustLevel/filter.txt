@@ -1,0 +1,10 @@
+! Homepage: http://adguard.com/filters.html#english
+! License: http://creativecommons.org/licenses/by-sa/3.0/
+!
+||adserver.com^$third-party
+||test.com/player/*.htm?autoplay=true&mute=true
+test.ru##.twitter-follow-button
+example.net#$?#.main-content { margin-top: 0!important; }
+test.com##body > section > .main-menu > .adsBanner
+example.org##.images > .private + .message
+||adsnet.com/*/700x350.gif$domain=example.com

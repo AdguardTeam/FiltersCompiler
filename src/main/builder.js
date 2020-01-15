@@ -43,6 +43,8 @@ module.exports = (function () {
     const EXCLUDED_LINES_FILE = 'diff.txt';
     const METADATA_FILE = 'metadata.json';
     const ADGUARD_FILTERS_SERVER_URL = 'https://filters.adtidy.org/';
+    const TRUST_LEVEL_DIR = './utils/trust-levels';
+    const DEFAULT_TRUST_LEVEL = 'low';
 
     const INCLUDE_DIRECTIVE = "@include ";
     const INCLUDE_OPTION_COMMENTS = "/stripComments";
@@ -170,11 +172,10 @@ module.exports = (function () {
      * @param excluded
      * @returns {*}
      */
-    const exclude = function (lines, exclusionsFileName, excluded) {
+    const exclude = function (lines, exclusionsFile, excluded) {
 
         logger.info('Applying exclusions..');
 
-        const exclusionsFile = path.join(currentDir, exclusionsFileName);
         let exclusions = readFile(exclusionsFile);
         if (!exclusions) {
             return lines;
@@ -301,7 +302,8 @@ module.exports = (function () {
             result = await FilterDownloader.resolveIncludes(result, originUrl);
 
             if (options.exclude) {
-                result = exclude(result, options.exclude, excluded);
+                const optionsExcludePath = path.join(currentDir, options.exclude);
+                result = exclude(result, optionsExcludePath, excluded);
             }
 
             if (options.stripComments) {
@@ -325,8 +327,9 @@ module.exports = (function () {
      * Compiles filter lines
      *
      * @param template
+     * @param trustLevelSettings
      */
-    const compile = async function(template) {
+    const compile = async function(template, trustLevelSettings) {
         let result = [];
         let excluded = [];
 
@@ -349,7 +352,11 @@ module.exports = (function () {
 
         result = converter.convert(result, excluded);
 
-        result = exclude(result, EXCLUDE_FILE, excluded);
+        const excludeFilePath = path.join(currentDir, EXCLUDE_FILE);
+        result = exclude(result, excludeFilePath, excluded);
+
+        logger.info('Applying trust-level exclusions..');
+        result = exclude(result, trustLevelSettings, excluded);
 
         result = validator.validate(result, excluded);
         result = validator.blacklistDomains(result, excluded);
@@ -427,8 +434,11 @@ module.exports = (function () {
             return;
         }
 
+        const trustLevel = metadata.trustLevel ? metadata.trustLevel : DEFAULT_TRUST_LEVEL;
+        const trustLevelSettings = path.resolve(__dirname, TRUST_LEVEL_DIR, `exclusions-${trustLevel}.txt`);
+
         logger.info('Compiling...');
-        const result = await compile(template);
+        const result = await compile(template, trustLevelSettings);
         const compiled = result.lines;
         const excluded = result.excluded;
         logger.info('Compiled length:' + compiled.length);

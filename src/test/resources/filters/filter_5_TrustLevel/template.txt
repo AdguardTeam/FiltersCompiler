@@ -1,0 +1,15 @@
+! Homepage: http://adguard.com/filters.html#english
+! License: http://creativecommons.org/licenses/by-sa/3.0/
+!
+||adserver.com^$third-party
+||test.com/player/*.htm?autoplay=true&mute=true
+example.com#%#//scriptlet("set-constant", "ads", "false")
+test.ru##.twitter-follow-button
+example.net#$?#.main-content { margin-top: 0!important; }
+test.com#%#AG_setConstant("ads", "false");
+example.com#$#h3 { color: green; }
+test.com##body > section > .main-menu > .adsBanner
+||example.com/api/v1/ad/*/json$replace=/html/abcd\,/i
+test.com#@%#Object.defineProperty(window, 'abcde', { get: function() { return []; } });
+example.org##.images > .private + .message
+||adsnet.com/*/700x350.gif$domain=example.com
