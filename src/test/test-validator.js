@@ -176,6 +176,40 @@ QUnit.test("Test ext-css validation - complicated cases", function (assert) {
     assert.ok(validator.validate(rules).length > 0);
 });
 
+QUnit.test("Test ext-css validation - complicated cases", function (assert) {
+    'use strict';
+
+    const validator = require("../main/validator.js");
+    validator.init();
+
+    let ruleText;
+    let rules;
+
+    ruleText = "example.com##div:has-text(/test-xpath-content/):xpath(../../..)";
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length > 0);
+
+    ruleText = 'example.com##div:xpath(//*[@class="test-xpath-class"])';
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length > 0);
+
+    ruleText = "example.com##div.test-nth-ancestor-marker:nth-ancestor(4)";
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length > 0);
+
+    ruleText = "example.com##div:xpath(../../..):has-text(/test-xpath-content/)";
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length === 0);
+
+    ruleText = "example.com##div:nth-ancestor(999)";
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length === 0);
+
+    ruleText = "example.com##div:xpath()";
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length === 0);
+});
+
 QUnit.test("Test ext-css validation - invalid pseudo classes", function (assert) {
     'use strict';
 
