@@ -157,13 +157,17 @@ QUnit.test('Test UBO to Adguard scriptlet converter', (assert) => {
     expected = "test.com#@%#//scriptlet('ubo-abort-on-property-read.js', 'some.prop')";
     assert.equal(actual, expected);
 
-    actual = converter.convert(['example.com#@#+js(disablenewtablinks.js)']);
-    expected = "example.com#@%#//scriptlet('ubo-disablenewtablinks.js')";
-    assert.notEqual(actual, expected);
+    actual = converter.convert(['example.com#@#+js(disable-newtab-link.js)']);
+    expected = "! [invalid scriptlet] example.com#@#+js(disable-newtab-link.js)";
+    assert.equal(actual, expected);
 
-    actual = converter.convert(['test.com#@#script:inject(json-prune-123.js)']);
-    expected = "test.com#@%#//scriptlet('ubo-json-prune-123.js')";
-    assert.notEqual(actual, expected);
+    actual = converter.convert(['test.com#@#script:inject(json-pune.js)']);
+    expected = "! [invalid scriptlet] test.com#@#script:inject(json-pune.js)";
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['test.com#@#script:inject(overlay-buster.js)']);
+    expected = "! [invalid scriptlet] test.com#@#script:inject(overlay-buster.js)";
+    assert.equal(actual, expected);
 });
 
 QUnit.test('Test ABP to Adguard scriptlet converter', (assert) => {
@@ -180,7 +184,11 @@ QUnit.test('Test ABP to Adguard scriptlet converter', (assert) => {
     expected = "example.com#@%#//scriptlet('abp-abort-on-property-write', 'adblock.check')";
     assert.equal(actual, expected);
 
-    actual = converter.convert(['example.com#$#abort-currentinlinescript console.log Hello']);
-    expected = "example.com#%#//scriptlet('abp-abort-currentinlinescript', 'console.log', 'Hello')";
-    assert.notEqual(actual, expected);
+    actual = converter.convert(['example.com#$#abort-current-inline-scripts console.log Hello']);
+    expected = "! [invalid scriptlet] example.com#$#abort-current-inline-scripts console.log Hello";
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['test.com#$#hide-if-contains ads-banner']);
+    expected = "! [invalid scriptlet] test.com#$#hide-if-contains ads-banner";
+    assert.equal(actual, expected);
 });

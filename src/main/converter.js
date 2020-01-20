@@ -5,7 +5,7 @@ module.exports = (() => {
 
     const logger = require("./utils/log.js");
     const RuleMasks = require('./rule/rule-masks.js');
-    const scriptletsCompatibility = require('../../node_modules/scriptlets/scripts/compatibility-table.json');
+    require('../../node_modules/scriptlets/dist/scriptlets.js');
     const ABP = 'abp';
     const UBO = 'ubo';
 
@@ -75,19 +75,9 @@ module.exports = (() => {
 
     /**
      * Validate scriptlet name
-     * @param {string} type - ubo, abp, adg
      * @param {string} scriptletName - rule
      */
-    const validateScriptlet = (type, scriptletName) => {
-        let valid = false;
-        // let { scriptletName } = parseUboScriptlet(scriptlet);
-        scriptletsCompatibility.scriptlets.forEach(compScriptlet => {
-            if (compScriptlet.adg && scriptletName === compScriptlet[type]) {
-                valid = true;
-            }
-        });
-        return valid;
-    };
+    const validateScriptletName = (scriptletName) => scriptlets.validate(scriptletName);
 
     /**
      * Parse UBO scriptlet
@@ -96,10 +86,12 @@ module.exports = (() => {
     const parseUboScriptlet = (scriptlet) => {
         const groups = UBO_SCRIPTLET_REGEX.exec(scriptlet);
         const args = groups[5] ? groups[5].split(', ') : '';
+        const compatibleName = `${UBO}-${groups[3]}`;
         return {
             domains: groups[1],
             mask: groups[2],
-            scriptletName: groups[3],
+            originalName: groups[3],
+            compatibleName: compatibleName,
             args: args,
         };
     };
@@ -111,29 +103,30 @@ module.exports = (() => {
     const parseAbpSnippet = (snippet) => {
         const groups = ABP_SNIPPET_REGEX.exec(snippet);
         const elements = groups[3].split(' ');
+        const compatibleName = `${ABP}-${elements[0]}`;
         return {
             domains: groups[1],
             mask: groups[2],
-            scriptletName: elements[0],
+            originalName: elements[0],
+            compatibleName: compatibleName,
             args: elements.slice(1),
         };
     };
 
     /**
      * Convert UBO or ABP scriptlet to AdGuard scriptlet
-     * @param {string} type
      * @param {string} domains
      * @param {string} mask
-     * @param {string} scriptletName
+     * @param {string} compatibleName
      * @param args
      */
-    const convertScriptlet = (type, domains, mask, scriptletName, args) => {
+    const convertScriptlet = (domains, mask, compatibleName, args) => {
         const scriptletMask = mask.includes('@') ? RuleMasks.MASK_SCRIPTLET_EXCEPTION : RuleMasks.MASK_SCRIPTLET;
-        scriptletName = `'${type}-${scriptletName}'`;
+        compatibleName = `'${compatibleName}'`;
         if (args) {
             args = `, '${args.join("', '")}'`;
         }
-        return `${domains}${scriptletMask}(${scriptletName}${args})`;
+        return `${domains}${scriptletMask}(${compatibleName}${args})`;
     };
 
     /**
@@ -201,9 +194,9 @@ module.exports = (() => {
 
             // Convert UBO scriptlets to AdGuard scriptlets
             if (UBO_SCRIPTLET_REGEX.test(rule)) {
-                let {domains, mask, scriptletName, args} = parseUboScriptlet(rule);
-                if (validateScriptlet(UBO, scriptletName)) {
-                    const convertedRule = convertScriptlet(UBO, domains, mask, scriptletName, args);
+                let {domains, mask, compatibleName, args} = parseUboScriptlet(rule);
+                if (validateScriptletName(compatibleName)) {
+                    const convertedRule = convertScriptlet(domains, mask, compatibleName, args);
                     const message = `Rule "${rule}" converted to: ${convertedRule}`;
                     logger.log(message);
                     rule = convertedRule;
@@ -213,14 +206,15 @@ module.exports = (() => {
                         excluded.push(`! ${message}`);
                         excluded.push(rule);
                     }
+                    rule = `! [invalid scriptlet] ${rule}`;
                 }
             }
 
             // Convert ABP snippets to AdGuard scriptlets
             if (ABP_SNIPPET_REGEX.test(rule) && !(ADG_CSS_MASK_REGEX.test(rule))) {
-                let {domains, mask, scriptletName, args} = parseAbpSnippet(rule);
-                if (validateScriptlet(ABP, scriptletName)) {
-                    const convertedRule = convertScriptlet(ABP, domains, mask, scriptletName, args);
+                let {domains, mask, compatibleName, args} = parseAbpSnippet(rule);
+                if (validateScriptletName(compatibleName)) {
+                    const convertedRule = convertScriptlet(domains, mask, compatibleName, args);
                     const message = `Rule "${rule}" converted to: ${convertedRule}`;
                     logger.log(message);
                     rule = convertedRule;
@@ -230,6 +224,7 @@ module.exports = (() => {
                         excluded.push(`! ${message}`);
                         excluded.push(rule);
                     }
+                    rule = `! [invalid scriptlet] ${rule}`;
                 }
             }
 
