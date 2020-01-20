@@ -14,3 +14,6 @@ src/test/resources/filters/filter_3_Test/revision.json
 src/test/resources/filters/filter_4_Directives/diff.txt
 src/test/resources/filters/filter_4_Directives/filter.txt
 src/test/resources/filters/filter_4_Directives/revision.json
+src/test/resources/filters/filter_5_TrustLevel/diff.txt
+src/test/resources/filters/filter_5_TrustLevel/filter.txt
+src/test/resources/filters/filter_5_TrustLevel/revision.json
