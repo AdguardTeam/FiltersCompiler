@@ -67,6 +67,19 @@ module.exports = (function () {
         'rewrite',
     ];
 
+    /**
+     * Push rule with warning message to excluded
+     * @param {array} excluded
+     * @param {string} warning
+     * @param {string} rule
+     */
+    const excludeRule = (excluded, warning, rule) => {
+        if (excluded) {
+            excluded.push(warning);
+            excluded.push(rule);
+        }
+    };
+
     let domainsBlacklist = [];
 
     /**
@@ -103,12 +116,7 @@ module.exports = (function () {
         return domains.filter((d) => {
             if (domainsBlacklist.indexOf(d) >= 0) {
                 logger.error(`Blacklisted domain: ${d}`);
-
-                if (excluded) {
-                    excluded.push(`! ${d} is blacklisted: `);
-                    excluded.push(rule);
-                }
-
+                excludeRule(excluded,`! ${d} is blacklisted: `, rule);
                 return false;
             }
 
@@ -133,12 +141,7 @@ module.exports = (function () {
                     const validated = removeBlacklistedDomains(modifiers.domain, line, excluded);
                     if (validated.length === 0) {
                         logger.error(`All domains are blacklisted for rule: ${line}`);
-
-                        if (excluded) {
-                            excluded.push('! All domains are blacklisted for rule:');
-                            excluded.push(line);
-                        }
-
+                        excludeRule(excluded,'! All domains are blacklisted for rule:', line);
                         return;
                     }
 
@@ -156,12 +159,7 @@ module.exports = (function () {
                     const validated = removeBlacklistedDomains(rule.domains, line, excluded);
                     if (validated.length === 0) {
                         logger.error(`All domains are blacklisted for rule: ${line}`);
-
-                        if (excluded) {
-                            excluded.push('! All domains are blacklisted for rule:');
-                            excluded.push(line);
-                        }
-
+                        excludeRule(excluded,'! All domains are blacklisted for rule:', line);
                         return;
                     }
 
@@ -194,6 +192,7 @@ module.exports = (function () {
      * @returns {Array}
      */
     const validate = function (list, excluded) {
+
         return list.filter((s) => {
             const rule = ruleParser.parseRule(s);
 
@@ -202,23 +201,13 @@ module.exports = (function () {
             } else if (rule.ruleType === RuleTypes.ElementHiding) {
                 if (s.startsWith('||')) {
                     logger.error(`|| are unnecessary for element hiding rule: ${s}`);
-
-                    if (excluded) {
-                        excluded.push('! || are unnecessary for element hiding rule:');
-                        excluded.push(rule.ruleText);
-                    }
-
+                    excludeRule(excluded,'! || are unnecessary for element hiding rule:', rule.ruleText);
                     return false;
                 }
 
                 if (!extendedCssValidator.validateCssSelector(rule.contentPart)) {
                     logger.error(`Invalid selector: ${s}`);
-
-                    if (excluded) {
-                        excluded.push('! Invalid selector:');
-                        excluded.push(rule.ruleText);
-                    }
-
+                    excludeRule(excluded,'! Invalid selector:', rule.ruleText);
                     return false;
                 }
 
@@ -241,27 +230,19 @@ module.exports = (function () {
                         return false;
                     }
                     return modifierOptions[0].startsWith('abp-resource:');
-                }
+                };
 
                 for (let name in modifiers) {
                     if (!validateOptionName(name) || !validateRewriteOption(name)) {
-                            logger.error(`Invalid rule: ${s} option: ${name}`);
-
-                        if (excluded) {
-                            excluded.push('! Invalid rule options:');
-                            excluded.push(rule.ruleText);
-                        }
+                        logger.error(`Invalid rule: ${s} option: ${name}`);
+                        excludeRule(excluded,'! Invalid rule options:', rule.ruleText);
                         return false;
                     }
 
                     if (name === 'domain' || name === '~domain') {
                         if (rule.modifiers[name].filter(x => x === '').length > 0) {
                             logger.error(`Invalid rule: ${s} incorrect option value: ${rule.modifiers[name]}`);
-
-                            if (excluded) {
-                                excluded.push('! Invalid rule options:');
-                                excluded.push(rule.ruleText);
-                            }
+                            excludeRule(excluded,'! Invalid rule options:', rule.ruleText);
                             return false;
                         }
                     }
@@ -271,30 +252,20 @@ module.exports = (function () {
                     rule.contentPart.toLowerCase().indexOf('url(') >= 0 ||
                     rule.contentPart.indexOf('\\') >= 0) {
                     logger.error(`Invalid rule: ${s} incorrect style: ${rule.contentPart}`);
-
-                    if (excluded) {
-                        excluded.push('! Incorrect style:');
-                        excluded.push(rule.ruleText);
-                    }
+                    excludeRule(excluded,'! Incorrect style:', rule.ruleText);
                     return false;
                 }
             }
             // Scriptlets validation
-            if (scriptlets.isAdgScriptletRule(s)) {
+            if (scriptlets.isAdgScriptletRule(rule.ruleText)) {
                 try {
-                    const validateScriptlet = scriptlets.validateRule(s);
+                    const validateScriptlet = scriptlets.validateRule(rule.ruleText);
                     if (!validateScriptlet) {
-                        if (excluded) {
-                            excluded.push('! Invalid scriptlet:');
-                            excluded.push(s);
-                        }
+                        excludeRule(excluded,'! Invalid scriptlet:', rule.ruleText);
                         return false;
                     }
                 } catch (error) {
-                    if (excluded) {
-                        excluded.push('! Invalid scriptlet:');
-                        excluded.push(s);
-                    }
+                    excludeRule(excluded,'! Invalid scriptlet:', rule.ruleText);
                     return false;
                 }
             }
