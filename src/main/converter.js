@@ -20,11 +20,6 @@ module.exports = (() => {
     const FRAME_REGEX = /([\$,])frame/i;
     const FRAME_REPLACEMENT = `$1subdocument`;
 
-    const UBO_SCRIPTLET_REGEX = /(.*)(#@?#script:inject|#@?#\s*\+js)\((.+\.js)(,\s(.+))?\)/i;
-
-    const ADG_CSS_MASK_REGEX = /#@?\$#.+?\s*{.*}\s*$/;
-    const ABP_SNIPPET_REGEX = /(.*)(#@?\$#)(.+)/;
-
     const SCRIPT_HAS_TEXT_REGEX = /(##\^script\:(has\-text|contains))\((?!\/.+\/\))/i;
     const SCRIPT_HAS_TEXT_REPLACEMENT = '$$$$script[tag-content="';
 
