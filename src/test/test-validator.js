@@ -507,3 +507,79 @@ QUnit.test('Test ##^script:has-text and $$script[tag-containts] rules', (assert)
     rules = ['example.com##^script:has-text(/\.advert/)'];
     assert.ok(validator.validate(rules).length === 0);
 });
+
+QUnit.test('Test scriptlets lib validator', (assert) => {
+    require('../../node_modules/scriptlets/dist/scriptlets.js');
+
+    let result = scriptlets.validateName('abort-on-property-read');
+    assert.equal(result, true);
+
+    result = scriptlets.validateName('abort-on--property-read');
+    assert.equal(result, false);
+
+    result = scriptlets.validateRule('test.com#$#abort-on-property-read adsShown');
+    assert.equal(result, true);
+
+    result = scriptlets.validateRule('test.com#$#abort-on-prop-read adsShown');
+    assert.equal(result, false);
+
+    result = scriptlets.validateRule('example.com#@#+js(nano-setInterval-booster.js, some.example, 1000)');
+    assert.equal(result, true);
+
+    result = scriptlets.validateRule('example.com#@#+js(nano-setInterval-booster, some.example, 1000)');
+    assert.equal(result, false);
+
+    result = scriptlets.isUboScriptletRule('example.com#@#+js(nano-setInterval-booster.js, some.example, 1000)');
+    assert.equal(result, true);
+
+    result = scriptlets.isUboScriptletRule('test.com##script:inject(json-prune.js)');
+    assert.equal(result, true);
+
+    result = scriptlets.isUboScriptletRule('test.com#%#//scriptlet(\'ubo-json-prune.js\')');
+    assert.equal(result, false);
+
+    result = scriptlets.isAdgScriptletRule('test.com#%#//scriptlet(\'ubo-json-prune.js\')');
+    assert.equal(result, true);
+
+    result = scriptlets.isAdgScriptletRule('test.com#%#//scriptlet("abort-on-property-read", "some.prop")');
+    assert.equal(result, true);
+
+    result = scriptlets.isAdgScriptletRule('test.com#@#script:inject(abort-on-property-read.js, some.prop)');
+    assert.equal(result, false);
+
+    result = scriptlets.isAbpSnippetRule('example.com#@$#abort-on-property-write adblock.check');
+    assert.equal(result, true);
+
+    result = scriptlets.isAbpSnippetRule('test.com#@#script:inject(abort-on-property-read.js, some.prop)');
+    assert.equal(result, false);
+});
+
+QUnit.test('Test scriptlets validator', (assert) => {
+    const validator = require("../main/validator.js");
+    validator.init();
+
+    let rules = [
+        'test.com#%#//scriptlet("ubo-abort-current-inline-script.js", "Math.random", "adbDetect")',
+        'example.com#@%#//scriptlet("ubo-disable-newtab-links.js")',
+        'example.com#%#//scriptlet("abp-abort-current-inline-script", "console.log", "Hello")',
+        'example.com#@%#//scriptlet("abort-on-property-write", "adblock.check")',
+        'example.com#%#//scriptlet(\'abort-on-property-read\', \'ads.prop\')',
+        'example.com#%#//scriptlet("prevent-adfly")',
+    ];
+    assert.ok(validator.validate(rules).length === 6);
+
+    rules = [
+        'test.com#%#//scriptlet("ubo-abort-current-inline-scripts.js", "Math.random", "adbDetect")',
+        'example.com#@%#//scriptlet("ubo-nano-setInterval-booster", "some.example", "1000")',
+        'example.com#%#//scriptlet("abp-abort-current-inline-script ", "console.log", "Hello")',
+        'example.com#@%#//scriptlet("abort-on--property-write", "adblock.check")',
+    ];
+    assert.ok(validator.validate(rules).length === 0);
+
+    rules = [
+        'test.com#%#//scriptlet(abort-current-inline-script", "Math.random", "adbDetect")',
+        'example.com#@%#//scriptlet("ubo-nano-setInterval-booster.js, "some.example", "1000")',
+        'example.com#%#//scriptlet("abp-abort-current-inline-script", console.log", "Hello")',
+    ];
+    assert.ok(validator.validate(rules).length === 0);
+});

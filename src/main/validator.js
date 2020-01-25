@@ -16,6 +16,7 @@ module.exports = (function () {
     const RuleMasks = require("./rule/rule-masks.js");
     const Rule = require("./rule/rule.js");
     const extendedCssValidator = require('./utils/extended-css-validator.js');
+    require('../../node_modules/scriptlets/dist/scriptlets.js');
 
     const VALID_OPTIONS = [
         // Basic modifiers
@@ -230,7 +231,7 @@ module.exports = (function () {
 
                 let modifiers = rule.modifiers;
 
-                // 'rewrite' modifier should be used only with 'abp-resource:' value 
+                // 'rewrite' modifier should be used only with 'abp-resource:' value
                 const validateRewriteOption = (name) => {
                     if (name !== 'rewrite') {
                         return true;
@@ -241,7 +242,7 @@ module.exports = (function () {
                     }
                     return modifierOptions[0].startsWith('abp-resource:');
                 }
-                
+
                 for (let name in modifiers) {
                     if (!validateOptionName(name) || !validateRewriteOption(name)) {
                             logger.error(`Invalid rule: ${s} option: ${name}`);
@@ -274,6 +275,25 @@ module.exports = (function () {
                     if (excluded) {
                         excluded.push('! Incorrect style:');
                         excluded.push(rule.ruleText);
+                    }
+                    return false;
+                }
+            }
+            // Scriptlets validation
+            if (scriptlets.isAdgScriptletRule(s)) {
+                try {
+                    const validateScriptlet = scriptlets.validateRule(s);
+                    if (!validateScriptlet) {
+                        if (excluded) {
+                            excluded.push('! Invalid scriptlet:');
+                            excluded.push(s);
+                        }
+                        return false;
+                    }
+                } catch (error) {
+                    if (excluded) {
+                        excluded.push('! Invalid scriptlet:');
+                        excluded.push(s);
                     }
                     return false;
                 }
