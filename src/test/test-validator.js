@@ -509,7 +509,7 @@ QUnit.test('Test ##^script:has-text and $$script[tag-containts] rules', (assert)
 });
 
 QUnit.test('Test scriptlets lib validator', (assert) => {
-    require('../../node_modules/scriptlets/dist/scriptlets.js');
+    const scriptlets = require('scriptlets/dist/cjs/scriptlets.js');
 
     let result = scriptlets.validateName('abort-on-property-read');
     assert.equal(result, true);
@@ -517,17 +517,8 @@ QUnit.test('Test scriptlets lib validator', (assert) => {
     result = scriptlets.validateName('abort-on--property-read');
     assert.equal(result, false);
 
-    result = scriptlets.validateRule('test.com#$#abort-on-property-read adsShown');
+    result = scriptlets.validateRule('test.com#%#//scriptlet("ubo-abort-current-inline-script.js", "Math.random", "adbDetect")');
     assert.equal(result, true);
-
-    result = scriptlets.validateRule('test.com#$#abort-on-prop-read adsShown');
-    assert.equal(result, false);
-
-    result = scriptlets.validateRule('example.com#@#+js(nano-setInterval-booster.js, some.example, 1000)');
-    assert.equal(result, true);
-
-    result = scriptlets.validateRule('example.com#@#+js(nano-setInterval-booster, some.example, 1000)');
-    assert.equal(result, false);
 
     result = scriptlets.isUboScriptletRule('example.com#@#+js(nano-setInterval-booster.js, some.example, 1000)');
     assert.equal(result, true);

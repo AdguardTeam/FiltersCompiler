@@ -16,7 +16,7 @@ module.exports = (function () {
     const RuleMasks = require("./rule/rule-masks.js");
     const Rule = require("./rule/rule.js");
     const extendedCssValidator = require('./utils/extended-css-validator.js');
-    require('../../node_modules/scriptlets/dist/scriptlets.js');
+    const scriptlets = require('scriptlets/dist/cjs/scriptlets.js');
 
     const VALID_OPTIONS = [
         // Basic modifiers
@@ -266,6 +266,7 @@ module.exports = (function () {
                     }
                 } catch (error) {
                     excludeRule(excluded,'! Invalid scriptlet:', rule.ruleText);
+                    logger.error(`Invalid scriptlet: ${rule.ruleText}`);
                     return false;
                 }
             }
