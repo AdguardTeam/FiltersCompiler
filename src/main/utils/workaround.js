@@ -5,7 +5,7 @@ module.exports = (() => {
     'use strict';
 
     const RuleMasks = require('../rule/rule-masks.js');
-    const { convertScriptletToUblockSyntax } = require('../converter.js');
+    const { convertAdgScriptletToUbo } = require('../converter.js');
 
     /**
      * CSS rules with width and height attributes break SVG rendering
@@ -39,6 +39,23 @@ module.exports = (() => {
     };
 
     /**
+     * Convert Adguard scriptlets to UBlock syntax
+     * https://github.com/AdguardTeam/FiltersCompiler/issues/56
+     * @param {array} rules
+     * @return {array} modified rules
+     */
+    const convertAdguardScriptletsToUblock = (rules) => {
+        const modified = [];
+        rules.forEach(rule => {
+            if (rule.includes(RuleMasks.MASK_SCRIPTLET) || rule.includes(RuleMasks.MASK_SCRIPTLET_EXCEPTION)) {
+                rule = convertAdgScriptletToUbo(rule);
+            }
+            modified.push(rule);
+        });
+        return modified;
+    };
+
+    /**
      * Rewrites title and description
      * https://github.com/AdguardTeam/AdguardFilters/issues/5138#issuecomment-328847738
      */
@@ -66,9 +83,6 @@ module.exports = (() => {
         let flag = -1;
         for (let i = 0; i < rules.length; i++) {
             let rule = rules[i];
-            if (rule.includes(RuleMasks.MASK_SCRIPTLET)) {
-                rule = convertScriptletToUblockSyntax(rule);
-            }
 
             if (flag >= 0 && rule.startsWith("!------------------")) {
                 if (flag !== i - 1) {
@@ -150,6 +164,7 @@ module.exports = (() => {
         rewriteRules: rewriteRules,
         fixVersionComments: fixVersionComments,
         removeAdblockVersion: removeAdblockVersion,
-        rewriteMetadataForOldMac: rewriteMetadataForOldMac
+        rewriteMetadataForOldMac: rewriteMetadataForOldMac,
+        convertAdguardScriptletsToUblock: convertAdguardScriptletsToUblock
     };
 })();

@@ -23,6 +23,7 @@ module.exports = (() => {
         MASK_COMMENT: "!",
         MASK_HINT: "!+",
         MASK_DIRECTIVES: "!#",
-        MASK_SCRIPTLET:"#%#//"
+        MASK_SCRIPTLET:"#%#//scriptlet",
+        MASK_SCRIPTLET_EXCEPTION:"#@%#//scriptlet"
     };
 })();

@@ -87,30 +87,25 @@ QUnit.test('Test options replacement', (assert) => {
 });
 
 QUnit.test('Test convert scriptlets to UBlock syntax', (assert) => {
-    const { convertScriptletToUblockSyntax } = require('../main/converter');
+    const { convertAdgScriptletToUbo } = require('../main/converter');
 
     // scriptlet with one argument
-    let actual = convertScriptletToUblockSyntax('example.org#%#//scriptlet("abort-on-property-read", "alert")');
+    let actual = convertAdgScriptletToUbo('example.org#%#//scriptlet("abort-on-property-read", "alert")');
     let expected = 'example.org##+js(abort-on-property-read.js, alert)';
     assert.equal(actual, expected);
 
     // scriptlet with two arguments
-    actual = convertScriptletToUblockSyntax("example.org#%#//scriptlet('set-constant', 'firstConst', 'false')");
+    actual = convertAdgScriptletToUbo("example.org#%#//scriptlet('set-constant', 'firstConst', 'false')");
     expected = 'example.org##+js(set-constant.js, firstConst, false)';
     assert.equal(actual, expected);
 
     // scriptlet without arguments and few domains
-    actual = convertScriptletToUblockSyntax("example1.org,example2.com,some-domain.dom#%#//scriptlet('prevent-adfly')");
+    actual = convertAdgScriptletToUbo("example1.org,example2.com,some-domain.dom#%#//scriptlet('prevent-adfly')");
     expected = 'example1.org,example2.com,some-domain.dom##+js(adfly-defuser.js)';
     assert.equal(actual, expected);
 
-    // scriptlet name error
-    actual = convertScriptletToUblockSyntax("example.org#%#//scriptlet('Zet-constant', 'firstConst', 'false')");
-    expected = '';
-    assert.equal(actual, expected);
-
     // scriptlet argument includes quotes
-    actual = convertScriptletToUblockSyntax("example.org#%#//scriptlet('set-constant', 'constName', 'value'12345'')");
+    actual = convertAdgScriptletToUbo("example.org#%#//scriptlet('set-constant', 'constName', 'value\"12345\"')");
     expected = 'example.org##+js(set-constant.js, constName, value\'12345\')';
 });
 

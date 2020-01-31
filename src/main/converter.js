@@ -24,6 +24,8 @@ module.exports = (() => {
     const SCRIPT_HAS_TEXT_REGEX = /(##\^script\:(has\-text|contains))\((?!\/.+\/\))/i;
     const SCRIPT_HAS_TEXT_REPLACEMENT = '$$$$script[tag-contains="';
 
+    const scriptlets = require('scriptlets/dist/cjs/scriptlets.js');
+
     /**
      * Executes rule css conversion
      *
@@ -136,60 +138,23 @@ module.exports = (() => {
         return result;
     };
 
-    // It is temporary solution
-    // TODO: Add scriptlets converter
-    // https://github.com/AdguardTeam/Scriptlets/issues/63
-    const scriptletsCompatibility = {
-        // AG: uBO
-        'abort-current-inline-script': 'abort-current-inline-script.js',
-        'abort-on-property-read': 'abort-on-property-read.js',
-        'abort-on-property-write': 'abort-on-property-write.js',
-        'adjust-setInterval': 'nano-setInterval-booster.js',
-        'adjust-setTimeout': 'nano-setTimeout-booster.js',
-        'disable-newtab-links': 'disable-newtab-links.js',
-        'json-prune': 'json-prune.js',
-        'json-prune-new': 'json-prune.js',
-        'log-addEventListener': 'addEventListener-logger.js',
-        'nowebrtc': 'nowebrtc.js',
-        'prevent-addEventListener': 'addEventListener-defuser.js',
-        'prevent-adfly': 'adfly-defuser.js',
-        'prevent-eval-if': 'noeval-if.js',
-        'prevent-setInterval': 'setInterval-defuser.js',
-        'prevent-setTimeout': 'setTimeout-defuser.js',
-        'remove-attr': 'remove-attr.js',
-        'remove-cookie': 'cookie-remover.js',
-        'set-constant': 'set-constant.js',
-    };
-
-    const parseScriptlet = (scriptlet) => {
-        const regex = /(.+)#%#\/\/scriptlet\(('|")(.+?)('|")((, )?(('|").+('|")))?\)/gi;
-        const elms = regex.exec(scriptlet);
-        let args = [];
-        if (elms[5]) {
-            args = elms[5].replace(/('|")/g, '').split(',');
-        }
-        return {
-            domains: elms[1],
-            scriptletName: elms[3],
-            args: args,
-        };
-    };
-
     /**
      * Convert Adguard scriptlets to UBlock syntax
-     * https://github.com/AdguardTeam/FiltersCompiler/issues/56
+     * @param {string} rule
+     * @return {string}
      */
-    const convertScriptletToUblockSyntax = (ruleText) => {
-        let { domains, scriptletName, args } = parseScriptlet(ruleText);
-        if (!scriptletsCompatibility[scriptletName]) {
-            logger.warn(`Cannot convert scriptlet ${ruleText} to UBlock syntax`);
-            return '';
+    const convertAdgScriptletToUbo = (rule) => {
+        const convertedRule = scriptlets.convertAdgToUbo(rule);
+        if (!convertedRule) {
+            logger.error(`Cannot convert Adguard scriptlet to Ublock: ${rule}`);
+            return rule;
         }
-        return `${domains}##+js(${scriptletsCompatibility[scriptletName]}${[...args]})`
+        logger.log(`Adguard scriptlet "${rule}" converted to Ublock: ${convertedRule}`);
+        return convertedRule;
     };
 
     return {
         convert: convert,
-        convertScriptletToUblockSyntax: convertScriptletToUblockSyntax
+        convertAdgScriptletToUbo: convertAdgScriptletToUbo
     };
 })();

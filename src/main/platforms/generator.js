@@ -540,7 +540,14 @@ module.exports = (() => {
         createDir(dir);
 
         const filterFile = path.join(dir, `${filterId}${optimized ? '_optimized' : ''}.txt`);
-        writeFilterFile(filterFile, config.configuration.adbHeader, rulesHeader, rules);
+        let rulesList = rules;
+
+        // Convert Adguard scriptlets to UBlock syntax
+        if (config.platform === 'ext_ublock') {
+            rulesList = workaround.convertAdguardScriptletsToUblock(rules);
+        }
+
+        writeFilterFile(filterFile, config.configuration.adbHeader, rulesHeader, rulesList);
 
         // For English filter only we should provide additional filter version.
         if (filterId == 2 && config.platform === 'ext_ublock' && !optimized) {
