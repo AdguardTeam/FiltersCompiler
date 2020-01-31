@@ -117,8 +117,6 @@
             "removeRulePatterns": [
                 "\\$\\$|\\$\\@\\$",
                 "\\$replace=",
-                "\\$stealth",
-                ",stealth",
                 "important,replace=",
                 "\\$app",
                 "\\$network",
@@ -141,8 +139,6 @@
             "removeRulePatterns": [
                 "\\$app",
                 "\\$network",
-                "\\$stealth",
-                ",stealth",
                 "\\$protobuf",
                 "important,protobuf",
                 "\\$extension",
@@ -196,8 +192,6 @@
                 "\\$\\$|\\$\\@\\$",
                 "\\$mp4",
                 "\\$replace=",
-                "\\$stealth",
-                ",stealth",
                 "important,replace=",
                 "\\$app",
                 "\\$network",
@@ -220,8 +214,6 @@
             "removeRulePatterns": [
                 "\\$\\$|\\$\\@\\$",
                 "\\$replace=",
-                "\\$stealth",
-                ",stealth",
                 "important,replace=",
                 "\\$app",
                 "\\$network",

@@ -176,6 +176,40 @@ QUnit.test("Test ext-css validation - complicated cases", function (assert) {
     assert.ok(validator.validate(rules).length > 0);
 });
 
+QUnit.test("Test ext-css validation - complicated cases", function (assert) {
+    'use strict';
+
+    const validator = require("../main/validator.js");
+    validator.init();
+
+    let ruleText;
+    let rules;
+
+    ruleText = "example.com##div:has-text(/test-xpath-content/):xpath(../../..)";
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length > 0);
+
+    ruleText = 'example.com##div:xpath(//*[@class="test-xpath-class"])';
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length > 0);
+
+    ruleText = "example.com##div.test-nth-ancestor-marker:nth-ancestor(4)";
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length > 0);
+
+    ruleText = "example.com##div:xpath(../../..):has-text(/test-xpath-content/)";
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length === 0);
+
+    ruleText = "example.com##div:nth-ancestor(999)";
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length === 0);
+
+    ruleText = "example.com##div:xpath()";
+    rules = [ruleText];
+    assert.ok(validator.validate(rules).length === 0);
+});
+
 QUnit.test("Test ext-css validation - invalid pseudo classes", function (assert) {
     'use strict';
 
@@ -352,8 +386,12 @@ QUnit.test("Test validation - various rules", function (assert) {
     rules = ["example.com##div[class^='textLink' i]"];
     assert.ok(validator.validate(rules).length > 0);
 
-    rules = ['example.com#?#section:has(div[class^="textLink" i])'];
-    assert.ok(validator.validate(rules).length > 0);
+    rules = ['example.com#?#section:has(div[class^="textLink" i])',
+        '##img[alt*="example.org" i]',
+        '##img[alt*="QQ998" i]',
+        '##[href*="35.200.169.1" i] > img',
+        'aszdziennik.pl##a[href*="/aszdziennik" i] > img[src^="/static/media/"]'];
+    assert.ok(validator.validate(rules).length === 5);
 
     rules = ['example.com##div[class^="textLink"i]',
         'example.com##div[class^=textLink i]',

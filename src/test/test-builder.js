@@ -37,7 +37,7 @@ QUnit.test("Test builder", async (assert) => {
 
     const os = require('os');
 
-    const filterLines = filterText.split(os.EOL);
+    let filterLines = filterText.split(os.EOL);
     assert.equal(filterLines.length, 23);
 
     //Common include
@@ -65,6 +65,18 @@ QUnit.test("Test builder", async (assert) => {
     assert.notOk(filterLines.indexOf('||test.com^$replace=') >= 0);
     assert.notOk(filterLines.indexOf('regularexpressionexcluded') >= 0);
     assert.ok(filterLines.indexOf('regularexpression_not_excluded') >= 0);
+
+    const filterContent = readFile(path.join(__dirname, 'resources/platforms/test', 'filters', '5.txt'));
+    filterLines = filterContent.split('\r\n');
+    assert.equal(filterLines.length, 17);
+
+    // Trust-level exclusions
+    assert.ok(filterLines.indexOf('||adsnet.com/*/700x350.gif$domain=example.com') >= 0);
+    assert.ok(filterLines.indexOf('example.com#%#//scriptlet("set-constant", "ads", "false")') ===  -1);
+    assert.ok(filterLines.indexOf('test.com#%#AG_setConstant("ads", "false");') ===  -1);
+    assert.ok(filterLines.indexOf('||example.com/api/v1/ad/*/json$replace=/html/abcd\\,/i') ===  -1);
+    assert.ok(filterLines.indexOf('||adsnet.com/*/700x350.gif$domain=example.com') >= 0);
+
 });
 
 QUnit.test("Test builder - build lists", async (assert) => {
@@ -154,6 +166,7 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.equal(filtersMetadata.filters[0].languages[1], 'pl');
     assert.equal(filtersMetadata.filters[0].tags.length, 4);
     assert.equal(filtersMetadata.filters[0].tags[0], 1);
+    assert.equal(filtersMetadata.filters[0].trustLevel, 'full');
 
     let filtersI18nMetadata = readFile(path.join(platforms, 'test', 'filters_i18n.json'));
     assert.ok(filtersI18nMetadata);
@@ -234,7 +247,7 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.ok(filtersMetadataMAC.filters);
     let englishFilter = filtersMetadataMAC.filters[0];
     assert.ok(englishFilter);
-    assert.equal(Object.keys(englishFilter).length, 11);
+    assert.equal(Object.keys(englishFilter).length, 12);
 
     assert.equal(englishFilter.filterId, 2);
     assert.equal(englishFilter.name, 'English Filter');

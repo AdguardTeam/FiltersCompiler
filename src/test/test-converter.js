@@ -112,7 +112,7 @@ QUnit.test('Test convert scriptlets to UBlock syntax', (assert) => {
 QUnit.test('Test ##^script:has-text to $$script[tag-containts] replacement', (assert) => {
     const converter = require('../main/converter');
     let actual = converter.convert(['example.com##^script:has-text(12313)']);
-    let expected = 'example.com$$script[tag-contains="12313"]';
+    let expected = 'example.com$$script[tag-content="12313"][max-length="262144"]';
     assert.equal(actual, expected);
 
     actual = converter.convert(['example.com##^script:has-text(/\.advert/)']);
@@ -120,7 +120,7 @@ QUnit.test('Test ##^script:has-text to $$script[tag-containts] replacement', (as
     assert.equal(actual, expected);
 
     actual = converter.convert(['example.com##^script:contains(banner)']);
-    expected = 'example.com$$script[tag-contains="banner"]';
+    expected = 'example.com$$script[tag-content="banner"][max-length="262144"]';
     assert.equal(actual, expected);
 
     actual = converter.convert(['example.com##^script:contains(/.+banner/)']);
@@ -128,3 +128,33 @@ QUnit.test('Test ##^script:has-text to $$script[tag-containts] replacement', (as
     assert.equal(actual, expected);
 });
 
+QUnit.test('Test $1p to $~third-party and $3p to $third-party replacement', (assert) => {
+    const converter = require('../main/converter');
+    let actual = converter.convert(['||www.ynet.co.il^$important,websocket,1p,domain=www.ynet.co.il']);
+    let expected = '||www.ynet.co.il^$important,websocket,~third-party,domain=www.ynet.co.il';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['||20il.co.il^$important,websocket,1p']);
+    expected = '||20il.co.il^$important,websocket,~third-party';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['||vidads.gr^$3p']);
+    expected = '||vidads.gr^$third-party';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['@@.com/ads.js|$3p,domain=~3ppt.com']);
+    expected = '@@.com/ads.js|$third-party,domain=~3ppt.com';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['@@.com/ads.js|$~third-party,domain=~3ppt.com']);
+    expected = '@@.com/ads.js|$~third-party,domain=~third-partypt.com';
+    assert.notEqual(actual, expected);
+
+    actual = converter.convert(['spiele-umsonst.de##.left > div.right[style$="1px;"]']);
+    expected = 'spiele-umsonst.de##.left > div.right[style$="~third-partyx;"]';
+    assert.notEqual(actual, expected);
+
+    actual = converter.convert(['realadmin.ru#$#.adsbygoogle { height: 1px!important; }']);
+    expected = 'realadmin.ru#$#.adsbygoogle { height: third-partyx!important; }';
+    assert.notEqual(actual, expected);
+});
