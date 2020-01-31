@@ -137,7 +137,7 @@ QUnit.test('Test $1p to $~third-party and $3p to $third-party replacement', (ass
 });
 
 QUnit.test('Test scriptlets lib converter', (assert) => {
-    require('../../node_modules/scriptlets/dist/scriptlets.js');
+    const scriptlets = require('scriptlets');
     let actual = scriptlets.convertUboToAdg('example.com#@#+js(nano-setInterval-booster.js, some.example, 1000)');
     let expected = 'example.com#@%#//scriptlet("ubo-nano-setInterval-booster.js", "some.example", "1000")';
     assert.equal(actual, expected);
