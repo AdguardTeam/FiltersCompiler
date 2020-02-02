@@ -266,7 +266,7 @@ module.exports = (function () {
                     }
                 } catch (error) {
                     excludeRule(excluded,'! Invalid scriptlet:', rule.ruleText);
-                    logger.error(`Invalid scriptlet: ${rule.ruleText}`);
+                    logger.error(`Invalid scriptlet: ${rule.ruleText}. Error: ${error.message}`);
                     return false;
                 }
             }
