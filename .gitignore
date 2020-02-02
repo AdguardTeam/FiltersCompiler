@@ -1,6 +1,7 @@
 node_modules
 .idea
 *.iml
+yarn-error.log
 src/test/resources/platforms/*
 src/test/resources/log.txt
 src/test/resources/log_platforms.txt

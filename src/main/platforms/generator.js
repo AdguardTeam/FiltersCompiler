@@ -12,6 +12,7 @@ module.exports = (() => {
     const logger = require("../utils/log.js");
     const filter = require("./filter.js");
     const workaround = require('../utils/workaround.js');
+    const converter = require('../converter.js');
     const optimization = require('../optimization');
 
     const RuleMasks = require('../rule/rule-masks.js');
@@ -544,7 +545,7 @@ module.exports = (() => {
 
         // Convert Adguard scriptlets to UBlock syntax
         if (config.platform === 'ext_ublock') {
-            rulesList = workaround.convertAdguardScriptletsToUblock(rules);
+            rulesList = converter.convertAdgScriptletsToUbo(rules);
         }
 
         writeFilterFile(filterFile, config.configuration.adbHeader, rulesHeader, rulesList);

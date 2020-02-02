@@ -155,21 +155,29 @@ module.exports = (() => {
 
     /**
      * Convert Adguard scriptlets to UBlock syntax
-     * @param {string} rule
-     * @return {string}
+     * https://github.com/AdguardTeam/FiltersCompiler/issues/56
+     * @param {array} rules
+     * @return {array} modified rules
      */
-    const convertAdgScriptletToUbo = (rule) => {
-        const convertedRule = scriptlets.convertAdgToUbo(rule);
-        if (!convertedRule) {
-            logger.error(`Cannot convert Adguard scriptlet to Ublock: ${rule}`);
-            return rule;
-        }
-        logger.log(`Adguard scriptlet "${rule}" converted to Ublock: ${convertedRule}`);
-        return convertedRule;
+    const convertAdgScriptletsToUbo = (rules) => {
+        const modified = [];
+        rules.forEach(rule => {
+            if (rule.includes(RuleMasks.MASK_SCRIPTLET) || rule.includes(RuleMasks.MASK_SCRIPTLET_EXCEPTION)) {
+                const convertedRule = scriptlets.convertAdgToUbo(rule);
+                if (!convertedRule) {
+                    logger.error(`Cannot convert Adguard scriptlet to Ublock: ${rule}`);
+                    return rule;
+                }
+                logger.log(`Adguard scriptlet "${rule}" converted to Ublock: ${convertedRule}`);
+                rule = convertedRule;
+            }
+            modified.push(rule);
+        });
+        return modified;
     };
 
     return {
         convert: convert,
-        convertAdgScriptletToUbo: convertAdgScriptletToUbo
+        convertAdgScriptletsToUbo: convertAdgScriptletsToUbo
     };
 })();
