@@ -185,7 +185,7 @@ module.exports = (() => {
      * @param {array} excluded
      * @return {array} result
      */
-    const convert = function (rulesList, excluded) {
+    const convertRulesToAdg = function (rulesList, excluded) {
         const result = [];
 
         for (let rule of rulesList) {
@@ -225,7 +225,7 @@ module.exports = (() => {
     };
 
     return {
-        convert: convert,
+        convertRulesToAdg: convertRulesToAdg,
         convertAdgScriptletsToUbo: convertAdgScriptletsToUbo
     };
 })();

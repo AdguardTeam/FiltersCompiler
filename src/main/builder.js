@@ -350,7 +350,7 @@ module.exports = (function () {
 
         result = await FilterDownloader.resolveIncludes(result, currentDir);
 
-        result = converter.convert(result, excluded);
+        result = converter.convertRulesToAdg(result, excluded);
 
         const excludeFilePath = path.join(currentDir, EXCLUDE_FILE);
         result = exclude(result, excludeFilePath, excluded);
