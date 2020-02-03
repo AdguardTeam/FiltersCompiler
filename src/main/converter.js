@@ -131,7 +131,6 @@ module.exports = (() => {
             }
 
             // Convert UBO and ABP scriptlets to AdGuard scriptlets
-            const scriptlets = require('scriptlets');
             if (scriptlets.isUboScriptletRule(rule) || scriptlets.isAbpSnippetRule(rule)) {
                 const convertedRule = scriptlets.convertScriptletToAdg(rule);
                 if (!convertedRule) {
