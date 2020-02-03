@@ -5,12 +5,6 @@ yarn-error.log
 src/test/resources/platforms/*
 src/test/resources/log.txt
 src/test/resources/log_platforms.txt
-src/test/resources/filters/filter_2_English/diff.txt
-src/test/resources/filters/filter_2_English/filter.txt
-src/test/resources/filters/filter_2_English/revision.json
-src/test/resources/filters/filter_3_Test/diff.txt
-src/test/resources/filters/filter_3_Test/filter.txt
-src/test/resources/filters/filter_3_Test/revision.json
-src/test/resources/filters/filter_4_Directives/diff.txt
-src/test/resources/filters/filter_4_Directives/filter.txt
-src/test/resources/filters/filter_4_Directives/revision.json
+src/test/resources/filters/*/diff.txt
+src/test/resources/filters/*/filter.txt
+src/test/resources/filters/*/revision.json

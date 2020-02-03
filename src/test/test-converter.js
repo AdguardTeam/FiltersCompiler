@@ -155,3 +155,60 @@ QUnit.test('Test $1p to $~third-party and $3p to $third-party replacement', (ass
     expected = 'realadmin.ru#$#.adsbygoogle { height: third-partyx!important; }';
     assert.notEqual(actual, expected);
 });
+
+QUnit.test('Test scriptlets lib converter', (assert) => {
+    const scriptlets = require('scriptlets');
+    let actual = scriptlets.convertUboToAdg('example.com#@#+js(nano-setInterval-booster.js, some.example, 1000)');
+    let expected = 'example.com#@%#//scriptlet("ubo-nano-setInterval-booster.js", "some.example", "1000")';
+    assert.equal(actual, expected);
+
+    actual = scriptlets.convertAbpToAdg('test.com#$#abort-on-property-read adsShown');
+    expected = 'test.com#%#//scriptlet("abp-abort-on-property-read", "adsShown")';
+    assert.equal(actual, expected);
+
+    actual = scriptlets.convertScriptletToAdg('example.com#@#+js(nano-setInterval-booster.js, some.example, 1000)');
+    expected = 'example.com#@%#//scriptlet("ubo-nano-setInterval-booster.js", "some.example", "1000")';
+    assert.equal(actual, expected);
+
+    actual = scriptlets.convertScriptletToAdg('test.com#$#abort-on-property-read adsShown');
+    expected = 'test.com#%#//scriptlet("abp-abort-on-property-read", "adsShown")';
+    assert.equal(actual, expected);
+});
+
+QUnit.test('Test UBO to Adguard scriptlet converter', (assert) => {
+    const converter = require('../main/converter');
+    let actual = converter.convert(['test.com##+js(abort-current-inline-script.js, Math.random, adbDetect)']);
+    let expected = 'test.com#%#//scriptlet("ubo-abort-current-inline-script.js", "Math.random", "adbDetect")';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['example.com##+js(disable-newtab-links.js)']);
+    expected = 'example.com#%#//scriptlet("ubo-disable-newtab-links.js")';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['example.com#@#+js(nano-setInterval-booster.js, some.example, 1000)']);
+    expected = 'example.com#@%#//scriptlet("ubo-nano-setInterval-booster.js", "some.example", "1000")';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['test.com##script:inject(json-prune.js)']);
+    expected = 'test.com#%#//scriptlet("ubo-json-prune.js")';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['test.com#@#script:inject(abort-on-property-read.js, some.prop)']);
+    expected = 'test.com#@%#//scriptlet("ubo-abort-on-property-read.js", "some.prop")';
+    assert.equal(actual, expected);
+});
+
+QUnit.test('Test ABP to Adguard scriptlet converter', (assert) => {
+    const converter = require('../main/converter');
+    let actual = converter.convert(['test.com#$#abort-on-property-read adsShown']);
+    let expected = 'test.com#%#//scriptlet("abp-abort-on-property-read", "adsShown")';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['example.com#$#abort-current-inline-script console.log Hello']);
+    expected = 'example.com#%#//scriptlet("abp-abort-current-inline-script", "console.log", "Hello")';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['example.com#@$#abort-on-property-write adblock.check']);
+    expected = 'example.com#@%#//scriptlet("abp-abort-on-property-write", "adblock.check")';
+    assert.equal(actual, expected);
+});

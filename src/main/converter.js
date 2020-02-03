@@ -1,7 +1,6 @@
 /* globals require */
 
 module.exports = (() => {
-
     'use strict';
 
     const logger = require("./utils/log.js");
@@ -129,6 +128,19 @@ module.exports = (() => {
                 let message = `Rule "${rule}" converted to: ${replacedRule}`;
                 logger.log(message);
                 rule = replacedRule;
+            }
+
+            // Convert UBO and ABP scriptlets to AdGuard scriptlets
+            const scriptlets = require('scriptlets');
+            if (scriptlets.isUboScriptletRule(rule) || scriptlets.isAbpSnippetRule(rule)) {
+                const convertedRule = scriptlets.convertScriptletToAdg(rule);
+                if (!convertedRule) {
+                    logger.error(`Unable to convert scriptlet to Adguard syntax: "${rule}" `);
+                    rule = `! Inconvertible scriptlet: ${rule}`;
+                } else {
+                    logger.log(`Rule "${rule}" converted to: ${convertedRule}`);
+                    rule = convertedRule;
+                }
             }
 
             // Convert ##^script:has-text and ##^script:contains to $$script[tag-content="..."][max-length="262144"]

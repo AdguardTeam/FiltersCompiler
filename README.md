@@ -29,5 +29,5 @@ The package could be run with the following command:
 ## Tests
 
 ```
- npm test
+ yarn test
 ```
