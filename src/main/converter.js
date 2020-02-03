@@ -8,19 +8,19 @@ module.exports = (() => {
 
     const CSS_RULE_REPLACE_PATTERN = /(.*):style\((.*)\)/g;
 
-    const FIRST_PARTY_REGEX = /([\$,])first-party/i;
+    const FIRST_PARTY_REGEX = /([$,])first-party/i;
     const FIRST_PARTY_REPLACEMENT = `$1~third-party`;
 
-    const XHR_REGEX = /([\$,])xhr/i;
+    const XHR_REGEX = /([$,])xhr/i;
     const XHR_REPLACEMENT = `$1xmlhttprequest`;
 
-    const CSS_REGEX = /([\$,])css/i;
+    const CSS_REGEX = /([$,])css/i;
     const CSS_REPLACEMENT = `$1stylesheet`;
 
-    const FRAME_REGEX = /([\$,])frame/i;
+    const FRAME_REGEX = /([$,])frame/i;
     const FRAME_REPLACEMENT = `$1subdocument`;
 
-    const SCRIPT_HAS_TEXT_REGEX = /(##\^script\:(has\-text|contains))\((?!\/.+\/\))/i;
+    const SCRIPT_HAS_TEXT_REGEX = /(##\^script:(has-text|contains))\((?!\/.+\/\))/i;
     const SCRIPT_HAS_TEXT_REPLACEMENT = '$$$$script[tag-content="';
 
     const THIRD_PARTY_1P_3P_REGEX = /\$[^#]?(.*,)?(1p|3p)/;
@@ -29,7 +29,7 @@ module.exports = (() => {
     const THIRD_PARTY_3P = '3p';
     const THIRD_PARTY_3P_REPLACEMENT = 'third-party';
 
-    const scriptlets = require('scriptlets/dist/cjs/scriptlets.js');
+    const scriptlets = require('scriptlets');
 
     /**
      * Executes rule css conversion
@@ -68,21 +68,83 @@ module.exports = (() => {
     };
 
     /**
-     * Function to which converts rules with different markers
-     *
-     * First-party conversion:
-     * $first-party -> $~third-party
-     * ,first-party -> ,~third-party
-     *
-     * options conversion:
+     * Convert UBO and ABP scriptlets to AdGuard scriptlets
+     * @param {string} rule
+     * @return {string} convertedRule
+     */
+    const convertUboAndAbpScriptletsToAdg = (rule) => {
+        if (scriptlets.isUboScriptletRule(rule) || scriptlets.isAbpSnippetRule(rule)) {
+            const result = scriptlets.convertScriptletToAdg(rule);
+            if (!result) {
+                logger.error(`Unable to convert scriptlet to Adguard syntax: "${rule}" `);
+                return `! Inconvertible scriptlet: ${rule}`;
+            }
+            logger.log(`Rule "${rule}" converted to: ${result}`);
+            return result;
+        }
+        return rule;
+    };
+
+    /**
+     * Convert ##^script:has-text and ##^script:contains to $$script[tag-content="..."][max-length="262144"]
+     * @param {string} rule
+     * @return {string} convertedRule
+     */
+    const convertScriptHasTextToScriptTagContent = (rule) => {
+        if (SCRIPT_HAS_TEXT_REGEX.test(rule)) {
+            const result = rule.replace(SCRIPT_HAS_TEXT_REGEX, SCRIPT_HAS_TEXT_REPLACEMENT).slice(0, -1) + '"]';
+            logger.log(`Rule "${rule}" converted to: ${result}`);
+            return `${result}[max-length="262144"]`;
+        }
+        return rule;
+    };
+
+    /**
+     * Convert $1p to $~third-party and $3p to $third-party
+     * @param {string} rule
+     * @return {string} convertedRule
+     */
+    const convertToThirdParty = (rule) => {
+        if (THIRD_PARTY_1P_3P_REGEX.test(rule)) {
+            const result = rule.replace(THIRD_PARTY_1P, THIRD_PARTY_1P_REPLACEMENT)
+                .replace(THIRD_PARTY_3P, THIRD_PARTY_3P_REPLACEMENT);
+            logger.log(`Rule "${rule}" converted to: ${result}`);
+            return result;
+        }
+        return rule;
+    };
+
+    /**
+     * Replace the following options:
      * $xhr -> $xmlhttprequest
      * ,xhr -> ,xmlhttprequest
      * $css -> $stylesheet
      * ,css -> ,stylesheet
      * $frame -> $subdocument
      * ,frame -> ,subdocument
+     * $first-party -> $~third-party
+     * ,first-party -> ,~third-party
      *
-     * CSS injection conversion:
+     * @param {string} rule
+     * @return {string} convertedRule
+     */
+    const replaceOptions = (rule) => {
+        if (FIRST_PARTY_REGEX.test(rule) ||
+            XHR_REGEX.test(rule) ||
+            CSS_REGEX.test(rule) ||
+            FRAME_REGEX.test(rule)) {
+            let result = rule.replace(FIRST_PARTY_REGEX, FIRST_PARTY_REPLACEMENT)
+                .replace(XHR_REGEX, XHR_REPLACEMENT)
+                .replace(CSS_REGEX, CSS_REPLACEMENT)
+                .replace(FRAME_REGEX, FRAME_REPLACEMENT);
+            logger.log(`Rule "${rule}" converted to: ${result}`);
+            return result;
+        }
+        return rule;
+    };
+
+    /**
+     * Convert CSS injection
      * example.com##h1:style(background-color: blue !important)
      * into
      * example.com#$#h1 { background-color: blue !important }
@@ -92,73 +154,47 @@ module.exports = (() => {
      * into
      * example.com#@$#h1 { background-color: blue !important }
      *
-     * @param rulesList Array of rules
-     * @param excluded
+     * @param {string} rule
+     * @param {array} excluded
+     * @return {string} convertedRule
+     */
+    const convertCssInjection = (rule, excluded) => {
+        if (rule.includes(':style')) {
+            let parts, result;
+            if (rule.includes(RuleMasks.MASK_CSS_EXTENDED_CSS_RULE)) {
+                parts = rule.split(RuleMasks.MASK_CSS_EXTENDED_CSS_RULE, 2);
+                result = executeConversion(rule, parts, RuleMasks.MASK_CSS_INJECT_EXTENDED_CSS_RULE, excluded);
+            } else if (rule.includes(RuleMasks.MASK_CSS_EXCEPTION_EXTENDED_CSS_RULE)) {
+                parts = rule.split(RuleMasks.MASK_CSS_EXCEPTION_EXTENDED_CSS_RULE, 2);
+                result = executeConversion(rule, parts, RuleMasks.MASK_CSS_EXCEPTION_INJECT_EXTENDED_CSS_RULE, excluded);
+            } else if (rule.includes(RuleMasks.MASK_ELEMENT_HIDING)) {
+                parts = rule.split(RuleMasks.MASK_ELEMENT_HIDING, 2);
+                result = executeConversion(rule, parts, RuleMasks.MASK_CSS, excluded);
+            } else if (rule.includes(RuleMasks.MASK_ELEMENT_HIDING_EXCEPTION)) {
+                parts = rule.split(RuleMasks.MASK_ELEMENT_HIDING_EXCEPTION, 2);
+                result = executeConversion(rule, parts, RuleMasks.MASK_CSS_EXCEPTION, excluded);
+            }
+            return result;
+        }
+        return rule;
+    };
+
+    /**
+     * Converts different types of rules
+     * @param {array} rulesList
+     * @param {array} excluded
+     * @return {array} result
      */
     const convert = function (rulesList, excluded) {
         const result = [];
 
         for (let rule of rulesList) {
-            if (rule.includes(':style')) {
-                let parts;
-                if (rule.includes(RuleMasks.MASK_CSS_EXTENDED_CSS_RULE)) {
-                    parts = rule.split(RuleMasks.MASK_CSS_EXTENDED_CSS_RULE, 2);
-                    rule = executeConversion(rule, parts, RuleMasks.MASK_CSS_INJECT_EXTENDED_CSS_RULE, excluded);
-                } else if (rule.includes(RuleMasks.MASK_CSS_EXCEPTION_EXTENDED_CSS_RULE)) {
-                    parts = rule.split(RuleMasks.MASK_CSS_EXCEPTION_EXTENDED_CSS_RULE, 2);
-                    rule = executeConversion(rule, parts, RuleMasks.MASK_CSS_EXCEPTION_INJECT_EXTENDED_CSS_RULE, excluded);
-                } else if (rule.includes(RuleMasks.MASK_ELEMENT_HIDING)) {
-                    parts = rule.split(RuleMasks.MASK_ELEMENT_HIDING, 2);
-                    rule = executeConversion(rule, parts, RuleMasks.MASK_CSS, excluded);
-                } else if (rule.includes(RuleMasks.MASK_ELEMENT_HIDING_EXCEPTION)) {
-                    parts = rule.split(RuleMasks.MASK_ELEMENT_HIDING_EXCEPTION, 2);
-                    rule = executeConversion(rule, parts, RuleMasks.MASK_CSS_EXCEPTION, excluded);
-                }
-            }
+            rule = convertCssInjection(rule, excluded);
+            rule = replaceOptions(rule);
+            rule = convertUboAndAbpScriptletsToAdg(rule);
+            rule = convertScriptHasTextToScriptTagContent(rule);
+            rule = convertToThirdParty(rule);
 
-            // Some options will be replaced
-            if (FIRST_PARTY_REGEX.test(rule) ||
-                XHR_REGEX.test(rule) ||
-                CSS_REGEX.test(rule) ||
-                FRAME_REGEX.test(rule)) {
-                let replacedRule = rule.replace(FIRST_PARTY_REGEX, FIRST_PARTY_REPLACEMENT)
-                    .replace(XHR_REGEX, XHR_REPLACEMENT)
-                    .replace(CSS_REGEX, CSS_REPLACEMENT)
-                    .replace(FRAME_REGEX, FRAME_REPLACEMENT);
-                let message = `Rule "${rule}" converted to: ${replacedRule}`;
-                logger.log(message);
-                rule = replacedRule;
-            }
-
-            // Convert UBO and ABP scriptlets to AdGuard scriptlets
-            const scriptlets = require('scriptlets');
-            if (scriptlets.isUboScriptletRule(rule) || scriptlets.isAbpSnippetRule(rule)) {
-                const convertedRule = scriptlets.convertScriptletToAdg(rule);
-                if (!convertedRule) {
-                    logger.error(`Unable to convert scriptlet to Adguard syntax: "${rule}" `);
-                    rule = `! Inconvertible scriptlet: ${rule}`;
-                } else {
-                    logger.log(`Rule "${rule}" converted to: ${convertedRule}`);
-                    rule = convertedRule;
-                }
-            }
-
-            // Convert ##^script:has-text and ##^script:contains to $$script[tag-content="..."][max-length="262144"]
-            if (SCRIPT_HAS_TEXT_REGEX.test(rule)) {
-                const replacedRule = rule.replace(SCRIPT_HAS_TEXT_REGEX, SCRIPT_HAS_TEXT_REPLACEMENT).slice(0, -1) + '"]';
-                const message = `Rule "${rule}" converted to: ${replacedRule}`;
-                logger.log(message);
-                rule = `${replacedRule}[max-length="262144"]`;
-            }
-
-            // Convert $1p to $~third-party and $3p to $third-party
-            if (THIRD_PARTY_1P_3P_REGEX.test(rule)) {
-                const replacedRule = rule.replace(THIRD_PARTY_1P, THIRD_PARTY_1P_REPLACEMENT)
-                    .replace(THIRD_PARTY_3P, THIRD_PARTY_3P_REPLACEMENT);
-                const message = `Rule "${rule}" converted to: ${replacedRule}`;
-                logger.log(message);
-                rule = replacedRule;
-            }
             result.push(rule);
         }
 
@@ -169,10 +205,10 @@ module.exports = (() => {
      * Convert Adguard scriptlets to UBlock syntax
      * https://github.com/AdguardTeam/FiltersCompiler/issues/56
      * @param {array} rules
-     * @return {array} modified rules
+     * @return {array} result - modified rules
      */
     const convertAdgScriptletsToUbo = (rules) => {
-        const modified = [];
+        const result = [];
         rules.forEach(rule => {
             if (rule.includes(RuleMasks.MASK_SCRIPTLET) || rule.includes(RuleMasks.MASK_SCRIPTLET_EXCEPTION)) {
                 const convertedRule = scriptlets.convertAdgToUbo(rule);
@@ -183,9 +219,9 @@ module.exports = (() => {
                 logger.log(`Adguard scriptlet "${rule}" converted to Ublock: ${convertedRule}`);
                 rule = convertedRule;
             }
-            modified.push(rule);
+            result.push(rule);
         });
-        return modified;
+        return result;
     };
 
     return {
