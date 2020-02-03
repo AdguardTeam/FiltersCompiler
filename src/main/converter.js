@@ -29,6 +29,8 @@ module.exports = (() => {
     const THIRD_PARTY_3P = '3p';
     const THIRD_PARTY_3P_REPLACEMENT = 'third-party';
 
+    const scriptlets = require('scriptlets/dist/cjs/scriptlets.js');
+
     /**
      * Executes rule css conversion
      *
@@ -163,7 +165,31 @@ module.exports = (() => {
         return result;
     };
 
+    /**
+     * Convert Adguard scriptlets to UBlock syntax
+     * https://github.com/AdguardTeam/FiltersCompiler/issues/56
+     * @param {array} rules
+     * @return {array} modified rules
+     */
+    const convertAdgScriptletsToUbo = (rules) => {
+        const modified = [];
+        rules.forEach(rule => {
+            if (rule.includes(RuleMasks.MASK_SCRIPTLET) || rule.includes(RuleMasks.MASK_SCRIPTLET_EXCEPTION)) {
+                const convertedRule = scriptlets.convertAdgToUbo(rule);
+                if (!convertedRule) {
+                    logger.error(`Cannot convert Adguard scriptlet to Ublock: ${rule}`);
+                    return rule;
+                }
+                logger.log(`Adguard scriptlet "${rule}" converted to Ublock: ${convertedRule}`);
+                rule = convertedRule;
+            }
+            modified.push(rule);
+        });
+        return modified;
+    };
+
     return {
-        convert: convert
+        convert: convert,
+        convertAdgScriptletsToUbo: convertAdgScriptletsToUbo
     };
 })();

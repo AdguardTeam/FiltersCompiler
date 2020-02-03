@@ -12,6 +12,7 @@ module.exports = (() => {
     const logger = require("../utils/log.js");
     const filter = require("./filter.js");
     const workaround = require('../utils/workaround.js');
+    const converter = require('../converter.js');
     const optimization = require('../optimization');
 
     const RuleMasks = require('../rule/rule-masks.js');
@@ -540,7 +541,14 @@ module.exports = (() => {
         createDir(dir);
 
         const filterFile = path.join(dir, `${filterId}${optimized ? '_optimized' : ''}.txt`);
-        writeFilterFile(filterFile, config.configuration.adbHeader, rulesHeader, rules);
+        let rulesList = rules;
+
+        // Convert Adguard scriptlets to UBlock syntax
+        if (config.platform === 'ext_ublock') {
+            rulesList = converter.convertAdgScriptletsToUbo(rules);
+        }
+
+        writeFilterFile(filterFile, config.configuration.adbHeader, rulesHeader, rulesList);
 
         // For English filter only we should provide additional filter version.
         if (filterId == 2 && config.platform === 'ext_ublock' && !optimized) {
