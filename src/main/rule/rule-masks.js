@@ -22,6 +22,8 @@ module.exports = (() => {
         MASK_CONTENT_EXCEPTION: "$@$",
         MASK_COMMENT: "!",
         MASK_HINT: "!+",
-        MASK_DIRECTIVES: "!#"
+        MASK_DIRECTIVES: "!#",
+        MASK_SCRIPTLET:"#%#//scriptlet",
+        MASK_SCRIPTLET_EXCEPTION:"#@%#//scriptlet"
     };
 })();
