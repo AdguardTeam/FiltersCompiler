@@ -29,7 +29,7 @@ module.exports = (() => {
     const THIRD_PARTY_3P = '3p';
     const THIRD_PARTY_3P_REPLACEMENT = 'third-party';
 
-    const scriptlets = require('scriptlets/dist/cjs/scriptlets.js');
+    const scriptlets = require('scriptlets');
 
     /**
      * Executes rule css conversion
@@ -131,7 +131,6 @@ module.exports = (() => {
             }
 
             // Convert UBO and ABP scriptlets to AdGuard scriptlets
-            const scriptlets = require('scriptlets');
             if (scriptlets.isUboScriptletRule(rule) || scriptlets.isAbpSnippetRule(rule)) {
                 const convertedRule = scriptlets.convertScriptletToAdg(rule);
                 if (!convertedRule) {

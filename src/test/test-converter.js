@@ -89,21 +89,26 @@ QUnit.test('Test options replacement', (assert) => {
 QUnit.test('Test convert scriptlets to UBlock syntax', (assert) => {
     const { convertAdgScriptletsToUbo } = require('../main/converter');
 
-    let actual = convertAdgScriptletsToUbo([
-        'example.org#%#//scriptlet("abort-on-property-read", "alert")', // scriptlet with one argument
-        "example.org#%#//scriptlet('set-constant', 'firstConst', 'false')", // scriptlet with two arguments
-        "example1.org,example2.com,some-domain.dom#%#//scriptlet('prevent-adfly')", // scriptlet without arguments and few domains
-        "example.org#%#//scriptlet('set-constant', 'constName', 'value\"12345\"')", // scriptlet argument includes quotes
-    ]);
-
-    let expected = [
-        'example.org##+js(abort-on-property-read.js, alert)',
-        'example.org##+js(set-constant.js, firstConst, false)',
-        'example1.org,example2.com,some-domain.dom##+js(adfly-defuser.js)',
-        'example.org##+js(set-constant.js, constName, value\'12345\')',
-    ];
-
+    // scriptlet with one argument
+    let actual = convertAdgScriptletsToUbo(['example.org#%#//scriptlet("abort-on-property-read", "alert")']);
+    let expected = 'example.org##+js(abort-on-property-read.js, alert)';
     assert.equal(actual, expected);
+
+    // scriptlet with two arguments
+    actual = convertAdgScriptletsToUbo(["example.org#%#//scriptlet('set-constant', 'firstConst', 'false')"]);
+    expected = 'example.org##+js(set-constant.js, firstConst, false)';
+    assert.equal(actual, expected);
+
+    // scriptlet without arguments and few domains
+    actual = convertAdgScriptletsToUbo(["example1.org,example2.com,some-domain.dom#%#//scriptlet('prevent-adfly')"]);
+    expected = 'example1.org,example2.com,some-domain.dom##+js(adfly-defuser.js)';
+    assert.equal(actual, expected);
+
+    // scriptlet argument includes quotes
+    actual = convertAdgScriptletsToUbo(["example.org#%#//scriptlet('set-constant', 'constName', 'value\"12345\"')"]);
+    expected = 'example.org##+js(set-constant.js, constName, value"12345")';
+    assert.equal(actual, expected);
+
 });
 
 QUnit.test('Test ##^script:has-text to $$script[tag-containts] replacement', (assert) => {
