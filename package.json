@@ -1,6 +1,6 @@
 {
   "name": "adguard-filters-compiler",
-  "version": "1.0.41",
+  "version": "1.0.42",
   "description": "Adguard filters compiler",
   "homepage": "http://adguard.com",
   "dependencies": {
