@@ -131,14 +131,14 @@ module.exports = (() => {
             }
 
             // Convert UBO and ABP scriptlets to AdGuard scriptlets
-            if (!rule.startsWith('!') && !rule.startsWith('#') && (scriptlets.isUboScriptletRule(rule) || scriptlets.isAbpSnippetRule(rule))) {
+            if (!rule.startsWith(RuleMasks.MASK_COMMENT) && (scriptlets.isUboScriptletRule(rule) || scriptlets.isAbpSnippetRule(rule))) {
                 const convertedRule = scriptlets.convertScriptletToAdg(rule);
                 if (!convertedRule) {
                     logger.error(`Unable to convert scriptlet to Adguard syntax: "${rule}" `);
                     rule = `! Inconvertible scriptlet: ${rule}`;
                 } else {
                     logger.log(`Rule "${rule}" converted to: ${convertedRule}`);
-                    rule = convertedRule;
+                    rule = String(convertedRule);
                 }
             }
 
