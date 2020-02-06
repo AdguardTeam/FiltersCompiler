@@ -178,6 +178,13 @@ QUnit.test('Test scriptlets lib converter', (assert) => {
     actual = scriptlets.convertScriptletToAdg('test.com#$#abort-on-property-read adsShown');
     expected = 'test.com#%#//scriptlet("abp-abort-on-property-read", "adsShown")';
     assert.equal(actual, expected);
+
+    actual = scriptlets.convertScriptletToAdg('example.org#$#hide-if-has-and-matches-style \'d[id^="_"]\' \'div > s\' \'display: none\'; hide-if-contains /.*/ .p \'a[href^="/ad__c?"]\'');
+    expected = [
+        'example.org#%#//scriptlet("abp-hide-if-has-and-matches-style", "d[id^=\\"_\\"]", "div > s", "display: none")',
+        'example.org#%#//scriptlet("abp-hide-if-contains", "/.*/", ".p", "a[href^=\\"/ad__c?\\"]")',
+    ];
+    assert.deepEqual(actual, expected);
 });
 
 QUnit.test('Test UBO to Adguard scriptlet converter', (assert) => {
