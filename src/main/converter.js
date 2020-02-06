@@ -138,8 +138,7 @@ module.exports = (() => {
                     rule = `! Inconvertible scriptlet: ${rule}`;
                 } else {
                     logger.log(`Rule "${rule}" converted to: ${convertedRule}`);
-                    rule = convertedRule.join("\n");
-                    result.push(rule);
+                    result.push(...convertedRule);
                     continue;
                 }
             }
