@@ -139,6 +139,7 @@ module.exports = (() => {
                 } else {
                     logger.log(`Rule "${rule}" converted to: ${convertedRule}`);
                     rule = convertedRule.join("\n");
+                    result.push(rule);
                     continue;
                 }
             }
