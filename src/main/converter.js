@@ -70,19 +70,19 @@ module.exports = (() => {
     /**
      * Convert UBO and ABP scriptlets to AdGuard scriptlets
      * @param {string} rule
-     * @return {string} convertedRule
+     * @return {string|array|undefined} convertedRule
      */
     const convertUboAndAbpScriptletsToAdg = (rule) => {
-        if (scriptlets.isUboScriptletRule(rule) || scriptlets.isAbpSnippetRule(rule)) {
-            const result = scriptlets.convertScriptletToAdg(rule);
-            if (!result) {
-                logger.error(`Unable to convert scriptlet to Adguard syntax: "${rule}" `);
-                return `! Inconvertible scriptlet: ${rule}`;
-            }
-            logger.log(`Rule "${rule}" converted to: ${result}`);
-            return result;
+        if (!(scriptlets.isUboScriptletRule(rule) || scriptlets.isAbpSnippetRule(rule))) {
+            return;
         }
-        return rule;
+        const result = scriptlets.convertScriptletToAdg(rule);
+        if (!result) {
+            logger.error(`Unable to convert scriptlet to Adguard syntax: "${rule}" `);
+            return;
+        }
+        logger.log(`Rule "${rule}" converted to: ${result}`);
+        return result;
     };
 
     /**
@@ -185,15 +185,20 @@ module.exports = (() => {
      * @param {array} excluded
      * @return {array} result
      */
-    const convertRulesToAdg = function (rulesList, excluded) {
+    const convertRulesToAdgFormat = function (rulesList, excluded) {
         const result = [];
 
         for (let rule of rulesList) {
             rule = convertCssInjection(rule, excluded);
             rule = replaceOptions(rule);
-            rule = convertUboAndAbpScriptletsToAdg(rule);
             rule = convertScriptHasTextToScriptTagContent(rule);
             rule = convertToThirdParty(rule);
+
+            const scriptletRule = convertUboAndAbpScriptletsToAdg(rule);
+            if (scriptletRule) {
+                result.push(...scriptletRule);
+                continue;
+            }
 
             result.push(rule);
         }
@@ -225,7 +230,7 @@ module.exports = (() => {
     };
 
     return {
-        convertRulesToAdg: convertRulesToAdg,
+        convertRulesToAdgFormat: convertRulesToAdgFormat,
         convertAdgScriptletsToUbo: convertAdgScriptletsToUbo
     };
 })();
