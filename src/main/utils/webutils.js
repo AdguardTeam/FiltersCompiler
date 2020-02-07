@@ -37,7 +37,7 @@ module.exports = (() => {
      */
     const tryDownloadFile = function (url) {
         return require('child_process')
-            .execFileSync('curl', ['--fail', '--silent', '--user-agent', USER_AGENT, '-L', url], {encoding: 'utf8'});
+            .execFileSync('curl', ['--fail', '--silent', '--user-agent', USER_AGENT, '-L', url], {encoding: 'utf8', maxBuffer: Infinity});
     };
 
     return {
