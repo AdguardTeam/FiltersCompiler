@@ -13,5 +13,15 @@
     "groupId": 3,
     "groupName": "Other",
     "displayNumber": 100
+  },
+  {
+    "groupId": 4,
+    "groupName": "Directives",
+    "displayNumber": 100
+  },
+  {
+    "groupId": 5,
+    "groupName": "Trust Levels tests",
+    "displayNumber": 250
   }
 ]

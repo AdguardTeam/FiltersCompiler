@@ -1,10 +1,10 @@
-! example.com#%#//scriptlet("set-constant", "ads", "false") is excluded by: #%#//scriptlet
-example.com#%#//scriptlet("set-constant", "ads", "false")
 ! test.com#%#AG_setConstant("ads", "false"); is excluded by: #%#
 test.com#%#AG_setConstant("ads", "false");
-! example.com#$#h3 { color: green; } is excluded by: #$#
-example.com#$#h3 { color: green; }
 ! ||example.com/api/v1/ad/*/json$replace=/html/abcd\,/i is excluded by: $replace
 ||example.com/api/v1/ad/*/json$replace=/html/abcd\,/i
 ! test.com#@%#Object.defineProperty(window, 'abcde', { get: function() { return []; } }); is excluded by: #@%#
 test.com#@%#Object.defineProperty(window, 'abcde', { get: function() { return []; } });
+! Invalid selector:
+example.com##^script:has-text(/.advert/)
+! Invalid selector:
+rybnik.com.pl##^iframe[name]:not([class]):not([id]):not([src])[style="display:none"]

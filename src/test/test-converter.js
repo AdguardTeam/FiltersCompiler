@@ -94,6 +94,11 @@ QUnit.test('Test convert scriptlets to UBlock syntax', (assert) => {
     let expected = 'example.org##+js(abort-on-property-read.js, alert)';
     assert.equal(actual, expected);
 
+    // scriptlet with ubo-compatible name
+    actual = convertAdgScriptletsToUbo(['example.org#%#//scriptlet("ubo-abort-on-property-read.js", "alert")']);
+    expected = 'example.org##+js(abort-on-property-read.js, alert)';
+    assert.equal(actual, expected);
+
     // scriptlet with two arguments
     actual = convertAdgScriptletsToUbo(["example.org#%#//scriptlet('set-constant', 'firstConst', 'false')"]);
     expected = 'example.org##+js(set-constant.js, firstConst, false)';
@@ -165,6 +170,10 @@ QUnit.test('Test scriptlets lib converter', (assert) => {
     const scriptlets = require('scriptlets');
     let actual = scriptlets.convertUboToAdg('example.com#@#+js(nano-setInterval-booster.js, some.example, 1000)');
     let expected = 'example.com#@%#//scriptlet("ubo-nano-setInterval-booster.js", "some.example", "1000")';
+    assert.equal(actual, expected);
+
+    actual = scriptlets.convertAdgToUbo('example.org#%#//scriptlet("ubo-abort-on-property-read.js", "alert")');
+    expected = 'example.org##+js(abort-on-property-read.js, alert)';
     assert.equal(actual, expected);
 
     actual = scriptlets.convertAbpToAdg('test.com#$#abort-on-property-read adsShown');
