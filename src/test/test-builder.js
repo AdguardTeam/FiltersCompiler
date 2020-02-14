@@ -190,18 +190,15 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.ok(filtersI18nMetadata);
 
     let localScriptRules = readFile(path.join(platforms, 'test', 'local_script_rules.txt'));
-    assert.ok(localScriptRules);
+    assert.notOk(localScriptRules);
     let localScriptRulesLines = localScriptRules.split('\r\n');
-    assert.ok(localScriptRulesLines.indexOf('test_domain#%#testScript();') >= 0);
+    assert.ok(localScriptRulesLines.indexOf('test_domain#%#testScript();') === -1);
 
     let localScriptRulesJson = readFile(path.join(platforms, 'test', 'local_script_rules.json'));
     assert.ok(localScriptRulesJson);
     localScriptRulesJson = JSON.parse(localScriptRulesJson);
     assert.ok(localScriptRulesJson.comment);
     assert.ok(localScriptRulesJson.rules);
-    assert.ok(localScriptRulesJson.rules[0]);
-    assert.equal(localScriptRulesJson.rules[0].domains, 'test_domain');
-    assert.equal(localScriptRulesJson.rules[0].script, 'testScript();');
 
     let filterContent = readFile(path.join(platforms, 'test', 'filters', '2.txt'));
     assert.ok(filterContent);
@@ -215,15 +212,18 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.ok(filterLines.indexOf('! some common rules could be places here') >= 0);
     assert.ok(filterLines.indexOf('~nigma.ru,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]') >= 0);
     assert.ok(filterLines.indexOf('excluded_platform') >= 0);
-    assert.ok(filterLines.indexOf('test_domain#%#testScript();') >= 0);
+    assert.ok(filterLines.indexOf('test_domain#%#testScript();') === -1);
     assert.ok(filterLines.indexOf('!+ NOT_OPTIMIZED') >= 0);
     assert.ok(filterLines.indexOf('test-common-2-rule.com') >= 0);
+    assert.ok(filterLines.indexOf('test.com#%#var isadblock=1;') === -1);
+    assert.ok(filterLines.indexOf('example.com#%#AG_onLoad(function() { AG_removeElementBySelector(\'span[class="intexta"]\'); });') === -1);
+    assert.ok(filterLines.indexOf('test.com##+js(abort-on-property-read.js, Object.prototype.getBanner)') >= 0);
 
     filterContent = readFile(path.join(platforms, 'config/test', 'filters', '2.txt'));
     assert.ok(filterContent);
 
     filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 24);
+    assert.equal(filterLines.length, 27);
 
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
     assert.notOk(filterLines.indexOf('test-common-1-rule.com') >= 0);
@@ -237,7 +237,7 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.ok(filterContent);
 
     filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 35);
+    assert.equal(filterLines.length, 39);
 
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
     assert.ok(filterLines.indexOf('test-common-1-rule.com') >= 0);

@@ -26,3 +26,7 @@ excluded_platform
 ||news.yandex.*/*/*-*-*-*-$replace=/Ya\[([0-9]{10\,15})\]\([\s\S]*\)\$/,script,important,domain=news.yandex.by|news.yandex.com|news.yandex.fr|news.yandex.kz|news.yandex.ru|news.yandex.ua
 invalid_options$invalid_opt
 test_domain#%#testScript();
+!
+test.com#%#var isadblock=1;
+example.com#%#AG_onLoad(function() { AG_removeElementBySelector('span[class="intexta"]'); });
+test.com#%#//scriptlet('ubo-abort-on-property-read.js', 'Object.prototype.getBanner')
