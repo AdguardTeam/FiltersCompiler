@@ -509,7 +509,7 @@ QUnit.test('Test ##^script:has-text and $$script[tag-containts] rules', (assert)
 });
 
 QUnit.test('Test scriptlets lib validator', (assert) => {
-    const scriptlets = require('scriptlets');
+    const scriptlets = require('scriptlets').default;
 
     let result = scriptlets.validateName('abort-on-property-read');
     assert.equal(result, true);

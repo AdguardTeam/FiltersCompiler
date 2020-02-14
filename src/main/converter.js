@@ -29,7 +29,7 @@ module.exports = (() => {
     const THIRD_PARTY_3P = '3p';
     const THIRD_PARTY_3P_REPLACEMENT = 'third-party';
 
-    const scriptlets = require('scriptlets');
+    const scriptlets = require('scriptlets').default;
 
     /**
      * Executes rule css conversion
