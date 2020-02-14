@@ -143,10 +143,9 @@ module.exports = (function () {
      * @return {boolean}
      */
     const scriptletException = (line, exclusion) => {
-        if ((exclusion === '#%#' && line.includes('#%#//scriptlet')) ||
-            (exclusion === '#@%#' && line.includes('#@%#//scriptlet'))) {
-            return true;
-        }
+        return (exclusion === '#%#' && line.includes('#%#//scriptlet')) ||
+            (exclusion === '#@%#' && line.includes('#@%#//scriptlet'));
+
     };
 
     /**
@@ -167,7 +166,6 @@ module.exports = (function () {
                     line.match(new RegExp(exclusion.substring(1, exclusion.length - 1)));
 
                 if ((isExcludedByRegexp || line.includes(exclusion)) && !scriptletException(line, exclusion)) {
-                // if (isExcludedByRegexp || line.includes(exclusion)) {
                     logger.log(message);
                     excluded.push('! ' + message);
                     excluded.push(line);
