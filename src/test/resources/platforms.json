@@ -12,6 +12,18 @@
             "ublock": true
         }
     },
+    "TEST2": {
+        "platform": "chromium",
+        "path": "test2",
+        "configuration": {
+            "removeRulePatterns": false,
+            "ignoreRuleHints": false,
+            "adbHeader": "![Test filter]"
+        },
+        "defines": {
+            "adguard": true
+        }
+    },
     "TEST_COMMENTS": {
         "platform": "test",
         "path": "config/test",

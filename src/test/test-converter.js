@@ -94,6 +94,11 @@ QUnit.test('Test convert scriptlets to UBlock syntax', (assert) => {
     let expected = 'example.org##+js(abort-on-property-read.js, alert)';
     assert.equal(actual, expected);
 
+    // scriptlet with ubo-compatible name
+    actual = convertAdgScriptletsToUbo(['example.org#%#//scriptlet("ubo-abort-on-property-read.js", "alert")']);
+    expected = 'example.org##+js(abort-on-property-read.js, alert)';
+    assert.equal(actual, expected);
+
     // scriptlet with two arguments
     actual = convertAdgScriptletsToUbo(["example.org#%#//scriptlet('set-constant', 'firstConst', 'false')"]);
     expected = 'example.org##+js(set-constant.js, firstConst, false)';
@@ -162,9 +167,17 @@ QUnit.test('Test $1p to $~third-party and $3p to $third-party replacement', (ass
 });
 
 QUnit.test('Test scriptlets lib converter', (assert) => {
-    const scriptlets = require('scriptlets');
+    const scriptlets = require('scriptlets').default;
     let actual = scriptlets.convertUboToAdg('example.com#@#+js(nano-setInterval-booster.js, some.example, 1000)');
     let expected = 'example.com#@%#//scriptlet("ubo-nano-setInterval-booster.js", "some.example", "1000")';
+    assert.equal(actual, expected);
+
+    actual = scriptlets.convertAdgToUbo('example.org#%#//scriptlet("ubo-abort-on-property-read.js", "alert")');
+    expected = 'example.org##+js(abort-on-property-read.js, alert)';
+    assert.equal(actual, expected);
+
+    actual = scriptlets.convertAdgToUbo('example.org#%#//scriptlet("abort-on-property-write", "adblock.check")');
+    expected = 'example.org##+js(abort-on-property-write.js, adblock.check)';
     assert.equal(actual, expected);
 
     actual = scriptlets.convertAbpToAdg('test.com#$#abort-on-property-read adsShown');
@@ -195,6 +208,10 @@ QUnit.test('Test UBO to Adguard scriptlet converter', (assert) => {
 
     actual = converter.convert(['example.com##+js(disable-newtab-links.js)']);
     expected = 'example.com#%#//scriptlet("ubo-disable-newtab-links.js")';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['example.com##+js(addEventListener-defuser, load, onload)']);
+    expected = 'example.com#%#//scriptlet("ubo-addEventListener-defuser.js", "load", "onload")';
     assert.equal(actual, expected);
 
     actual = converter.convert(['example.com#@#+js(nano-setInterval-booster.js, some.example, 1000)']);

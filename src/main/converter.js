@@ -29,7 +29,7 @@ module.exports = (() => {
     const THIRD_PARTY_3P = '3p';
     const THIRD_PARTY_3P_REPLACEMENT = 'third-party';
 
-    const scriptlets = require('scriptlets');
+    const scriptlets = require('scriptlets').default;
 
     /**
      * Executes rule css conversion
@@ -96,7 +96,7 @@ module.exports = (() => {
      * @param excluded
      */
     const convert = function (rulesList, excluded) {
-        const result = [];
+        let result = [];
 
         for (let rule of rulesList) {
             if (rule.includes(':style')) {
@@ -144,7 +144,7 @@ module.exports = (() => {
             }
 
             // Convert ##^script:has-text and ##^script:contains to $$script[tag-content="..."][max-length="262144"]
-            if (SCRIPT_HAS_TEXT_REGEX.test(rule)) {
+            if (!rule.startsWith(RuleMasks.MASK_COMMENT) && SCRIPT_HAS_TEXT_REGEX.test(rule)) {
                 const replacedRule = rule.replace(SCRIPT_HAS_TEXT_REGEX, SCRIPT_HAS_TEXT_REPLACEMENT).slice(0, -1) + '"]';
                 const message = `Rule "${rule}" converted to: ${replacedRule}`;
                 logger.log(message);
@@ -152,7 +152,7 @@ module.exports = (() => {
             }
 
             // Convert $1p to $~third-party and $3p to $third-party
-            if (THIRD_PARTY_1P_3P_REGEX.test(rule)) {
+            if (!rule.startsWith(RuleMasks.MASK_COMMENT) && THIRD_PARTY_1P_3P_REGEX.test(rule)) {
                 const replacedRule = rule.replace(THIRD_PARTY_1P, THIRD_PARTY_1P_REPLACEMENT)
                     .replace(THIRD_PARTY_3P, THIRD_PARTY_3P_REPLACEMENT);
                 const message = `Rule "${rule}" converted to: ${replacedRule}`;
@@ -174,7 +174,7 @@ module.exports = (() => {
     const convertAdgScriptletsToUbo = (rules) => {
         const modified = [];
         rules.forEach(rule => {
-            if (rule.includes(RuleMasks.MASK_SCRIPTLET) || rule.includes(RuleMasks.MASK_SCRIPTLET_EXCEPTION)) {
+            if (!rule.startsWith(RuleMasks.MASK_COMMENT) && (rule.includes(RuleMasks.MASK_SCRIPTLET) || rule.includes(RuleMasks.MASK_SCRIPTLET_EXCEPTION))) {
                 const convertedRule = scriptlets.convertAdgToUbo(rule);
                 if (!convertedRule) {
                     logger.error(`Cannot convert Adguard scriptlet to Ublock: ${rule}`);

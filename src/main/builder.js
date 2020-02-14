@@ -136,6 +136,19 @@ module.exports = (function () {
     };
 
     /**
+     * Checks case when '#%#' rules are excluded to DON'T exclude '#%#//scriptlet' rules
+     *
+     * @param {string} line
+     * @param {string} exclusion
+     * @return {boolean}
+     */
+    const scriptletException = (line, exclusion) => {
+        return (exclusion === '#%#' && line.includes('#%#//scriptlet')) ||
+            (exclusion === '#@%#' && line.includes('#@%#//scriptlet'));
+
+    };
+
+    /**
      * Checks if line is excluded with specified set of exclusions
      *
      * @param line
@@ -152,7 +165,7 @@ module.exports = (function () {
                 let isExcludedByRegexp = exclusion.startsWith("/") && exclusion.endsWith("/") &&
                     line.match(new RegExp(exclusion.substring(1, exclusion.length - 1)));
 
-                if (isExcludedByRegexp || line.includes(exclusion)) {
+                if ((isExcludedByRegexp || line.includes(exclusion)) && !scriptletException(line, exclusion)) {
                     logger.log(message);
                     excluded.push('! ' + message);
                     excluded.push(line);
@@ -168,7 +181,7 @@ module.exports = (function () {
      * Applies exclusion from exclusions file
      *
      * @param lines
-     * @param exclusionsFileName
+     * @param exclusionsFile
      * @param excluded
      * @returns {*}
      */

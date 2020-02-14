@@ -3,8 +3,25 @@
 !
 ||adserver.com^$third-party
 ||test.com/player/*.htm?autoplay=true&mute=true
+example.com#%#//scriptlet("set-constant", "ads", "false")
 test.ru##.twitter-follow-button
 example.net#$?#.main-content { margin-top: 0!important; }
+example.com#$#h3 { color: green; }
 test.com##body > section > .main-menu > .adsBanner
 example.org##.images > .private + .message
 ||adsnet.com/*/700x350.gif$domain=example.com
+!
+example.com$$script[tag-content="12313"][max-length="262144"]
+example.com$$script[tag-content="banner"][max-length="262144"]
+!
+||www.ynet.co.il^$important,websocket,~third-party,domain=www.ynet.co.il
+@@.com/ads.js|$third-party,domain=~3ppt.com']
+!
+test.com#%#//scriptlet("abp-abort-on-property-read", "adsShown")
+example.com#@%#//scriptlet("abp-abort-on-property-write", "adblock.check")
+!
+example.com#%#//scriptlet("ubo-set-constant.js", "ads", "false")
+example.com#%#//scriptlet("ubo-disable-newtab-links.js")
+example.com#@%#//scriptlet("ubo-nano-setInterval-booster.js", "some.example", "1000")
+test.com#%#//scriptlet("ubo-json-prune.js")
+test.com#@%#//scriptlet("ubo-abort-on-property-read.js", "some.prop")

@@ -293,8 +293,6 @@
                 "\\$network",
                 "\\$protobuf",
                 "important,protobuf",
-                "#%#",
-                "#@%#",
                 "\\$extension",
                 ",extension"
             ],

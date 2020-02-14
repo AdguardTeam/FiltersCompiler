@@ -13,3 +13,20 @@ test.com##body > section > .main-menu > .adsBanner
 test.com#@%#Object.defineProperty(window, 'abcde', { get: function() { return []; } });
 example.org##.images > .private + .message
 ||adsnet.com/*/700x350.gif$domain=example.com
+!
+example.com##^script:has-text(12313)
+example.com##^script:contains(banner)
+!
+||www.ynet.co.il^$important,websocket,1p,domain=www.ynet.co.il
+@@.com/ads.js|$3p,domain=~3ppt.com']
+example.com##^script:has-text(/.advert/)
+rybnik.com.pl##^iframe[name]:not([class]):not([id]):not([src])[style="display:none"]
+!
+test.com#$#abort-on-property-read adsShown
+example.com#@$#abort-on-property-write adblock.check
+!
+example.com##+js(set-constant.js, ads, false)
+example.com##+js(disable-newtab-links.js)
+example.com#@#+js(nano-setInterval-booster.js, some.example, 1000)
+test.com##script:inject(json-prune.js)
+test.com#@#script:inject(abort-on-property-read.js, some.prop)
