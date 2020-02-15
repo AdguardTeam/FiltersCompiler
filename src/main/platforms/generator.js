@@ -569,7 +569,7 @@ module.exports = (() => {
         // For English filter only we should provide additional filter version.
         if (filterId == 2 && config.platform === 'ext_ublock' && !optimized) {
             const correctedHeader = workaround.rewriteHeader(rulesHeader);
-            const correctedRules = workaround.rewriteRules(rules);
+            const correctedRules = workaround.rewriteRules(rulesList);
 
             const correctedFile = path.join(dir, `${filterId}_without_easylist.txt`);
             writeFilterFile(correctedFile, config.configuration.adbHeader, correctedHeader, correctedRules);
