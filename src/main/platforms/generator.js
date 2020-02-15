@@ -534,6 +534,21 @@ module.exports = (() => {
     };
 
     /**
+     * Exclude #%# rules from rules list
+     * @param {array} rules
+     * @return {array} result
+     */
+    const excludeScriptRules = (rules) => {
+        const result = [];
+        rules.forEach(rule => {
+            if (!rule.includes(RuleMasks.MASK_SCRIPT)) {
+                result.push(rule);
+            }
+        });
+        return result;
+    };
+
+    /**
      * Writes filter platform build
      */
     const writeFilterRules = function (filterId, dir, config, rulesHeader, rules, optimized) {
@@ -546,6 +561,7 @@ module.exports = (() => {
         // Convert Adguard scriptlets to UBlock syntax
         if (config.platform === 'ext_ublock') {
             rulesList = converter.convertAdgScriptletsToUbo(rulesList);
+            rulesList = excludeScriptRules(rulesList);
         }
 
         writeFilterFile(filterFile, config.configuration.adbHeader, rulesHeader, rulesList);
