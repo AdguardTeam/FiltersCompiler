@@ -169,7 +169,7 @@ module.exports = (() => {
         if (config.configuration.removeRulePatterns) {
             for (let pattern of config.configuration.removeRulePatterns) {
                 if (ruleText.match(new RegExp(pattern))) {
-                    logger.log(`${ruleText} removed with removeRulePattern ${pattern} if filter ${filterId} for ${config.platform} platform`);
+                    logger.log(`${ruleText} removed with removeRulePattern ${pattern} in filter ${filterId} for ${config.platform} platform`);
                     return true;
                 }
             }
