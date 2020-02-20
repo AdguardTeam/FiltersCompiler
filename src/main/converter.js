@@ -31,6 +31,11 @@ module.exports = (() => {
 
     const scriptlets = require('scriptlets').default;
 
+    const GHIDE_REGEX = /(.+[^#]\$.*)(ghide)($|,.+)/i;
+    const GENERICHIDE = 'generichide';
+    const EHIDE_REGEX = /(.+[^#]\$.*)(ehide)($|,.+)/i;
+    const ELEMHIDE = 'elemhide';
+
     /**
      * Executes rule css conversion
      *
@@ -159,6 +164,16 @@ module.exports = (() => {
                 logger.log(message);
                 rule = replacedRule;
             }
+
+            // Convert ghide to generichide and ehide to elemhide
+            if (!rule.startsWith(RuleMasks.MASK_COMMENT) && (GHIDE_REGEX.test(rule) || EHIDE_REGEX.test(rule))) {
+                const replacedRule = rule.replace(GHIDE_REGEX, `$1${GENERICHIDE}$3`)
+                    .replace(EHIDE_REGEX, `$1${ELEMHIDE}$3`);
+                const message = `Rule "${rule}" converted to: ${replacedRule}`;
+                logger.log(message);
+                rule = replacedRule;
+            }
+
             result.push(rule);
         }
 
