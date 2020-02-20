@@ -154,13 +154,14 @@ module.exports = (function () {
      * @param line
      * @param exclusions
      * @param excluded
+     * @param reason
      */
-    const isExcluded = function (line, exclusions, excluded) {
+    const isExcluded = function (line, exclusions, excluded, reason) {
         for (let exclusion of exclusions) {
             exclusion = exclusion.trim();
 
             if (exclusion && !exclusion.startsWith('!')) {
-                let message = `${line} is excluded by: ${exclusion}`;
+                let message = `${line} is excluded by "${exclusion}" in ${reason}`;
 
                 let isExcludedByRegexp = exclusion.startsWith("/") && exclusion.endsWith("/") &&
                     line.match(new RegExp(exclusion.substring(1, exclusion.length - 1)));
@@ -196,10 +197,11 @@ module.exports = (function () {
 
         exclusions = splitLines(exclusions);
 
+        const exclusionsFileName = path.parse(exclusionsFile).base;
         const result = [];
 
         lines.forEach((line, pos) => {
-            const exclusion = isExcluded(line, exclusions, excluded);
+            const exclusion = isExcluded(line, exclusions, excluded, exclusionsFileName);
             if (exclusion) {
                 if (pos > 0 && lines[pos - 1].startsWith(RuleMasks.MASK_HINT)) {
                     result.push(`${RuleMasks.MASK_COMMENT} [excluded by ${exclusion}] ${line}`);

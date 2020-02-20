@@ -29,7 +29,7 @@ QUnit.test("Test hints", (assert) => {
         "invalid_hint"
     ];
 
-    const after = filter.cleanupRules(before, config);
+    const after = filter.cleanupRules(before, config, 0);
 
     assert.ok(after);
     assert.equal(after.length, 10);
@@ -142,7 +142,7 @@ QUnit.test("Test remove rule patterns", (assert) => {
         "aranzulla.it##body > div[id][class][-ext-has=\"a[href^='/locked-no-script.php']\"]"
     ];
 
-    const after = filter.cleanupRules(before, config);
+    const after = filter.cleanupRules(before, config, 0);
 
     assert.ok(after);
     assert.equal(after.length, 2);

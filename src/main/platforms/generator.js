@@ -676,7 +676,7 @@ module.exports = (() => {
         for (let platform in platformPathsConfig) {
             const config = platformPathsConfig[platform];
             let rules = FilterDownloader.resolveConditions(originalRules, config.defines);
-            rules = filter.cleanupRules(rules, config);
+            rules = filter.cleanupRules(rules, config, filterId);
             rules = removeRuleDuplicates(rules);
             const optimizedRules = filter.cleanupAndOptimizeRules(rules, config, optimizationConfig, filterId);
             logger.info(`Filter ${filterId}. Rules ${originalRules.length} => ${rules.length} => ${optimizedRules.length}. PlatformPath: '${config.path}'`);
