@@ -241,3 +241,38 @@ QUnit.test('Test ABP to Adguard scriptlet converter', (assert) => {
     expected = 'example.com#@%#//scriptlet("abp-abort-on-property-write", "adblock.check")';
     assert.equal(actual, expected);
 });
+
+QUnit.test('Test ghide to generichide and ehide to elemhide conversion', (assert) => {
+    const converter = require('../main/converter');
+    let actual = converter.convert(['||example.com^$ghide']);
+    let expected = '||example.com^$generichide';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['@@||ghider.com^$ghide']);
+    expected = '@@||ghider.com^$generichide';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['||test.com^$ehide']);
+    expected = '||test.com^$elemhide';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['@@||ghide.ehide.ru^$ehide']);
+    expected = '@@||ghide.ehide.ru^$elemhide';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['||ghide.com/ghide^$elemhide']);
+    expected = '||ghide.com/ghide^$elemhide';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['||ehide.com/ehide^$generichide']);
+    expected = '||ehide.com/ehide^$generichide';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['||ehide.com/ehide^$domain=ehide.com,ehide']);
+    expected = '||ehide.com/ehide^$domain=ehide.com,elemhide';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['||ghide.com/ehide^$domain=ghide.com,ghide']);
+    expected = '||ghide.com/ehide^$domain=ghide.com,generichide';
+    assert.equal(actual, expected);
+});
