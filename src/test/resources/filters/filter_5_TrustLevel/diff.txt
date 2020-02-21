@@ -1,8 +1,8 @@
-! test.com#%#AG_setConstant("ads", "false"); is excluded by: #%#
+! test.com#%#AG_setConstant("ads", "false"); is excluded by "#%#" in exclusions-high.txt
 test.com#%#AG_setConstant("ads", "false");
-! ||example.com/api/v1/ad/*/json$replace=/html/abcd\,/i is excluded by: $replace
+! ||example.com/api/v1/ad/*/json$replace=/html/abcd\,/i is excluded by "$replace" in exclusions-high.txt
 ||example.com/api/v1/ad/*/json$replace=/html/abcd\,/i
-! test.com#@%#Object.defineProperty(window, 'abcde', { get: function() { return []; } }); is excluded by: #@%#
+! test.com#@%#Object.defineProperty(window, 'abcde', { get: function() { return []; } }); is excluded by "#@%#" in exclusions-high.txt
 test.com#@%#Object.defineProperty(window, 'abcde', { get: function() { return []; } });
 ! Invalid selector:
 example.com##^script:has-text(/.advert/)

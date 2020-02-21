@@ -60,7 +60,7 @@ module.exports = (function () {
         'collapse', '~collapse',
         'app',
         'badfilter',
-        // UBlock extension has redirect options
+        // uBlock extension has redirect options
         // https://github.com/AdguardTeam/FiltersCompiler/issues/23
         'redirect',
         // https://github.com/AdguardTeam/FiltersCompiler/issues/53

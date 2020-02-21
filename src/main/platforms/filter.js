@@ -150,9 +150,10 @@ module.exports = (() => {
      *
      * @param rule
      * @param config
+     * @param filterId
      * @returns {boolean}
      */
-    const shouldOmitRule = function (rule, config) {
+    const shouldOmitRule = function (rule, config, filterId) {
         const ruleText = rule.rule;
 
         if (!ruleText) {
@@ -168,7 +169,7 @@ module.exports = (() => {
         if (config.configuration.removeRulePatterns) {
             for (let pattern of config.configuration.removeRulePatterns) {
                 if (ruleText.match(new RegExp(pattern))) {
-                    logger.log(`${ruleText} removed with removeRulePattern ${pattern}`);
+                    logger.log(`${ruleText} removed with removeRulePattern ${pattern} in filter ${filterId} for ${config.platform} platform`);
                     return true;
                 }
             }
@@ -241,13 +242,14 @@ module.exports = (() => {
      * Filters set of rules with configuration
      *
      * @param rules
+     * @param filterId
      * @param config
      */
-    const cleanupRules = function (rules, config) {
+    const cleanupRules = function (rules, config, filterId) {
         const ruleLines = splitRuleHintLines(rules, config.platform);
 
         const filtered = ruleLines.filter((r) => {
-            return !shouldOmitRule(r, config);
+            return !shouldOmitRule(r, config, filterId);
         });
 
         return joinRuleHintLines(filtered);
@@ -269,7 +271,7 @@ module.exports = (() => {
         const ruleLines = splitRuleHintLines(rules, config.platform);
 
         const filtered = ruleLines.filter((r) => {
-            return !shouldOmitRule(r, config);
+            return !shouldOmitRule(r, config, filterId);
         });
 
         const optimized = filtered.filter((r) => {
