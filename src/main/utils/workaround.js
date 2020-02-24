@@ -127,15 +127,11 @@ module.exports = (() => {
         result.filters = [];
 
         for (let f of metadata.filters) {
-            if (f.tags) {
-                let copy = Object.assign({}, f);
-                delete copy.tags;
-                delete copy.timeAdded;
-
-                result.filters.push(copy);
-            } else {
-                result.filters.push(f);
-            }
+            let copy = Object.assign({}, f);
+            delete copy.tags;
+            delete copy.timeAdded;
+            delete copy.trustLevel;
+            result.filters.push(copy);
         }
 
         return result;
