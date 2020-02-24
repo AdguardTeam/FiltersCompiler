@@ -265,12 +265,13 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.ok(filtersMetadataMAC.filters);
     let englishFilter = filtersMetadataMAC.filters[0];
     assert.ok(englishFilter);
-    assert.equal(Object.keys(englishFilter).length, 12);
+    assert.equal(Object.keys(englishFilter).length, 11);
 
     assert.equal(englishFilter.filterId, 2);
     assert.equal(englishFilter.name, 'English Filter');
     assert.equal(englishFilter.description, 'English Filter description');
     assert.equal(englishFilter.timeAdded, undefined);
+    assert.equal(englishFilter.trustLevel, undefined);
     assert.equal(englishFilter.homepage, 'https://easylist.adblockplus.org/');
     assert.equal(englishFilter.expires, 172800);
     assert.equal(englishFilter.displayNumber, 101);
