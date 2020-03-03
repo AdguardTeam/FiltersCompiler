@@ -24,6 +24,22 @@
             "adguard": true
         }
     },
+    "IOS": {
+        "platform": "ios",
+        "path": "ios",
+        "configuration": {
+            "removeRulePatterns": [
+                "\\$(.*,)?mp4",
+                "\\$(.*,)?app",
+                "\\$(.*,)?replace="
+            ],
+            "ignoreRuleHints": false,
+            "adbHeader": "![Test ios filter]"
+        },
+        "defines": {
+            "adguard": true
+        }
+    },
     "TEST_COMMENTS": {
         "platform": "test",
         "path": "config/test",
