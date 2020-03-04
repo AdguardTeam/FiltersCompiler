@@ -16,7 +16,8 @@ module.exports = (function () {
     const RuleMasks = require("./rule/rule-masks.js");
     const Rule = require("./rule/rule.js");
     const extendedCssValidator = require('./utils/extended-css-validator.js');
-    const scriptlets = require('scriptlets').default;
+    const scriptlets = require('scriptlets');
+    const redirects = require('scriptlets').redirects;
 
     const VALID_OPTIONS = [
         // Basic modifiers
@@ -220,25 +221,7 @@ module.exports = (function () {
 
                 let modifiers = rule.modifiers;
 
-                // 'rewrite' modifier should be used only with 'abp-resource:' value
-                const validateRewriteOption = (name) => {
-                    if (name !== 'rewrite') {
-                        return true;
-                    }
-                    const modifierOptions = modifiers[name];
-                    if (!modifierOptions || modifierOptions.length === 0) {
-                        return false;
-                    }
-                    return modifierOptions[0].startsWith('abp-resource:');
-                };
-
                 for (let name in modifiers) {
-                    if (!validateOptionName(name) || !validateRewriteOption(name)) {
-                        logger.error(`Invalid rule: ${s} option: ${name}`);
-                        excludeRule(excluded,'! Invalid rule options:', rule.ruleText);
-                        return false;
-                    }
-
                     if (name === 'domain' || name === '~domain') {
                         if (rule.modifiers[name].filter(x => x === '').length > 0) {
                             logger.error(`Invalid rule: ${s} incorrect option value: ${rule.modifiers[name]}`);
@@ -267,6 +250,21 @@ module.exports = (function () {
                 } catch (error) {
                     excludeRule(excluded,'! Invalid scriptlet:', rule.ruleText);
                     logger.error(`Invalid scriptlet: ${rule.ruleText}. Error: ${error.message}`);
+                    return false;
+                }
+            }
+
+            // Redirect rules validation
+            if (redirects.isRedirectRule(rule.ruleText, 'ADG')) {
+                try {
+                    const validateRedirect = redirects.isValidRedirectRule(rule.ruleText);
+                    if (!validateRedirect) {
+                        excludeRule(excluded,'! Invalid redirect rule:', rule.ruleText);
+                        return false;
+                    }
+                } catch (error) {
+                    excludeRule(excluded,'! Invalid redirect rule:', rule.ruleText);
+                    logger.error(`Invalid redirect rule: ${rule.ruleText}. Error: ${error.message}`);
                     return false;
                 }
             }

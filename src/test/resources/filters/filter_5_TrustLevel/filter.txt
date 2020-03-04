@@ -36,3 +36,7 @@ test.com,mp4upload.com###overlay
 @@||test.com^$generichide,app=iexplore.exe
 example.com##div.grid_1[class$="app"]
 ||app-test.com^$third-party
+!
+||example.com/banner$image,redirect=3x2-transparent.png
+||test.com^$script,redirect=noopjs
+||example.com/*.mp4$media,redirect=noopmp4-1s

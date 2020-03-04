@@ -561,6 +561,7 @@ module.exports = (() => {
         // Convert Adguard scriptlets to UBlock syntax
         if (config.platform === 'ext_ublock') {
             rulesList = converter.convertAdgScriptletsToUbo(rulesList);
+            rulesList = converter.convertAdgRedirectsToUbo(rulesList);
             rulesList = excludeScriptRules(rulesList);
         }
 

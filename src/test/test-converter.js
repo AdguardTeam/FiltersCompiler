@@ -91,27 +91,27 @@ QUnit.test('Test convert scriptlets to UBlock syntax', (assert) => {
 
     // scriptlet with one argument
     let actual = convertAdgScriptletsToUbo(['example.org#%#//scriptlet("abort-on-property-read", "alert")']);
-    let expected = 'example.org##+js(abort-on-property-read.js, alert)';
+    let expected = 'example.org##+js(abort-on-property-read, alert)';
     assert.equal(actual, expected);
 
     // scriptlet with ubo-compatible name
     actual = convertAdgScriptletsToUbo(['example.org#%#//scriptlet("ubo-abort-on-property-read.js", "alert")']);
-    expected = 'example.org##+js(abort-on-property-read.js, alert)';
+    expected = 'example.org##+js(abort-on-property-read, alert)';
     assert.equal(actual, expected);
 
     // scriptlet with two arguments
     actual = convertAdgScriptletsToUbo(["example.org#%#//scriptlet('set-constant', 'firstConst', 'false')"]);
-    expected = 'example.org##+js(set-constant.js, firstConst, false)';
+    expected = 'example.org##+js(set-constant, firstConst, false)';
     assert.equal(actual, expected);
 
     // scriptlet without arguments and few domains
     actual = convertAdgScriptletsToUbo(["example1.org,example2.com,some-domain.dom#%#//scriptlet('prevent-adfly')"]);
-    expected = 'example1.org,example2.com,some-domain.dom##+js(adfly-defuser.js)';
+    expected = 'example1.org,example2.com,some-domain.dom##+js(adfly-defuser)';
     assert.equal(actual, expected);
 
     // scriptlet argument includes quotes
     actual = convertAdgScriptletsToUbo(["example.org#%#//scriptlet('set-constant', 'constName', 'value\"12345\"')"]);
-    expected = 'example.org##+js(set-constant.js, constName, value"12345")';
+    expected = 'example.org##+js(set-constant, constName, value"12345")';
     assert.equal(actual, expected);
 
 });
@@ -167,17 +167,17 @@ QUnit.test('Test $1p to $~third-party and $3p to $third-party replacement', (ass
 });
 
 QUnit.test('Test scriptlets lib converter', (assert) => {
-    const scriptlets = require('scriptlets').default;
+    const scriptlets = require('scriptlets');
     let actual = scriptlets.convertUboToAdg('example.com#@#+js(nano-setInterval-booster.js, some.example, 1000)');
     let expected = 'example.com#@%#//scriptlet("ubo-nano-setInterval-booster.js", "some.example", "1000")';
     assert.equal(actual, expected);
 
     actual = scriptlets.convertAdgToUbo('example.org#%#//scriptlet("ubo-abort-on-property-read.js", "alert")');
-    expected = 'example.org##+js(abort-on-property-read.js, alert)';
+    expected = 'example.org##+js(abort-on-property-read, alert)';
     assert.equal(actual, expected);
 
     actual = scriptlets.convertAdgToUbo('example.org#%#//scriptlet("abort-on-property-write", "adblock.check")');
-    expected = 'example.org##+js(abort-on-property-write.js, adblock.check)';
+    expected = 'example.org##+js(abort-on-property-write, adblock.check)';
     assert.equal(actual, expected);
 
     actual = scriptlets.convertAbpToAdg('test.com#$#abort-on-property-read adsShown');
@@ -274,5 +274,27 @@ QUnit.test('Test ghide to generichide and ehide to elemhide conversion', (assert
 
     actual = converter.convert(['||ghide.com/ehide^$domain=ghide.com,ghide']);
     expected = '||ghide.com/ehide^$domain=ghide.com,generichide';
+    assert.equal(actual, expected);
+});
+
+QUnit.test('Test redirects converter', (assert) => {
+    const converter = require('../main/converter');
+
+    let actual = converter.convert(['||example.com/banner$image,redirect=1x1.gif']);
+    expected = '||example.com/banner$image,redirect=1x1-transparent.gif';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['||example.com^$script,rewrite=abp-resource:blank-js']);
+    expected = '||example.com^$script,redirect=noopjs';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['||googletagservices.com/test.js$domain=test.com,redirect=googletagservices_gpt.js']);
+    expected = '||googletagservices.com/test.js$domain=test.com,redirect=googletagservices-gpt';
+    assert.equal(actual, expected);
+
+    const { convertAdgRedirectsToUbo } = require('../main/converter');
+
+    actual = convertAdgRedirectsToUbo(['||example.com/banner$image,redirect=32x32-transparent.png']);
+    expected = '||example.com/banner$image,redirect=32x32.png';
     assert.equal(actual, expected);
 });

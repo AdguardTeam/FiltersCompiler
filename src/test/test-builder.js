@@ -68,13 +68,13 @@ QUnit.test("Test builder", async (assert) => {
 
     let filterContent = readFile(path.join(__dirname, 'resources/platforms/test', 'filters', '5.txt'));
     filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 45);
+    assert.equal(filterLines.length, 49);
 
     assert.ok(filterLines.indexOf('||adsnet.com/*/700x350.gif$domain=example.com') >= 0);
-    assert.ok(filterLines.indexOf('example.com##+js(set-constant.js, ads, false)') >= 0);
-    assert.ok(filterLines.indexOf('test.com##+js(abort-on-property-read.js, adsShown)') >= 0);
-    assert.ok(filterLines.indexOf('example.com##+js(disable-newtab-links.js)') >= 0);
-    assert.ok(filterLines.indexOf('test.com#@#+js(abort-on-property-read.js, some.prop)') >= 0);
+    assert.ok(filterLines.indexOf('example.com##+js(set-constant, ads, false)') >= 0);
+    assert.ok(filterLines.indexOf('test.com##+js(abort-on-property-read, adsShown)') >= 0);
+    assert.ok(filterLines.indexOf('example.com##+js(disable-newtab-links)') >= 0);
+    assert.ok(filterLines.indexOf('test.com#@#+js(abort-on-property-read, some.prop)') >= 0);
     assert.ok(filterLines.indexOf('||www.ynet.co.il^$important,websocket,~third-party,domain=www.ynet.co.il') >= 0);
     assert.ok(filterLines.indexOf('example.com$$script[tag-content="12313"][max-length="262144"]') >= 0);
     assert.ok(filterLines.indexOf('rybnik.com.pl##^iframe[name]:not([class]):not([id]):not([src])[style="display:none"]') === -1);
@@ -82,10 +82,13 @@ QUnit.test("Test builder", async (assert) => {
     assert.ok(filterLines.indexOf('test.com#@%#Object.defineProperty(window, \'abcde\', { get: function() { return []; } });') ===  -1);
     assert.ok(filterLines.indexOf('||example.com/api/v1/ad/*/json$replace=/html/abcd\\,/i') ===  -1);
     assert.ok(filterLines.indexOf('||adsnet.com/*/700x350.gif$domain=example.com') >= 0);
+    assert.ok(filterLines.indexOf('||example.com/banner$image,redirect=3x2.png') >= 0);
+    assert.ok(filterLines.indexOf('||test.com^$script,redirect=noop.js') >= 0);
+    assert.ok(filterLines.indexOf('||example.com/*.mp4$media,redirect=noop-1s.mp4') >= 0);
 
     filterContent = readFile(path.join(__dirname, 'resources/platforms/test2', 'filters', '5.txt'));
     filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 45);
+    assert.equal(filterLines.length, 49);
     assert.ok(filterLines.indexOf('test.com#%#//scriptlet("abp-abort-on-property-read", "adsShown")') >= 0);
     assert.ok(filterLines.indexOf('example.com#@%#//scriptlet("abp-abort-on-property-write", "adblock.check")') >= 0);
     assert.ok(filterLines.indexOf('example.com#%#//scriptlet("ubo-disable-newtab-links.js")') >= 0);
@@ -95,10 +98,13 @@ QUnit.test("Test builder", async (assert) => {
     assert.ok(filterLines.indexOf('example.com#%#//scriptlet("set-constant", "ads", "false")') >= 0);
     assert.ok(filterLines.indexOf('example.com$$script[tag-content="12313"][max-length="262144"]') >= 0);
     assert.ok(filterLines.indexOf('||www.ynet.co.il^$important,websocket,~third-party,domain=www.ynet.co.il') >= 0);
+    assert.ok(filterLines.indexOf('||example.com/banner$image,redirect=3x2-transparent.png') >= 0);
+    assert.ok(filterLines.indexOf('||test.com^$script,redirect=noopjs') >= 0);
+    assert.ok(filterLines.indexOf('||example.com/*.mp4$media,redirect=noopmp4-1s') >= 0);
 
     filterContent = readFile(path.join(__dirname, 'resources/platforms/ios', 'filters', '5.txt'));
     filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 41);
+    assert.equal(filterLines.length, 45);
     assert.ok(filterLines.indexOf('||example.com/images/*.mp4') >= 0);
     assert.ok(filterLines.indexOf('test.com,mp4upload.com###overlay') >= 0);
     assert.ok(filterLines.indexOf('||example.com/test/$media,mp4,domain=test.com') === -1);
@@ -231,7 +237,7 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.ok(filterLines.indexOf('test-common-2-rule.com') >= 0);
     assert.ok(filterLines.indexOf('test.com#%#var isadblock=1;') === -1);
     assert.ok(filterLines.indexOf('example.com#%#AG_onLoad(function() { AG_removeElementBySelector(\'span[class="intexta"]\'); });') === -1);
-    assert.ok(filterLines.indexOf('test.com##+js(abort-on-property-read.js, Object.prototype.getBanner)') >= 0);
+    assert.ok(filterLines.indexOf('test.com##+js(abort-on-property-read, Object.prototype.getBanner)') >= 0);
 
     filterContent = readFile(path.join(platforms, 'config/test', 'filters', '2.txt'));
     assert.ok(filterContent);

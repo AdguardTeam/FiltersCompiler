@@ -509,7 +509,7 @@ QUnit.test('Test ##^script:has-text and $$script[tag-containts] rules', (assert)
 });
 
 QUnit.test('Test scriptlets lib validator', (assert) => {
-    const scriptlets = require('scriptlets').default;
+    const scriptlets = require('scriptlets');
 
     let result = scriptlets.validateName('abort-on-property-read');
     assert.equal(result, true);
@@ -573,4 +573,29 @@ QUnit.test('Test scriptlets validator', (assert) => {
         'example.com#%#//scriptlet("abp-abort-current-inline-script", console.log", "Hello")',
     ];
     assert.ok(validator.validate(rules).length === 0);
+});
+
+QUnit.test('Test redirects validator', (assert) => {
+    const redirects = require('scriptlets').redirects;
+
+    let result = redirects.isRedirectRule('||example.com^$script,redirect=noopjs', 'ADG');
+    assert.equal(result, true);
+
+    result = redirects.isRedirectRule('||example.com^$script,rewrite=abp-resource:blank-js', 'ABP');
+    assert.equal(result, true);
+
+    result = redirects.isRedirectRule('||example.com/banner$image,redirect=32x32.png', 'ADG');
+    assert.equal(result, false);
+
+    result = redirects.isRedirectRule('||example.com/banner$image,redirect=32x32.png', 'UBO');
+    assert.equal(result, true);
+
+    result = redirects.isValidRedirectRule('||example.com^$script,redirect=noopjs');
+    assert.equal(result, true);
+
+    result = redirects.isValidRedirectRule('||example.com/banner$image,redirect=32x32-transparent.png');
+    assert.equal(result, true);
+
+    result = redirects.isValidRedirectRule('||example.com/banner$image,redirect=32x32.png');
+    assert.equal(result, false);
 });
