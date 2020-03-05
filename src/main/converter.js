@@ -30,7 +30,7 @@ module.exports = (() => {
     const THIRD_PARTY_3P_REPLACEMENT = 'third-party';
 
     const scriptlets = require('scriptlets');
-    const redirects = require('scriptlets').redirects;
+    const { redirects } = scriptlets;
 
     const GHIDE_REGEX = /(.+[^#]\$.*)(ghide)($|,.+)/i;
     const GENERICHIDE = 'generichide';
@@ -150,7 +150,7 @@ module.exports = (() => {
             }
 
             // Convert UBO and ABP redirect rules to AdGuard redirect rules
-            if (!rule.startsWith(RuleMasks.MASK_COMMENT) && (redirects.isRedirectRule(rule, 'UBO') || redirects.isRedirectRule(rule, 'ABP'))) {
+            if (!rule.startsWith(RuleMasks.MASK_COMMENT) && (redirects.isUboRedirectRule(rule) || redirects.isAbpRedirectRule(rule))) {
                 const convertedRule = redirects.convertRedirectToAdg(rule);
                 if (!convertedRule) {
                     logger.error(`Unable to convert redirect rule to Adguard syntax: "${rule}" `);
@@ -224,16 +224,17 @@ module.exports = (() => {
     const convertAdgRedirectsToUbo = (rules) => {
         const modified = [];
         rules.forEach(rule => {
-            if (!rule.startsWith(RuleMasks.MASK_COMMENT) && redirects.isRedirectRule(rule, 'ADG')) {
+            if (redirects.isAdgRedirectRule(rule)) {
                 const convertedRule = redirects.convertAdgRedirectToUbo(rule);
-                if (!convertedRule) {
+                if (convertedRule) {
+                    logger.log(`Adguard redirect rule "${rule}" converted to uBlock: ${convertedRule}`);
+                    modified.push(convertedRule);
+                } else {
                     logger.error(`Cannot convert Adguard redirect rule to uBlock: ${rule}`);
-                    return rule;
                 }
-                logger.log(`Adguard redirect rule "${rule}" converted to uBlock: ${convertedRule}`);
-                rule = convertedRule;
+            } else {
+                modified.push(rule);
             }
-            modified.push(rule);
         });
         return modified;
     };

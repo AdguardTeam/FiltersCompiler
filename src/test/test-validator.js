@@ -576,26 +576,19 @@ QUnit.test('Test scriptlets validator', (assert) => {
 });
 
 QUnit.test('Test redirects validator', (assert) => {
-    const redirects = require('scriptlets').redirects;
+    const validator = require("../main/validator.js");
+    validator.init();
 
-    let result = redirects.isRedirectRule('||example.com^$script,redirect=noopjs', 'ADG');
-    assert.equal(result, true);
+    let rules = ['||delivery.tf1.fr/pub$media,redirect=noopmp3.0.1s,domain=tf1.fr',
+        '||example.com/banner$image,redirect=32x32-transparent.png',
+        '||example.com/*.mp4$media,redirect=noopmp4-1s',
+        '||googletagservices.com/test.js$domain=test.com,redirect=googletagservices-gpt'];
+    assert.equal(validator.validate(rules).length, 4);
 
-    result = redirects.isRedirectRule('||example.com^$script,rewrite=abp-resource:blank-js', 'ABP');
-    assert.equal(result, true);
-
-    result = redirects.isRedirectRule('||example.com/banner$image,redirect=32x32.png', 'ADG');
-    assert.equal(result, false);
-
-    result = redirects.isRedirectRule('||example.com/banner$image,redirect=32x32.png', 'UBO');
-    assert.equal(result, true);
-
-    result = redirects.isValidRedirectRule('||example.com^$script,redirect=noopjs');
-    assert.equal(result, true);
-
-    result = redirects.isValidRedirectRule('||example.com/banner$image,redirect=32x32-transparent.png');
-    assert.equal(result, true);
-
-    result = redirects.isValidRedirectRule('||example.com/banner$image,redirect=32x32.png');
-    assert.equal(result, false);
+    rules = ['||example.com^$script,redirect=noopjs.js',
+        '||example.com/banner$image,redirect=3x3.png',
+        '||googletagservices.com/test.js$domain=test.com,redirect=googletagservices_gpt.js',
+        '||example.com/banner$image,redirect=1x1.gif',
+        '||example.com/*.mp4$media,redirect=noopmp4_1s'];
+    assert.equal(validator.validate(rules).length, 0);
 });

@@ -17,7 +17,8 @@ module.exports = (function () {
     const Rule = require("./rule/rule.js");
     const extendedCssValidator = require('./utils/extended-css-validator.js');
     const scriptlets = require('scriptlets');
-    const redirects = require('scriptlets').redirects;
+    const { redirects } = scriptlets;
+    const REDIRECT_RULE_REGEXP = /\$(.*,)?redirect=/;
 
     const VALID_OPTIONS = [
         // Basic modifiers
@@ -221,7 +222,25 @@ module.exports = (function () {
 
                 let modifiers = rule.modifiers;
 
+                // 'rewrite' modifier should be used only with 'abp-resource:' value
+                const validateRewriteOption = (name) => {
+                    if (name !== 'rewrite') {
+                        return true;
+                    }
+                    const modifierOptions = modifiers[name];
+                    if (!modifierOptions || modifierOptions.length === 0) {
+                        return false;
+                    }
+                    return modifierOptions[0].startsWith('abp-resource:');
+                };
+
                 for (let name in modifiers) {
+                    if (!validateOptionName(name) || !validateRewriteOption(name)) {
+                        logger.error(`Invalid rule: ${s} option: ${name}`);
+                        excludeRule(excluded,'! Invalid rule options:', rule.ruleText);
+                        return false;
+                    }
+
                     if (name === 'domain' || name === '~domain') {
                         if (rule.modifiers[name].filter(x => x === '').length > 0) {
                             logger.error(`Invalid rule: ${s} incorrect option value: ${rule.modifiers[name]}`);
@@ -255,9 +274,9 @@ module.exports = (function () {
             }
 
             // Redirect rules validation
-            if (redirects.isRedirectRule(rule.ruleText, 'ADG')) {
+            if (REDIRECT_RULE_REGEXP.test(rule.ruleText)) {
                 try {
-                    const validateRedirect = redirects.isValidRedirectRule(rule.ruleText);
+                    const validateRedirect = redirects.isAdgRedirectRule(rule.ruleText);
                     if (!validateRedirect) {
                         excludeRule(excluded,'! Invalid redirect rule:', rule.ruleText);
                         return false;

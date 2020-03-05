@@ -292,9 +292,21 @@ QUnit.test('Test redirects converter', (assert) => {
     expected = '||googletagservices.com/test.js$domain=test.com,redirect=googletagservices-gpt';
     assert.equal(actual, expected);
 
+    actual = converter.convert(['||delivery.tf1.fr/pub$media,rewrite=abp-resource:blank-mp3,domain=tf1.fr']);
+    expected = '||delivery.tf1.fr/pub$media,redirect=noopmp3.0.1s,domain=tf1.fr';
+    assert.equal(actual, expected);
+
     const { convertAdgRedirectsToUbo } = require('../main/converter');
 
     actual = convertAdgRedirectsToUbo(['||example.com/banner$image,redirect=32x32-transparent.png']);
     expected = '||example.com/banner$image,redirect=32x32.png';
+    assert.equal(actual, expected);
+
+    actual = convertAdgRedirectsToUbo(['||example.com^$script,redirect=noopjs']);
+    expected = '||example.com^$script,redirect=noop.js';
+    assert.equal(actual, expected);
+
+    actual = convertAdgRedirectsToUbo(['||example.com/banner$image,redirect=1x1-transparent.gif']);
+    expected = '||example.com/banner$image,redirect=1x1.gif';
     assert.equal(actual, expected);
 });
