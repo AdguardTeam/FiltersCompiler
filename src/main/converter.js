@@ -225,12 +225,12 @@ module.exports = (() => {
         const modified = [];
         rules.forEach(rule => {
             if (redirects.isAdgRedirectRule(rule)) {
-                const convertedRule = redirects.convertAdgRedirectToUbo(rule);
-                if (convertedRule) {
+                try {
+                    const convertedRule = redirects.convertAdgRedirectToUbo(rule);
                     logger.log(`Adguard redirect rule "${rule}" converted to uBlock: ${convertedRule}`);
                     modified.push(convertedRule);
-                } else {
-                    logger.error(`Cannot convert Adguard redirect rule to uBlock: ${rule}`);
+                } catch (error) {
+                    logger.error(`Cannot convert Adguard redirect rule to uBlock: ${rule}\n${error}`);
                 }
             } else {
                 modified.push(rule);

@@ -309,4 +309,12 @@ QUnit.test('Test redirects converter', (assert) => {
     actual = convertAdgRedirectsToUbo(['||example.com/banner$image,redirect=1x1-transparent.gif']);
     expected = '||example.com/banner$image,redirect=1x1.gif';
     assert.equal(actual, expected);
+
+    actual = convertAdgRedirectsToUbo(['||*/ad/$redirect=noopmp3.0.1s,domain=huaren.tv']);
+    expected = '';
+    assert.equal(actual, expected);
+
+    actual = convertAdgRedirectsToUbo(['||example.com^$redirect=noopjs']);
+    expected = '';
+    assert.equal(actual, expected);
 });
