@@ -511,13 +511,13 @@ QUnit.test('Test ##^script:has-text and $$script[tag-containts] rules', (assert)
 QUnit.test('Test scriptlets lib validator', (assert) => {
     const scriptlets = require('scriptlets');
 
-    let result = scriptlets.validateName('abort-on-property-read');
+    let result = scriptlets.isValidScriptletName('abort-on-property-read');
     assert.equal(result, true);
 
-    result = scriptlets.validateName('abort-on--property-read');
+    result = scriptlets.isValidScriptletName('abort-on--property-read');
     assert.equal(result, false);
 
-    result = scriptlets.validateRule('test.com#%#//scriptlet("ubo-abort-current-inline-script.js", "Math.random", "adbDetect")');
+    result = scriptlets.isValidScriptletRule('test.com#%#//scriptlet("ubo-abort-current-inline-script.js", "Math.random", "adbDetect")');
     assert.equal(result, true);
 
     result = scriptlets.isUboScriptletRule('example.com#@#+js(nano-setInterval-booster.js, some.example, 1000)');
@@ -591,4 +591,18 @@ QUnit.test('Test redirects validator', (assert) => {
         '||example.com/banner$image,redirect=1x1.gif',
         '||example.com/*.mp4$media,redirect=noopmp4_1s'];
     assert.equal(validator.validate(rules).length, 0);
+
+    const { redirects } = scriptlets;
+
+    let rule = '||example.com^$script,redirect=noopjs.js';
+    assert.equal(redirects.isAdgRedirectRule(rule), false);
+
+    rule = '||example.com^$script,redirect=noopjs';
+    assert.equal(redirects.isAdgRedirectRule(rule), true);
+
+    rule = '||example.com^$script,redirects=noopjs';
+    assert.equal(redirects.isAdgRedirectRule(rule), false);
+
+    rule = '||example.com&redirects=noopjs^$script';
+    assert.equal(redirects.isAdgRedirectRule(rule), false);
 });

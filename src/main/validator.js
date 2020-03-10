@@ -261,7 +261,7 @@ module.exports = (function () {
             // Scriptlets validation
             if (scriptlets.isAdgScriptletRule(rule.ruleText)) {
                 try {
-                    const validateScriptlet = scriptlets.validateRule(rule.ruleText);
+                    const validateScriptlet = scriptlets.isValidScriptletRule(rule.ruleText);
                     if (!validateScriptlet) {
                         excludeRule(excluded,'! Invalid scriptlet:', rule.ruleText);
                         return false;
