@@ -558,9 +558,10 @@ module.exports = (() => {
         const filterFile = path.join(dir, `${filterId}${optimized ? '_optimized' : ''}.txt`);
         let rulesList = rules;
 
-        // Convert Adguard scriptlets to UBlock syntax
+        // Convert Adguard scriptlets and redirect rules to UBlock syntax. Exclude script rules.
         if (config.platform === 'ext_ublock') {
             rulesList = converter.convertAdgScriptletsToUbo(rulesList);
+            rulesList = converter.convertAdgRedirectsToUbo(rulesList);
             rulesList = excludeScriptRules(rulesList);
         }
 

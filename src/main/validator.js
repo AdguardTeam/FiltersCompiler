@@ -16,7 +16,8 @@ module.exports = (function () {
     const RuleMasks = require("./rule/rule-masks.js");
     const Rule = require("./rule/rule.js");
     const extendedCssValidator = require('./utils/extended-css-validator.js');
-    const scriptlets = require('scriptlets').default;
+    const scriptlets = require('scriptlets');
+    const { redirects } = scriptlets;
 
     const VALID_OPTIONS = [
         // Basic modifiers
@@ -265,7 +266,7 @@ module.exports = (function () {
             // Scriptlets validation
             if (scriptlets.isAdgScriptletRule(rule.ruleText)) {
                 try {
-                    const validateScriptlet = scriptlets.validateRule(rule.ruleText);
+                    const validateScriptlet = scriptlets.isValidScriptletRule(rule.ruleText);
                     if (!validateScriptlet) {
                         excludeRule(excluded,'! Invalid scriptlet:', rule.ruleText);
                         return false;
@@ -273,6 +274,21 @@ module.exports = (function () {
                 } catch (error) {
                     excludeRule(excluded,'! Invalid scriptlet:', rule.ruleText);
                     logger.error(`Invalid scriptlet: ${rule.ruleText}. Error: ${error.message}`);
+                    return false;
+                }
+            }
+
+            // Redirect rules validation
+            if (redirects.isAdgRedirectRule(rule.ruleText)) {
+                try {
+                    const validateRedirect = redirects.isValidAdgRedirectRule(rule.ruleText);
+                    if (!validateRedirect) {
+                        excludeRule(excluded,'! Invalid redirect rule:', rule.ruleText);
+                        return false;
+                    }
+                } catch (error) {
+                    excludeRule(excluded,'! Invalid redirect rule:', rule.ruleText);
+                    logger.error(`Invalid redirect rule: ${rule.ruleText}. Error: ${error.message}`);
                     return false;
                 }
             }

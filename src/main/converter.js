@@ -29,7 +29,8 @@ module.exports = (() => {
     const THIRD_PARTY_3P = '3p';
     const THIRD_PARTY_3P_REPLACEMENT = 'third-party';
 
-    const scriptlets = require('scriptlets').default;
+    const scriptlets = require('scriptlets');
+    const { redirects } = scriptlets;
 
     const GHIDE_REGEX = /(.+[^#]\$.*)(ghide)($|,.+)/i;
     const GENERICHIDE = 'generichide';
@@ -148,6 +149,18 @@ module.exports = (() => {
                 }
             }
 
+            // Convert UBO and ABP redirect rules to AdGuard redirect rules
+            if (!rule.startsWith(RuleMasks.MASK_COMMENT) && (redirects.isValidUboRedirectRule(rule) || redirects.isValidAbpRedirectRule(rule))) {
+                const convertedRule = redirects.convertRedirectToAdg(rule);
+                if (!convertedRule) {
+                    logger.error(`Unable to convert redirect rule to Adguard syntax: "${rule}" `);
+                    rule = `! Inconvertible redirect rule: ${rule}`;
+                } else {
+                    logger.log(`Rule "${rule}" converted to: ${convertedRule}`);
+                    rule = convertedRule;
+                }
+            }
+
             // Convert ##^script:has-text and ##^script:contains to $$script[tag-content="..."][max-length="262144"]
             if (!rule.startsWith(RuleMasks.MASK_COMMENT) && SCRIPT_HAS_TEXT_REGEX.test(rule)) {
                 const replacedRule = rule.replace(SCRIPT_HAS_TEXT_REGEX, SCRIPT_HAS_TEXT_REPLACEMENT).slice(0, -1) + '"]';
@@ -203,8 +216,32 @@ module.exports = (() => {
         return modified;
     };
 
+    /**
+     * Converts Adguard redirect rules to uBlock syntax
+     * @param {array} rules
+     * @return {array} modified rules
+     */
+    const convertAdgRedirectsToUbo = (rules) => {
+        const modified = [];
+        rules.forEach(rule => {
+            if (redirects.isValidAdgRedirectRule(rule)) {
+                try {
+                    const convertedRule = redirects.convertAdgRedirectToUbo(rule);
+                    logger.log(`Adguard redirect rule "${rule}" converted to uBlock: ${convertedRule}`);
+                    modified.push(convertedRule);
+                } catch (error) {
+                    logger.error(`Cannot convert Adguard redirect rule to uBlock: ${rule}\n${error}`);
+                }
+            } else {
+                modified.push(rule);
+            }
+        });
+        return modified;
+    };
+
     return {
         convert: convert,
-        convertAdgScriptletsToUbo: convertAdgScriptletsToUbo
+        convertAdgScriptletsToUbo: convertAdgScriptletsToUbo,
+        convertAdgRedirectsToUbo: convertAdgRedirectsToUbo
     };
 })();

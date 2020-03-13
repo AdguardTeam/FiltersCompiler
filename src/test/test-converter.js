@@ -91,27 +91,27 @@ QUnit.test('Test convert scriptlets to UBlock syntax', (assert) => {
 
     // scriptlet with one argument
     let actual = convertAdgScriptletsToUbo(['example.org#%#//scriptlet("abort-on-property-read", "alert")']);
-    let expected = 'example.org##+js(abort-on-property-read.js, alert)';
+    let expected = 'example.org##+js(abort-on-property-read, alert)';
     assert.equal(actual, expected);
 
     // scriptlet with ubo-compatible name
     actual = convertAdgScriptletsToUbo(['example.org#%#//scriptlet("ubo-abort-on-property-read.js", "alert")']);
-    expected = 'example.org##+js(abort-on-property-read.js, alert)';
+    expected = 'example.org##+js(abort-on-property-read, alert)';
     assert.equal(actual, expected);
 
     // scriptlet with two arguments
     actual = convertAdgScriptletsToUbo(["example.org#%#//scriptlet('set-constant', 'firstConst', 'false')"]);
-    expected = 'example.org##+js(set-constant.js, firstConst, false)';
+    expected = 'example.org##+js(set-constant, firstConst, false)';
     assert.equal(actual, expected);
 
     // scriptlet without arguments and few domains
     actual = convertAdgScriptletsToUbo(["example1.org,example2.com,some-domain.dom#%#//scriptlet('prevent-adfly')"]);
-    expected = 'example1.org,example2.com,some-domain.dom##+js(adfly-defuser.js)';
+    expected = 'example1.org,example2.com,some-domain.dom##+js(adfly-defuser)';
     assert.equal(actual, expected);
 
     // scriptlet argument includes quotes
     actual = convertAdgScriptletsToUbo(["example.org#%#//scriptlet('set-constant', 'constName', 'value\"12345\"')"]);
-    expected = 'example.org##+js(set-constant.js, constName, value"12345")';
+    expected = 'example.org##+js(set-constant, constName, value"12345")';
     assert.equal(actual, expected);
 
 });
@@ -167,35 +167,39 @@ QUnit.test('Test $1p to $~third-party and $3p to $third-party replacement', (ass
 });
 
 QUnit.test('Test scriptlets lib converter', (assert) => {
-    const scriptlets = require('scriptlets').default;
+    const scriptlets = require('scriptlets');
     let actual = scriptlets.convertUboToAdg('example.com#@#+js(nano-setInterval-booster.js, some.example, 1000)');
-    let expected = 'example.com#@%#//scriptlet("ubo-nano-setInterval-booster.js", "some.example", "1000")';
+    let expected = "example.com#@%#//scriptlet('ubo-nano-setInterval-booster.js', 'some.example', '1000')";
     assert.equal(actual, expected);
 
     actual = scriptlets.convertAdgToUbo('example.org#%#//scriptlet("ubo-abort-on-property-read.js", "alert")');
-    expected = 'example.org##+js(abort-on-property-read.js, alert)';
+    expected = 'example.org##+js(abort-on-property-read, alert)';
     assert.equal(actual, expected);
 
     actual = scriptlets.convertAdgToUbo('example.org#%#//scriptlet("abort-on-property-write", "adblock.check")');
-    expected = 'example.org##+js(abort-on-property-write.js, adblock.check)';
+    expected = 'example.org##+js(abort-on-property-write, adblock.check)';
     assert.equal(actual, expected);
 
     actual = scriptlets.convertAbpToAdg('test.com#$#abort-on-property-read adsShown');
-    expected = 'test.com#%#//scriptlet("abp-abort-on-property-read", "adsShown")';
+    expected = "test.com#%#//scriptlet('abp-abort-on-property-read', 'adsShown')";
     assert.equal(actual, expected);
 
     actual = scriptlets.convertScriptletToAdg('example.com#@#+js(nano-setInterval-booster.js, some.example, 1000)');
-    expected = 'example.com#@%#//scriptlet("ubo-nano-setInterval-booster.js", "some.example", "1000")';
+    expected = "example.com#@%#//scriptlet('ubo-nano-setInterval-booster.js', 'some.example', '1000')";
     assert.equal(actual, expected);
 
     actual = scriptlets.convertScriptletToAdg('test.com#$#abort-on-property-read adsShown');
-    expected = 'test.com#%#//scriptlet("abp-abort-on-property-read", "adsShown")';
+    expected = "test.com#%#//scriptlet('abp-abort-on-property-read', 'adsShown')" ;
+    assert.equal(actual, expected);
+
+    actual = scriptlets.convertScriptletToAdg('test.com##+js(abort-current-inline-script, $, popup)');
+    expected = "test.com#%#//scriptlet('ubo-abort-current-inline-script.js', '$', 'popup')" ;
     assert.equal(actual, expected);
 
     actual = scriptlets.convertScriptletToAdg('example.org#$#hide-if-has-and-matches-style \'d[id^="_"]\' \'div > s\' \'display: none\'; hide-if-contains /.*/ .p \'a[href^="/ad__c?"]\'');
     expected = [
-        'example.org#%#//scriptlet("abp-hide-if-has-and-matches-style", "d[id^=\\"_\\"]", "div > s", "display: none")',
-        'example.org#%#//scriptlet("abp-hide-if-contains", "/.*/", ".p", "a[href^=\\"/ad__c?\\"]")',
+        `example.org#%#//scriptlet('abp-hide-if-has-and-matches-style', 'd[id^="_"]', 'div > s', 'display: none')`,
+        `example.org#%#//scriptlet('abp-hide-if-contains', '/.*/', '.p', 'a[href^="/ad__c?"]')`,
     ];
     assert.deepEqual(actual, expected);
 });
@@ -203,42 +207,42 @@ QUnit.test('Test scriptlets lib converter', (assert) => {
 QUnit.test('Test UBO to Adguard scriptlet converter', (assert) => {
     const converter = require('../main/converter');
     let actual = converter.convert(['test.com##+js(abort-current-inline-script.js, Math.random, adbDetect)']);
-    let expected = 'test.com#%#//scriptlet("ubo-abort-current-inline-script.js", "Math.random", "adbDetect")';
+    let expected = "test.com#%#//scriptlet('ubo-abort-current-inline-script.js', 'Math.random', 'adbDetect')";
     assert.equal(actual, expected);
 
     actual = converter.convert(['example.com##+js(disable-newtab-links.js)']);
-    expected = 'example.com#%#//scriptlet("ubo-disable-newtab-links.js")';
+    expected = "example.com#%#//scriptlet('ubo-disable-newtab-links.js')" ;
     assert.equal(actual, expected);
 
     actual = converter.convert(['example.com##+js(addEventListener-defuser, load, onload)']);
-    expected = 'example.com#%#//scriptlet("ubo-addEventListener-defuser.js", "load", "onload")';
+    expected = "example.com#%#//scriptlet('ubo-addEventListener-defuser.js', 'load', 'onload')";
     assert.equal(actual, expected);
 
     actual = converter.convert(['example.com#@#+js(nano-setInterval-booster.js, some.example, 1000)']);
-    expected = 'example.com#@%#//scriptlet("ubo-nano-setInterval-booster.js", "some.example", "1000")';
+    expected = "example.com#@%#//scriptlet('ubo-nano-setInterval-booster.js', 'some.example', '1000')";
     assert.equal(actual, expected);
 
     actual = converter.convert(['test.com##script:inject(json-prune.js)']);
-    expected = 'test.com#%#//scriptlet("ubo-json-prune.js")';
+    expected = "test.com#%#//scriptlet('ubo-json-prune.js')";
     assert.equal(actual, expected);
 
     actual = converter.convert(['test.com#@#script:inject(abort-on-property-read.js, some.prop)']);
-    expected = 'test.com#@%#//scriptlet("ubo-abort-on-property-read.js", "some.prop")';
+    expected = "test.com#@%#//scriptlet('ubo-abort-on-property-read.js', 'some.prop')";
     assert.equal(actual, expected);
 });
 
 QUnit.test('Test ABP to Adguard scriptlet converter', (assert) => {
     const converter = require('../main/converter');
     let actual = converter.convert(['test.com#$#abort-on-property-read adsShown']);
-    let expected = 'test.com#%#//scriptlet("abp-abort-on-property-read", "adsShown")';
+    let expected = "test.com#%#//scriptlet('abp-abort-on-property-read', 'adsShown')";
     assert.equal(actual, expected);
 
     actual = converter.convert(['example.com#$#abort-current-inline-script console.log Hello']);
-    expected = 'example.com#%#//scriptlet("abp-abort-current-inline-script", "console.log", "Hello")';
+    expected = "example.com#%#//scriptlet('abp-abort-current-inline-script', 'console.log', 'Hello')";
     assert.equal(actual, expected);
 
     actual = converter.convert(['example.com#@$#abort-on-property-write adblock.check']);
-    expected = 'example.com#@%#//scriptlet("abp-abort-on-property-write", "adblock.check")';
+    expected = "example.com#@%#//scriptlet('abp-abort-on-property-write', 'adblock.check')";
     assert.equal(actual, expected);
 });
 
@@ -274,5 +278,47 @@ QUnit.test('Test ghide to generichide and ehide to elemhide conversion', (assert
 
     actual = converter.convert(['||ghide.com/ehide^$domain=ghide.com,ghide']);
     expected = '||ghide.com/ehide^$domain=ghide.com,generichide';
+    assert.equal(actual, expected);
+});
+
+QUnit.test('Test redirects converter', (assert) => {
+    const converter = require('../main/converter');
+
+    let actual = converter.convert(['||example.com/banner$image,redirect=1x1.gif']);
+    expected = '||example.com/banner$image,redirect=1x1-transparent.gif';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['||example.com^$script,rewrite=abp-resource:blank-js']);
+    expected = '||example.com^$script,redirect=noopjs';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['||googletagservices.com/test.js$domain=test.com,redirect=googletagservices_gpt.js']);
+    expected = '||googletagservices.com/test.js$domain=test.com,redirect=googletagservices-gpt';
+    assert.equal(actual, expected);
+
+    actual = converter.convert(['||delivery.tf1.fr/pub$media,rewrite=abp-resource:blank-mp3,domain=tf1.fr']);
+    expected = '||delivery.tf1.fr/pub$media,redirect=noopmp3.0.1s,domain=tf1.fr';
+    assert.equal(actual, expected);
+
+    const { convertAdgRedirectsToUbo } = require('../main/converter');
+
+    actual = convertAdgRedirectsToUbo(['||example.com/banner$image,redirect=32x32-transparent.png']);
+    expected = '||example.com/banner$image,redirect=32x32.png';
+    assert.equal(actual, expected);
+
+    actual = convertAdgRedirectsToUbo(['||example.com^$script,redirect=noopjs']);
+    expected = '||example.com^$script,redirect=noop.js';
+    assert.equal(actual, expected);
+
+    actual = convertAdgRedirectsToUbo(['||example.com/banner$image,redirect=1x1-transparent.gif']);
+    expected = '||example.com/banner$image,redirect=1x1.gif';
+    assert.equal(actual, expected);
+
+    actual = convertAdgRedirectsToUbo(['||*/ad/$redirect=noopmp3.0.1s,domain=huaren.tv']);
+    expected = '';
+    assert.equal(actual, expected);
+
+    actual = convertAdgRedirectsToUbo(['||example.com^$redirect=noopjs']);
+    expected = '';
     assert.equal(actual, expected);
 });

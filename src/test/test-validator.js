@@ -518,15 +518,15 @@ QUnit.test('Test ##^script:has-text and $$script[tag-containts] rules', (assert)
 });
 
 QUnit.test('Test scriptlets lib validator', (assert) => {
-    const scriptlets = require('scriptlets').default;
+    const scriptlets = require('scriptlets');
 
-    let result = scriptlets.validateName('abort-on-property-read');
+    let result = scriptlets.isValidScriptletName('abort-on-property-read');
     assert.equal(result, true);
 
-    result = scriptlets.validateName('abort-on--property-read');
+    result = scriptlets.isValidScriptletName('abort-on--property-read');
     assert.equal(result, false);
 
-    result = scriptlets.validateRule('test.com#%#//scriptlet("ubo-abort-current-inline-script.js", "Math.random", "adbDetect")');
+    result = scriptlets.isValidScriptletRule('test.com#%#//scriptlet("ubo-abort-current-inline-script.js", "Math.random", "adbDetect")');
     assert.equal(result, true);
 
     result = scriptlets.isUboScriptletRule('example.com#@#+js(nano-setInterval-booster.js, some.example, 1000)');
@@ -583,3 +583,45 @@ QUnit.test('Test scriptlets validator', (assert) => {
     ];
     assert.ok(validator.validate(rules).length === 0);
 });
+
+QUnit.test('Test redirects validator', (assert) => {
+    const validator = require("../main/validator.js");
+    validator.init();
+
+    let rules = ['||delivery.tf1.fr/pub$media,redirect=noopmp3.0.1s,domain=tf1.fr',
+        '||example.com/banner$image,redirect=32x32-transparent.png',
+        '||example.com/*.mp4$media,redirect=noopmp4-1s',
+        '||googletagservices.com/test.js$domain=test.com,redirect=googletagservices-gpt'];
+    assert.equal(validator.validate(rules).length, 4);
+
+    rules = ['||example.com^$script,redirect=noopjs.js',
+        '||example.com/banner$image,redirect=3x3.png',
+        '||googletagservices.com/test.js$domain=test.com,redirect=googletagservices_gpt.js',
+        '||example.com/banner$image,redirect=1x1.gif',
+        '||example.com/*.mp4$media,redirect=noopmp4_1s',];
+    assert.equal(validator.validate(rules).length, 0);
+
+    const { redirects } = scriptlets;
+
+    let rule = '||example.com^$script,redirect=noopjs.js';
+    assert.equal(redirects.isValidAdgRedirectRule(rule), false);
+
+    rule = '||example.com^$script,redirect=noopjs';
+    assert.equal(redirects.isValidAdgRedirectRule(rule), true);
+
+    rule = '||example.com^$script,redirects=noopjs';
+    assert.equal(redirects.isValidAdgRedirectRule(rule), false);
+
+    rule = '||example.com&redirects=noopjs^$script';
+    assert.equal(redirects.isValidAdgRedirectRule(rule), false);
+
+    rule = '||example.com/banner$image,redirect=32x32transparent.png';
+    assert.equal(redirects.isAdgRedirectRule(rule), true);
+
+    rule = '||example.com/banner$image,redirect=32x32transparent.png';
+    assert.equal(redirects.isValidAdgRedirectRule(rule), false);
+});
+
+
+// если ты вот так сделаешь, то что у тебя прозойдет?
+//     то правило с ошибкой ||example.com/banner$image,redirect=32x32transparent.png улетит в прод, потому что isAdgRedirectRule вернет false
