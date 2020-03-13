@@ -274,9 +274,9 @@ module.exports = (function () {
             }
 
             // Redirect rules validation
-            if (REDIRECT_RULE_REGEXP.test(rule.ruleText)) {
+            if (redirects.isAdgRedirectRule(rule.ruleText)) {
                 try {
-                    const validateRedirect = redirects.isAdgRedirectRule(rule.ruleText);
+                    const validateRedirect = redirects.isValidAdgRedirectRule(rule.ruleText);
                     if (!validateRedirect) {
                         excludeRule(excluded,'! Invalid redirect rule:', rule.ruleText);
                         return false;

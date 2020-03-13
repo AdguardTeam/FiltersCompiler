@@ -150,7 +150,7 @@ module.exports = (() => {
             }
 
             // Convert UBO and ABP redirect rules to AdGuard redirect rules
-            if (!rule.startsWith(RuleMasks.MASK_COMMENT) && (redirects.isUboRedirectRule(rule) || redirects.isAbpRedirectRule(rule))) {
+            if (!rule.startsWith(RuleMasks.MASK_COMMENT) && (redirects.isValidUboRedirectRule(rule) || redirects.isValidAbpRedirectRule(rule))) {
                 const convertedRule = redirects.convertRedirectToAdg(rule);
                 if (!convertedRule) {
                     logger.error(`Unable to convert redirect rule to Adguard syntax: "${rule}" `);
@@ -224,7 +224,7 @@ module.exports = (() => {
     const convertAdgRedirectsToUbo = (rules) => {
         const modified = [];
         rules.forEach(rule => {
-            if (redirects.isAdgRedirectRule(rule)) {
+            if (redirects.isValidAdgRedirectRule(rule)) {
                 try {
                     const convertedRule = redirects.convertAdgRedirectToUbo(rule);
                     logger.log(`Adguard redirect rule "${rule}" converted to uBlock: ${convertedRule}`);

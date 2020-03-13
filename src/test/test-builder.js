@@ -89,13 +89,11 @@ QUnit.test("Test builder", async (assert) => {
     filterContent = readFile(path.join(__dirname, 'resources/platforms/test2', 'filters', '5.txt'));
     filterLines = filterContent.split('\r\n');
     assert.equal(filterLines.length, 49);
-    assert.ok(filterLines.indexOf('test.com#%#//scriptlet("abp-abort-on-property-read", "adsShown")') >= 0);
-    assert.ok(filterLines.indexOf('example.com#@%#//scriptlet("abp-abort-on-property-write", "adblock.check")') >= 0);
-    assert.ok(filterLines.indexOf('example.com#%#//scriptlet("ubo-disable-newtab-links.js")') >= 0);
-    assert.ok(filterLines.indexOf('test.com#@%#//scriptlet("ubo-abort-on-property-read.js", "some.prop")') >= 0);
-    assert.ok(filterLines.indexOf('example.com#%#//scriptlet("ubo-set-constant.js", "ads", "false")') >= 0);
-    assert.ok(filterLines.indexOf('example.com#%#//scriptlet("ubo-disable-newtab-links.js")') >= 0);
-    assert.ok(filterLines.indexOf('example.com#%#//scriptlet("set-constant", "ads", "false")') >= 0);
+    assert.ok(filterLines.indexOf('test.com#%#//scriptlet(\'abp-abort-on-property-read\', \'adsShown\')') >= 0);
+    assert.ok(filterLines.indexOf('example.com#@%#//scriptlet(\'abp-abort-on-property-write\', \'adblock.check\')') >= 0);
+    assert.ok(filterLines.indexOf('test.com#@%#//scriptlet(\'ubo-abort-on-property-read.js\', \'some.prop\')') >= 0);
+    assert.ok(filterLines.indexOf('example.com#%#//scriptlet(\'ubo-disable-newtab-links.js\')') >= 0);
+    assert.ok(filterLines.indexOf('example.com#%#//scriptlet(\'ubo-set-constant.js\', \'ads\', \'false\')') >= 0);
     assert.ok(filterLines.indexOf('example.com$$script[tag-content="12313"][max-length="262144"]') >= 0);
     assert.ok(filterLines.indexOf('||www.ynet.co.il^$important,websocket,~third-party,domain=www.ynet.co.il') >= 0);
     assert.ok(filterLines.indexOf('||example.com/banner$image,redirect=3x2-transparent.png') >= 0);

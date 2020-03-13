@@ -17,14 +17,14 @@ example.com$$script[tag-content="banner"][max-length="262144"]
 ||www.ynet.co.il^$important,websocket,~third-party,domain=www.ynet.co.il
 @@.com/ads.js|$third-party,domain=~3ppt.com']
 !
-test.com#%#//scriptlet("abp-abort-on-property-read", "adsShown")
-example.com#@%#//scriptlet("abp-abort-on-property-write", "adblock.check")
+test.com#%#//scriptlet('abp-abort-on-property-read', 'adsShown')
+example.com#@%#//scriptlet('abp-abort-on-property-write', 'adblock.check')
 !
-example.com#%#//scriptlet("ubo-set-constant.js", "ads", "false")
-example.com#%#//scriptlet("ubo-disable-newtab-links.js")
-example.com#@%#//scriptlet("ubo-nano-setInterval-booster.js", "some.example", "1000")
-test.com#%#//scriptlet("ubo-json-prune.js")
-test.com#@%#//scriptlet("ubo-abort-on-property-read.js", "some.prop")
+example.com#%#//scriptlet('ubo-set-constant.js', 'ads', 'false')
+example.com#%#//scriptlet('ubo-disable-newtab-links.js')
+example.com#@%#//scriptlet('ubo-nano-setInterval-booster.js', 'some.example', '1000')
+test.com#%#//scriptlet('ubo-json-prune.js')
+test.com#@%#//scriptlet('ubo-abort-on-property-read.js', 'some.prop')
 !
 ||example.com/test/$media,mp4,domain=test.com
 ||test.com/cams/video_file/*.mp4$media,mp4
