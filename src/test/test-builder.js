@@ -351,4 +351,12 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.equal(filterLines.length, 13);
     assert.ok(filterLines.indexOf('if_not_ublock') < 0);
 
+    filterContent = readFile(path.join(platforms, 'mac', 'filters', '5.txt'));
+    assert.ok(filterContent);
+
+    filterLines = filterContent.split('\r\n');
+    assert.equal(filterLines.length, 47);
+
+    assert.ok(filterLines.indexOf('||example.com^$script,redirect=noopjs') >= 0);
+    assert.ok(filterLines.indexOf('||example.com/banner$image,redirect=1x1-transparent.gif') >= 0);
 });

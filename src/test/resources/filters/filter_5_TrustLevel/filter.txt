@@ -20,6 +20,9 @@ example.com$$script[tag-content="banner"][max-length="262144"]
 test.com#%#//scriptlet('abp-abort-on-property-read', 'adsShown')
 example.com#@%#//scriptlet('abp-abort-on-property-write', 'adblock.check')
 !
+||example.com^$script,redirect=noopjs
+||example.com/banner$image,redirect=1x1-transparent.gif
+!
 example.com#%#//scriptlet('ubo-set-constant.js', 'ads', 'false')
 example.com#%#//scriptlet('ubo-disable-newtab-links.js')
 example.com#@%#//scriptlet('ubo-nano-setInterval-booster.js', 'some.example', '1000')
