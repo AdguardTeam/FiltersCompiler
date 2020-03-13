@@ -3,10 +3,6 @@
         "platform": "windows",
         "path": "windows",
         "configuration": {
-            "removeRulePatterns": [
-                "\\$redirect=",
-                ",redirect="
-            ],
             "ignoreRuleHints": false
         },
         "defines": {
@@ -18,10 +14,6 @@
         "platform": "mac",
         "path": "mac",
         "configuration": {
-            "removeRulePatterns": [
-                "\\$redirect=",
-                ",redirect="
-            ],
             "ignoreRuleHints": false
         },
         "defines": {
@@ -33,10 +25,6 @@
         "platform": "mac",
         "path": "mac_v2",
         "configuration": {
-            "removeRulePatterns": [
-                "\\$redirect=",
-                ",redirect="
-            ],
             "ignoreRuleHints": false
         },
         "defines": {
@@ -49,10 +37,6 @@
         "platform": "android",
         "path": "android",
         "configuration": {
-            "removeRulePatterns": [
-                "\\$redirect=",
-                ",redirect="
-            ],
             "ignoreRuleHints": false
         },
         "defines": {
