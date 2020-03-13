@@ -68,7 +68,7 @@ QUnit.test("Test builder", async (assert) => {
 
     let filterContent = readFile(path.join(__dirname, 'resources/platforms/test', 'filters', '5.txt'));
     filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 49);
+    assert.equal(filterLines.length, 52);
 
     assert.ok(filterLines.indexOf('||adsnet.com/*/700x350.gif$domain=example.com') >= 0);
     assert.ok(filterLines.indexOf('example.com##+js(set-constant, ads, false)') >= 0);
@@ -88,7 +88,7 @@ QUnit.test("Test builder", async (assert) => {
 
     filterContent = readFile(path.join(__dirname, 'resources/platforms/test2', 'filters', '5.txt'));
     filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 49);
+    assert.equal(filterLines.length, 52);
     assert.ok(filterLines.indexOf('test.com#%#//scriptlet(\'abp-abort-on-property-read\', \'adsShown\')') >= 0);
     assert.ok(filterLines.indexOf('example.com#@%#//scriptlet(\'abp-abort-on-property-write\', \'adblock.check\')') >= 0);
     assert.ok(filterLines.indexOf('test.com#@%#//scriptlet(\'ubo-abort-on-property-read.js\', \'some.prop\')') >= 0);
@@ -102,7 +102,7 @@ QUnit.test("Test builder", async (assert) => {
 
     filterContent = readFile(path.join(__dirname, 'resources/platforms/ios', 'filters', '5.txt'));
     filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 45);
+    assert.equal(filterLines.length, 48);
     assert.ok(filterLines.indexOf('||example.com/images/*.mp4') >= 0);
     assert.ok(filterLines.indexOf('test.com,mp4upload.com###overlay') >= 0);
     assert.ok(filterLines.indexOf('||example.com/test/$media,mp4,domain=test.com') === -1);
@@ -355,7 +355,7 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.ok(filterContent);
 
     filterLines = filterContent.split('\r\n');
-    assert.equal(filterLines.length, 47);
+    assert.equal(filterLines.length, 51);
 
     assert.ok(filterLines.indexOf('||example.com^$script,redirect=noopjs') >= 0);
     assert.ok(filterLines.indexOf('||example.com/banner$image,redirect=1x1-transparent.gif') >= 0);

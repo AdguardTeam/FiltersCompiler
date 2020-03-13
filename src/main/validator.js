@@ -18,7 +18,6 @@ module.exports = (function () {
     const extendedCssValidator = require('./utils/extended-css-validator.js');
     const scriptlets = require('scriptlets');
     const { redirects } = scriptlets;
-    const REDIRECT_RULE_REGEXP = /\$(.*,)?redirect=/;
 
     const VALID_OPTIONS = [
         // Basic modifiers
