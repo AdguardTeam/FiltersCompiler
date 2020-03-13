@@ -198,6 +198,12 @@ module.exports = (function () {
         return list.filter((s) => {
             const rule = ruleParser.parseRule(s);
 
+            if (!rule.ruleText.startsWith(RuleMasks.MASK_COMMENT) && rule.ruleText.length <= 3) {
+                logger.error(`Invalid rule: ${rule.ruleText} The rule is too short.`);
+                excludeRule(excluded,'! The rule is too short:', rule.ruleText);
+                return false;
+            }
+
             if (rule.ruleType === RuleTypes.Comment) {
                 return true;
             } else if (rule.ruleType === RuleTypes.ElementHiding) {
