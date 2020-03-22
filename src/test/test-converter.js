@@ -5,55 +5,55 @@ QUnit.test("Test converter", (assert) => {
 
     const converter = require('../main/converter.js');
 
-    let c = converter.convert(['example.com']);
+    let c = converter.convertRulesToAdgSyntax(['example.com']);
     assert.equal(c[0], 'example.com');
 
-    c = converter.convert(['example.com##h1:style(background-color: blue !important)']);
+    c = converter.convertRulesToAdgSyntax(['example.com##h1:style(background-color: blue !important)']);
     assert.equal(c[0], 'example.com#$#h1 { background-color: blue !important }');
 
-    c = converter.convert(['example.com#@#h1:style(background-color: blue !important)']);
+    c = converter.convertRulesToAdgSyntax(['example.com#@#h1:style(background-color: blue !important)']);
     assert.equal(c[0], 'example.com#@$#h1 { background-color: blue !important }');
 
-    c = converter.convert(['apkmirror.com##body .google-ad-leaderboard-smaller:style(position: absolute!important; left: -4000px!important; display:block!important;)']);
+    c = converter.convertRulesToAdgSyntax(['apkmirror.com##body .google-ad-leaderboard-smaller:style(position: absolute!important; left: -4000px!important; display:block!important;)']);
     assert.equal(c[0], 'apkmirror.com#$#body .google-ad-leaderboard-smaller { position: absolute!important; left: -4000px!important; display:block!important; }');
 
-    c = converter.convert(['apkmirror.com##body .google-ad-square-sidebar:style(position: absolute!important; left: -4000px!important; display:block!important;)']);
+    c = converter.convertRulesToAdgSyntax(['apkmirror.com##body .google-ad-square-sidebar:style(position: absolute!important; left: -4000px!important; display:block!important;)']);
     assert.equal(c[0], 'apkmirror.com#$#body .google-ad-square-sidebar { position: absolute!important; left: -4000px!important; display:block!important; }');
 
-    c = converter.convert(['benchmark.pl###bannerDBB:style(height: 10px !important;)']);
+    c = converter.convertRulesToAdgSyntax(['benchmark.pl###bannerDBB:style(height: 10px !important;)']);
     assert.equal(c[0], 'benchmark.pl#$##bannerDBB { height: 10px !important; }');
 
     // https://github.com/AdguardTeam/FiltersCompiler/issues/24
-    c = converter.convert(['720hd.club#?##all:style(margin-top: 0 !important)']);
+    c = converter.convertRulesToAdgSyntax(['720hd.club#?##all:style(margin-top: 0 !important)']);
     assert.equal(c[0], '720hd.club#$?##all { margin-top: 0 !important }');
 
-    c = converter.convert(['720hd.club#@?##all:style(margin-top: 0 !important)']);
+    c = converter.convertRulesToAdgSyntax(['720hd.club#@?##all:style(margin-top: 0 !important)']);
     assert.equal(c[0], '720hd.club#@$?##all { margin-top: 0 !important }');
 });
 
 QUnit.test('Test first-party replaced by ~third-party', (assert) => {
     const converter = require('../main/converter');
-    let actual = converter.convert(['||www.ynet.co.il^$important,websocket,first-party']);
+    let actual = converter.convertRulesToAdgSyntax(['||www.ynet.co.il^$important,websocket,first-party']);
     let expected = '||www.ynet.co.il^$important,websocket,~third-party';
     assert.equal(actual, expected);
 
-    actual = converter.convert(['||zive.cz^*+$script,first-party']);
+    actual = converter.convertRulesToAdgSyntax(['||zive.cz^*+$script,first-party']);
     expected = '||zive.cz^*+$script,~third-party';
     assert.equal(actual, expected);
 
-    actual = converter.convert(['||zive.cz^*+$script,first-party']);
+    actual = converter.convertRulesToAdgSyntax(['||zive.cz^*+$script,first-party']);
     expected = '||zive.cz^*+$script,~third-party';
     assert.equal(actual, expected);
 
-    actual = converter.convert(['||zive.cz^*+$first-party,script']);
+    actual = converter.convertRulesToAdgSyntax(['||zive.cz^*+$first-party,script']);
     expected = '||zive.cz^*+$~third-party,script';
     assert.equal(actual, expected);
 
-    actual = converter.convert(['||zive.cz^*+$first-party']);
+    actual = converter.convertRulesToAdgSyntax(['||zive.cz^*+$first-party']);
     expected = '||zive.cz^*+$~third-party';
     assert.equal(actual, expected);
 
-    actual = converter.convert(['||www.ynet.co.il^$important,websocket,first-party', '||zive.cz^*+$script,first-party']);
+    actual = converter.convertRulesToAdgSyntax(['||www.ynet.co.il^$important,websocket,first-party', '||zive.cz^*+$script,first-party']);
     expected = ['||www.ynet.co.il^$important,websocket,~third-party', '||zive.cz^*+$script,~third-party'];
     assert.equal(actual[0], expected[0]);
     assert.equal(actual[1], expected[1]);
@@ -61,27 +61,27 @@ QUnit.test('Test first-party replaced by ~third-party', (assert) => {
 
 QUnit.test('Test options replacement', (assert) => {
     const converter = require('../main/converter');
-    let actual = converter.convert(['||www.ynet.co.il^$xhr,websocket']);
+    let actual = converter.convertRulesToAdgSyntax(['||www.ynet.co.il^$xhr,websocket']);
     let expected = '||www.ynet.co.il^$xmlhttprequest,websocket';
     assert.equal(actual, expected);
 
-    actual = converter.convert(['||zive.cz^*+$script,xhr']);
+    actual = converter.convertRulesToAdgSyntax(['||zive.cz^*+$script,xhr']);
     expected = '||zive.cz^*+$script,xmlhttprequest';
     assert.equal(actual, expected);
 
-    actual = converter.convert(['||zive.cz^*+$script,css']);
+    actual = converter.convertRulesToAdgSyntax(['||zive.cz^*+$script,css']);
     expected = '||zive.cz^*+$script,stylesheet';
     assert.equal(actual, expected);
 
-    actual = converter.convert(['||zive.cz^*+$css,script']);
+    actual = converter.convertRulesToAdgSyntax(['||zive.cz^*+$css,script']);
     expected = '||zive.cz^*+$stylesheet,script';
     assert.equal(actual, expected);
 
-    actual = converter.convert(['||zive.cz^*+$frame']);
+    actual = converter.convertRulesToAdgSyntax(['||zive.cz^*+$frame']);
     expected = '||zive.cz^*+$subdocument';
     assert.equal(actual, expected);
 
-    actual = converter.convert(['||zive.cz^*+$xhr,frame']);
+    actual = converter.convertRulesToAdgSyntax(['||zive.cz^*+$xhr,frame']);
     expected = '||zive.cz^*+$xmlhttprequest,subdocument';
     assert.equal(actual, expected);
 });
@@ -118,50 +118,50 @@ QUnit.test('Test convert scriptlets to UBlock syntax', (assert) => {
 
 QUnit.test('Test ##^script:has-text to $$script[tag-containts] replacement', (assert) => {
     const converter = require('../main/converter');
-    let actual = converter.convert(['example.com##^script:has-text(12313)']);
+    let actual = converter.convertRulesToAdgSyntax(['example.com##^script:has-text(12313)']);
     let expected = 'example.com$$script[tag-content="12313"][max-length="262144"]';
     assert.equal(actual, expected);
 
-    actual = converter.convert(['example.com##^script:has-text(/\.advert/)']);
+    actual = converter.convertRulesToAdgSyntax(['example.com##^script:has-text(/\.advert/)']);
     expected = 'example.com##^script:has-text(/\.advert/)';
     assert.equal(actual, expected);
 
-    actual = converter.convert(['example.com##^script:contains(banner)']);
+    actual = converter.convertRulesToAdgSyntax(['example.com##^script:contains(banner)']);
     expected = 'example.com$$script[tag-content="banner"][max-length="262144"]';
     assert.equal(actual, expected);
 
-    actual = converter.convert(['example.com##^script:contains(/.+banner/)']);
+    actual = converter.convertRulesToAdgSyntax(['example.com##^script:contains(/.+banner/)']);
     expected = 'example.com##^script:contains(/.+banner/)';
     assert.equal(actual, expected);
 });
 
 QUnit.test('Test $1p to $~third-party and $3p to $third-party replacement', (assert) => {
     const converter = require('../main/converter');
-    let actual = converter.convert(['||www.ynet.co.il^$important,websocket,1p,domain=www.ynet.co.il']);
+    let actual = converter.convertRulesToAdgSyntax(['||www.ynet.co.il^$important,websocket,1p,domain=www.ynet.co.il']);
     let expected = '||www.ynet.co.il^$important,websocket,~third-party,domain=www.ynet.co.il';
     assert.equal(actual, expected);
 
-    actual = converter.convert(['||20il.co.il^$important,websocket,1p']);
+    actual = converter.convertRulesToAdgSyntax(['||20il.co.il^$important,websocket,1p']);
     expected = '||20il.co.il^$important,websocket,~third-party';
     assert.equal(actual, expected);
 
-    actual = converter.convert(['||vidads.gr^$3p']);
+    actual = converter.convertRulesToAdgSyntax(['||vidads.gr^$3p']);
     expected = '||vidads.gr^$third-party';
     assert.equal(actual, expected);
 
-    actual = converter.convert(['@@.com/ads.js|$3p,domain=~3ppt.com']);
+    actual = converter.convertRulesToAdgSyntax(['@@.com/ads.js|$3p,domain=~3ppt.com']);
     expected = '@@.com/ads.js|$third-party,domain=~3ppt.com';
     assert.equal(actual, expected);
 
-    actual = converter.convert(['@@.com/ads.js|$~third-party,domain=~3ppt.com']);
+    actual = converter.convertRulesToAdgSyntax(['@@.com/ads.js|$~third-party,domain=~3ppt.com']);
     expected = '@@.com/ads.js|$~third-party,domain=~third-partypt.com';
     assert.notEqual(actual, expected);
 
-    actual = converter.convert(['spiele-umsonst.de##.left > div.right[style$="1px;"]']);
+    actual = converter.convertRulesToAdgSyntax(['spiele-umsonst.de##.left > div.right[style$="1px;"]']);
     expected = 'spiele-umsonst.de##.left > div.right[style$="~third-partyx;"]';
     assert.notEqual(actual, expected);
 
-    actual = converter.convert(['realadmin.ru#$#.adsbygoogle { height: 1px!important; }']);
+    actual = converter.convertRulesToAdgSyntax(['realadmin.ru#$#.adsbygoogle { height: 1px!important; }']);
     expected = 'realadmin.ru#$#.adsbygoogle { height: third-partyx!important; }';
     assert.notEqual(actual, expected);
 });
@@ -206,77 +206,77 @@ QUnit.test('Test scriptlets lib converter', (assert) => {
 
 QUnit.test('Test UBO to Adguard scriptlet converter', (assert) => {
     const converter = require('../main/converter');
-    let actual = converter.convert(['test.com##+js(abort-current-inline-script.js, Math.random, adbDetect)']);
+    let actual = converter.convertRulesToAdgSyntax(['test.com##+js(abort-current-inline-script.js, Math.random, adbDetect)']);
     let expected = "test.com#%#//scriptlet('ubo-abort-current-inline-script.js', 'Math.random', 'adbDetect')";
     assert.equal(actual, expected);
 
-    actual = converter.convert(['example.com##+js(disable-newtab-links.js)']);
+    actual = converter.convertRulesToAdgSyntax(['example.com##+js(disable-newtab-links.js)']);
     expected = "example.com#%#//scriptlet('ubo-disable-newtab-links.js')" ;
     assert.equal(actual, expected);
 
-    actual = converter.convert(['example.com##+js(addEventListener-defuser, load, onload)']);
+    actual = converter.convertRulesToAdgSyntax(['example.com##+js(addEventListener-defuser, load, onload)']);
     expected = "example.com#%#//scriptlet('ubo-addEventListener-defuser.js', 'load', 'onload')";
     assert.equal(actual, expected);
 
-    actual = converter.convert(['example.com#@#+js(nano-setInterval-booster.js, some.example, 1000)']);
+    actual = converter.convertRulesToAdgSyntax(['example.com#@#+js(nano-setInterval-booster.js, some.example, 1000)']);
     expected = "example.com#@%#//scriptlet('ubo-nano-setInterval-booster.js', 'some.example', '1000')";
     assert.equal(actual, expected);
 
-    actual = converter.convert(['test.com##script:inject(json-prune.js)']);
+    actual = converter.convertRulesToAdgSyntax(['test.com##script:inject(json-prune.js)']);
     expected = "test.com#%#//scriptlet('ubo-json-prune.js')";
     assert.equal(actual, expected);
 
-    actual = converter.convert(['test.com#@#script:inject(abort-on-property-read.js, some.prop)']);
+    actual = converter.convertRulesToAdgSyntax(['test.com#@#script:inject(abort-on-property-read.js, some.prop)']);
     expected = "test.com#@%#//scriptlet('ubo-abort-on-property-read.js', 'some.prop')";
     assert.equal(actual, expected);
 });
 
 QUnit.test('Test ABP to Adguard scriptlet converter', (assert) => {
     const converter = require('../main/converter');
-    let actual = converter.convert(['test.com#$#abort-on-property-read adsShown']);
+    let actual = converter.convertRulesToAdgSyntax(['test.com#$#abort-on-property-read adsShown']);
     let expected = "test.com#%#//scriptlet('abp-abort-on-property-read', 'adsShown')";
     assert.equal(actual, expected);
 
-    actual = converter.convert(['example.com#$#abort-current-inline-script console.log Hello']);
+    actual = converter.convertRulesToAdgSyntax(['example.com#$#abort-current-inline-script console.log Hello']);
     expected = "example.com#%#//scriptlet('abp-abort-current-inline-script', 'console.log', 'Hello')";
     assert.equal(actual, expected);
 
-    actual = converter.convert(['example.com#@$#abort-on-property-write adblock.check']);
+    actual = converter.convertRulesToAdgSyntax(['example.com#@$#abort-on-property-write adblock.check']);
     expected = "example.com#@%#//scriptlet('abp-abort-on-property-write', 'adblock.check')";
     assert.equal(actual, expected);
 });
 
 QUnit.test('Test ghide to generichide and ehide to elemhide conversion', (assert) => {
     const converter = require('../main/converter');
-    let actual = converter.convert(['||example.com^$ghide']);
+    let actual = converter.convertRulesToAdgSyntax(['||example.com^$ghide']);
     let expected = '||example.com^$generichide';
     assert.equal(actual, expected);
 
-    actual = converter.convert(['@@||ghider.com^$ghide']);
+    actual = converter.convertRulesToAdgSyntax(['@@||ghider.com^$ghide']);
     expected = '@@||ghider.com^$generichide';
     assert.equal(actual, expected);
 
-    actual = converter.convert(['||test.com^$ehide']);
+    actual = converter.convertRulesToAdgSyntax(['||test.com^$ehide']);
     expected = '||test.com^$elemhide';
     assert.equal(actual, expected);
 
-    actual = converter.convert(['@@||ghide.ehide.ru^$ehide']);
+    actual = converter.convertRulesToAdgSyntax(['@@||ghide.ehide.ru^$ehide']);
     expected = '@@||ghide.ehide.ru^$elemhide';
     assert.equal(actual, expected);
 
-    actual = converter.convert(['||ghide.com/ghide^$elemhide']);
+    actual = converter.convertRulesToAdgSyntax(['||ghide.com/ghide^$elemhide']);
     expected = '||ghide.com/ghide^$elemhide';
     assert.equal(actual, expected);
 
-    actual = converter.convert(['||ehide.com/ehide^$generichide']);
+    actual = converter.convertRulesToAdgSyntax(['||ehide.com/ehide^$generichide']);
     expected = '||ehide.com/ehide^$generichide';
     assert.equal(actual, expected);
 
-    actual = converter.convert(['||ehide.com/ehide^$domain=ehide.com,ehide']);
+    actual = converter.convertRulesToAdgSyntax(['||ehide.com/ehide^$domain=ehide.com,ehide']);
     expected = '||ehide.com/ehide^$domain=ehide.com,elemhide';
     assert.equal(actual, expected);
 
-    actual = converter.convert(['||ghide.com/ehide^$domain=ghide.com,ghide']);
+    actual = converter.convertRulesToAdgSyntax(['||ghide.com/ehide^$domain=ghide.com,ghide']);
     expected = '||ghide.com/ehide^$domain=ghide.com,generichide';
     assert.equal(actual, expected);
 });
@@ -284,19 +284,19 @@ QUnit.test('Test ghide to generichide and ehide to elemhide conversion', (assert
 QUnit.test('Test redirects converter', (assert) => {
     const converter = require('../main/converter');
 
-    let actual = converter.convert(['||example.com/banner$image,redirect=1x1.gif']);
+    let actual = converter.convertRulesToAdgSyntax(['||example.com/banner$image,redirect=1x1.gif']);
     expected = '||example.com/banner$image,redirect=1x1-transparent.gif';
     assert.equal(actual, expected);
 
-    actual = converter.convert(['||example.com^$script,rewrite=abp-resource:blank-js']);
+    actual = converter.convertRulesToAdgSyntax(['||example.com^$script,rewrite=abp-resource:blank-js']);
     expected = '||example.com^$script,redirect=noopjs';
     assert.equal(actual, expected);
 
-    actual = converter.convert(['||googletagservices.com/test.js$domain=test.com,redirect=googletagservices_gpt.js']);
+    actual = converter.convertRulesToAdgSyntax(['||googletagservices.com/test.js$domain=test.com,redirect=googletagservices_gpt.js']);
     expected = '||googletagservices.com/test.js$domain=test.com,redirect=googletagservices-gpt';
     assert.equal(actual, expected);
 
-    actual = converter.convert(['||delivery.tf1.fr/pub$media,rewrite=abp-resource:blank-mp3,domain=tf1.fr']);
+    actual = converter.convertRulesToAdgSyntax(['||delivery.tf1.fr/pub$media,rewrite=abp-resource:blank-mp3,domain=tf1.fr']);
     expected = '||delivery.tf1.fr/pub$media,redirect=noopmp3.0.1s,domain=tf1.fr';
     assert.equal(actual, expected);
 
