@@ -186,6 +186,179 @@ module.exports = (function () {
     };
 
     /**
+     * Checks if the rule is not less then 3 characters
+     *
+     * @param {string} rule
+     * @param {array} excluded
+     * @returns {boolean}
+     */
+    const isShortRule = (rule, excluded) => {
+        if (rule && !rule.startsWith(RuleMasks.MASK_COMMENT) && rule.length <= 3) {
+            logger.error(`Invalid rule: ${rule} The rule is too short.`);
+            excludeRule(excluded,'! The rule is too short:', rule);
+            return true;
+        }
+        return false;
+    };
+
+    /**
+     * Validates scriptlet
+     *
+     * @param {object} rule
+     * @param {array} excluded
+     * @returns {boolean}
+     */
+    const isValidScriptlet = (rule, excluded) => {
+        if (scriptlets.isAdgScriptletRule(rule.ruleText)) {
+            try {
+                const validateScriptlet = scriptlets.isValidScriptletRule(rule.ruleText);
+                if (!validateScriptlet) {
+                    excludeRule(excluded,'! Invalid scriptlet:', rule.ruleText);
+                    return false;
+                }
+            } catch (error) {
+                excludeRule(excluded,'! Invalid scriptlet:', rule.ruleText);
+                logger.error(`Invalid scriptlet: ${rule.ruleText}. Error: ${error.message}`);
+                return false;
+            }
+        }
+        return true;
+    };
+
+    /**
+     * Validates redirect rule
+     *
+     * @param {object} rule
+     * @param {array} excluded
+     * @returns {boolean}
+     */
+    const isValidRedirectRule = (rule, excluded) => {
+        if (redirects.isAdgRedirectRule(rule.ruleText)) {
+            try {
+                const validateRedirect = redirects.isValidAdgRedirectRule(rule.ruleText);
+                if (!validateRedirect) {
+                    excludeRule(excluded,'! Invalid redirect rule:', rule.ruleText);
+                    return false;
+                }
+            } catch (error) {
+                excludeRule(excluded,'! Invalid redirect rule:', rule.ruleText);
+                logger.error(`Invalid redirect rule: ${rule.ruleText}. Error: ${error.message}`);
+                return false;
+            }
+        }
+        return true;
+    };
+
+    /**
+     * Checks if 'rewrite' modifier has 'abp-resource:' value
+     *
+     * @param {string} option
+     * @param {object} modifiers
+     * @returns {boolean}
+     */
+    const validateRewriteOption = (option, modifiers) => {
+        if (option !== 'rewrite') {
+            return true;
+        }
+        const modifierOptions = modifiers[option];
+        if (!modifierOptions || modifierOptions.length === 0) {
+            return false;
+        }
+        return modifierOptions[0].startsWith('abp-resource:');
+    };
+
+    /**
+     * Validates element hiding rule
+     *
+     * @param {string} ruleString
+     * @param {object} rule
+     * @param {array} excluded
+     * @returns {boolean}
+     */
+    const isValidElementHidingRule = (ruleString, rule, excluded) => {
+        if (rule.ruleType === RuleTypes.ElementHiding) {
+            if (ruleString.startsWith('||')) {
+                logger.error(`|| are unnecessary for element hiding rule: ${ruleString}`);
+                excludeRule(excluded,'! || are unnecessary for element hiding rule:', rule.ruleText);
+                return false;
+            }
+
+            if (!extendedCssValidator.validateCssSelector(rule.contentPart)) {
+                logger.error(`Invalid selector: ${ruleString}`);
+                excludeRule(excluded,'! Invalid selector:', rule.ruleText);
+                return false;
+            }
+        }
+        return true;
+    };
+
+    /**
+     * Validates url blocking rule
+     *
+     * @param {string} ruleString
+     * @param {object} rule
+     * @param {array} excluded
+     * @returns {boolean}
+     */
+    const isValidUrlBlockingRule = (ruleString, rule, excluded) => {
+        if (rule.ruleType === RuleTypes.UrlBlocking) {
+            // TODO: There is no way to separate content rules from incorrect $$ options separator
+            // if (s.includes('$$')) {
+            //     logger.error(`Invalid rule: ${s} - two option separators.`);
+            //     return false;
+            // }
+
+            let modifiers = rule.modifiers;
+
+            for (let name in modifiers) {
+                if (!validateOptionName(name) || !validateRewriteOption(name, modifiers)) {
+                    logger.error(`Invalid rule: ${ruleString} option: ${name}`);
+                    excludeRule(excluded,'! Invalid rule options:', rule.ruleText);
+                    return false;
+                }
+
+                if (name === 'domain' || name === '~domain') {
+                    if (rule.modifiers[name].filter(x => x === '').length > 0) {
+                        logger.error(`Invalid rule: ${ruleString} incorrect option value: ${rule.modifiers[name]}`);
+                        excludeRule(excluded,'! Invalid rule options:', rule.ruleText);
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    };
+
+    /**
+     * Validates css rule
+     *
+     * @param {string} ruleString
+     * @param {object} rule
+     * @param {array} excluded
+     * @returns {boolean}
+     */
+    const isValidCssRule = (ruleString, rule, excluded) => {
+        if (rule.ruleType === RuleTypes.Css) {
+            if (rule.contentPart &&
+                rule.contentPart.toLowerCase().indexOf('url(') >= 0 ||
+                rule.contentPart.indexOf('\\') >= 0) {
+                logger.error(`Invalid rule: ${ruleString} incorrect style: ${rule.contentPart}`);
+                excludeRule(excluded,'! Incorrect style:', rule.ruleText);
+                return false;
+            }
+        }
+        return true;
+    };
+
+    /**
+     * Checks if the rule is comment
+     *
+     * @param {object} rule
+     * @returns {boolean}
+     */
+    const isComment = (rule) => rule.ruleType === RuleTypes.Comment;
+
+    /**
      * Validates list of rules
      *
      * @param list
@@ -197,100 +370,17 @@ module.exports = (function () {
         return list.filter((s) => {
             const rule = ruleParser.parseRule(s);
 
-            if (!rule.ruleText.startsWith(RuleMasks.MASK_COMMENT) && rule.ruleText.length <= 3) {
-                logger.error(`Invalid rule: ${rule.ruleText} The rule is too short.`);
-                excludeRule(excluded,'! The rule is too short:', rule.ruleText);
-                return false;
-            }
-
-            if (rule.ruleType === RuleTypes.Comment) {
+            if (isComment(rule)) {
                 return true;
-            } else if (rule.ruleType === RuleTypes.ElementHiding) {
-                if (s.startsWith('||')) {
-                    logger.error(`|| are unnecessary for element hiding rule: ${s}`);
-                    excludeRule(excluded,'! || are unnecessary for element hiding rule:', rule.ruleText);
-                    return false;
-                }
-
-                if (!extendedCssValidator.validateCssSelector(rule.contentPart)) {
-                    logger.error(`Invalid selector: ${s}`);
-                    excludeRule(excluded,'! Invalid selector:', rule.ruleText);
-                    return false;
-                }
-
-            } else if (rule.ruleType === RuleTypes.UrlBlocking) {
-                // TODO: There is no way to separate content rules from incorrect $$ options separator
-                // if (s.includes('$$')) {
-                //     logger.error(`Invalid rule: ${s} - two option separators.`);
-                //     return false;
-                // }
-
-                let modifiers = rule.modifiers;
-
-                // 'rewrite' modifier should be used only with 'abp-resource:' value
-                const validateRewriteOption = (name) => {
-                    if (name !== 'rewrite') {
-                        return true;
-                    }
-                    const modifierOptions = modifiers[name];
-                    if (!modifierOptions || modifierOptions.length === 0) {
-                        return false;
-                    }
-                    return modifierOptions[0].startsWith('abp-resource:');
-                };
-
-                for (let name in modifiers) {
-                    if (!validateOptionName(name) || !validateRewriteOption(name)) {
-                        logger.error(`Invalid rule: ${s} option: ${name}`);
-                        excludeRule(excluded,'! Invalid rule options:', rule.ruleText);
-                        return false;
-                    }
-
-                    if (name === 'domain' || name === '~domain') {
-                        if (rule.modifiers[name].filter(x => x === '').length > 0) {
-                            logger.error(`Invalid rule: ${s} incorrect option value: ${rule.modifiers[name]}`);
-                            excludeRule(excluded,'! Invalid rule options:', rule.ruleText);
-                            return false;
-                        }
-                    }
-                }
-            } else if (rule.ruleType === RuleTypes.Css) {
-                if (rule.contentPart &&
-                    rule.contentPart.toLowerCase().indexOf('url(') >= 0 ||
-                    rule.contentPart.indexOf('\\') >= 0) {
-                    logger.error(`Invalid rule: ${s} incorrect style: ${rule.contentPart}`);
-                    excludeRule(excluded,'! Incorrect style:', rule.ruleText);
-                    return false;
-                }
-            }
-            // Scriptlets validation
-            if (scriptlets.isAdgScriptletRule(rule.ruleText)) {
-                try {
-                    const validateScriptlet = scriptlets.isValidScriptletRule(rule.ruleText);
-                    if (!validateScriptlet) {
-                        excludeRule(excluded,'! Invalid scriptlet:', rule.ruleText);
-                        return false;
-                    }
-                } catch (error) {
-                    excludeRule(excluded,'! Invalid scriptlet:', rule.ruleText);
-                    logger.error(`Invalid scriptlet: ${rule.ruleText}. Error: ${error.message}`);
-                    return false;
-                }
             }
 
-            // Redirect rules validation
-            if (redirects.isAdgRedirectRule(rule.ruleText)) {
-                try {
-                    const validateRedirect = redirects.isValidAdgRedirectRule(rule.ruleText);
-                    if (!validateRedirect) {
-                        excludeRule(excluded,'! Invalid redirect rule:', rule.ruleText);
-                        return false;
-                    }
-                } catch (error) {
-                    excludeRule(excluded,'! Invalid redirect rule:', rule.ruleText);
-                    logger.error(`Invalid redirect rule: ${rule.ruleText}. Error: ${error.message}`);
-                    return false;
-                }
+            if (isShortRule(s, excluded) ||
+                !isValidElementHidingRule(s, rule, excluded) ||
+                !isValidUrlBlockingRule(s, rule, excluded) ||
+                !isValidCssRule(s, rule, excluded) ||
+                !isValidScriptlet(rule, excluded) ||
+                !isValidRedirectRule(rule, excluded)) {
+                return false;
             }
 
             //TODO: Check js rules validation
