@@ -197,7 +197,7 @@ module.exports = (function () {
         return list.filter((s) => {
             const rule = ruleParser.parseRule(s);
 
-            if (!rule.ruleText.startsWith(RuleMasks.MASK_COMMENT) && rule.ruleText.length <= 3) {
+            if (rule.ruleText && !rule.ruleText.startsWith(RuleMasks.MASK_COMMENT) && rule.ruleText.length <= 3) {
                 logger.error(`Invalid rule: ${rule.ruleText} The rule is too short.`);
                 excludeRule(excluded,'! The rule is too short:', rule.ruleText);
                 return false;
