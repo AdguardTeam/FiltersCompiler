@@ -182,7 +182,12 @@
                 "\\$protobuf",
                 "important,protobuf",
                 "\\$extension",
-                ",extension"
+                ",extension",
+                "\\$redirect=",
+                ",redirect=",
+                "\\$empty=",
+                ",empty=",
+                "#%#//scriptlet"
             ],
             "ignoreRuleHints": false
         },
