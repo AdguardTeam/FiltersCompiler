@@ -257,7 +257,7 @@ module.exports = (() => {
      */
     const convertToUbo = (rules, ruleType, validateMethod, convertMethod) => {
             const modified = [];
-            rules.map(rule => {
+            rules.forEach(rule => {
                 if (validateMethod(rule)) {
                     try {
                         const convertedRule = convertMethod(rule);
