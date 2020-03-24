@@ -8,19 +8,19 @@ module.exports = (() => {
 
     const CSS_RULE_REPLACE_PATTERN = /(.*):style\((.*)\)/g;
 
-    const FIRST_PARTY_REGEX = /([\$,])first-party/i;
+    const FIRST_PARTY_REGEX = /([$,])first-party/i;
     const FIRST_PARTY_REPLACEMENT = `$1~third-party`;
 
-    const XHR_REGEX = /([\$,])xhr/i;
+    const XHR_REGEX = /([$,])xhr/i;
     const XHR_REPLACEMENT = `$1xmlhttprequest`;
 
-    const CSS_REGEX = /([\$,])css/i;
+    const CSS_REGEX = /([$,])css/i;
     const CSS_REPLACEMENT = `$1stylesheet`;
 
-    const FRAME_REGEX = /([\$,])frame/i;
+    const FRAME_REGEX = /([$,])frame/i;
     const FRAME_REPLACEMENT = `$1subdocument`;
 
-    const SCRIPT_HAS_TEXT_REGEX = /(##\^script\:(has\-text|contains))\((?!\/.+\/\))/i;
+    const SCRIPT_HAS_TEXT_REGEX = /(##\^script:(has-text|contains))\((?!\/.+\/\))/i;
     const SCRIPT_HAS_TEXT_REPLACEMENT = '$$$$script[tag-content="';
 
     const THIRD_PARTY_1P_3P_REGEX = /\$[^#]?(.*,)?(1p|3p)/;
@@ -36,6 +36,19 @@ module.exports = (() => {
     const GENERICHIDE = 'generichide';
     const EHIDE_REGEX = /(.+[^#]\$.*)(ehide)($|,.+)/i;
     const ELEMHIDE = 'elemhide';
+
+    /**
+     * Excludes rule
+     * @param {string} rule
+     * @param {array} excluded
+     * @param {string} message
+     */
+    const excludeRule = (rule, excluded, message) => {
+        if (excluded) {
+            excluded.push(`! ${message}`);
+            excluded.push(rule);
+        }
+    };
 
     /**
      * Executes rule css conversion
@@ -61,11 +74,7 @@ module.exports = (() => {
 
                     let message = `Rule "${rule}" converted to: ${result}`;
                     logger.log(message);
-
-                    if (excluded) {
-                        excluded.push(`! ${message}`);
-                        excluded.push(rule);
-                    }
+                    excludeRule(rule, excluded, message);
                 }
             }
         }
@@ -73,22 +82,9 @@ module.exports = (() => {
         return result;
     };
 
+
     /**
-     * Function to which converts rules with different markers
-     *
-     * First-party conversion:
-     * $first-party -> $~third-party
-     * ,first-party -> ,~third-party
-     *
-     * options conversion:
-     * $xhr -> $xmlhttprequest
-     * ,xhr -> ,xmlhttprequest
-     * $css -> $stylesheet
-     * ,css -> ,stylesheet
-     * $frame -> $subdocument
-     * ,frame -> ,subdocument
-     *
-     * CSS injection conversion:
+     * Converts CSS injection
      * example.com##h1:style(background-color: blue !important)
      * into
      * example.com#$#h1 { background-color: blue !important }
@@ -98,93 +94,151 @@ module.exports = (() => {
      * into
      * example.com#@$#h1 { background-color: blue !important }
      *
-     * @param rulesList Array of rules
-     * @param excluded
+     * @param {string} rule
+     * @param {array} excluded
+     * @return {string} convertedRule
      */
-    const convert = function (rulesList, excluded) {
+    const convertCssInjection = (rule, excluded) => {
+        if (rule.includes(':style')) {
+            let parts, result;
+            if (rule.includes(RuleMasks.MASK_CSS_EXTENDED_CSS_RULE)) {
+                parts = rule.split(RuleMasks.MASK_CSS_EXTENDED_CSS_RULE, 2);
+                result = executeConversion(rule, parts, RuleMasks.MASK_CSS_INJECT_EXTENDED_CSS_RULE, excluded);
+            } else if (rule.includes(RuleMasks.MASK_CSS_EXCEPTION_EXTENDED_CSS_RULE)) {
+                parts = rule.split(RuleMasks.MASK_CSS_EXCEPTION_EXTENDED_CSS_RULE, 2);
+                result = executeConversion(rule, parts, RuleMasks.MASK_CSS_EXCEPTION_INJECT_EXTENDED_CSS_RULE, excluded);
+            } else if (rule.includes(RuleMasks.MASK_ELEMENT_HIDING)) {
+                parts = rule.split(RuleMasks.MASK_ELEMENT_HIDING, 2);
+                result = executeConversion(rule, parts, RuleMasks.MASK_CSS, excluded);
+            } else if (rule.includes(RuleMasks.MASK_ELEMENT_HIDING_EXCEPTION)) {
+                parts = rule.split(RuleMasks.MASK_ELEMENT_HIDING_EXCEPTION, 2);
+                result = executeConversion(rule, parts, RuleMasks.MASK_CSS_EXCEPTION, excluded);
+            }
+            return result;
+        }
+        return rule;
+    };
+
+    /**
+     * Replaces the following options:
+     * $first-party -> $~third-party
+     * $xhr -> $xmlhttprequest
+     * $css -> $stylesheet
+     * $frame -> $subdocument
+     * $1p -> $~third-party
+     * $3p -> $third-party
+     * ghide -> generichide
+     * ehide -> elemhide
+     *
+     * @param {string} rule
+     * @return {string} convertedRule
+     */
+    const replaceOptions = (rule) => {
+        if (!rule.startsWith(RuleMasks.MASK_COMMENT) &&
+            (FIRST_PARTY_REGEX.test(rule) ||
+            XHR_REGEX.test(rule) ||
+            CSS_REGEX.test(rule) ||
+            FRAME_REGEX.test(rule) ||
+            THIRD_PARTY_1P_3P_REGEX.test(rule) ||
+            GHIDE_REGEX.test(rule) ||
+            EHIDE_REGEX.test(rule))) {
+            const result = rule
+                .replace(FIRST_PARTY_REGEX, FIRST_PARTY_REPLACEMENT)
+                .replace(XHR_REGEX, XHR_REPLACEMENT)
+                .replace(CSS_REGEX, CSS_REPLACEMENT)
+                .replace(FRAME_REGEX, FRAME_REPLACEMENT)
+                .replace(THIRD_PARTY_1P, THIRD_PARTY_1P_REPLACEMENT)
+                .replace(THIRD_PARTY_3P, THIRD_PARTY_3P_REPLACEMENT)
+                .replace(GHIDE_REGEX, `$1${GENERICHIDE}$3`)
+                .replace(EHIDE_REGEX, `$1${ELEMHIDE}$3`);
+            logger.log(`Rule "${rule}" converted to: ${result}`);
+            return result;
+        }
+        return rule;
+    };
+
+    /**
+     * Converts ##^script:has-text and ##^script:contains to $$script[tag-content="..."][max-length="262144"]
+     * @param {string} rule
+     * @return {string} convertedRule
+     */
+    const convertScriptHasTextToScriptTagContent = (rule) => {
+        if (!rule.startsWith(RuleMasks.MASK_COMMENT) && SCRIPT_HAS_TEXT_REGEX.test(rule)) {
+            const result = rule.replace(SCRIPT_HAS_TEXT_REGEX, SCRIPT_HAS_TEXT_REPLACEMENT).slice(0, -1) + '"][max-length="262144"]';
+            logger.log(`Rule "${rule}" converted to: ${result}`);
+            return result;
+        }
+        return rule;
+    };
+
+    /**
+     * Converts UBO and ABP redirect rules to AdGuard redirect rules
+     * @param {string} rule
+     * @param {array} excluded
+     * @return {string} convertedRule
+     */
+    const convertUboAndAbpRedirectsToAdg = (rule, excluded) => {
+        if (!rule.startsWith(RuleMasks.MASK_COMMENT) &&
+            (redirects.isValidUboRedirectRule(rule) || redirects.isValidAbpRedirectRule(rule))) {
+            const result = redirects.convertRedirectToAdg(rule);
+            if (!result) {
+                const message = `Unable to convert redirect rule to AdGuard syntax: ${rule}`;
+                logger.error(message);
+                excludeRule(rule, excluded, message);
+            } else {
+                logger.log(`Rule "${rule}" converted to: ${result}`);
+                return result;
+            }
+        }
+        return rule;
+    };
+
+    /**
+     * Converts UBO and ABP scriptlets to AdGuard scriptlets
+     * @param {string} rule
+     * @param {array} excluded
+     * @return {string|array|undefined} convertedRule
+     */
+    const convertUboAndAbpScriptletsToAdg = (rule, excluded) => {
+        if (!rule.startsWith(RuleMasks.MASK_COMMENT) &&
+            (scriptlets.isUboScriptletRule(rule) || scriptlets.isAbpSnippetRule(rule))) {
+            const result = scriptlets.convertScriptletToAdg(rule);
+            if (!result) {
+                const message = `Unable to convert scriptlet to AdGuard syntax: ${rule}`;
+                logger.error(message);
+                excludeRule(rule, excluded, message);
+            } else {
+                logger.log(`Rule "${rule}" converted to: ${result}`);
+                return result;
+            }
+        }
+        return rule;
+    };
+
+    /**
+     * Converts rules to AdGuard syntax
+     * @param {array} rulesList
+     * @param {array} excluded
+     * @return {array} result
+     */
+    const convertRulesToAdgSyntax = function (rulesList, excluded) {
         let result = [];
 
         for (let rule of rulesList) {
-            if (rule.includes(':style')) {
-                let parts;
-                if (rule.includes(RuleMasks.MASK_CSS_EXTENDED_CSS_RULE)) {
-                    parts = rule.split(RuleMasks.MASK_CSS_EXTENDED_CSS_RULE, 2);
-                    rule = executeConversion(rule, parts, RuleMasks.MASK_CSS_INJECT_EXTENDED_CSS_RULE, excluded);
-                } else if (rule.includes(RuleMasks.MASK_CSS_EXCEPTION_EXTENDED_CSS_RULE)) {
-                    parts = rule.split(RuleMasks.MASK_CSS_EXCEPTION_EXTENDED_CSS_RULE, 2);
-                    rule = executeConversion(rule, parts, RuleMasks.MASK_CSS_EXCEPTION_INJECT_EXTENDED_CSS_RULE, excluded);
-                } else if (rule.includes(RuleMasks.MASK_ELEMENT_HIDING)) {
-                    parts = rule.split(RuleMasks.MASK_ELEMENT_HIDING, 2);
-                    rule = executeConversion(rule, parts, RuleMasks.MASK_CSS, excluded);
-                } else if (rule.includes(RuleMasks.MASK_ELEMENT_HIDING_EXCEPTION)) {
-                    parts = rule.split(RuleMasks.MASK_ELEMENT_HIDING_EXCEPTION, 2);
-                    rule = executeConversion(rule, parts, RuleMasks.MASK_CSS_EXCEPTION, excluded);
-                }
-            }
+            rule = convertCssInjection(rule, excluded);
+            rule = replaceOptions(rule);
+            rule = convertScriptHasTextToScriptTagContent(rule);
+            rule = convertUboAndAbpRedirectsToAdg(rule, excluded);
 
-            // Some options will be replaced
-            if (FIRST_PARTY_REGEX.test(rule) ||
-                XHR_REGEX.test(rule) ||
-                CSS_REGEX.test(rule) ||
-                FRAME_REGEX.test(rule)) {
-                let replacedRule = rule.replace(FIRST_PARTY_REGEX, FIRST_PARTY_REPLACEMENT)
-                    .replace(XHR_REGEX, XHR_REPLACEMENT)
-                    .replace(CSS_REGEX, CSS_REPLACEMENT)
-                    .replace(FRAME_REGEX, FRAME_REPLACEMENT);
-                let message = `Rule "${rule}" converted to: ${replacedRule}`;
-                logger.log(message);
-                rule = replacedRule;
-            }
-
-            // Convert UBO and ABP scriptlets to AdGuard scriptlets
-            if (!rule.startsWith(RuleMasks.MASK_COMMENT) && (scriptlets.isUboScriptletRule(rule) || scriptlets.isAbpSnippetRule(rule))) {
-                const convertedRule = scriptlets.convertScriptletToAdg(rule);
-                if (!convertedRule) {
-                    logger.error(`Unable to convert scriptlet to Adguard syntax: "${rule}" `);
-                    rule = `! Inconvertible scriptlet: ${rule}`;
+            const scriptletRule = convertUboAndAbpScriptletsToAdg(rule, excluded);
+            if (scriptletRule) {
+                if (scriptletRule instanceof Array) {
+                    result.push(...scriptletRule);
+                    continue;
                 } else {
-                    logger.log(`Rule "${rule}" converted to: ${convertedRule}`);
-                    result.push(...convertedRule);
+                    result.push(scriptletRule);
                     continue;
                 }
-            }
-
-            // Convert UBO and ABP redirect rules to AdGuard redirect rules
-            if (!rule.startsWith(RuleMasks.MASK_COMMENT) && (redirects.isValidUboRedirectRule(rule) || redirects.isValidAbpRedirectRule(rule))) {
-                const convertedRule = redirects.convertRedirectToAdg(rule);
-                if (!convertedRule) {
-                    logger.error(`Unable to convert redirect rule to Adguard syntax: "${rule}" `);
-                    rule = `! Inconvertible redirect rule: ${rule}`;
-                } else {
-                    logger.log(`Rule "${rule}" converted to: ${convertedRule}`);
-                    rule = convertedRule;
-                }
-            }
-
-            // Convert ##^script:has-text and ##^script:contains to $$script[tag-content="..."][max-length="262144"]
-            if (!rule.startsWith(RuleMasks.MASK_COMMENT) && SCRIPT_HAS_TEXT_REGEX.test(rule)) {
-                const replacedRule = rule.replace(SCRIPT_HAS_TEXT_REGEX, SCRIPT_HAS_TEXT_REPLACEMENT).slice(0, -1) + '"]';
-                const message = `Rule "${rule}" converted to: ${replacedRule}`;
-                logger.log(message);
-                rule = `${replacedRule}[max-length="262144"]`;
-            }
-
-            // Convert $1p to $~third-party and $3p to $third-party
-            if (!rule.startsWith(RuleMasks.MASK_COMMENT) && THIRD_PARTY_1P_3P_REGEX.test(rule)) {
-                const replacedRule = rule.replace(THIRD_PARTY_1P, THIRD_PARTY_1P_REPLACEMENT)
-                    .replace(THIRD_PARTY_3P, THIRD_PARTY_3P_REPLACEMENT);
-                const message = `Rule "${rule}" converted to: ${replacedRule}`;
-                logger.log(message);
-                rule = replacedRule;
-            }
-
-            // Convert ghide to generichide and ehide to elemhide
-            if (!rule.startsWith(RuleMasks.MASK_COMMENT) && (GHIDE_REGEX.test(rule) || EHIDE_REGEX.test(rule))) {
-                const replacedRule = rule.replace(GHIDE_REGEX, `$1${GENERICHIDE}$3`)
-                    .replace(EHIDE_REGEX, `$1${ELEMHIDE}$3`);
-                const message = `Rule "${rule}" converted to: ${replacedRule}`;
-                logger.log(message);
-                rule = replacedRule;
             }
 
             result.push(rule);
@@ -194,53 +248,59 @@ module.exports = (() => {
     };
 
     /**
-     * Convert Adguard scriptlets to uBlock syntax
-     * https://github.com/AdguardTeam/FiltersCompiler/issues/56
+     * Converts AdGuard rules to uBlock syntax
      * @param {array} rules
+     * @param {string} ruleType
+     * @param {function} validateMethod
+     * @param {function} convertMethod
      * @return {array} modified rules
      */
-    const convertAdgScriptletsToUbo = (rules) => {
-        const modified = [];
-        rules.forEach(rule => {
-            if (!rule.startsWith(RuleMasks.MASK_COMMENT) && (rule.includes(RuleMasks.MASK_SCRIPTLET) || rule.includes(RuleMasks.MASK_SCRIPTLET_EXCEPTION))) {
-                const convertedRule = scriptlets.convertAdgToUbo(rule);
-                if (!convertedRule) {
-                    logger.error(`Cannot convert Adguard scriptlet to uBlock: ${rule}`);
-                    return rule;
+    const convertToUbo = (rules, ruleType, validateMethod, convertMethod) => {
+            const modified = [];
+            rules.forEach(rule => {
+                if (validateMethod(rule)) {
+                    try {
+                        const convertedRule = convertMethod(rule);
+                        logger.log(`AdGuard ${ruleType} ${rule} converted to uBlock: ${convertedRule}`);
+                        modified.push(convertedRule);
+                    } catch (error) {
+                        logger.error(`Cannot convert AdGuard ${ruleType} to uBlock: ${rule}\n${error}`);
+                    }
+                } else {
+                    modified.push(rule);
                 }
-                logger.log(`Adguard scriptlet "${rule}" converted to uBlock: ${convertedRule}`);
-                rule = convertedRule;
-            }
-            modified.push(rule);
-        });
-        return modified;
+
+            });
+            return modified;
     };
 
     /**
-     * Converts Adguard redirect rules to uBlock syntax
+     * Convert AdGuard scriptlets to uBlock
      * @param {array} rules
      * @return {array} modified rules
      */
-    const convertAdgRedirectsToUbo = (rules) => {
-        const modified = [];
-        rules.forEach(rule => {
-            if (redirects.isValidAdgRedirectRule(rule)) {
-                try {
-                    const convertedRule = redirects.convertAdgRedirectToUbo(rule);
-                    logger.log(`Adguard redirect rule "${rule}" converted to uBlock: ${convertedRule}`);
-                    modified.push(convertedRule);
-                } catch (error) {
-                    logger.error(`Cannot convert Adguard redirect rule to uBlock: ${rule}\n${error}`);
-                }
-            } else {
-                modified.push(rule);
-            }
-        });
-        return modified;
-    };
+    const convertAdgScriptletsToUbo = (rules) => convertToUbo(
+        rules,
+        'scriptlet',
+        scriptlets.isAdgScriptletRule,
+        scriptlets.convertAdgToUbo
+    );
+
+    /**
+     * Converts AdGuard redirect rules to uBlock
+     * @param {array} rules
+     * @return {array} modified rules
+     */
+    const convertAdgRedirectsToUbo = (rules) => convertToUbo(
+        rules,
+        'redirect',
+        redirects.isValidAdgRedirectRule,
+        redirects.convertAdgRedirectToUbo
+    );
+
 
     return {
-        convert: convert,
+        convertRulesToAdgSyntax: convertRulesToAdgSyntax,
         convertAdgScriptletsToUbo: convertAdgScriptletsToUbo,
         convertAdgRedirectsToUbo: convertAdgRedirectsToUbo
     };
