@@ -29,6 +29,16 @@ QUnit.test("Test converter", (assert) => {
 
     c = converter.convertRulesToAdgSyntax(['720hd.club#@?##all:style(margin-top: 0 !important)']);
     assert.equal(c[0], '720hd.club#@$?##all { margin-top: 0 !important }');
+
+    // https://github.com/AdguardTeam/FiltersCompiler/issues/54
+    c = converter.convertRulesToAdgSyntax(['#####']);
+    assert.equal(c[0], '! #####');
+
+    c = converter.convertRulesToAdgSyntax(['# ubo syntax comment']);
+    assert.equal(c[0], '! # ubo syntax comment');
+
+    c = converter.convertRulesToAdgSyntax(['##selector']);
+    assert.equal(c[0], '##selector');
 });
 
 QUnit.test('Test first-party replaced by ~third-party', (assert) => {

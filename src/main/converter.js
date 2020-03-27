@@ -216,6 +216,24 @@ module.exports = (() => {
     };
 
     /**
+     * Converts ubo syntax comments (rules starting with #)
+     * Note: It's not possible to detect 100% cause rules starting with ## are valid elemhide rules
+     * https://github.com/AdguardTeam/FiltersCompiler/issues/54
+     *
+     * @param rule
+     * @return {string}
+     */
+    const convertUboComments = (rule) => {
+        if (rule.startsWith('# ') ||  rule.startsWith('####')) {
+            const result = `! ${rule}`;
+            logger.log(`Rule "${rule}" converted to: ${result}`);
+            return result;
+        }
+
+        return rule;
+    };
+
+    /**
      * Converts rules to AdGuard syntax
      * @param {array} rulesList
      * @param {array} excluded
@@ -225,6 +243,7 @@ module.exports = (() => {
         let result = [];
 
         for (let rule of rulesList) {
+            rule = convertUboComments(rule);
             rule = convertCssInjection(rule, excluded);
             rule = replaceOptions(rule);
             rule = convertScriptHasTextToScriptTagContent(rule);
