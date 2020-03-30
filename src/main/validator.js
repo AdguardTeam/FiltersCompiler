@@ -19,6 +19,8 @@ module.exports = (function () {
     const scriptlets = require('scriptlets');
     const { redirects } = scriptlets;
 
+    const ESCAPE_CHARACTER_REGEX = /{.*\\.*}/;
+
     const VALID_OPTIONS = [
         // Basic modifiers
         'domain', '~domain',
@@ -341,7 +343,7 @@ module.exports = (function () {
         if (rule.ruleType === RuleTypes.Css) {
             if (rule.contentPart &&
                 rule.contentPart.toLowerCase().indexOf('url(') >= 0 ||
-                rule.contentPart.indexOf('\\') >= 0) {
+                ESCAPE_CHARACTER_REGEX.test(rule.contentPart)) {
                 logger.error(`Invalid rule: ${ruleString} incorrect style: ${rule.contentPart}`);
                 excludeRule(excluded,'! Incorrect style:', rule.ruleText);
                 return false;
