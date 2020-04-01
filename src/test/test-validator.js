@@ -174,6 +174,19 @@ QUnit.test("Test ext-css validation - complicated cases", function (assert) {
     ruleText = "pan.baidu.com,music.baidu.com,yun.baidu.com##[class|=ad]";
     rules = [ruleText];
     assert.ok(validator.validate(rules).length > 0);
+
+    rules = ["example.org#$?#div:matches-css(width: /\d+/) { background-color: red!important; }",
+        "better.com#$##header-floating\ navbar { position: absolute !important; }",
+        "bongino.com#$##site-header\ 1 > .site-header-main { height: 167.3px !important; }",
+        "deadline.com#$#.pmc-u-background-white.\/\/.header__bar { position: relative !important; transform: translateY(0) !important; }",
+        "engadget.com#$#.o-sticky_header\@tp- { position: relative !important; }",
+        "sports.yahoo.com#$##atomic .Mt\(headerHeight\) { margin-top: 22px !important; }",
+        "texasmonthly.com#$##\#novella-header { position: relative !important; top: 0 !important; }"];
+    assert.ok(validator.validate(rules).length === 7);
+
+    rules = ["example.org#$?#div:matches-css(width: /\d+/) { background-color: red!important; background-url: url(../images/pic1.jpg); }",
+            "better.com#$##header-floating\ navbar { font-family: \\'Blogger\\'; }"];
+    assert.ok(validator.validate(rules).length === 0);
 });
 
 QUnit.test("Test ext-css validation - complicated cases", function (assert) {
@@ -601,7 +614,7 @@ QUnit.test('Test redirects validator', (assert) => {
         '||example.com/*.mp4$media,redirect=noopmp4_1s',];
     assert.equal(validator.validate(rules).length, 0);
 
-    const { redirects } = scriptlets;
+    const { redirects } = require('scriptlets');
 
     let rule = '||example.com^$script,redirect=noopjs.js';
     assert.equal(redirects.isValidAdgRedirectRule(rule), false);
@@ -621,7 +634,3 @@ QUnit.test('Test redirects validator', (assert) => {
     rule = '||example.com/banner$image,redirect=32x32transparent.png';
     assert.equal(redirects.isValidAdgRedirectRule(rule), false);
 });
-
-
-// если ты вот так сделаешь, то что у тебя прозойдет?
-//     то правило с ошибкой ||example.com/banner$image,redirect=32x32transparent.png улетит в прод, потому что isAdgRedirectRule вернет false
