@@ -26,10 +26,8 @@ module.exports = (function () {
     const version = require("./utils/version.js");
     const converter = require("./converter.js");
     const validator = require("./validator.js");
-    const sorter = require("./sorting.js");
     const generator = require("./platforms/generator.js");
     const logger = require("./utils/log.js");
-    const utils = require("./utils/utils.js");
     const RuleMasks = require("./rule/rule-masks");
     const workaround = require('./utils/workaround.js');
     const webutils = require('./utils/webutils.js');
@@ -450,6 +448,7 @@ module.exports = (function () {
         }
 
         const trustLevel = metadata.trustLevel ? metadata.trustLevel : DEFAULT_TRUST_LEVEL;
+        // eslint-disable-next-line no-undef
         const trustLevelSettings = path.resolve(__dirname, TRUST_LEVEL_DIR, `exclusions-${trustLevel}.txt`);
 
         logger.info('Compiling...');

@@ -19,7 +19,7 @@ module.exports = (() => {
     const optimization = require('../optimization');
 
     const HINT_MASK = RuleMasks.MASK_HINT + " ";
-    const COMMENT_REGEXP = "^\\!(\$|[^#])";
+    const COMMENT_REGEXP = "^\\!($|[^#])";
 
     const PLATFORM_HINT_REGEXP = /(^| )PLATFORM\(([^)]+)\)/g;
     const NOT_PLATFORM_HINT_REGEXP = /(.*)NOT_PLATFORM\(([^)]+)\)/g;

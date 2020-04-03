@@ -1,4 +1,4 @@
-/* globals require, Buffer */
+/* globals require */
 
 module.exports = (() => {
 
@@ -161,6 +161,7 @@ module.exports = (() => {
 
         const sep = path.sep;
         const initDir = path.isAbsolute(dir) ? sep : '';
+        // eslint-disable-next-line no-undef
         const baseDir = __dirname;
 
         return dir.split(sep).reduce((parentDir, childDir) => {

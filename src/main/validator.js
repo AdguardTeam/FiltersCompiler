@@ -1,4 +1,4 @@
-/* globals module, require, console, global */
+/* globals module, require */
 
 module.exports = (function () {
 

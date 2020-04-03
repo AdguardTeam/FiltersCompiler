@@ -13,6 +13,7 @@ module.exports = (function () {
     function requireFromString(src) {
         const Module = module.constructor;
         const m = new Module();
+        // eslint-disable-next-line no-undef
         m._compile(src, __filename);
         return m.exports;
     }

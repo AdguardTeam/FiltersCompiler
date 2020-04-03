@@ -70,7 +70,7 @@ module.exports = (() => {
                     logger.warn(`Cannot convert ${rule}`);
                 } else {
                     result = domain + ruleMark;
-                    result += `${groups[1]} \{ ${groups[2]} }`;
+                    result += `${groups[1]} { ${groups[2]} }`;
 
                     let message = `Rule "${rule}" converted to: ${result}`;
                     logger.log(message);

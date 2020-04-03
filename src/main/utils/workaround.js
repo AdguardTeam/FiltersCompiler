@@ -5,7 +5,6 @@ module.exports = (() => {
     'use strict';
 
     const RuleMasks = require('../rule/rule-masks.js');
-    const { convertAdgScriptletToUbo } = require('../converter.js');
 
     /**
      * CSS rules with width and height attributes break SVG rendering
@@ -21,7 +20,7 @@ module.exports = (() => {
             ruleText.includes(RuleMasks.MASK_ELEMENT_HIDING_EXCEPTION)) {
 
             ruleText = ruleText.replace(/\[width=/gi, "[Width=");
-            ruleText = ruleText.replace("/\[height=/gi", "[Height=");
+            ruleText = ruleText.replace("/[height=/gi", "[Height=");
         }
 
         return ruleText;
@@ -111,7 +110,7 @@ module.exports = (() => {
      * @param inclusionContent
      */
     const removeAdblockVersion = function (inclusionContent) {
-        return inclusionContent.replace(/\!?.?\[Adblock.*?\]\r?\n?/g, "");
+        return inclusionContent.replace(/!?.?\[Adblock.*?\]\r?\n?/g, "");
     };
 
     /**
