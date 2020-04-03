@@ -17,6 +17,10 @@
   },
   "main": "index.js",
   "scripts": {
-    "test": "node ./src/test/testrunner.js"
+    "test": "node ./src/test/testrunner.js",
+    "lint": "eslint ./src/main"
+  },
+  "devDependencies": {
+    "eslint": "^6.8.0"
   }
 }
