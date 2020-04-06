@@ -175,16 +175,15 @@ QUnit.test("Test ext-css validation - complicated cases", function (assert) {
     rules = [ruleText];
     assert.ok(validator.validate(rules).length > 0);
 
-    rules = ["example.org#$?#div:matches-css(width: /\d+/) { background-color: red!important; }",
-        "better.com#$##header-floating\ navbar { position: absolute !important; }",
+    rules = ["better.com#$##header-floating\ navbar { position: absolute !important; }",
         "bongino.com#$##site-header\ 1 > .site-header-main { height: 167.3px !important; }",
         "deadline.com#$#.pmc-u-background-white.\/\/.header__bar { position: relative !important; transform: translateY(0) !important; }",
         "engadget.com#$#.o-sticky_header\@tp- { position: relative !important; }",
         "sports.yahoo.com#$##atomic .Mt\(headerHeight\) { margin-top: 22px !important; }",
         "texasmonthly.com#$##\#novella-header { position: relative !important; top: 0 !important; }"];
-    assert.ok(validator.validate(rules).length === 7);
+    assert.ok(validator.validate(rules).length === 6);
 
-    rules = ["example.org#$?#div:matches-css(width: /\d+/) { background-color: red!important; background-url: url(../images/pic1.jpg); }",
+    rules = ["sports.yahoo.com#$##atomic .Mt\(headerHeight\) { margin-top: \\'22px\\' !important; }",
             "better.com#$##header-floating\ navbar { font-family: \\'Blogger\\'; }"];
     assert.ok(validator.validate(rules).length === 0);
 });
@@ -601,17 +600,21 @@ QUnit.test('Test redirects validator', (assert) => {
     const validator = require("../main/validator.js");
     validator.init();
 
-    let rules = ['||delivery.tf1.fr/pub$media,redirect=noopmp3.0.1s,domain=tf1.fr',
+    let rules = ['||delivery.tf1.fr/pub$media,redirect=noopmp3-0.1s,domain=tf1.fr',
         '||example.com/banner$image,redirect=32x32-transparent.png',
         '||example.com/*.mp4$media,redirect=noopmp4-1s',
         '||googletagservices.com/test.js$domain=test.com,redirect=googletagservices-gpt'];
     assert.equal(validator.validate(rules).length, 4);
 
+    rules = ['||podu.me/ads/audio/*.mp3$redirect=noopmp3-0.1s',
+        '||podu.me/ads/audio/*.mp3$media,redirect=noopmp3-0.1s'];
+    assert.equal(validator.validate(rules).length, 2);
+
     rules = ['||example.com^$script,redirect=noopjs.js',
         '||example.com/banner$image,redirect=3x3.png',
         '||googletagservices.com/test.js$domain=test.com,redirect=googletagservices_gpt.js',
         '||example.com/banner$image,redirect=1x1.gif',
-        '||example.com/*.mp4$media,redirect=noopmp4_1s',];
+        '||example.com/*.mp4$media,redirect=noopmp4_1s'];
     assert.equal(validator.validate(rules).length, 0);
 
     const { redirects } = require('scriptlets');

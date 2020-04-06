@@ -340,7 +340,7 @@ module.exports = (function () {
      * @returns {boolean}
      */
     const isValidCssRule = (ruleString, rule, excluded) => {
-        if (rule.ruleType === RuleTypes.Css || rule.ruleType === RuleTypes.ExtCss) {
+        if (rule.ruleType === RuleTypes.Css) {
             if (rule.contentPart &&
                 rule.contentPart.toLowerCase().indexOf('url(') >= 0 ||
                 ESCAPE_CHARACTER_REGEX.test(rule.contentPart)) {
