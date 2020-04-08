@@ -147,6 +147,8 @@
                 ",stealth",
                 "\\$cookie",
                 ",cookie",
+                "\\$popup",
+                ",popup",
                 "important,replace=",
                 "\\$(.*,)?app",
                 "\\$network",

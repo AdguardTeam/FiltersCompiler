@@ -113,6 +113,13 @@ QUnit.test("Test builder", async (assert) => {
     assert.ok(filterLines.indexOf('@@||test.com^$generichide,app=iexplore.exe') === -1);
     assert.ok(filterLines.indexOf('example.com##div.grid_1[class$="app"]') >= 0);
     assert.ok(filterLines.indexOf('||app-test.com^$third-party') >= 0);
+
+    filterContent = readFile(path.join(__dirname, 'resources/platforms/safari', 'filters', '6.txt'));
+    filterLines = filterContent.split('\r\n');
+    assert.equal(filterLines.length, 10);
+    assert.ok(filterLines.indexOf('||test.com^$document,popup') === -1);
+    assert.ok(filterLines.indexOf('||test.org^$popup,third-party') === -1);
+    assert.ok(filterLines.indexOf('popup.net##.g-single > center > a.gofollow') >= 0);
 });
 
 QUnit.test("Test builder - build lists", async (assert) => {

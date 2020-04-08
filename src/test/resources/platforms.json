@@ -55,6 +55,20 @@
             "adguard": true
         }
     },
+    "SAFARI": {
+        "platform": "ext_safari",
+        "path": "safari",
+        "configuration": {
+            "removeRulePatterns": [
+                "\\$popup",
+                ",popup"
+            ],
+            "ignoreRuleHints": false
+        },
+        "defines": {
+            "adguard": true
+        }
+    },
     "MAC": {
         "platform": "mac",
         "path": "mac",

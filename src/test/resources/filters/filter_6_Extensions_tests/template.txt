@@ -1,0 +1,8 @@
+! Homepage: http://adguard.com/filters.html#test
+! License: http://creativecommons.org/licenses/by-sa/3.0/
+!
+||test.com^$document,popup
+||example.net^$third-party,popup,domain=~cashalot.su|~cashlot24.ru|~creditkarm.ru
+||test.org^$popup,third-party
+||example.com^$popup
+popup.net##.g-single > center > a.gofollow
