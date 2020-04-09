@@ -179,7 +179,7 @@ module.exports = (() => {
      */
     const convertUboAndAbpRedirectsToAdg = (rule, excluded) => {
         if (!rule.startsWith(RuleMasks.MASK_COMMENT) &&
-            (redirects.isValidUboRedirectRule(rule) || redirects.isValidAbpRedirectRule(rule))) {
+            (redirects.isUboRedirectCompatibleWithAdg(rule) || redirects.isAbpRedirectCompatibleWithAdg(rule))) {
             const result = redirects.convertRedirectToAdg(rule);
             if (!result) {
                 const message = `Unable to convert redirect rule to AdGuard syntax: ${rule}`;
@@ -313,7 +313,7 @@ module.exports = (() => {
     const convertAdgRedirectsToUbo = (rules) => convertToUbo(
         rules,
         'redirect',
-        redirects.isValidAdgRedirectRule,
+        redirects.isAdgRedirectCompatibleWithUbo,
         redirects.convertAdgRedirectToUbo
     );
 
