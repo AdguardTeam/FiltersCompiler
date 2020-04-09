@@ -240,6 +240,10 @@ module.exports = (() => {
      * @return {array} result
      */
     const convertRulesToAdgSyntax = function (rulesList, excluded) {
+        if (!rulesList) {
+            return [];
+        }
+
         let result = [];
 
         for (let rule of rulesList) {
@@ -298,24 +302,34 @@ module.exports = (() => {
      * @param {array} rules
      * @return {array} modified rules
      */
-    const convertAdgScriptletsToUbo = (rules) => convertToUbo(
-        rules,
-        'scriptlet',
-        scriptlets.isAdgScriptletRule,
-        scriptlets.convertAdgToUbo
-    );
+    const convertAdgScriptletsToUbo = (rules) => {
+        if (!rules) {
+            return [];
+        }
+        return convertToUbo(
+            rules,
+            'scriptlet',
+            scriptlets.isAdgScriptletRule,
+            scriptlets.convertAdgToUbo
+        );
+    };
 
     /**
      * Converts AdGuard redirect rules to uBlock
      * @param {array} rules
      * @return {array} modified rules
      */
-    const convertAdgRedirectsToUbo = (rules) => convertToUbo(
-        rules,
-        'redirect',
-        redirects.isAdgRedirectCompatibleWithUbo,
-        redirects.convertAdgRedirectToUbo
-    );
+    const convertAdgRedirectsToUbo = (rules) => {
+        if (!rules) {
+            return [];
+        }
+        return convertToUbo(
+            rules,
+            'redirect',
+            redirects.isAdgRedirectCompatibleWithUbo,
+            redirects.convertAdgRedirectToUbo
+        );
+    };
 
 
     return {
