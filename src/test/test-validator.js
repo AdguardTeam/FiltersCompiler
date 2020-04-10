@@ -633,4 +633,16 @@ QUnit.test('Test redirects validator', (assert) => {
 
     rule = '||example.com/banner$image,redirect=32x32transparent.png';
     assert.equal(redirects.isValidAdgRedirectRule(rule), false);
+
+    rule = '||tvn.adocean.pl/*ad.xml$xmlhttprequest,redirect=noopvast-2.0,domain=tvn24.pl';
+    assert.equal(redirects.isValidAdgRedirectRule(rule), true);
+
+    rule = '||vast.kinogo.by/code/video-steam/?id=$redirect=noopvast-2.0';
+    assert.equal(redirects.isValidAdgRedirectRule(rule), true);
+
+    rule = '||strm.yandex.ru/get/$script,redirect=noopvast-2.0,domain=kinopoisk.ru';
+    assert.equal(redirects.isValidAdgRedirectRule(rule), true);
+
+    rule = '||strm.yandex.ru/get/$script,redirect=noopvast-2.0,domain=kinopoisk.ru';
+    assert.equal(redirects.isValidAdgRedirectRule(rule), true);
 });
