@@ -1,9 +1,5 @@
-/* globals require */
-
+/* eslint-disable global-require */
 module.exports = (() => {
-
-    'use strict';
-
     const RuleMasks = require('../rule/rule-masks.js');
 
     /**
@@ -13,14 +9,12 @@ module.exports = (() => {
      * @param ruleText Rule text
      */
     const fixCssRuleAttributesForEdge = function (ruleText) {
-
-        if (ruleText.includes(RuleMasks.MASK_CSS) ||
-            ruleText.includes(RuleMasks.MASK_CSS_EXCEPTION) ||
-            ruleText.includes(RuleMasks.MASK_ELEMENT_HIDING) ||
-            ruleText.includes(RuleMasks.MASK_ELEMENT_HIDING_EXCEPTION)) {
-
-            ruleText = ruleText.replace(/\[width=/gi, "[Width=");
-            ruleText = ruleText.replace("/[height=/gi", "[Height=");
+        if (ruleText.includes(RuleMasks.MASK_CSS)
+            || ruleText.includes(RuleMasks.MASK_CSS_EXCEPTION)
+            || ruleText.includes(RuleMasks.MASK_ELEMENT_HIDING)
+            || ruleText.includes(RuleMasks.MASK_ELEMENT_HIDING_EXCEPTION)) {
+            ruleText = ruleText.replace(/\[width=/gi, '[Width=');
+            ruleText = ruleText.replace('/[height=/gi', '[Height=');
         }
 
         return ruleText;
@@ -44,10 +38,10 @@ module.exports = (() => {
     const rewriteHeader = function (header) {
         const result = [];
         header.forEach((line) => {
-            if (line.startsWith("! Title: ")) {
-                line = "! Title: AdGuard Base filter";
-            } else if (line.startsWith("! Description: ")) {
-                line = "! Description: This filter is necessary for quality ad blocking.";
+            if (line.startsWith('! Title: ')) {
+                line = '! Title: AdGuard Base filter';
+            } else if (line.startsWith('! Description: ')) {
+                line = '! Description: This filter is necessary for quality ad blocking.';
             }
 
             result.push(line);
@@ -63,10 +57,10 @@ module.exports = (() => {
     const rewriteRules = function (rules) {
         const filtered = [];
         let flag = -1;
-        for (let i = 0; i < rules.length; i++) {
-            let rule = rules[i];
+        for (let i = 0; i < rules.length; i += 1) {
+            const rule = rules[i];
 
-            if (flag >= 0 && rule.startsWith("!------------------")) {
+            if (flag >= 0 && rule.startsWith('!------------------')) {
                 if (flag !== i - 1) {
                     // we skip next line after block header
                     // looking for the end of easylist block
@@ -76,7 +70,7 @@ module.exports = (() => {
                 continue;
             }
 
-            if (rule.startsWith("!------------------ EasyList rules")) {
+            if (rule.startsWith('!------------------ EasyList rules')) {
                 flag = i;
                 continue;
             }
@@ -110,7 +104,7 @@ module.exports = (() => {
      * @param inclusionContent
      */
     const removeAdblockVersion = function (inclusionContent) {
-        return inclusionContent.replace(/!?.?\[Adblock.*?\]\r?\n?/g, "");
+        return inclusionContent.replace(/!?.?\[Adblock.*?\]\r?\n?/g, '');
     };
 
     /**
@@ -125,8 +119,9 @@ module.exports = (() => {
         result.groups = metadata.groups.slice(0);
         result.filters = [];
 
-        for (let f of metadata.filters) {
-            let copy = Object.assign({}, f);
+        // eslint-disable-next-line no-restricted-syntax
+        for (const f of metadata.filters) {
+            const copy = { ...f };
             delete copy.tags;
             delete copy.timeAdded;
             delete copy.trustLevel;
@@ -137,11 +132,11 @@ module.exports = (() => {
     };
 
     return {
-        overrideRule: overrideRule,
-        rewriteHeader: rewriteHeader,
-        rewriteRules: rewriteRules,
-        fixVersionComments: fixVersionComments,
-        removeAdblockVersion: removeAdblockVersion,
-        rewriteMetadataForOldMac: rewriteMetadataForOldMac
+        overrideRule,
+        rewriteHeader,
+        rewriteRules,
+        fixVersionComments,
+        removeAdblockVersion,
+        rewriteMetadataForOldMac,
     };
 })();

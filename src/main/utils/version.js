@@ -1,7 +1,4 @@
 module.exports = (() => {
-
-    'use strict';
-
     /**
      * Parses version from string
      *
@@ -9,17 +6,19 @@ module.exports = (() => {
      * @returns {Array}
      */
     const parse = function (v) {
-        let version = [];
-        const parts = String(v || "").split(".");
+        const version = [];
+        const parts = String(v || '').split('.');
 
         const parseVersionPart = (part) => {
+            // eslint-disable-next-line no-restricted-globals
             if (isNaN(part)) {
                 return 0;
             }
             return Math.max(part - 0, 0);
         };
 
-        for (let part of parts) {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const part of parts) {
             version.push(parseVersionPart(part));
         }
 
@@ -39,10 +38,10 @@ module.exports = (() => {
             version[version.length - 1] = version[version.length - 1] + 1;
         }
 
-        for (let i = version.length; i > 0; i--) {
+        for (let i = version.length; i > 0; i -= 1) {
             if (version[i] === 100) {
                 version[i] = 0;
-                version[i - 1]++;
+                version[i - 1] += 1;
             }
         }
 
@@ -50,6 +49,6 @@ module.exports = (() => {
     };
 
     return {
-        increment: increment
+        increment,
     };
 })();

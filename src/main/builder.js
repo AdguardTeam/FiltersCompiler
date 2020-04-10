@@ -1,9 +1,6 @@
-/* globals require, Buffer */
+/* eslint-disable global-require */
 
 module.exports = (function () {
-
-    'use strict';
-
     /**
      * @typedef {Object} fs
      * @property {function} readFileSync
@@ -23,12 +20,12 @@ module.exports = (function () {
     const path = require('path');
     const md5 = require('md5');
 
-    const version = require("./utils/version.js");
-    const converter = require("./converter.js");
-    const validator = require("./validator.js");
-    const generator = require("./platforms/generator.js");
-    const logger = require("./utils/log.js");
-    const RuleMasks = require("./rule/rule-masks");
+    const version = require('./utils/version.js');
+    const converter = require('./converter.js');
+    const validator = require('./validator.js');
+    const generator = require('./platforms/generator.js');
+    const logger = require('./utils/log.js');
+    const RuleMasks = require('./rule/rule-masks');
     const workaround = require('./utils/workaround.js');
     const webutils = require('./utils/webutils.js');
 
@@ -44,12 +41,12 @@ module.exports = (function () {
     const TRUST_LEVEL_DIR = './utils/trust-levels';
     const DEFAULT_TRUST_LEVEL = 'low';
 
-    const INCLUDE_DIRECTIVE = "@include ";
-    const INCLUDE_OPTION_COMMENTS = "/stripComments";
-    const INCLUDE_OPTION_NOT_OPTIMIZED = "/notOptimized";
-    const INCLUDE_OPTION_EXCLUDE = "/exclude=";
+    const INCLUDE_DIRECTIVE = '@include ';
+    const INCLUDE_OPTION_COMMENTS = '/stripComments';
+    const INCLUDE_OPTION_NOT_OPTIMIZED = '/notOptimized';
+    const INCLUDE_OPTION_EXCLUDE = '/exclude=';
 
-    const NOT_OPTIMIZED_HINT = "!+ NOT_OPTIMIZED";
+    const NOT_OPTIMIZED_HINT = '!+ NOT_OPTIMIZED';
 
 
     let currentDir;
@@ -65,7 +62,7 @@ module.exports = (function () {
             return null;
         }
 
-        return fs.readFileSync(path, {encoding: 'utf-8'});
+        return fs.readFileSync(path, { encoding: 'utf-8' });
     };
 
     /**
@@ -100,7 +97,8 @@ module.exports = (function () {
                 return true;
             }
 
-            if (line.startsWith(RuleMasks.MASK_HINT) || line.startsWith(RuleMasks.MASK_DIRECTIVES)) {
+            if (line.startsWith(RuleMasks.MASK_HINT)
+                || line.startsWith(RuleMasks.MASK_DIRECTIVES)) {
                 return true;
             }
 
@@ -116,14 +114,14 @@ module.exports = (function () {
     const addNotOptimizedHints = function (lines) {
         logger.log('Adding hints..');
 
-        let result = [];
+        const result = [];
 
-        lines.forEach(function (v) {
+        lines.forEach((v) => {
             if (!v) {
                 return;
             }
 
-            if (!v.startsWith("! ")) {
+            if (!v.startsWith('! ')) {
                 result.push(NOT_OPTIMIZED_HINT);
             }
 
@@ -140,11 +138,8 @@ module.exports = (function () {
      * @param {string} exclusion
      * @return {boolean}
      */
-    const scriptletException = (line, exclusion) => {
-        return (exclusion === '#%#' && line.includes('#%#//scriptlet')) ||
-            (exclusion === '#@%#' && line.includes('#@%#//scriptlet'));
-
-    };
+    const scriptletException = (line, exclusion) => (exclusion === '#%#' && line.includes('#%#//scriptlet'))
+            || (exclusion === '#@%#' && line.includes('#@%#//scriptlet'));
 
     /**
      * Checks if line is excluded with specified set of exclusions
@@ -155,18 +150,19 @@ module.exports = (function () {
      * @param reason
      */
     const isExcluded = function (line, exclusions, excluded, reason) {
+        // eslint-disable-next-line no-restricted-syntax
         for (let exclusion of exclusions) {
             exclusion = exclusion.trim();
 
             if (exclusion && !exclusion.startsWith('!')) {
-                let message = `${line} is excluded by "${exclusion}" in ${reason}`;
+                const message = `${line} is excluded by "${exclusion}" in ${reason}`;
 
-                let isExcludedByRegexp = exclusion.startsWith("/") && exclusion.endsWith("/") &&
-                    line.match(new RegExp(exclusion.substring(1, exclusion.length - 1)));
+                const isExcludedByRegexp = line.match(new RegExp(exclusion.substring(1, exclusion.length - 1)))
+                    && exclusion.endsWith('/') && exclusion.startsWith('/');
 
                 if ((isExcludedByRegexp || line.includes(exclusion)) && !scriptletException(line, exclusion)) {
                     logger.log(message);
-                    excluded.push('! ' + message);
+                    excluded.push(`! ${message}`);
                     excluded.push(line);
                     return exclusion;
                 }
@@ -185,7 +181,6 @@ module.exports = (function () {
      * @returns {*}
      */
     const exclude = function (lines, exclusionsFile, excluded) {
-
         logger.info('Applying exclusions..');
 
         let exclusions = readFile(exclusionsFile);
@@ -221,8 +216,9 @@ module.exports = (function () {
     const stripEndQuotes = function (s) {
         let t = s.length;
         if (s.charAt(0) === '"') {
-            s = s.substring(1, t--);
+            s = s.substring(1, t -= 1);
         }
+        // eslint-disable-next-line no-plusplus
         if (s.charAt(--t) === '"') {
             s = s.substring(0, t);
         }
@@ -246,8 +242,8 @@ module.exports = (function () {
         let notOptimized = false;
         let exclude = null;
 
-        for (let i = 1; i < parts.length; i++) {
-            let attribute = parts[i].trim();
+        for (let i = 1; i < parts.length; i += 1) {
+            const attribute = parts[i].trim();
             if (attribute.startsWith(INCLUDE_OPTION_COMMENTS)) {
                 stripComments = true;
             } else if (attribute.startsWith(INCLUDE_OPTION_NOT_OPTIMIZED)) {
@@ -262,7 +258,7 @@ module.exports = (function () {
             url,
             stripComments,
             notOptimized,
-            exclude
+            exclude,
         };
     };
 
@@ -273,7 +269,8 @@ module.exports = (function () {
      * @param url
      */
     const checkRedirects = function (lines, url) {
-        for (let line of lines) {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const line of lines) {
             if (/^!\s?[Rr]edirect:/.test(line)) {
                 throw new Error(`Error: include ${url} contains redirect directive: ${line}`);
             }
@@ -287,7 +284,7 @@ module.exports = (function () {
      * @param excluded
      * @returns {Array}
      */
-    const include = async function(line, excluded) {
+    const include = async function (line, excluded) {
         let result = [];
 
         const options = parseIncludeLine(line);
@@ -299,10 +296,9 @@ module.exports = (function () {
 
         logger.log(`Applying inclusion from: ${options.url}`);
 
-        let externalInclude = options.url.includes(':');
-        const included = externalInclude ?
-            webutils.downloadFile(options.url) :
-            readFile(path.join(currentDir, options.url));
+        const externalInclude = options.url.includes(':');
+        // eslint-disable-next-line max-len
+        const included = externalInclude ? webutils.downloadFile(options.url) : readFile(path.join(currentDir, options.url));
 
         if (included) {
             result = workaround.removeAdblockVersion(included);
@@ -311,7 +307,7 @@ module.exports = (function () {
             checkRedirects(result, options.url);
 
             // resolved includes
-            let originUrl = externalInclude ? FilterDownloader.getFilterUrlOrigin(options.url) : currentDir;
+            const originUrl = externalInclude ? FilterDownloader.getFilterUrlOrigin(options.url) : currentDir;
             result = await FilterDownloader.resolveIncludes(result, originUrl);
 
             if (options.exclude) {
@@ -342,19 +338,21 @@ module.exports = (function () {
      * @param template
      * @param trustLevelSettings
      */
-    const compile = async function(template, trustLevelSettings) {
+    const compile = async function (template, trustLevelSettings) {
         let result = [];
-        let excluded = [];
+        const excluded = [];
 
         const lines = splitLines(template);
-        for (let line of lines) {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const line of lines) {
             if (line.startsWith(INCLUDE_DIRECTIVE)) {
+                // eslint-disable-next-line no-await-in-loop
                 const inc = await include(line.trim(), excluded);
 
                 let k = 0;
                 while (k < inc.length) {
                     result.push(inc[k].trim());
-                    k++;
+                    k += 1;
                 }
             } else {
                 result.push(line.trim());
@@ -376,7 +374,7 @@ module.exports = (function () {
 
         return {
             lines: result,
-            excluded: excluded
+            excluded,
         };
     };
 
@@ -388,16 +386,16 @@ module.exports = (function () {
      * @param hash
      * @returns {{version: string, timeUpdated: number}}
      */
-    const makeRevision = function(path, hash) {
+    const makeRevision = function (path, hash) {
         const result = {
-            "version": "1.0.0.0",
-            "timeUpdated": new Date().getTime(),
-            "hash": hash
+            version: '1.0.0.0',
+            timeUpdated: new Date().getTime(),
+            hash,
         };
 
         const current = readFile(path);
         if (current) {
-            let currentRevision = JSON.parse(current);
+            const currentRevision = JSON.parse(current);
             if (currentRevision.version) {
                 result.version = currentRevision.version;
 
@@ -436,7 +434,7 @@ module.exports = (function () {
             return;
         }
 
-        const filterId = metadata.filterId;
+        const { filterId } = metadata;
         if (whitelist && whitelist.length > 0 && whitelist.indexOf(filterId) < 0) {
             logger.info(`Filter ${filterId} skipped with whitelist`);
             return;
@@ -454,22 +452,23 @@ module.exports = (function () {
         logger.info('Compiling...');
         const result = await compile(template, trustLevelSettings);
         const compiled = result.lines;
-        const excluded = result.excluded;
-        logger.info('Compiled length:' + compiled.length);
-        logger.info('Excluded length:' + excluded.length);
+        const { excluded } = result;
+        logger.info(`Compiled length:${compiled.length}`);
+        logger.info(`Excluded length:${excluded.length}`);
 
         const compiledData = compiled.join('\r\n');
 
-        logger.info('Writing filter file, lines:' + compiled.length);
+        logger.info(`Writing filter file, lines:${compiled.length}`);
         writeFile(path.join(currentDir, FILTER_FILE), compiledData);
-        logger.info('Writing excluded file, lines:' + excluded.length);
+        logger.info(`Writing excluded file, lines:${excluded.length}`);
         writeFile(path.join(currentDir, EXCLUDED_LINES_FILE), excluded.join('\r\n'));
         logger.info('Writing revision file..');
 
-        const hash = new Buffer(md5(compiledData, {asString: true})).toString('base64').trim();
+        // eslint-disable-next-line no-buffer-constructor
+        const hash = new Buffer(md5(compiledData, { asString: true })).toString('base64').trim();
         const revisionFile = path.join(currentDir, REVISION_FILE);
         const revision = makeRevision(revisionFile, hash);
-        writeFile(revisionFile, JSON.stringify(revision, null, "\t"));
+        writeFile(revisionFile, JSON.stringify(revision, null, '\t'));
     };
 
     /**
@@ -482,16 +481,18 @@ module.exports = (function () {
     const parseDirectory = async function (filtersDir, whitelist, blacklist) {
         const items = fs.readdirSync(filtersDir);
 
-        for (let directory of items) {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const directory of items) {
             const filterDir = path.join(filtersDir, directory);
             if (fs.lstatSync(filterDir).isDirectory()) {
-
-                let template = path.join(filterDir, TEMPLATE_FILE);
+                const template = path.join(filterDir, TEMPLATE_FILE);
                 if (fs.existsSync(template)) {
                     logger.info(`Building filter: ${directory}`);
+                    // eslint-disable-next-line no-await-in-loop
                     await buildFilter(filterDir, whitelist, blacklist);
                     logger.info(`Building filter: ${directory} ok`);
                 } else {
+                    // eslint-disable-next-line no-await-in-loop
                     await parseDirectory(filterDir, whitelist, blacklist);
                 }
             }
@@ -505,22 +506,31 @@ module.exports = (function () {
      * @param logFile
      * @param domainBlacklistFile
      * @param platformsPath
+     * @param platformsConfigFile
      * @param whitelist
      * @param blacklist
      */
-    const build = async function (filtersDir, logFile, domainBlacklistFile, platformsPath, platformsConfigFile, whitelist, blacklist) {
+    const build = async function (
+        filtersDir,
+        logFile,
+        domainBlacklistFile,
+        platformsPath,
+        platformsConfigFile,
+        whitelist,
+        blacklist
+    ) {
         logger.initialize(logFile);
         validator.init(domainBlacklistFile);
         generator.init(FILTER_FILE, METADATA_FILE, REVISION_FILE, platformsConfigFile, ADGUARD_FILTERS_SERVER_URL);
 
         await parseDirectory(filtersDir, whitelist, blacklist);
 
-        logger.info(`Generating platforms`);
+        logger.info('Generating platforms');
         generator.generate(filtersDir, platformsPath, whitelist, blacklist);
-        logger.info(`Generating platforms done`);
+        logger.info('Generating platforms done');
     };
 
     return {
-        build: build
+        build,
     };
-})();
+}());

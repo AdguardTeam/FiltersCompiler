@@ -1,11 +1,11 @@
-module.exports = (() => {
+module.exports = (() =>
 
-    'use strict';
 
     /**
      * Rule types enum
      */
-    return {
+// eslint-disable-next-line implicit-arrow-linebreak
+    ({
         /**
          * Comments
          */
@@ -33,6 +33,6 @@ module.exports = (() => {
         /**
          * Extended css rules
          */
-        ExtCss: 7
-    };
-})();
+        ExtCss: 7,
+    })
+)();

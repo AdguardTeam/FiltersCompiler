@@ -1,30 +1,28 @@
-/* globals require */
-
+/* eslint-disable global-require */
 module.exports = (() => {
-
-    'use strict';
-
     /**
      * @typedef {object} OptimizationConfig
      * @property {number} filterId - Filter identifier
-     * @property {number} percent - Expected optimization percent `~= (rules count in optimized filter) / (rules count in original filter) * 100`
+     * @property {number} percent - Expected optimization percent
+     * `~= (rules count in optimized filter) / (rules count in original filter) * 100`
      * @property {number} minPercent - Lower bound of `percent` value
      * @property {number} maxPercent - Upper bound of `percent` value
-     * @property {boolean} strict - If `percent < minPercent || percent  > maxPercent` and strict mode is on then filter compilation should fail, otherwise original rules must be used
+     * @property {boolean} strict - If `percent < minPercent || percent  > maxPercent`
+     * and strict mode is on then filter compilation should fail, otherwise original rules must be used
      */
 
-    const logger = require("../utils/log.js");
+    const logger = require('../utils/log.js');
     const Workaround = require('../utils/workaround.js');
     const RuleMasks = require('../rule/rule-masks.js');
     const optimization = require('../optimization');
 
-    const HINT_MASK = RuleMasks.MASK_HINT + " ";
-    const COMMENT_REGEXP = "^\\!($|[^#])";
+    const HINT_MASK = `${RuleMasks.MASK_HINT} `;
+    const COMMENT_REGEXP = '^\\!($|[^#])';
 
     const PLATFORM_HINT_REGEXP = /(^| )PLATFORM\(([^)]+)\)/g;
     const NOT_PLATFORM_HINT_REGEXP = /(.*)NOT_PLATFORM\(([^)]+)\)/g;
 
-    const NOT_OPTIMIZED_HINT = "NOT_OPTIMIZED";
+    const NOT_OPTIMIZED_HINT = 'NOT_OPTIMIZED';
 
     /**
      * Parses rule hints
@@ -35,7 +33,7 @@ module.exports = (() => {
     const splitRuleHintLines = function (rules, platform) {
         const result = [];
         if (rules) {
-            for (let i = 0; i < rules.length; i++) {
+            for (let i = 0; i < rules.length; i += 1) {
                 let rule = rules[i].trim();
                 if (rule.startsWith(HINT_MASK)) {
                     continue;
@@ -45,8 +43,8 @@ module.exports = (() => {
 
                 const hint = i > 0 ? rules[i - 1] : null;
                 result.push({
-                    rule: rule,
-                    hint: (hint && hint.startsWith(HINT_MASK)) ? hint : null
+                    rule,
+                    hint: (hint && hint.startsWith(HINT_MASK)) ? hint : null,
                 });
             }
         }
@@ -88,8 +86,9 @@ module.exports = (() => {
 
         let match = pattern.exec(hint);
         while (match !== null) {
-            let group = match[2];
-            let split = group.split(",");
+            const group = match[2];
+            const split = group.split(',');
+            // eslint-disable-next-line no-restricted-syntax
             for (let s of split) {
                 s = s.trim();
                 result.push(s);
@@ -108,7 +107,7 @@ module.exports = (() => {
      * @param platform
      */
     const isPlatformSupported = function (rule, platform) {
-        const hint = rule.hint;
+        const { hint } = rule;
         if (!hint || !hint.startsWith(HINT_MASK)) {
             return true;
         }
@@ -135,7 +134,7 @@ module.exports = (() => {
      * @returns {boolean}
      */
     const isOptimizationSupported = function (rule) {
-        const hint = rule.hint;
+        const { hint } = rule;
         if (!hint || !hint.startsWith(HINT_MASK)) {
             return true;
         }
@@ -167,9 +166,11 @@ module.exports = (() => {
         }
 
         if (config.configuration.removeRulePatterns) {
-            for (let pattern of config.configuration.removeRulePatterns) {
+            // eslint-disable-next-line no-restricted-syntax
+            for (const pattern of config.configuration.removeRulePatterns) {
                 if (ruleText.match(new RegExp(pattern))) {
-                    logger.log(`${ruleText} removed with removeRulePattern ${pattern} in filter ${filterId} for ${config.platform} platform`);
+                    logger.log(`${ruleText} removed with removeRulePattern ${pattern}`
+                        + `in filter ${filterId} for ${config.platform} platform`);
                     return true;
                 }
             }
@@ -207,16 +208,15 @@ module.exports = (() => {
      * @param {OptimizationConfig} optimizationConfig
      */
     const isOptimizationCorrect = function (filterId, rules, optimizedRules, optimizationConfig) {
-
         const filterRulesCount = rules.length;
         const optimizedRulesCount = optimizedRules.length;
 
-        const resultOptimizationPercent = optimizedRulesCount / filterRulesCount * 100;
+        const resultOptimizationPercent = (optimizedRulesCount / filterRulesCount) * 100;
 
         const expectedOptimizationPercent = optimizationConfig.percent;
         const minOptimizationPercent = optimizationConfig.minPercent;
         const maxOptimizationPercent = optimizationConfig.maxPercent;
-        const strict = optimizationConfig.strict;
+        const { strict } = optimizationConfig;
 
         const tooLow = resultOptimizationPercent < minOptimizationPercent;
         const tooHigh = resultOptimizationPercent > maxOptimizationPercent;
@@ -224,8 +224,10 @@ module.exports = (() => {
         const incorrect = tooLow || tooHigh;
 
         if (incorrect) {
-            let message = `Unable to optimize filter ${filterId} with configuration [~=${expectedOptimizationPercent}%, min=${minOptimizationPercent}%, max=${maxOptimizationPercent}%], calculated = ${resultOptimizationPercent.toFixed(2)}%! ` +
-                `Filter rules count: ${filterRulesCount}. Optimized rules count: ${optimizedRulesCount}.`;
+            const message = `Unable to optimize filter ${filterId} with configuration`
+                + `[~=${expectedOptimizationPercent}%, min=${minOptimizationPercent}%, max=${maxOptimizationPercent}%],`
+                + `calculated = ${resultOptimizationPercent.toFixed(2)}%! `
+                + `Filter rules count: ${filterRulesCount}. Optimized rules count: ${optimizedRulesCount}.`;
             if (strict) {
                 throw new Error(message);
             } else {
@@ -233,7 +235,8 @@ module.exports = (() => {
             }
         }
 
-        logger.info(`Filter ${filterId} optimization: ${filterRulesCount} => ${optimizedRulesCount}, ${expectedOptimizationPercent}% => ${resultOptimizationPercent}%.`);
+        logger.info(`Filter ${filterId} optimization: ${filterRulesCount} => ${optimizedRulesCount},`
+            + `${expectedOptimizationPercent}% => ${resultOptimizationPercent}%.`);
 
         return !incorrect;
     };
@@ -248,9 +251,7 @@ module.exports = (() => {
     const cleanupRules = function (rules, config, filterId) {
         const ruleLines = splitRuleHintLines(rules, config.platform);
 
-        const filtered = ruleLines.filter((r) => {
-            return !shouldOmitRule(r, config, filterId);
-        });
+        const filtered = ruleLines.filter((r) => !shouldOmitRule(r, config, filterId));
 
         return joinRuleHintLines(filtered);
     };
@@ -264,23 +265,19 @@ module.exports = (() => {
      * @param filterId
      */
     const cleanupAndOptimizeRules = function (rules, config, optimizationConfig, filterId) {
-
         config.configuration.removeRulePatterns = config.configuration.removeRulePatterns || [];
         config.configuration.removeRulePatterns.push(COMMENT_REGEXP);
 
         const ruleLines = splitRuleHintLines(rules, config.platform);
 
-        const filtered = ruleLines.filter((r) => {
-            return !shouldOmitRule(r, config, filterId);
-        });
+        const filtered = ruleLines.filter((r) => !shouldOmitRule(r, config, filterId));
 
-        const optimized = filtered.filter((r) => {
-            return !shouldOmitRuleWithOptimization(r, optimizationConfig);
-        });
+        const optimized = filtered.filter((r) => !shouldOmitRuleWithOptimization(r, optimizationConfig));
 
         let result;
         // We check that our optimization is correct and didn't remove valuable rules
-        // We do it via comparing expected optimization percent with real (ratio between optimized rules number and all rules number)
+        // We do it via comparing expected optimization percent
+        // with real (ratio between optimized rules number and all rules number)
         if (optimizationConfig && !isOptimizationCorrect(filterId, filtered, optimized, optimizationConfig)) {
             // Back to default OPTIMIZATION
             result = joinRuleHintLines(filtered);
@@ -293,7 +290,7 @@ module.exports = (() => {
     };
 
     return {
-        cleanupRules: cleanupRules,
-        cleanupAndOptimizeRules: cleanupAndOptimizeRules
+        cleanupRules,
+        cleanupAndOptimizeRules,
     };
 })();

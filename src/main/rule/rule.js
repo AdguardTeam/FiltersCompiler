@@ -1,6 +1,4 @@
-/*jslint node: true */
-
-'use strict';
+/* jslint node: true */
 
 /**
  * Rule class object
@@ -25,8 +23,9 @@ module.exports = class Rule {
      */
     buildNewModifiers(modifiers) {
         const options = [];
-        for (let m in modifiers) {
-            if (modifiers[m] && modifiers[m].length > 0 ) {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const m in modifiers) {
+            if (modifiers[m] && modifiers[m].length > 0) {
                 options.push(`${m}=${modifiers[m].join('|')}`);
             } else {
                 options.push(m);
