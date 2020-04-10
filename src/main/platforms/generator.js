@@ -542,7 +542,7 @@ module.exports = (() => {
     const excludeScriptRules = (rules) => {
         const result = [];
         rules.forEach(rule => {
-            if (!rule.includes(RuleMasks.MASK_SCRIPT)) {
+            if (rule && !rule.includes(RuleMasks.MASK_SCRIPT)) {
                 result.push(rule);
             }
         });
