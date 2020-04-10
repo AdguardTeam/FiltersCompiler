@@ -10,8 +10,7 @@ module.exports = (() => {
         const parts = String(v || '').split('.');
 
         const parseVersionPart = (part) => {
-            // eslint-disable-next-line no-restricted-globals
-            if (isNaN(part)) {
+            if (Number.isNaN(part)) {
                 return 0;
             }
             return Math.max(part - 0, 0);

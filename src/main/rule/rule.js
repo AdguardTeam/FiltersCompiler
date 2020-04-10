@@ -1,5 +1,3 @@
-/* jslint node: true */
-
 /**
  * Rule class object
  *

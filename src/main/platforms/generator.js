@@ -237,15 +237,12 @@ module.exports = (() => {
         for (const f of filters) {
             if (f.expires) {
                 if (f.expires.indexOf('day') > 0) {
-                    // eslint-disable-next-line radix
-                    f.expires = parseInt(f.expires) * 24 * 60 * 60;
+                    f.expires = parseInt(f.expires, 10) * 24 * 60 * 60;
                 } else if (f.expires.indexOf('hour') > 0) {
-                    // eslint-disable-next-line radix
-                    f.expires = parseInt(f.expires) * 60 * 60;
+                    f.expires = parseInt(f.expires, 10) * 60 * 60;
                 }
 
-                // eslint-disable-next-line no-restricted-globals
-                if (isNaN(f.expires)) {
+                if (Number.isNaN(f.expires)) {
                     // Default
                     f.expires = 86400;
                 }

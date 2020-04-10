@@ -1,38 +1,34 @@
-module.exports = (() =>
-
-
+/**
+ * Rule types enum
+ */
+module.exports = (() => ({
     /**
-     * Rule types enum
-     */
-// eslint-disable-next-line implicit-arrow-linebreak
-    ({
-        /**
          * Comments
          */
-        Comment: 1,
-        /**
+    Comment: 1,
+    /**
          * Url blocking rules
          */
-        UrlBlocking: 2,
-        /**
+    UrlBlocking: 2,
+    /**
          * Element hiding rules
          */
-        ElementHiding: 3,
-        /**
+    ElementHiding: 3,
+    /**
          * Content rules
          */
-        Content: 4,
-        /**
+    Content: 4,
+    /**
          * Javascript rules
          */
-        Script: 5,
-        /**
+    Script: 5,
+    /**
          * Cosmetic css rules
          */
-        Css: 6,
-        /**
+    Css: 6,
+    /**
          * Extended css rules
          */
-        ExtCss: 7,
-    })
+    ExtCss: 7,
+})
 )();

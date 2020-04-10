@@ -97,8 +97,8 @@ module.exports = (() => {
      */
     const convertCssInjection = (rule, excluded) => {
         if (rule.includes(':style')) {
-            let parts; let
-                result;
+            let parts;
+            let result;
             if (rule.includes(RuleMasks.MASK_CSS_EXTENDED_CSS_RULE)) {
                 parts = rule.split(RuleMasks.MASK_CSS_EXTENDED_CSS_RULE, 2);
                 result = executeConversion(
@@ -109,8 +109,11 @@ module.exports = (() => {
                 );
             } else if (rule.includes(RuleMasks.MASK_CSS_EXCEPTION_EXTENDED_CSS_RULE)) {
                 parts = rule.split(RuleMasks.MASK_CSS_EXCEPTION_EXTENDED_CSS_RULE, 2);
-                // eslint-disable-next-line max-len
-                result = executeConversion(rule, parts, RuleMasks.MASK_CSS_EXCEPTION_INJECT_EXTENDED_CSS_RULE, excluded);
+                result = executeConversion(
+                    rule, parts,
+                    RuleMasks.MASK_CSS_EXCEPTION_INJECT_EXTENDED_CSS_RULE,
+                    excluded
+                );
             } else if (rule.includes(RuleMasks.MASK_ELEMENT_HIDING)) {
                 parts = rule.split(RuleMasks.MASK_ELEMENT_HIDING, 2);
                 result = executeConversion(rule, parts, RuleMasks.MASK_CSS, excluded);
