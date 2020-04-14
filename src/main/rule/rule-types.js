@@ -3,32 +3,32 @@
  */
 module.exports = (() => ({
     /**
-         * Comments
-         */
+     * Comments
+     */
     Comment: 1,
     /**
-         * Url blocking rules
-         */
+     * Url blocking rules
+     */
     UrlBlocking: 2,
     /**
-         * Element hiding rules
-         */
+     * Element hiding rules
+     */
     ElementHiding: 3,
     /**
-         * Content rules
-         */
+     * Content rules
+     */
     Content: 4,
     /**
-         * Javascript rules
-         */
+     * Javascript rules
+     */
     Script: 5,
     /**
-         * Cosmetic css rules
-         */
+     * Cosmetic css rules
+     */
     Css: 6,
     /**
-         * Extended css rules
-         */
+     * Extended css rules
+     */
     ExtCss: 7,
 })
 )();

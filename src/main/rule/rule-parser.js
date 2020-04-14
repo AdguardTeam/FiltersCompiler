@@ -32,7 +32,7 @@ module.exports = (() => {
             const c = str.charAt(i);
 
             if (c === delimiter) {
-                if (i === 0) { // jshint ignore:line
+                if (i === 0) {
                     // Ignore
                 } else if (str.charAt(i - 1) === escapeCharacter) {
                     sb.push(c);
