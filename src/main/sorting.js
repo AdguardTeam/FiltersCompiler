@@ -1,14 +1,10 @@
-/* globals require */
-
+/* eslint-disable global-require */
 module.exports = (() => {
-
-    'use strict';
-
-    const logger = require("./utils/log.js");
-    const utils = require("./utils/utils.js");
-    const ruleParser = require("./rule/rule-parser.js");
-    const Rule = require("./rule/rule.js");
-    const RuleTypes = require("./rule/rule-types.js");
+    const logger = require('./utils/log.js');
+    const utils = require('./utils/utils.js');
+    const ruleParser = require('./rule/rule-parser.js');
+    const Rule = require('./rule/rule.js');
+    const RuleTypes = require('./rule/rule-types.js');
 
     const COMMENT_SEPARATOR = '!';
     const HINT_SEPARATOR = '!+';
@@ -23,7 +19,8 @@ module.exports = (() => {
      */
     const sortElementHidingRules = function (rules) {
         const map = new Map();
-        for (let rule of rules) {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const rule of rules) {
             const selector = rule.contentPart;
             const domains = map.get(selector) || [];
 
@@ -34,7 +31,8 @@ module.exports = (() => {
         sortedSelectors.sort();
 
         const result = [];
-        for (let selector of sortedSelectors) {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const selector of sortedSelectors) {
             result.push(Rule.buildNewLeadingDomainsRuleText(selector, utils.removeDuplicates(map.get(selector)), '##'));
         }
 
@@ -50,12 +48,12 @@ module.exports = (() => {
      * @param line
      */
     const isImmutableRule = function (line) {
-        return line.includes('#%#') ||
-            line.includes('#$#') ||
-            line.includes('$replace') ||
-            line.includes('$protobuf=') ||
-            line.includes('$csp=') ||
-            line.includes('$app=');
+        return line.includes('#%#')
+            || line.includes('#$#')
+            || line.includes('$replace')
+            || line.includes('$protobuf=')
+            || line.includes('$csp=')
+            || line.includes('$app=');
     };
 
     /**
@@ -68,15 +66,14 @@ module.exports = (() => {
      * @param rules
      */
     const sortUrlBlockingRules = function (rules) {
-
         const rest = [];
         const map = new Map();
 
         rules.forEach((rule) => {
-            const modifiers = rule.modifiers;
+            const { modifiers } = rule;
             const names = Object.getOwnPropertyNames(modifiers);
             if (names.length === 1 && modifiers.domain) {
-                const url = rule.url;
+                const { url } = rule;
 
                 const domains = map.get(url) || [];
                 map.set(url, domains.concat(modifiers.domain));
@@ -86,7 +83,8 @@ module.exports = (() => {
         });
 
         let result = [];
-        for (let url of map.keys()) {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const url of map.keys()) {
             const domains = utils.removeDuplicates(map.get(url));
             domains.sort();
 
@@ -105,7 +103,6 @@ module.exports = (() => {
      * @param list
      */
     const sortBlock = function (list) {
-
         const elementHidingRules = [];
         const urlBlockingRules = [];
         const comments = [];
@@ -113,12 +110,13 @@ module.exports = (() => {
         const contentRules = [];
         const otherRules = [];
 
-        for (let line of list) {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const line of list) {
             if (!line) {
                 continue;
             }
 
-            let rule = ruleParser.parseRule(line);
+            const rule = ruleParser.parseRule(line);
 
             if (rule.ruleType === RuleTypes.Comment) {
                 comments.push(line);
@@ -161,13 +159,13 @@ module.exports = (() => {
      *  sorting and merging domains list if the rules contain only $domain= modifier
      *  removing duplicates;
      * types of rules that must be ignored(allow sorting as string, but don't change them):
-     *  JS(#%#), CSS(#$#), content replacing rules($replace), protobuf($protobuf=), Content Security Policy ($csp), application modifier for Android and Windows('$app=')
+     *  JS(#%#), CSS(#$#), content replacing rules($replace), protobuf($protobuf=),
+     *  Content Security Policy ($csp), application modifier for Android and Windows('$app=')
      *
      * @param list
      * @returns {*}
      */
     const sort = function (list) {
-
         logger.log(`Sorting ${list.length} rules`);
 
         // Split to blocks with '! ' and '!+'
@@ -176,7 +174,8 @@ module.exports = (() => {
         blocks.push(block);
 
         let hint = false;
-        for (let line of list) {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const line of list) {
             if (line.startsWith(COMMENT_SEPARATOR) || line.startsWith(HINT_SEPARATOR)) {
                 block = [];
                 blocks.push(block);
@@ -184,7 +183,7 @@ module.exports = (() => {
 
             block.push(line);
 
-            //In case of hint the block is only the next rule
+            // In case of hint the block is only the next rule
             if (hint) {
                 hint = false;
 
@@ -208,6 +207,6 @@ module.exports = (() => {
     };
 
     return {
-        sort: sort
+        sort,
     };
 })();

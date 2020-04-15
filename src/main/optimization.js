@@ -1,13 +1,11 @@
-/* globals require */
-
+/* eslint-disable global-require */
 module.exports = (() => {
-
-    'use strict';
-
     const webutils = require('./utils/webutils.js');
 
     // Here we can access optimizable filters and its optimization percentages
+    // eslint-disable-next-line max-len
     const OPTIMIZATION_PERCENT_URL = 'https://chrome.adtidy.org/optimization_config/percent.json?key=4DDBE80A3DA94D819A00523252FB6380';
+    // eslint-disable-next-line max-len
     const OPTIMIZATION_STATS_URL = 'https://chrome.adtidy.org/filters/{0}/stats.json?key=4DDBE80A3DA94D819A00523252FB6380';
 
     let optimizationEnabled = true;
@@ -27,6 +25,7 @@ module.exports = (() => {
         }
 
         if (filtersOptimizationPercent.config.length === 0) {
+            // eslint-disable-next-line no-throw-literal
             throw 'Invalid configuration';
         }
 
@@ -42,9 +41,8 @@ module.exports = (() => {
         }
 
         // config: [{filterId: 1, percent: 45}, ...]
-        const filterOptimizationPercent = getFiltersOptimizationPercent().config.find(function (config) {
-            return config.filterId == filterId;
-        });
+        const filterOptimizationPercent = getFiltersOptimizationPercent().config
+            .find((config) => config.filterId === filterId);
 
         let optimizationConfig = null;
         if (optimizationEnabled && filterOptimizationPercent) {
@@ -58,18 +56,19 @@ module.exports = (() => {
     };
 
     /**
-     * Checks if rule should be skipped, because optimization is enabled for this filter and hits of this rule is lower than some value
+     * Checks if rule should be skipped, because optimization is enabled for this filter
+     * and hits of this rule is lower than some value
      * @param ruleText Rule text
      * @param optimizationConfig Optimization config for this filter (retrieved with getFilterOptimizationConfig)
      */
     const skipRuleWithOptimization = (ruleText, optimizationConfig) => {
-
         if (!optimizationConfig) {
             return false;
         }
 
-        for (let group of optimizationConfig.groups) {
-            let hits = group.rules[ruleText];
+        // eslint-disable-next-line no-restricted-syntax
+        for (const group of optimizationConfig.groups) {
+            const hits = group.rules[ruleText];
             if (hits !== undefined && hits < group.config.hits) {
                 return true;
             }
@@ -86,9 +85,9 @@ module.exports = (() => {
     };
 
     return {
-        getFiltersOptimizationPercent: getFiltersOptimizationPercent,
-        getFilterOptimizationConfig: getFilterOptimizationConfig,
-        skipRuleWithOptimization: skipRuleWithOptimization,
-        disableOptimization: disableOptimization
+        getFiltersOptimizationPercent,
+        getFilterOptimizationConfig,
+        skipRuleWithOptimization,
+        disableOptimization,
     };
 })();

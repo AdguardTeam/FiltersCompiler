@@ -1,20 +1,16 @@
-/* globals require */
-
+/* eslint-disable global-require,no-console */
 module.exports = (function () {
-
-    'use strict';
-
     const fs = require('fs');
     const os = require('os');
 
     let fd;
-    let logLevel = "LOG";
+    let logLevel = 'LOG';
 
     const Levels = {
-        "LOG": 0,
-        "INFO": 1,
-        "WARN": 2,
-        "ERROR": 3
+        LOG: 0,
+        INFO: 1,
+        WARN: 2,
+        ERROR: 3,
     };
 
     const appendFile = function (message, level) {
@@ -36,7 +32,6 @@ module.exports = (function () {
      * @param level log lvl
      */
     const initialize = function (path, level) {
-
         if (level) {
             logLevel = level;
         }
@@ -96,10 +91,10 @@ module.exports = (function () {
     };
 
     return {
-        initialize: initialize,
-        log: log,
-        info: info,
-        warn: warn,
-        error: error
+        initialize,
+        log,
+        info,
+        warn,
+        error,
     };
-})();
+}());

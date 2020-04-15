@@ -17,6 +17,18 @@
   },
   "main": "index.js",
   "scripts": {
-    "test": "node ./src/test/testrunner.js"
+    "test": "node ./src/test/testrunner.js",
+    "lint": "eslint ./src/main/"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn lint"
+    }
+  },
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-plugin-import": "^2.20.2",
+    "husky": "^4.2.3"
   }
 }

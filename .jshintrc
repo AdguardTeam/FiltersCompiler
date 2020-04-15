@@ -1,7 +1,0 @@
-{
-  "esversion": 6,
-  "globals": {
-    "module": true,
-    "console": true
-  }
-}

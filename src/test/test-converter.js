@@ -307,7 +307,7 @@ QUnit.test('Test redirects converter', (assert) => {
     assert.equal(actual, expected);
 
     actual = converter.convertRulesToAdgSyntax(['||delivery.tf1.fr/pub$media,rewrite=abp-resource:blank-mp3,domain=tf1.fr']);
-    expected = '||delivery.tf1.fr/pub$media,redirect=noopmp3.0.1s,domain=tf1.fr';
+    expected = '||delivery.tf1.fr/pub$media,redirect=noopmp3-0.1s,domain=tf1.fr';
     assert.equal(actual, expected);
 
     const { convertAdgRedirectsToUbo } = require('../main/converter');
@@ -324,7 +324,7 @@ QUnit.test('Test redirects converter', (assert) => {
     expected = '||example.com/banner$image,redirect=1x1.gif';
     assert.equal(actual, expected);
 
-    actual = convertAdgRedirectsToUbo(['||*/ad/$redirect=noopmp3.0.1s,domain=huaren.tv']);
+    actual = convertAdgRedirectsToUbo(['||*/ad/$redirect=noopmp3-0.1s,domain=huaren.tv']);
     expected = '';
     assert.equal(actual, expected);
 
