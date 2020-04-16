@@ -1,13 +1,9 @@
-/* globals require */
-
+/* eslint-disable global-require */
 module.exports = (() => {
+    const logger = require('./utils/log.js');
 
-    'use strict';
-
-    const logger = require("./utils/log.js");
-
-    const fs = require("fs");
-    const path = require("path");
+    const fs = require('fs');
+    const path = require('path');
     const Ajv = require('ajv');
 
     const OLD_MAC_SCHEMAS_SUBDIR = 'mac';
@@ -25,9 +21,10 @@ module.exports = (() => {
         const schemas = {};
 
         const items = fs.readdirSync(dir);
-        for (let f of items) {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const f of items) {
             if (f.endsWith(SCHEMA_EXTENSION)) {
-                let validationFileName = f.substr(0, f.indexOf(SCHEMA_EXTENSION));
+                const validationFileName = f.substr(0, f.indexOf(SCHEMA_EXTENSION));
 
                 logger.info(`Loading schema for ${validationFileName}`);
                 schemas[validationFileName] = JSON.parse(fs.readFileSync(path.join(dir, f)));
@@ -49,7 +46,8 @@ module.exports = (() => {
      */
     const validateDir = (dir, validator, schemas, oldSchemas, filtersRequiredAmount) => {
         const items = fs.readdirSync(dir);
-        for (let f of items) {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const f of items) {
             const item = path.join(dir, f);
             if (fs.lstatSync(item).isDirectory()) {
                 if (!validateDir(item, validator, schemas, oldSchemas)) {
@@ -78,8 +76,8 @@ module.exports = (() => {
                         }
                     }
 
-                    let validate = validator.compile(schema);
-                    let valid = validate(json);
+                    const validate = validator.compile(schema);
+                    const valid = validate(json);
                     if (!valid) {
                         logger.error(`Invalid json in ${item}, errors:`);
                         logger.error(validate.errors);
@@ -100,7 +98,7 @@ module.exports = (() => {
      * @param filtersRequiredAmount
      */
     const validate = (platformsPath, jsonSchemasConfigDir, filtersRequiredAmount) => {
-        logger.info(`Validating json schemas for platforms`);
+        logger.info('Validating json schemas for platforms');
 
         const schemas = loadSchemas(jsonSchemasConfigDir);
         const oldSchemas = loadSchemas(path.join(jsonSchemasConfigDir, OLD_MAC_SCHEMAS_SUBDIR));
@@ -109,13 +107,13 @@ module.exports = (() => {
 
         const result = validateDir(platformsPath, ajv, schemas, oldSchemas, filtersRequiredAmount);
 
-        logger.info(`Validating json schemas for platforms - done`);
+        logger.info('Validating json schemas for platforms - done');
         logger.info(`Validation result: ${result}`);
 
         return result;
     };
 
     return {
-        validate: validate
+        validate,
     };
 })();

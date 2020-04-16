@@ -1,9 +1,5 @@
-/* globals require, global */
-
+/* eslint-disable global-require */
 module.exports = (function () {
-
-    'use strict';
-
     /**
      * Loads module from string source
      *
@@ -13,6 +9,7 @@ module.exports = (function () {
     function requireFromString(src) {
         const Module = module.constructor;
         const m = new Module();
+        // eslint-disable-next-line no-undef
         m._compile(src, __filename);
         return m.exports;
     }
@@ -24,16 +21,16 @@ module.exports = (function () {
      * ExtendedCss is not supposed to work without window environment,
      * so we pass some wrapper dummy.
      */
-    const jsdom = require("jsdom");
+    const jsdom = require('jsdom');
     const { JSDOM } = jsdom;
-    const dom = new JSDOM(`<!DOCTYPE html><p>Empty</p>`);
+    const dom = new JSDOM('<!DOCTYPE html><p>Empty</p>');
     global.window = dom.window;
     global.document = global.window.document;
     global.navigator = global.window.navigator;
     global.Element = global.window.Element;
 
     // Load module from string, adding module exports at the end
-    const ExtendedCss = requireFromString(extendedCssString + '\r\nmodule.exports = ExtendedCss;');
+    const ExtendedCss = requireFromString(`${extendedCssString}\r\nmodule.exports = ExtendedCss;`);
 
     /**
      * Validates css selector
@@ -44,8 +41,8 @@ module.exports = (function () {
     const validateCssSelector = function (selectorText) {
         try {
             // jsdom is crashing when selector is a script
-            if (selectorText.indexOf('##script:contains') !== -1 ||
-                selectorText.indexOf('##script:inject') !== -1) {
+            if (selectorText.indexOf('##script:contains') !== -1
+                || selectorText.indexOf('##script:inject') !== -1) {
                 return false;
             }
 
@@ -67,6 +64,6 @@ module.exports = (function () {
     };
 
     return {
-        validateCssSelector: validateCssSelector
+        validateCssSelector,
     };
-})();
+}());

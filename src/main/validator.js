@@ -1,20 +1,16 @@
-/* globals module, require, console, global */
-
+/* eslint-disable global-require */
 module.exports = (function () {
-
-    'use strict';
-
     /**
      * @typedef {Object} fs
      * @property {function} readFileSync
      */
     const fs = require('fs');
 
-    const logger = require("./utils/log.js");
-    const ruleParser = require("./rule/rule-parser.js");
-    const RuleTypes = require("./rule/rule-types.js");
-    const RuleMasks = require("./rule/rule-masks.js");
-    const Rule = require("./rule/rule.js");
+    const logger = require('./utils/log.js');
+    const ruleParser = require('./rule/rule-parser.js');
+    const RuleTypes = require('./rule/rule-types.js');
+    const RuleMasks = require('./rule/rule-masks.js');
+    const Rule = require('./rule/rule.js');
     const extendedCssValidator = require('./utils/extended-css-validator.js');
     const scriptlets = require('scriptlets');
     const { redirects } = scriptlets;
@@ -92,7 +88,7 @@ module.exports = (function () {
      */
     const init = function (domainBlacklistFile) {
         try {
-            let s = fs.readFileSync(domainBlacklistFile, {encoding: 'utf-8'});
+            const s = fs.readFileSync(domainBlacklistFile, { encoding: 'utf-8' });
             if (s) {
                 domainsBlacklist = s.split('\n');
             } else {
@@ -119,7 +115,7 @@ module.exports = (function () {
         return domains.filter((d) => {
             if (domainsBlacklist.indexOf(d) >= 0) {
                 logger.error(`Blacklisted domain: ${d}`);
-                excludeRule(excluded,`! ${d} is blacklisted: `, rule);
+                excludeRule(excluded, `! ${d} is blacklisted: `, rule);
                 return false;
             }
 
@@ -139,12 +135,12 @@ module.exports = (function () {
             const rule = ruleParser.parseRule(line);
 
             if (rule.ruleType === RuleTypes.UrlBlocking) {
-                let modifiers = rule.modifiers;
+                const { modifiers } = rule;
                 if (modifiers.domain) {
                     const validated = removeBlacklistedDomains(modifiers.domain, line, excluded);
                     if (validated.length === 0) {
                         logger.error(`All domains are blacklisted for rule: ${line}`);
-                        excludeRule(excluded,'! All domains are blacklisted for rule:', line);
+                        excludeRule(excluded, '! All domains are blacklisted for rule:', line);
                         return;
                     }
 
@@ -155,14 +151,13 @@ module.exports = (function () {
                         corrected = RuleMasks.MASK_WHITE_LIST + corrected;
                     }
                 }
-            } else if (rule.ruleType === RuleTypes.ElementHiding || rule.ruleType === RuleTypes.Css ||
-                rule.ruleType === RuleTypes.Content || rule.ruleType === RuleTypes.Script) {
-
+            } else if (rule.ruleType === RuleTypes.ElementHiding || rule.ruleType === RuleTypes.Css
+                || rule.ruleType === RuleTypes.Content || rule.ruleType === RuleTypes.Script) {
                 if (rule.domains) {
                     const validated = removeBlacklistedDomains(rule.domains, line, excluded);
                     if (validated.length === 0) {
                         logger.error(`All domains are blacklisted for rule: ${line}`);
-                        excludeRule(excluded,'! All domains are blacklisted for rule:', line);
+                        excludeRule(excluded, '! All domains are blacklisted for rule:', line);
                         return;
                     }
 
@@ -197,7 +192,7 @@ module.exports = (function () {
     const isShortRule = (rule, excluded) => {
         if (rule && !rule.startsWith(RuleMasks.MASK_COMMENT) && rule.length <= 3) {
             logger.error(`Invalid rule: ${rule} The rule is too short.`);
-            excludeRule(excluded,'! The rule is too short:', rule);
+            excludeRule(excluded, '! The rule is too short:', rule);
             return true;
         }
         return false;
@@ -215,11 +210,11 @@ module.exports = (function () {
             try {
                 const validateScriptlet = scriptlets.isValidScriptletRule(rule.ruleText);
                 if (!validateScriptlet) {
-                    excludeRule(excluded,'! Invalid scriptlet:', rule.ruleText);
+                    excludeRule(excluded, '! Invalid scriptlet:', rule.ruleText);
                     return false;
                 }
             } catch (error) {
-                excludeRule(excluded,'! Invalid scriptlet:', rule.ruleText);
+                excludeRule(excluded, '! Invalid scriptlet:', rule.ruleText);
                 logger.error(`Invalid scriptlet: ${rule.ruleText}. Error: ${error.message}`);
                 return false;
             }
@@ -239,11 +234,11 @@ module.exports = (function () {
             try {
                 const validateRedirect = redirects.isValidAdgRedirectRule(rule.ruleText);
                 if (!validateRedirect) {
-                    excludeRule(excluded,'! Invalid redirect rule:', rule.ruleText);
+                    excludeRule(excluded, '! Invalid redirect rule:', rule.ruleText);
                     return false;
                 }
             } catch (error) {
-                excludeRule(excluded,'! Invalid redirect rule:', rule.ruleText);
+                excludeRule(excluded, '! Invalid redirect rule:', rule.ruleText);
                 logger.error(`Invalid redirect rule: ${rule.ruleText}. Error: ${error.message}`);
                 return false;
             }
@@ -281,13 +276,13 @@ module.exports = (function () {
         if (rule.ruleType === RuleTypes.ElementHiding) {
             if (ruleString.startsWith('||')) {
                 logger.error(`|| are unnecessary for element hiding rule: ${ruleString}`);
-                excludeRule(excluded,'! || are unnecessary for element hiding rule:', rule.ruleText);
+                excludeRule(excluded, '! || are unnecessary for element hiding rule:', rule.ruleText);
                 return false;
             }
 
             if (!extendedCssValidator.validateCssSelector(rule.contentPart)) {
                 logger.error(`Invalid selector: ${ruleString}`);
-                excludeRule(excluded,'! Invalid selector:', rule.ruleText);
+                excludeRule(excluded, '! Invalid selector:', rule.ruleText);
                 return false;
             }
         }
@@ -310,19 +305,20 @@ module.exports = (function () {
             //     return false;
             // }
 
-            let modifiers = rule.modifiers;
+            const { modifiers } = rule;
 
-            for (let name in modifiers) {
+            // eslint-disable-next-line guard-for-in,no-restricted-syntax
+            for (const name in modifiers) {
                 if (!validateOptionName(name) || !validateRewriteOption(name, modifiers)) {
                     logger.error(`Invalid rule: ${ruleString} option: ${name}`);
-                    excludeRule(excluded,'! Invalid rule options:', rule.ruleText);
+                    excludeRule(excluded, '! Invalid rule options:', rule.ruleText);
                     return false;
                 }
 
                 if (name === 'domain' || name === '~domain') {
-                    if (rule.modifiers[name].filter(x => x === '').length > 0) {
+                    if (rule.modifiers[name].filter((x) => x === '').length > 0) {
                         logger.error(`Invalid rule: ${ruleString} incorrect option value: ${rule.modifiers[name]}`);
-                        excludeRule(excluded,'! Invalid rule options:', rule.ruleText);
+                        excludeRule(excluded, '! Invalid rule options:', rule.ruleText);
                         return false;
                     }
                 }
@@ -341,11 +337,10 @@ module.exports = (function () {
      */
     const isValidCssRule = (ruleString, rule, excluded) => {
         if (rule.ruleType === RuleTypes.Css) {
-            if (rule.contentPart &&
-                rule.contentPart.toLowerCase().indexOf('url(') >= 0 ||
-                ESCAPE_CHARACTER_REGEX.test(rule.contentPart)) {
+            if ((rule.contentPart && rule.contentPart.toLowerCase().indexOf('url(') >= 0)
+                || ESCAPE_CHARACTER_REGEX.test(rule.contentPart)) {
                 logger.error(`Invalid rule: ${ruleString} incorrect style: ${rule.contentPart}`);
-                excludeRule(excluded,'! Incorrect style:', rule.ruleText);
+                excludeRule(excluded, '! Incorrect style:', rule.ruleText);
                 return false;
             }
         }
@@ -379,25 +374,24 @@ module.exports = (function () {
                 return true;
             }
 
-            if (isShortRule(s, excluded) ||
-                !isValidElementHidingRule(s, rule, excluded) ||
-                !isValidUrlBlockingRule(s, rule, excluded) ||
-                !isValidCssRule(s, rule, excluded) ||
-                !isValidScriptlet(rule, excluded) ||
-                !isValidRedirectRule(rule, excluded)) {
+            if (isShortRule(s, excluded)
+                || !isValidElementHidingRule(s, rule, excluded)
+                || !isValidUrlBlockingRule(s, rule, excluded)
+                || !isValidCssRule(s, rule, excluded)
+                || !isValidScriptlet(rule, excluded)
+                || !isValidRedirectRule(rule, excluded)) {
                 return false;
             }
 
-            //TODO: Check js rules validation
+            // TODO: Check js rules validation
 
             return true;
         });
     };
 
     return {
-        init: init,
-        validate: validate,
-        blacklistDomains: blacklistDomains
+        init,
+        validate,
+        blacklistDomains,
     };
-})();
-
+}());
