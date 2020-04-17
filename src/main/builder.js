@@ -157,8 +157,8 @@ module.exports = (function () {
             if (exclusion && !exclusion.startsWith('!')) {
                 const message = `${line} is excluded by "${exclusion}" in ${reason}`;
 
-                const isExcludedByRegexp = line.match(new RegExp(exclusion.substring(1, exclusion.length - 1)))
-                    && exclusion.endsWith('/') && exclusion.startsWith('/');
+                const isExcludedByRegexp = exclusion.endsWith('/') && exclusion.startsWith('/')
+                    && line.match(new RegExp(exclusion.substring(1, exclusion.length - 1)));
 
                 if ((isExcludedByRegexp || line.includes(exclusion)) && !scriptletException(line, exclusion)) {
                     logger.log(message);

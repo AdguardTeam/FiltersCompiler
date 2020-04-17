@@ -363,6 +363,10 @@ module.exports = (function () {
      * @returns {Array}
      */
     const validate = function (list, excluded) {
+        if (!list) {
+            return [];
+        }
+
         return list.filter((s) => {
             const rule = ruleParser.parseRule(s);
 

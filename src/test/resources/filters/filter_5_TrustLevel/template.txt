@@ -14,6 +14,10 @@ test.com#@%#Object.defineProperty(window, 'abcde', { get: function() { return []
 example.org##.images > .private + .message
 ||adsnet.com/*/700x350.gif$domain=example.com
 !
+
+
+
+
 example.com##^script:has-text(12313)
 example.com##^script:contains(banner)
 !
@@ -22,6 +26,9 @@ example.com##^script:contains(banner)
 example.com##^script:has-text(/.advert/)
 rybnik.com.pl##^iframe[name]:not([class]):not([id]):not([src])[style="display:none"]
 !
+
+
+
 test.com#$#abort-on-property-read adsShown
 example.com#@$#abort-on-property-write adblock.check
 !
@@ -34,6 +41,8 @@ example.com#@#+js(nano-setInterval-booster.js, some.example, 1000)
 test.com##script:inject(json-prune.js)
 test.com#@#script:inject(abort-on-property-read.js, some.prop)
 !
+
+
 ||example.com/test/$media,mp4,domain=test.com
 ||test.com/cams/video_file/*.mp4$media,mp4
 ||example.com/images/*.mp4

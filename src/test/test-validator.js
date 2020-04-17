@@ -426,6 +426,14 @@ QUnit.test("Test validation - various rules", function (assert) {
         '||q',
     ];
     assert.ok(validator.validate(rules).length === 0);
+
+    let actual = validator.validate(['']);
+    let expected = '';
+    assert.equal(actual, expected);
+
+    actual = validator.validate(undefined);
+    expected = '';
+    assert.equal(actual, expected);
 });
 
 QUnit.test("Test validation - validate redirect option", function (assert) {

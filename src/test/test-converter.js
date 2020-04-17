@@ -39,6 +39,14 @@ QUnit.test("Test converter", (assert) => {
 
     c = converter.convertRulesToAdgSyntax(['##selector']);
     assert.equal(c[0], '##selector');
+
+    let actual = converter.convertRulesToAdgSyntax(['']);
+    let expected = '';
+    assert.equal(actual, expected);
+
+    actual = converter.convertRulesToAdgSyntax(undefined);
+    expected = '';
+    assert.equal(actual, expected);
 });
 
 QUnit.test('Test first-party replaced by ~third-party', (assert) => {
@@ -124,6 +132,13 @@ QUnit.test('Test convert scriptlets to UBlock syntax', (assert) => {
     expected = 'example.org##+js(set-constant, constName, value"12345")';
     assert.equal(actual, expected);
 
+    actual = convertAdgScriptletsToUbo(['']);
+    expected = '';
+    assert.equal(actual, expected);
+
+    actual = convertAdgScriptletsToUbo(undefined);
+    expected = '';
+    assert.equal(actual, expected);
 });
 
 QUnit.test('Test ##^script:has-text to $$script[tag-containts] replacement', (assert) => {
@@ -329,6 +344,14 @@ QUnit.test('Test redirects converter', (assert) => {
     assert.equal(actual, expected);
 
     actual = convertAdgRedirectsToUbo(['||example.com^$redirect=noopjs']);
+    expected = '';
+    assert.equal(actual, expected);
+
+    actual = convertAdgRedirectsToUbo(['']);
+    expected = '';
+    assert.equal(actual, expected);
+
+    actual = convertAdgRedirectsToUbo(undefined);
     expected = '';
     assert.equal(actual, expected);
 });

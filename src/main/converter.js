@@ -189,7 +189,7 @@ module.exports = (() => {
      */
     const convertUboAndAbpRedirectsToAdg = (rule, excluded) => {
         if (!rule.startsWith(RuleMasks.MASK_COMMENT)
-            && (redirects.isValidUboRedirectRule(rule) || redirects.isValidAbpRedirectRule(rule))) {
+            && (redirects.isUboRedirectCompatibleWithAdg(rule) || redirects.isAbpRedirectCompatibleWithAdg(rule))) {
             const result = redirects.convertRedirectToAdg(rule);
             if (!result) {
                 const message = `Unable to convert redirect rule to AdGuard syntax: ${rule}`;
@@ -250,6 +250,10 @@ module.exports = (() => {
      * @return {array} result
      */
     const convertRulesToAdgSyntax = function (rulesList, excluded) {
+        if (!rulesList) {
+            return [];
+        }
+
         const result = [];
 
         // eslint-disable-next-line no-restricted-syntax
@@ -308,24 +312,34 @@ module.exports = (() => {
      * @param {array} rules
      * @return {array} modified rules
      */
-    const convertAdgScriptletsToUbo = (rules) => convertToUbo(
-        rules,
-        'scriptlet',
-        scriptlets.isAdgScriptletRule,
-        scriptlets.convertAdgToUbo
-    );
+    const convertAdgScriptletsToUbo = (rules) => {
+        if (!rules) {
+            return [];
+        }
+        return convertToUbo(
+            rules,
+            'scriptlet',
+            scriptlets.isAdgScriptletRule,
+            scriptlets.convertAdgToUbo
+        );
+    };
 
     /**
      * Converts AdGuard redirect rules to uBlock
      * @param {array} rules
      * @return {array} modified rules
      */
-    const convertAdgRedirectsToUbo = (rules) => convertToUbo(
-        rules,
-        'redirect',
-        redirects.isValidAdgRedirectRule,
-        redirects.convertAdgRedirectToUbo
-    );
+    const convertAdgRedirectsToUbo = (rules) => {
+        if (!rules) {
+            return [];
+        }
+        return convertToUbo(
+            rules,
+            'redirect',
+            redirects.isAdgRedirectCompatibleWithUbo,
+            redirects.convertAdgRedirectToUbo
+        );
+    };
 
 
     return {
