@@ -708,7 +708,13 @@ module.exports = (() => {
 
             const platformDir = path.join(platformsPath, config.path, PLATFORM_FILTERS_DIR);
             writeFilterRules(filterId, platformDir, config, header, rules, false);
-            writeFilterRules(filterId, platformDir, config, header, optimizedRules, true);
+
+            // add '(Optimized)' to the '! Title:' for optimized filters
+            // https://github.com/AdguardTeam/FiltersCompiler/issues/78
+            const optimizedHeader = [...header];
+            optimizedHeader[0] += ' (Optimized)';
+
+            writeFilterRules(filterId, platformDir, config, optimizedHeader, optimizedRules, true);
         }
     };
 

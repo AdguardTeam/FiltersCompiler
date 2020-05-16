@@ -585,12 +585,12 @@ QUnit.test('Test scriptlets validator', (assert) => {
         'example.com#@%#//scriptlet("abort-on-property-write", "adblock.check")',
         'example.com#%#//scriptlet(\'abort-on-property-read\', \'ads.prop\')',
         'example.com#%#//scriptlet("prevent-adfly")',
+        'example.com#@%#//scriptlet("ubo-nano-setInterval-booster", "some.example", "1000")',
     ];
-    assert.ok(validator.validate(rules).length === 6);
+    assert.ok(validator.validate(rules).length === 7);
 
     rules = [
         'test.com#%#//scriptlet("ubo-abort-current-inline-scripts.js", "Math.random", "adbDetect")',
-        'example.com#@%#//scriptlet("ubo-nano-setInterval-booster", "some.example", "1000")',
         'example.com#%#//scriptlet("abp-abort-current-inline-script ", "console.log", "Hello")',
         'example.com#@%#//scriptlet("abort-on--property-write", "adblock.check")',
     ];
