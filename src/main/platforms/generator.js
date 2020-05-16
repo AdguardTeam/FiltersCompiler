@@ -607,11 +607,16 @@ module.exports = (() => {
         const filterFile = path.join(dir, `${filterId}${optimized ? '_optimized' : ''}.txt`);
         let rulesList = rules;
 
-        // Convert Adguard scriptlets and redirect rules to UBlock syntax. Exclude script rules.
+        // Convert Adguard scriptlets and redirect rules to UBlock syntax.
+        // Exclude script rules.
+        // Modify title for base filter
         if (config.platform === 'ext_ublock') {
             rulesList = converter.convertAdgScriptletsToUbo(rulesList);
             rulesList = converter.convertAdgRedirectsToUbo(rulesList);
             rulesList = excludeScriptRules(rulesList);
+            if (filterId === 2) {
+                workaround.modifyBaseFilterHeader(rulesHeader, optimized);
+            }
         }
 
         writeFilterFile(filterFile, config.configuration.adbHeader, rulesHeader, rulesList);
@@ -631,7 +636,7 @@ module.exports = (() => {
      * ignores comments and hinted rules
      *
      * @param list a list of rules to filter
-     * @returns {*} a list of ruls without duplicate
+     * @returns {*} a list of rules without duplicate
      */
     const removeRuleDuplicates = function (list) {
         logger.info('Removing duplicates..');

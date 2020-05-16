@@ -186,8 +186,8 @@ QUnit.test('Test builder - platforms', async (assert) => {
     assert.ok(filtersMetadata.filters);
     assert.ok(filtersMetadata.filters[0]);
     assert.equal(filtersMetadata.filters[0].filterId, 2);
-    assert.equal(filtersMetadata.filters[0].name, 'English Filter');
-    assert.equal(filtersMetadata.filters[0].description, 'English Filter description');
+    assert.equal(filtersMetadata.filters[0].name, 'AdGuard Base filter');
+    assert.equal(filtersMetadata.filters[0].description, 'EasyList + AdGuard English filter. This filter is necessary for quality ad blocking.');
     assert.ok(filtersMetadata.filters[0].timeAdded);
     assert.equal(filtersMetadata.filters[0].homepage, 'https://easylist.adblockplus.org/');
     assert.equal(filtersMetadata.filters[0].expires, 172800);
@@ -224,6 +224,7 @@ QUnit.test('Test builder - platforms', async (assert) => {
     let filterLines = filterContent.split('\r\n');
     assert.equal(filterLines.length, 40);
 
+    assert.equal(filterLines[2], '! Title: AdGuard Base filter + EasyList');
     assert.ok(filterLines.indexOf('![Adblock Plus 2.0]') >= 0);
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
     assert.ok(filterLines.indexOf('test-common-1-rule.com') >= 0);
@@ -236,6 +237,18 @@ QUnit.test('Test builder - platforms', async (assert) => {
     assert.ok(filterLines.indexOf('test.com#%#var isadblock=1;') === -1);
     assert.ok(filterLines.indexOf('example.com#%#AG_onLoad(function() { AG_removeElementBySelector(\'span[class="intexta"]\'); });') === -1);
     assert.ok(filterLines.indexOf('test.com##+js(abort-on-property-read, Object.prototype.getBanner)') >= 0);
+
+    filterContent = readFile(path.join(platforms, 'test', 'filters', '2_optimized.txt'));
+    assert.ok(filterContent);
+    filterLines = filterContent.split('\r\n');
+    assert.equal(filterLines.length, 26);
+    assert.equal(filterLines[2], '! Title: AdGuard Base filter + EasyList (Optimized)');
+
+    filterContent = readFile(path.join(platforms, 'test', 'filters', '2_without_easylist.txt'));
+    assert.ok(filterContent);
+    filterLines = filterContent.split('\r\n');
+    assert.equal(filterLines.length, 28);
+    assert.equal(filterLines[2], '! Title: AdGuard Base filter');
 
     filterContent = readFile(path.join(platforms, 'config/test', 'filters', '2.txt'));
     assert.ok(filterContent);
@@ -286,8 +299,8 @@ QUnit.test('Test builder - platforms', async (assert) => {
     assert.equal(Object.keys(englishFilter).length, 11);
 
     assert.equal(englishFilter.filterId, 2);
-    assert.equal(englishFilter.name, 'English Filter');
-    assert.equal(englishFilter.description, 'English Filter description');
+    assert.equal(englishFilter.name, 'AdGuard Base filter');
+    assert.equal(englishFilter.description, 'EasyList + AdGuard English filter. This filter is necessary for quality ad blocking.');
     assert.equal(englishFilter.timeAdded, undefined);
     assert.equal(englishFilter.homepage, 'https://easylist.adblockplus.org/');
     assert.equal(englishFilter.expires, 172800);
