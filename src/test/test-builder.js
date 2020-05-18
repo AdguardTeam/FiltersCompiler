@@ -4,21 +4,21 @@
 const path = require('path');
 const fs = require('fs');
 
-QUnit.test("Test builder", async (assert) => {
+QUnit.test('Test builder', async (assert) => {
     'use strict';
 
     const readFile = function (path) {
         try {
-            return fs.readFileSync(path, {encoding: 'utf-8'});
+            return fs.readFileSync(path, { encoding: 'utf-8' });
         } catch (e) {
             return null;
         }
     };
 
-    const optimization = require("../main/optimization.js");
+    const optimization = require('../main/optimization.js');
     optimization.disableOptimization();
 
-    const builder = require("../main/builder.js");
+    const builder = require('../main/builder.js');
     assert.ok(builder);
 
     const filtersDir = path.join(__dirname, './resources/filters');
@@ -40,25 +40,25 @@ QUnit.test("Test builder", async (assert) => {
     let filterLines = filterText.split(os.EOL);
     assert.equal(filterLines.length, 23);
 
-    //Common include
+    // Common include
     assert.ok(filterLines.indexOf('! some common rules could be places here') >= 0);
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
     assert.ok(filterLines.indexOf('test-common-rule.com$xmlhttprequest') >= 0);
     assert.ok(filterLines.indexOf('example.com#$#h1 { background-color: blue !important }') >= 0);
 
-    //Check replace version comment
+    // Check replace version comment
     assert.notOk(filterLines.indexOf('! Version: 11.9090.19.19') >= 0);
     assert.ok(filterLines.indexOf('! OriginalVersion: 11.9090.19.19') >= 0);
 
-    //Common_1 include
+    // Common_1 include
     assert.ok(filterLines.indexOf('test-common-1-rule.com') >= 0);
 
-    //Exclude_1
+    // Exclude_1
     assert.notOk(filterLines.indexOf('test-common-1-rule.com$xmlhttprequest') >= 0);
-    //Strip comments
+    // Strip comments
     assert.notOk(filterLines.indexOf('! some common rules could be places here, but comment are stripped') >= 0);
 
-    //Exclude
+    // Exclude
     assert.ok(filterLines.indexOf('||test.com^') >= 0);
     assert.notOk(filterLines.indexOf('#%#test.com^$third-party') >= 0);
     assert.notOk(filterLines.indexOf('||test.com^$third-party') >= 0);
@@ -78,9 +78,9 @@ QUnit.test("Test builder", async (assert) => {
     assert.ok(filterLines.indexOf('||www.ynet.co.il^$important,websocket,~third-party,domain=www.ynet.co.il') >= 0);
     assert.ok(filterLines.indexOf('example.com$$script[tag-content="12313"][max-length="262144"]') >= 0);
     assert.ok(filterLines.indexOf('rybnik.com.pl##^iframe[name]:not([class]):not([id]):not([src])[style="display:none"]') === -1);
-    assert.ok(filterLines.indexOf('test.com#%#AG_setConstant("ads", "false");') ===  -1);
-    assert.ok(filterLines.indexOf('test.com#@%#Object.defineProperty(window, \'abcde\', { get: function() { return []; } });') ===  -1);
-    assert.ok(filterLines.indexOf('||example.com/api/v1/ad/*/json$replace=/html/abcd\\,/i') ===  -1);
+    assert.ok(filterLines.indexOf('test.com#%#AG_setConstant("ads", "false");') === -1);
+    assert.ok(filterLines.indexOf('test.com#@%#Object.defineProperty(window, \'abcde\', { get: function() { return []; } });') === -1);
+    assert.ok(filterLines.indexOf('||example.com/api/v1/ad/*/json$replace=/html/abcd\\,/i') === -1);
     assert.ok(filterLines.indexOf('||adsnet.com/*/700x350.gif$domain=example.com') >= 0);
     assert.ok(filterLines.indexOf('||example.com/banner$image,redirect=3x2.png') >= 0);
     assert.ok(filterLines.indexOf('||test.com^$script,redirect=noop.js') >= 0);
@@ -115,21 +115,21 @@ QUnit.test("Test builder", async (assert) => {
     assert.ok(filterLines.indexOf('||app-test.com^$third-party') >= 0);
 });
 
-QUnit.test("Test builder - build lists", async (assert) => {
+QUnit.test('Test builder - build lists', async (assert) => {
     'use strict';
 
     const readFile = function (path) {
         try {
-            return fs.readFileSync(path, {encoding: 'utf-8'});
+            return fs.readFileSync(path, { encoding: 'utf-8' });
         } catch (e) {
             return null;
         }
     };
 
-    const optimization = require("../main/optimization.js");
+    const optimization = require('../main/optimization.js');
     optimization.disableOptimization();
 
-    const builder = require("../main/builder.js");
+    const builder = require('../main/builder.js');
     assert.ok(builder);
 
     const filtersDir = path.join(__dirname, './resources/filters');
@@ -151,7 +151,7 @@ QUnit.test("Test builder - build lists", async (assert) => {
     assert.ok(revision);
 });
 
-QUnit.test("Test builder - platforms", async (assert) => {
+QUnit.test('Test builder - platforms', async (assert) => {
     'use strict';
 
     const path = require('path');
@@ -159,17 +159,17 @@ QUnit.test("Test builder - platforms", async (assert) => {
 
     const readFile = function (path) {
         try {
-            return fs.readFileSync(path, {encoding: 'utf-8'});
+            return fs.readFileSync(path, { encoding: 'utf-8' });
         } catch (e) {
             return null;
         }
     };
 
-    const optimization = require("../main/optimization.js");
+    const optimization = require('../main/optimization.js');
     optimization.disableOptimization();
 
-    const builder = require("../main/builder.js");
-    const generator = require("../main/platforms/generator.js");
+    const builder = require('../main/builder.js');
+    const generator = require('../main/platforms/generator.js');
 
     const filtersDir = path.join(__dirname, './resources/filters');
     const logFile = path.join(__dirname, './resources/log_platforms.txt');
@@ -186,8 +186,8 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.ok(filtersMetadata.filters);
     assert.ok(filtersMetadata.filters[0]);
     assert.equal(filtersMetadata.filters[0].filterId, 2);
-    assert.equal(filtersMetadata.filters[0].name, 'English Filter');
-    assert.equal(filtersMetadata.filters[0].description, 'English Filter description');
+    assert.equal(filtersMetadata.filters[0].name, 'AdGuard Base filter');
+    assert.equal(filtersMetadata.filters[0].description, 'EasyList + AdGuard English filter. This filter is necessary for quality ad blocking.');
     assert.ok(filtersMetadata.filters[0].timeAdded);
     assert.equal(filtersMetadata.filters[0].homepage, 'https://easylist.adblockplus.org/');
     assert.equal(filtersMetadata.filters[0].expires, 172800);
@@ -204,12 +204,12 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.equal(filtersMetadata.filters[0].tags[0], 1);
     assert.equal(filtersMetadata.filters[0].trustLevel, 'full');
 
-    let filtersI18nMetadata = readFile(path.join(platforms, 'test', 'filters_i18n.json'));
+    const filtersI18nMetadata = readFile(path.join(platforms, 'test', 'filters_i18n.json'));
     assert.ok(filtersI18nMetadata);
 
-    let localScriptRules = readFile(path.join(platforms, 'test', 'local_script_rules.txt'));
+    const localScriptRules = readFile(path.join(platforms, 'test', 'local_script_rules.txt'));
     assert.notOk(localScriptRules);
-    let localScriptRulesLines = localScriptRules.split('\r\n');
+    const localScriptRulesLines = localScriptRules.split('\r\n');
     assert.ok(localScriptRulesLines.indexOf('test_domain#%#testScript();') === -1);
 
     let localScriptRulesJson = readFile(path.join(platforms, 'test', 'local_script_rules.json'));
@@ -224,6 +224,7 @@ QUnit.test("Test builder - platforms", async (assert) => {
     let filterLines = filterContent.split('\r\n');
     assert.equal(filterLines.length, 40);
 
+    assert.equal(filterLines[2], '! Title: AdGuard Base filter + EasyList');
     assert.ok(filterLines.indexOf('![Adblock Plus 2.0]') >= 0);
     assert.ok(filterLines.indexOf('test-common-rule.com') >= 0);
     assert.ok(filterLines.indexOf('test-common-1-rule.com') >= 0);
@@ -236,6 +237,18 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.ok(filterLines.indexOf('test.com#%#var isadblock=1;') === -1);
     assert.ok(filterLines.indexOf('example.com#%#AG_onLoad(function() { AG_removeElementBySelector(\'span[class="intexta"]\'); });') === -1);
     assert.ok(filterLines.indexOf('test.com##+js(abort-on-property-read, Object.prototype.getBanner)') >= 0);
+
+    filterContent = readFile(path.join(platforms, 'test', 'filters', '2_optimized.txt'));
+    assert.ok(filterContent);
+    filterLines = filterContent.split('\r\n');
+    assert.equal(filterLines.length, 26);
+    assert.equal(filterLines[2], '! Title: AdGuard Base filter + EasyList (Optimized)');
+
+    filterContent = readFile(path.join(platforms, 'test', 'filters', '2_without_easylist.txt'));
+    assert.ok(filterContent);
+    filterLines = filterContent.split('\r\n');
+    assert.equal(filterLines.length, 28);
+    assert.equal(filterLines[2], '! Title: AdGuard Base filter');
 
     filterContent = readFile(path.join(platforms, 'config/test', 'filters', '2.txt'));
     assert.ok(filterContent);
@@ -264,30 +277,30 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.ok(filterLines.indexOf('excluded_platform') >= 0);
     assert.ok(filterLines.indexOf('test_domain#%#testScript();') >= 0);
 
-    //Check MAC platform
+    // Check MAC platform
     let filtersMetadataMAC = readFile(path.join(platforms, 'mac', 'filters.json'));
     assert.ok(filtersMetadataMAC);
     filtersMetadataMAC = JSON.parse(filtersMetadataMAC);
     assert.equal(Object.keys(filtersMetadataMAC).length, 2);
 
     assert.ok(filtersMetadataMAC.groups);
-    let group = filtersMetadataMAC.groups[0];
+    const group = filtersMetadataMAC.groups[0];
     assert.ok(group);
     assert.equal(Object.keys(group).length, 3);
     assert.equal(group.groupId, 1);
-    assert.equal(group.groupName, "Adguard Filters");
+    assert.equal(group.groupName, 'Adguard Filters');
     assert.equal(group.displayNumber, 1);
 
     assert.equal(filtersMetadataMAC.tags, undefined);
 
     assert.ok(filtersMetadataMAC.filters);
-    let englishFilter = filtersMetadataMAC.filters[0];
+    const englishFilter = filtersMetadataMAC.filters[0];
     assert.ok(englishFilter);
     assert.equal(Object.keys(englishFilter).length, 11);
 
     assert.equal(englishFilter.filterId, 2);
-    assert.equal(englishFilter.name, 'English Filter');
-    assert.equal(englishFilter.description, 'English Filter description');
+    assert.equal(englishFilter.name, 'AdGuard Base filter');
+    assert.equal(englishFilter.description, 'EasyList + AdGuard English filter. This filter is necessary for quality ad blocking.');
     assert.equal(englishFilter.timeAdded, undefined);
     assert.equal(englishFilter.homepage, 'https://easylist.adblockplus.org/');
     assert.equal(englishFilter.expires, 172800);
@@ -312,7 +325,7 @@ QUnit.test("Test builder - platforms", async (assert) => {
     assert.equal(filtersMetadataMAC.tags, undefined);
     assert.ok(filtersMetadataMAC.filters);
 
-    //Check conditions
+    // Check conditions
     assert.notOk(filterLines.indexOf('!#if adguard') >= 0);
     assert.notOk(filterLines.indexOf('!#endif') >= 0);
     assert.notOk(filterLines.indexOf('if_not_adguard_rule') >= 0);
@@ -322,7 +335,7 @@ QUnit.test("Test builder - platforms", async (assert) => {
     // wrong condition
     assert.notOk(filterLines.indexOf('wrong_condition') >= 0);
 
-    //Check includes
+    // Check includes
     assert.notOk(filterLines.indexOf('!#include') >= 0);
 
     // platform specify includes
@@ -336,12 +349,14 @@ QUnit.test("Test builder - platforms", async (assert) => {
     // do not remove directives while stripped comment. `directives_not_stripped` rule should not remain
     assert.notOk(filterLines.indexOf('directives_not_stripped') >= 0);
 
-    //Check condition directives for platforms
+    // Check condition directives for platforms
     filterContent = readFile(path.join(platforms, 'test', 'filters', '4.txt'));
     assert.ok(filterContent);
 
     filterLines = filterContent.split('\r\n');
     assert.equal(filterLines.length, 23);
+    assert.ok(filterLines[2].startsWith('! Title:'));
+    assert.notOk(filterLines[2].endsWith('(Optimized)'));
     assert.ok(filterLines.indexOf('if_not_ublock') < 0);
 
     filterContent = readFile(path.join(platforms, 'test', 'filters', '4_optimized.txt'));
@@ -349,6 +364,8 @@ QUnit.test("Test builder - platforms", async (assert) => {
 
     filterLines = filterContent.split('\r\n');
     assert.equal(filterLines.length, 13);
+    assert.ok(filterLines[2].startsWith('! Title:'));
+    assert.ok(filterLines[2].endsWith('(Optimized)'));
     assert.ok(filterLines.indexOf('if_not_ublock') < 0);
 
     filterContent = readFile(path.join(platforms, 'mac', 'filters', '5.txt'));

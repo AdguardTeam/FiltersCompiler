@@ -32,6 +32,16 @@ module.exports = (() => {
     };
 
     /**
+     * Modifies header for AdGuard Base filter
+     * https://github.com/AdguardTeam/FiltersCompiler/issues/78
+     * @param {array} header
+     * @param {boolean} optimized
+     */
+    const modifyBaseFilterHeader = (header, optimized) => {
+        header[0] = `! Title: AdGuard Base filter + EasyList${optimized ? ' (Optimized)' : ''}`;
+    };
+
+    /**
      * Rewrites title and description
      * https://github.com/AdguardTeam/AdguardFilters/issues/5138#issuecomment-328847738
      */
@@ -138,5 +148,6 @@ module.exports = (() => {
         fixVersionComments,
         removeAdblockVersion,
         rewriteMetadataForOldMac,
+        modifyBaseFilterHeader,
     };
 })();
