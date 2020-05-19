@@ -16,6 +16,7 @@ module.exports = (function () {
     const { redirects } = scriptlets;
 
     const ESCAPE_CHARACTER_REGEX = /{.*\\.*}/;
+    const REGEX_PATTERN = /^\/.+\/$/;
 
     const VALID_OPTIONS = [
         // Basic modifiers
@@ -305,7 +306,17 @@ module.exports = (function () {
             //     return false;
             // }
 
-            const { modifiers } = rule;
+            const { url, modifiers } = rule;
+
+            if (REGEX_PATTERN.test(url)) {
+                try {
+                    // eslint-disable-next-line no-new
+                    new RegExp(url);
+                } catch (e) {
+                    logger.error(`Invalid rule: ${ruleString}. Regex ${url} is not valid.`);
+                    return false;
+                }
+            }
 
             // eslint-disable-next-line guard-for-in,no-restricted-syntax
             for (const name in modifiers) {
