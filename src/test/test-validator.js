@@ -12,10 +12,10 @@
  * @property {function} join
  */
 
-QUnit.test("Test css validation", function (assert) {
+QUnit.test('Test css validation', (assert) => {
     'use strict';
 
-    const validator = require("../main/validator.js");
+    const validator = require('../main/validator.js');
     validator.init();
 
     let rules = ['example.com##.div'];
@@ -28,18 +28,18 @@ QUnit.test("Test css validation", function (assert) {
     assert.notOk(validator.validate(rules).length > 0);
 });
 
-QUnit.test("Test incorrect rules", function (assert) {
+QUnit.test('Test incorrect rules', (assert) => {
     'use strict';
 
-    const validator = require("../main/validator.js");
+    const validator = require('../main/validator.js');
     validator.init();
 
-    const rules = ['||example.com##.div',
+    let rules = ['||example.com##.div',
         'test$domain=yandex.ru,google.com'];
     assert.ok(validator.validate(rules).length === 0);
 });
 
-QUnit.test("Test blacklist domains - ulr/css rules", (assert) => {
+QUnit.test('Test blacklist domains - ulr/css rules', (assert) => {
     'use strict';
 
     const before = `
@@ -55,7 +55,7 @@ google.com,one.com##a[href^=/], .container:has(nav) > a[href]:lt($var)
     const path = require('path');
     const domainsBlacklist = path.join(__dirname, './resources/domains-blacklist.txt');
 
-    const validator = require("../main/validator.js");
+    const validator = require('../main/validator.js');
     validator.init(domainsBlacklist);
 
     const after = validator.blacklistDomains(before.trim().split('\n'));
@@ -73,44 +73,44 @@ one.com##a[href^=/], .container:has(nav) > a[href]:lt($var)
     assert.equal(after.join('\n').trim(), correct.trim());
 });
 
-QUnit.test("Test ext-css validation", function (assert) {
+QUnit.test('Test ext-css validation', (assert) => {
     'use strict';
 
-    const validator = require("../main/validator.js");
+    const validator = require('../main/validator.js');
     validator.init();
 
-    let selector = "#main > table.w3-table-all.notranslate:first-child > tbody > tr:nth-child(17) > td.notranslate:nth-child(2)";
-    let ruleText = "w3schools.com##" + selector;
+    let selector = '#main > table.w3-table-all.notranslate:first-child > tbody > tr:nth-child(17) > td.notranslate:nth-child(2)';
+    let ruleText = `w3schools.com##${selector}`;
     let rules = [ruleText];
     assert.ok(validator.validate(rules).length > 0);
 
     selector = "#body div[attr='test']:first-child  div";
-    ruleText = "w3schools.com##" + selector;
+    ruleText = `w3schools.com##${selector}`;
     rules = [ruleText];
     assert.ok(validator.validate(rules).length > 0);
 
-    selector = ".todaystripe:matches-css(display: block)";
-    ruleText = "w3schools.com##" + selector;
+    selector = '.todaystripe:matches-css(display: block)';
+    ruleText = `w3schools.com##${selector}`;
     rules = [ruleText];
     assert.ok(validator.validate(rules).length > 0);
 
-    selector = ".todaystripe:matches-css-before(display: block)";
-    ruleText = "w3schools.com##" + selector;
+    selector = '.todaystripe:matches-css-before(display: block)';
+    ruleText = `w3schools.com##${selector}`;
     rules = [ruleText];
     assert.ok(validator.validate(rules).length > 0);
 
-    selector = ".todaystripe:matches-css-after(display: block)";
-    ruleText = "w3schools.com##" + selector;
+    selector = '.todaystripe:matches-css-after(display: block)';
+    ruleText = `w3schools.com##${selector}`;
     rules = [ruleText];
     assert.ok(validator.validate(rules).length > 0);
 
-    selector = ".todaystripe:has(.banner)";
-    ruleText = "w3schools.com##" + selector;
+    selector = '.todaystripe:has(.banner)';
+    ruleText = `w3schools.com##${selector}`;
     rules = [ruleText];
     assert.ok(validator.validate(rules).length > 0);
 
-    selector = ".todaystripe:contains(test)";
-    ruleText = "w3schools.com##" + selector;
+    selector = '.todaystripe:contains(test)';
+    ruleText = `w3schools.com##${selector}`;
     rules = [ruleText];
     assert.ok(validator.validate(rules).length > 0);
 
@@ -119,85 +119,85 @@ QUnit.test("Test ext-css validation", function (assert) {
     // rules = [ruleText];
     // assert.ok(validator.validate(rules).length > 0);
 
-    ruleText = "drive2.ru##.l-main.js-main div.c-block:has(> div.c-header)";
+    ruleText = 'drive2.ru##.l-main.js-main div.c-block:has(> div.c-header)';
     rules = [ruleText];
     assert.ok(validator.validate(rules).length > 0);
 
     selector = "[-ext-has='script:contains(var banner)']";
-    ruleText = "w3schools.com##" + selector;
+    ruleText = `w3schools.com##${selector}`;
     rules = [ruleText];
     assert.ok(validator.validate(rules).length > 0);
 
     selector = "[-ext-has='script:inject(var banner)']";
-    ruleText = "w3schools.com##" + selector;
+    ruleText = `w3schools.com##${selector}`;
     rules = [ruleText];
     assert.ok(validator.validate(rules).length === 0);
 });
 
-QUnit.test("Test ext-css validation - complicated cases", function (assert) {
+QUnit.test('Test ext-css validation - complicated cases', (assert) => {
     'use strict';
 
-    const validator = require("../main/validator.js");
+    const validator = require('../main/validator.js');
     validator.init();
 
     let ruleText;
     let rules;
 
-    ruleText = "doodhwali.com##.container .col-xs-12 .col-xs-12 > .yellow:not(:nth-child(3))";
+    ruleText = 'doodhwali.com##.container .col-xs-12 .col-xs-12 > .yellow:not(:nth-child(3))';
     rules = [ruleText];
     assert.ok(validator.validate(rules).length > 0);
 
-    ruleText = "w3schools.com##.todaystripe:after";
+    ruleText = 'w3schools.com##.todaystripe:after';
     rules = [ruleText];
     assert.ok(validator.validate(rules).length > 0);
 
-    ruleText = "puls4.com##.media-actions-list > li:not(:nth-child(3)):not(:nth-child(4))";
+    ruleText = 'puls4.com##.media-actions-list > li:not(:nth-child(3)):not(:nth-child(4))';
     rules = [ruleText];
     assert.ok(validator.validate(rules).length > 0);
 
-    ruleText = "salamnews.org##.snlikebt > ul > li:not(:nth-child(4)):not(:nth-child(5))";
+    ruleText = 'salamnews.org##.snlikebt > ul > li:not(:nth-child(4)):not(:nth-child(5))';
     rules = [ruleText];
     assert.ok(validator.validate(rules).length > 0);
 
-    ruleText = "posta.com.tr##.detail-share-item > a:not([href*=\"window.print()\"])";
+    ruleText = 'posta.com.tr##.detail-share-item > a:not([href*="window.print()"])';
     rules = [ruleText];
     assert.ok(validator.validate(rules).length > 0);
 
-    ruleText = "disk.yandex.az,disk.yandex.by,disk.yandex.co.il,disk.yandex.com,disk.yandex.com.am,disk.yandex.com.ge,disk.yandex.com.tr,disk.yandex.ee,disk.yandex.fr,disk.yandex.kg,disk.yandex.kz,disk.yandex.lt,disk.yandex.lv,disk.yandex.md,disk.yandex.ru,disk.yandex.tj,disk.yandex.tm,disk.yandex.ua,disk.yandex.uz,yadi.sk##.share-link-popup__menu > div.menu__group:last-child > div.menu__item:not(:last-child):not(:nth-child(3))";
+    ruleText = 'disk.yandex.az,disk.yandex.by,disk.yandex.co.il,disk.yandex.com,disk.yandex.com.am,disk.yandex.com.ge,disk.yandex.com.tr,disk.yandex.ee,disk.yandex.fr,disk.yandex.kg,disk.yandex.kz,disk.yandex.lt,disk.yandex.lv,disk.yandex.md,disk.yandex.ru,disk.yandex.tj,disk.yandex.tm,disk.yandex.ua,disk.yandex.uz,yadi.sk##.share-link-popup__menu > div.menu__group:last-child > div.menu__item:not(:last-child):not(:nth-child(3))';
     rules = [ruleText];
     assert.ok(validator.validate(rules).length > 0);
 
-    ruleText = "fullfilmihdizlesene.com###sidebar > .sidebarborder:not(:nth-child(3))";
+    ruleText = 'fullfilmihdizlesene.com###sidebar > .sidebarborder:not(:nth-child(3))';
     rules = [ruleText];
     assert.ok(validator.validate(rules).length > 0);
 
-    ruleText = "pan.baidu.com,music.baidu.com,yun.baidu.com##[class|=ad]";
+    ruleText = 'pan.baidu.com,music.baidu.com,yun.baidu.com##[class|=ad]';
     rules = [ruleText];
     assert.ok(validator.validate(rules).length > 0);
 
-    rules = ["better.com#$##header-floating\ navbar { position: absolute !important; }",
-        "bongino.com#$##site-header\ 1 > .site-header-main { height: 167.3px !important; }",
-        "deadline.com#$#.pmc-u-background-white.\/\/.header__bar { position: relative !important; transform: translateY(0) !important; }",
-        "engadget.com#$#.o-sticky_header\@tp- { position: relative !important; }",
-        "sports.yahoo.com#$##atomic .Mt\(headerHeight\) { margin-top: 22px !important; }",
-        "texasmonthly.com#$##\#novella-header { position: relative !important; top: 0 !important; }"];
+    rules = ['better.com#$##header-floating\ navbar { position: absolute !important; }',
+        'bongino.com#$##site-header\ 1 > .site-header-main { height: 167.3px !important; }',
+        'deadline.com#$#.pmc-u-background-white.\/\/.header__bar { position: relative !important; transform: translateY(0) !important; }',
+        'engadget.com#$#.o-sticky_header\@tp- { position: relative !important; }',
+        'sports.yahoo.com#$##atomic .Mt\(headerHeight\) { margin-top: 22px !important; }',
+        'texasmonthly.com#$##\#novella-header { position: relative !important; top: 0 !important; }'];
     assert.ok(validator.validate(rules).length === 6);
 
     rules = ["sports.yahoo.com#$##atomic .Mt\(headerHeight\) { margin-top: \\'22px\\' !important; }",
-            "better.com#$##header-floating\ navbar { font-family: \\'Blogger\\'; }"];
+        "better.com#$##header-floating\ navbar { font-family: \\'Blogger\\'; }"];
     assert.ok(validator.validate(rules).length === 0);
 });
 
-QUnit.test("Test ext-css validation - complicated cases", function (assert) {
+QUnit.test('Test ext-css validation - complicated cases', (assert) => {
     'use strict';
 
-    const validator = require("../main/validator.js");
+    const validator = require('../main/validator.js');
     validator.init();
 
     let ruleText;
     let rules;
 
-    ruleText = "example.com##div:has-text(/test-xpath-content/):xpath(../../..)";
+    ruleText = 'example.com##div:has-text(/test-xpath-content/):xpath(../../..)';
     rules = [ruleText];
     assert.ok(validator.validate(rules).length > 0);
 
@@ -205,46 +205,46 @@ QUnit.test("Test ext-css validation - complicated cases", function (assert) {
     rules = [ruleText];
     assert.ok(validator.validate(rules).length > 0);
 
-    ruleText = "example.com##div.test-nth-ancestor-marker:nth-ancestor(4)";
+    ruleText = 'example.com##div.test-nth-ancestor-marker:nth-ancestor(4)';
     rules = [ruleText];
     assert.ok(validator.validate(rules).length > 0);
 
-    ruleText = "example.com##div:xpath(../../..):has-text(/test-xpath-content/)";
+    ruleText = 'example.com##div:xpath(../../..):has-text(/test-xpath-content/)';
     rules = [ruleText];
     assert.ok(validator.validate(rules).length === 0);
 
-    ruleText = "example.com##div:nth-ancestor(999)";
+    ruleText = 'example.com##div:nth-ancestor(999)';
     rules = [ruleText];
     assert.ok(validator.validate(rules).length === 0);
 
-    ruleText = "example.com##div:xpath()";
+    ruleText = 'example.com##div:xpath()';
     rules = [ruleText];
     assert.ok(validator.validate(rules).length === 0);
 });
 
-QUnit.test("Test ext-css validation - invalid pseudo classes", function (assert) {
+QUnit.test('Test ext-css validation - invalid pseudo classes', (assert) => {
     'use strict';
 
-    const validator = require("../main/validator.js");
+    const validator = require('../main/validator.js');
     validator.init();
 
     let ruleText;
     let rules;
 
-    ruleText = "yandex.ru##[-ext-has=test]:matches(.whatisthis)";
+    ruleText = 'yandex.ru##[-ext-has=test]:matches(.whatisthis)';
     rules = [ruleText];
     assert.ok(validator.validate(rules).length > 0);
 
-    //Invalid pseudo class
-    ruleText = "yandex.ru##[-ext-has=test]:matches(.whatisthis), .todaystripe:contains(test)";
+    // Invalid pseudo class
+    ruleText = 'yandex.ru##[-ext-has=test]:matches(.whatisthis), .todaystripe:contains(test)';
     rules = [ruleText];
     assert.notOk(validator.validate(rules).length > 0);
 });
 
-QUnit.test("Test content rules validation", function (assert) {
+QUnit.test('Test content rules validation', (assert) => {
     'use strict';
 
-    const validator = require("../main/validator.js");
+    const validator = require('../main/validator.js');
     validator.init();
 
     let rules = ['~nigma.ru,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]'];
@@ -255,7 +255,7 @@ QUnit.test("Test content rules validation", function (assert) {
     assert.ok(validator.validate(rules).length > 0);
 });
 
-QUnit.test("Test blacklist domains - content/script rules", (assert) => {
+QUnit.test('Test blacklist domains - content/script rules', (assert) => {
     'use strict';
 
     const before = `
@@ -270,7 +270,7 @@ google.com,one.com#%#window.__gaq3 = undefined;
     const path = require('path');
     const domainsBlacklist = path.join(__dirname, './resources/domains-blacklist.txt');
 
-    const validator = require("../main/validator.js");
+    const validator = require('../main/validator.js');
     validator.init(domainsBlacklist);
 
     const after = validator.blacklistDomains(before.trim().split('\n'));
@@ -287,7 +287,7 @@ one.com#%#window.__gaq3 = undefined;`;
     assert.equal(after.join('\n').trim(), correct.trim());
 });
 
-QUnit.test("Test blacklist domains - cosmetic css rules", (assert) => {
+QUnit.test('Test blacklist domains - cosmetic css rules', (assert) => {
     'use strict';
 
     const before = `
@@ -300,7 +300,7 @@ google.com,one.com$$script[data-src="banner3"]
     const path = require('path');
     const domainsBlacklist = path.join(__dirname, './resources/domains-blacklist.txt');
 
-    const validator = require("../main/validator.js");
+    const validator = require('../main/validator.js');
     validator.init(domainsBlacklist);
 
     const after = validator.blacklistDomains(before.trim().split('\n'));
@@ -318,7 +318,7 @@ one.com$$script[data-src="banner3"]
     assert.equal(after.join('\n').trim(), correct.trim());
 });
 
-QUnit.test("Test blacklist domains - no domain rules", function (assert) {
+QUnit.test('Test blacklist domains - no domain rules', (assert) => {
     'use strict';
 
     const before = `###PopUpWnd
@@ -330,7 +330,7 @@ example.com##.div
     const path = require('path');
     const domainsBlacklist = path.join(__dirname, './resources/domains-blacklist.txt');
 
-    const validator = require("../main/validator.js");
+    const validator = require('../main/validator.js');
     validator.init(domainsBlacklist);
 
     const after = validator.blacklistDomains(before.trim().split('\n'));
@@ -345,7 +345,7 @@ example.com##.div`;
     assert.equal(after.join('\n').trim(), correct.trim());
 });
 
-QUnit.test("Test blacklist domains - replace rules", function (assert) {
+QUnit.test('Test blacklist domains - replace rules', (assert) => {
     'use strict';
 
     const before = `###PopUpWnd
@@ -358,7 +358,7 @@ example.com##.div
     const path = require('path');
     const domainsBlacklist = path.join(__dirname, './resources/domains-blacklist.txt');
 
-    const validator = require("../main/validator.js");
+    const validator = require('../main/validator.js');
     validator.init(domainsBlacklist);
 
     const after = validator.blacklistDomains(before.trim().split('\n'));
@@ -374,10 +374,10 @@ example.com##.div
     assert.equal(after.join('\n').trim(), correct.trim());
 });
 
-QUnit.test("Test validation - various rules", function (assert) {
+QUnit.test('Test validation - various rules', (assert) => {
     'use strict';
 
-    const validator = require("../main/validator.js");
+    const validator = require('../main/validator.js');
     validator.init();
 
     let rules = ['||onedrive.su/code/bshow.php$empty,important,~websocket'];
@@ -436,10 +436,10 @@ QUnit.test("Test validation - various rules", function (assert) {
     assert.equal(actual, expected);
 });
 
-QUnit.test("Test validation - validate redirect option", function (assert) {
+QUnit.test('Test validation - validate redirect option', (assert) => {
     'use strict';
 
-    const validator = require("../main/validator.js");
+    const validator = require('../main/validator.js');
     validator.init();
 
 
@@ -452,7 +452,7 @@ QUnit.test("Test validation - validate redirect option", function (assert) {
         validRedirectRule1,
         validRedirectRule2,
         validImportantRule3,
-        nonValidRule
+        nonValidRule,
     ];
 
     const validateRules = validator.validate(rules);
@@ -464,10 +464,10 @@ QUnit.test("Test validation - validate redirect option", function (assert) {
     assert.ok(validator.validate(rules).length === 3);
 });
 
-QUnit.test("Test validation - validate rules with $", function (assert) {
+QUnit.test('Test validation - validate rules with $', (assert) => {
     'use strict';
 
-    const validator = require("../main/validator.js");
+    const validator = require('../main/validator.js');
     validator.init();
 
 
@@ -483,10 +483,10 @@ QUnit.test("Test validation - validate rules with $", function (assert) {
     assert.ok(validateRules.length > 0);
 });
 
-QUnit.test("Test validation - incorrect domain option", function (assert) {
+QUnit.test('Test validation - incorrect domain option', (assert) => {
     'use strict';
 
-    const validator = require("../main/validator.js");
+    const validator = require('../main/validator.js');
     validator.init();
 
     let rules = ['|http*$domain='];
@@ -499,8 +499,8 @@ QUnit.test("Test validation - incorrect domain option", function (assert) {
     assert.ok(validator.validate(rules).length === 0);
 });
 
-QUnit.test("Test validation - cosmetic css rules", function (assert) {
-    const validator = require("../main/validator.js");
+QUnit.test('Test validation - cosmetic css rules', (assert) => {
+    const validator = require('../main/validator.js');
     validator.init();
 
     let rules = ['example.com#$#body { background: black; }'];
@@ -527,7 +527,7 @@ QUnit.test("Test validation - cosmetic css rules", function (assert) {
 });
 
 QUnit.test('Test ##^script:has-text and $$script[tag-containts] rules', (assert) => {
-    const validator = require("../main/validator.js");
+    const validator = require('../main/validator.js');
     validator.init();
 
     let rules = ['example.com##^script:contains(/.+banner/)'];
@@ -575,7 +575,7 @@ QUnit.test('Test scriptlets lib validator', (assert) => {
 });
 
 QUnit.test('Test scriptlets validator', (assert) => {
-    const validator = require("../main/validator.js");
+    const validator = require('../main/validator.js');
     validator.init();
 
     let rules = [
@@ -605,7 +605,7 @@ QUnit.test('Test scriptlets validator', (assert) => {
 });
 
 QUnit.test('Test redirects validator', (assert) => {
-    const validator = require("../main/validator.js");
+    const validator = require('../main/validator.js');
     validator.init();
 
     let rules = ['||delivery.tf1.fr/pub$media,redirect=noopmp3-0.1s,domain=tf1.fr',
@@ -625,7 +625,7 @@ QUnit.test('Test redirects validator', (assert) => {
         '||example.com/*.mp4$media,redirect=noopmp4_1s'];
     assert.equal(validator.validate(rules).length, 0);
 
-    const { redirects } = require('scriptlets');
+    const {redirects} = require('scriptlets');
 
     let rule = '||example.com^$script,redirect=noopjs.js';
     assert.equal(redirects.isValidAdgRedirectRule(rule), false);
@@ -656,4 +656,25 @@ QUnit.test('Test redirects validator', (assert) => {
 
     rule = '||strm.yandex.ru/get/$script,redirect=noopvast-2.0,domain=kinopoisk.ru';
     assert.equal(redirects.isValidAdgRedirectRule(rule), true);
+});
+
+QUnit.test('Test blocking rules with regexp', (assert) => {
+    'use strict';
+
+    const validator = require('../main/validator.js');
+    validator.init();
+
+    let rules = [
+        '/ex[[ampl[[e\.com\///.*\/banner/$script',
+        '/^htt[[[ps?:\/\/.*(bitly|bit)\.(com|ly)\//$domain=1337x.to',
+        '/\.sharesix\.com/.*[a-zA-Z0-9]({4}/$script',
+    ];
+    assert.ok(validator.validate(rules).length === 0);
+
+    rules = [
+        '/^https:\/\/([a-z]+\.)?sythe\.org\/\[=%#@$&!^].*[\w\W]{20,}/$image',
+        '/^https?:\/\/.*(bitly|bit)\.(com|ly)\//$domain=1337x.to',
+        '/^https?:\/\/.*(powvideo|powvldeo|povvideo).*\.*[?&$=&!]/$script,subdocument',
+    ];
+    assert.ok(validator.validate(rules).length === 3);
 });
