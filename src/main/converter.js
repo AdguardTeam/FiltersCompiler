@@ -34,6 +34,9 @@ module.exports = (() => {
     const EHIDE_REGEX = /(.+[^#]\$.*)(ehide)($|,.+)/i;
     const ELEMHIDE = 'elemhide';
 
+    const REMOVE_RULE_PATTERN = ':remove()';
+    const REMOVE_RULE_REPLACER = ' { remove: true; }';
+
     /**
      * Excludes rule
      * @param {string} rule
@@ -244,6 +247,25 @@ module.exports = (() => {
     };
 
     /**
+     * Converts ':remove()' rule to AdGuard extended css rule
+     * example.com###banner:remove() -> example.com#$?##banner { remove: true; }
+     * @param {string} rule
+     * @return {string} rule or converted rule
+     */
+    const convertRemoveRule = (rule) => {
+        if (rule.includes(RuleMasks.MASK_ELEMENT_HIDING) && rule.endsWith(REMOVE_RULE_PATTERN)) {
+            const result = rule
+                .replace(RuleMasks.MASK_ELEMENT_HIDING, RuleMasks.MASK_CSS_INJECT_EXTENDED_CSS_RULE)
+                .replace(REMOVE_RULE_PATTERN, REMOVE_RULE_REPLACER);
+
+            logger.log(`Rule "${rule}" converted to: ${result}`);
+            return result;
+        }
+
+        return rule;
+    };
+
+    /**
      * Converts rules to AdGuard syntax
      * @param {array} rulesList
      * @param {array} excluded
@@ -263,6 +285,7 @@ module.exports = (() => {
             rule = replaceOptions(rule);
             rule = convertScriptHasTextToScriptTagContent(rule);
             rule = convertUboAndAbpRedirectsToAdg(rule, excluded);
+            rule = convertRemoveRule(rule);
 
             const scriptletRule = convertUboAndAbpScriptletsToAdg(rule, excluded);
             if (scriptletRule) {
