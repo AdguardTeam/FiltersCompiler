@@ -355,3 +355,22 @@ QUnit.test('Test redirects converter', (assert) => {
     expected = '';
     assert.equal(actual, expected);
 });
+
+QUnit.test('Test :remove() rules conversion', (assert) => {
+    const converter = require('../main/converter');
+    let actual = converter.convertRulesToAdgSyntax(['ekoteka.pl###popUpModal:remove()']);
+    let expected = 'ekoteka.pl#$?##popUpModal { remove: true; }';
+    assert.equal(actual, expected);
+
+    actual = converter.convertRulesToAdgSyntax(['aftonbladet.se##.jwplayer:has(.svp-sponsor-label):remove()']);
+    expected = 'aftonbladet.se#$?#.jwplayer:has(.svp-sponsor-label) { remove: true; }';
+    assert.equal(actual, expected);
+
+    actual = converter.convertRulesToAdgSyntax(['bmw-motorrad.pl##.cookielayer:remove()']);
+    expected = 'bmw-motorrad.pl#$?#.cookielayer { remove: true; }';
+    assert.equal(actual, expected);
+
+    actual = converter.convertRulesToAdgSyntax(['besplatka.ua,forumodua.com##body > div:not([id]):not([class]):not([style]):empty:remove()']);
+    expected = 'besplatka.ua,forumodua.com#$?#body > div:not([id]):not([class]):not([style]):empty { remove: true; }';
+    assert.equal(actual, expected);
+});
