@@ -512,13 +512,15 @@ module.exports = (function () {
         const logLines = logsData.split(os.EOL);
         const errors = logLines.filter((line) => line.includes('[ERROR]'));
 
-        let dotIndex = logFile.lastIndexOf('.');
-        if (!dotIndex) {
-            dotIndex = logFile.length;
-        }
-        const errorsLogFile = `${logFile.slice(0, dotIndex)}-errors${logFile.slice(dotIndex)}`;
+        if (errors.length) {
+            let dotIndex = logFile.lastIndexOf('.');
+            if (!dotIndex) {
+                dotIndex = logFile.length;
+            }
+            const errorsLogFile = `${logFile.slice(0, dotIndex)}-errors${logFile.slice(dotIndex)}`;
 
-        writeFile(errorsLogFile, errors);
+            writeFile(errorsLogFile, errors.join('\n'));
+        }
     };
 
     /**
