@@ -13,6 +13,7 @@ module.exports = (function () {
      * @property {function} mkdirSync
      */
     const fs = require('fs');
+    const os = require('os');
     /**
      * @typedef {Object} path
      * @property {function} join
@@ -500,6 +501,27 @@ module.exports = (function () {
     };
 
     /**
+     * Creates errors log file from common logs
+     * @param {string} logFile
+     */
+    const createErrorsLog = (logFile) => {
+        const logsData = readFile(logFile);
+        if (!logsData) {
+            return;
+        }
+        const logLines = logsData.split(os.EOL);
+        const errors = logLines.filter((line) => line.includes('[ERROR]'));
+
+        let dotIndex = logFile.lastIndexOf('.');
+        if (!dotIndex) {
+            dotIndex = logFile.length;
+        }
+        const errorsLogFile = `${logFile.slice(0, dotIndex)}-errors${logFile.slice(dotIndex)}`;
+
+        writeFile(errorsLogFile, errors);
+    };
+
+    /**
      * Builds all filters in child directories
      *
      * @param filtersDir
@@ -528,6 +550,8 @@ module.exports = (function () {
         logger.info('Generating platforms');
         generator.generate(filtersDir, platformsPath, whitelist, blacklist);
         logger.info('Generating platforms done');
+
+        createErrorsLog(logFile);
     };
 
     return {
