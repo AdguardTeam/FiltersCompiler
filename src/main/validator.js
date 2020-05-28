@@ -16,7 +16,8 @@ module.exports = (function () {
     const { redirects } = scriptlets;
 
     const ESCAPE_CHARACTER_REGEX = /{.*\\.*}/;
-    const FORBIDDEN_URL_REGEX = /{.+url\(.*\).*}/i;
+    // const FORBIDDEN_URL_REGEX = /{.+url\(.*\).*}/i;
+    const FORBIDDEN_URL_REGEX = /{.*url\(/i;
     const REGEX_PATTERN = /^\/.+\/$/;
 
     const VALID_OPTIONS = [
