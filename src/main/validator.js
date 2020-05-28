@@ -16,6 +16,7 @@ module.exports = (function () {
     const { redirects } = scriptlets;
 
     const ESCAPE_CHARACTER_REGEX = /{.*\\.*}/;
+    const FORBIDDEN_URL_REGEX = /{.+url\(.*\).*}/i;
     const REGEX_PATTERN = /^\/.+\/$/;
 
     const VALID_OPTIONS = [
@@ -348,7 +349,7 @@ module.exports = (function () {
      */
     const isValidCssRule = (ruleString, rule, excluded) => {
         if (rule.ruleType === RuleTypes.Css) {
-            if ((rule.contentPart && rule.contentPart.toLowerCase().indexOf('url(') >= 0)
+            if (FORBIDDEN_URL_REGEX.test(rule.contentPart)
                 || ESCAPE_CHARACTER_REGEX.test(rule.contentPart)) {
                 logger.error(`Invalid rule: ${ruleString} incorrect style: ${rule.contentPart}`);
                 excludeRule(excluded, '! Incorrect style:', rule.ruleText);
