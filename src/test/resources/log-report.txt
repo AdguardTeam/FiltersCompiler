@@ -1,0 +1,11 @@
+Filter ID: 2
+Filter name: AdGuard Base filter
+Compiled rules: 51
+Excluded rules: 20
+URL: https://filters.adtidy.org/extension/chromium/filters/2.txt
+---------------------------
+Filter ID: 3
+Filter name: Test Filter
+Filter is DISABLED!
+URL: https://easylist-downloads.adblockplus.org/easylist.txt
+---------------------------

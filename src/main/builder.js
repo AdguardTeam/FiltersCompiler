@@ -13,7 +13,6 @@ module.exports = (function () {
      * @property {function} mkdirSync
      */
     const fs = require('fs');
-    const os = require('os');
     /**
      * @typedef {Object} path
      * @property {function} join
@@ -26,6 +25,7 @@ module.exports = (function () {
     const validator = require('./validator.js');
     const generator = require('./platforms/generator.js');
     const logger = require('./utils/log.js');
+    const report = require('./utils/report.js');
     const RuleMasks = require('./rule/rule-masks');
     const workaround = require('./utils/workaround.js');
     const webutils = require('./utils/webutils.js');
@@ -432,6 +432,7 @@ module.exports = (function () {
         const metadata = JSON.parse(readFile(path.join(currentDir, METADATA_FILE)));
         if (metadata.disabled) {
             logger.warn('Filter skipped');
+            report.skipFilter(metadata);
             return;
         }
 
@@ -454,6 +455,7 @@ module.exports = (function () {
         const result = await compile(template, trustLevelSettings);
         const compiled = result.lines;
         const { excluded } = result;
+        report.addFilter(metadata, result);
         logger.info(`Compiled length:${compiled.length}`);
         logger.info(`Excluded length:${excluded.length}`);
 
@@ -501,29 +503,6 @@ module.exports = (function () {
     };
 
     /**
-     * Creates errors log file from common logs
-     * @param {string} logFile
-     */
-    const createErrorsLog = (logFile) => {
-        const logsData = readFile(logFile);
-        if (!logsData) {
-            return;
-        }
-        const logLines = logsData.split(os.EOL);
-        const errors = logLines.filter((line) => line.includes('[ERROR]'));
-
-        if (errors.length) {
-            let dotIndex = logFile.lastIndexOf('.');
-            if (!dotIndex) {
-                dotIndex = logFile.length;
-            }
-            const errorsLogFile = `${logFile.slice(0, dotIndex)}-errors${logFile.slice(dotIndex)}`;
-
-            writeFile(errorsLogFile, errors.join('\n'));
-        }
-    };
-
-    /**
      * Builds all filters in child directories
      *
      * @param filtersDir
@@ -544,6 +523,7 @@ module.exports = (function () {
         blacklist
     ) {
         logger.initialize(logFile);
+        report.init(logFile);
         validator.init(domainBlacklistFile);
         generator.init(FILTER_FILE, METADATA_FILE, REVISION_FILE, platformsConfigFile, ADGUARD_FILTERS_SERVER_URL);
 
@@ -552,8 +532,6 @@ module.exports = (function () {
         logger.info('Generating platforms');
         generator.generate(filtersDir, platformsPath, whitelist, blacklist);
         logger.info('Generating platforms done');
-
-        createErrorsLog(logFile);
     };
 
     return {
