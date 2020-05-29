@@ -23,7 +23,8 @@ QUnit.test('Test builder', async (assert) => {
 
     const filtersDir = path.join(__dirname, './resources/filters');
     const logFile = path.join(__dirname, './resources/log.txt');
-    await builder.build(filtersDir, logFile);
+    const reportFile = path.join(__dirname, './resources/report.txt');
+    await builder.build(filtersDir, logFile, reportFile);
 
     let revision = readFile(path.join(filtersDir, 'filter_3_Test', 'revision.json'));
     assert.ok(revision);
@@ -134,18 +135,19 @@ QUnit.test('Test builder - build lists', async (assert) => {
 
     const filtersDir = path.join(__dirname, './resources/filters');
     const logFile = path.join(__dirname, './resources/log.txt');
+    const reportFile = path.join(__dirname, './resources/report.txt');
 
-    await builder.build(filtersDir, logFile, null, null, null, [2, 3]);
+    await builder.build(filtersDir, logFile, reportFile, null, null, null, [2, 3]);
 
     let revision = readFile(path.join(filtersDir, 'filter_2_English', 'revision.json'));
     assert.ok(revision);
 
-    await builder.build(filtersDir, logFile, null, null, null, null, [3, 4]);
+    await builder.build(filtersDir, logFile, reportFile, null, null, null, null, [3, 4]);
 
     revision = readFile(path.join(filtersDir, 'filter_2_English', 'revision.json'));
     assert.ok(revision);
 
-    await builder.build(filtersDir, logFile, null, null, null, [2, 3], [3, 4]);
+    await builder.build(filtersDir, logFile, reportFile, null, null, null, [2, 3], [3, 4]);
 
     revision = readFile(path.join(filtersDir, 'filter_2_English', 'revision.json'));
     assert.ok(revision);
@@ -173,9 +175,10 @@ QUnit.test('Test builder - platforms', async (assert) => {
 
     const filtersDir = path.join(__dirname, './resources/filters');
     const logFile = path.join(__dirname, './resources/log_platforms.txt');
+    const reportFile = path.join(__dirname, './resources/report_platforms.txt');
     const platforms = path.join(__dirname, './resources/platforms');
     const platformsConfig = path.join(__dirname, './resources/platforms.json');
-    await builder.build(filtersDir, logFile, null, platforms, platformsConfig);
+    await builder.build(filtersDir, logFile, reportFile, null, platforms, platformsConfig);
 
     const filterText = readFile(path.join(filtersDir, 'filter_3_Test', 'filter.txt'));
     assert.ok(filterText);

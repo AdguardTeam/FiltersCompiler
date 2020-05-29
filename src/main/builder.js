@@ -507,6 +507,7 @@ module.exports = (function () {
      *
      * @param filtersDir
      * @param logFile
+     * @param reportFile
      * @param domainBlacklistFile
      * @param platformsPath
      * @param platformsConfigFile
@@ -516,6 +517,7 @@ module.exports = (function () {
     const build = async function (
         filtersDir,
         logFile,
+        reportFile,
         domainBlacklistFile,
         platformsPath,
         platformsConfigFile,
@@ -523,7 +525,6 @@ module.exports = (function () {
         blacklist
     ) {
         logger.initialize(logFile);
-        report.init(logFile);
         validator.init(domainBlacklistFile);
         generator.init(FILTER_FILE, METADATA_FILE, REVISION_FILE, platformsConfigFile, ADGUARD_FILTERS_SERVER_URL);
 
@@ -532,6 +533,7 @@ module.exports = (function () {
         logger.info('Generating platforms');
         generator.generate(filtersDir, platformsPath, whitelist, blacklist);
         logger.info('Generating platforms done');
+        report.create(reportFile);
     };
 
     return {
