@@ -512,6 +512,12 @@ QUnit.test('Test validation - cosmetic css rules', (assert) => {
     rules = ['example.com#$#body { background: \\75 rl("https://some.jpg"); }'];
     assert.ok(validator.validate(rules).length === 0);
 
+    rules = ['example.com#$#body[style*="background-image: url()"] { margin-top: 45px !important; }'];
+    assert.ok(validator.validate(rules).length === 1);
+
+    rules = ['example.com#$#body[style*="background-image: url(\'https://some.jpg\')"] { background: url() !important; }'];
+    assert.ok(validator.validate(rules).length === 0);
+
     rules = ['hotline.ua#$#body.reset-scroll:before { z-index: -9999!important; display: none!important; }',
         'hotline.ua##body.reset-scroll::before',
         'hotline.ua##body.reset-scroll::after'];
