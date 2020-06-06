@@ -18,7 +18,7 @@ module.exports = (() => {
         return require('child_process')
             .execFileSync(
                 'curl',
-                ['--fail', '--silent', '--user-agent', USER_AGENT, '-L', url],
+                ['--fail', '--insecure', '--silent', '--user-agent', USER_AGENT, '-L', url],
                 { encoding: 'utf8', maxBuffer: Infinity }
             );
     };
