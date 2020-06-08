@@ -15,12 +15,14 @@ module.exports = (() => {
      * @returns {*}
      */
     const tryDownloadFile = function (url) {
+        let args = ['--fail', '--silent', '--user-agent', USER_AGENT, '-L', url];
+        const options = { encoding: 'utf8', maxBuffer: Infinity };
+        const tlsCheck = process.env.TLS;
+        if (tlsCheck === 'insecure') {
+            args = ['--insecure'].concat(args);
+        }
         return require('child_process')
-            .execFileSync(
-                'curl',
-                ['--fail', '--silent', '--user-agent', USER_AGENT, '-L', url],
-                { encoding: 'utf8', maxBuffer: Infinity }
-            );
+            .execFileSync('curl', args, options);
     };
 
     /**
