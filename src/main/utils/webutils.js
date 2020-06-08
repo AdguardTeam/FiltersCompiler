@@ -17,8 +17,8 @@ module.exports = (() => {
     const tryDownloadFile = function (url) {
         let args = ['--fail', '--silent', '--user-agent', USER_AGENT, '-L', url];
         const options = { encoding: 'utf8', maxBuffer: Infinity };
-        const tlsCheck = process.env.TLS_CHECK;
-        if (tlsCheck) {
+        const tlsCheck = process.env.TLS;
+        if (tlsCheck === 'insecure') {
             args = ['--insecure'].concat(args);
         }
         return require('child_process')
