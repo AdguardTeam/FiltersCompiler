@@ -19,11 +19,11 @@ The package could be run with the following command:
  
  const filtersDir = path.join(__dirname, './filters');
  const logPath = path.join(__dirname, './log.txt');
- const domainBlacklistFile = path.join(__dirname, './domains-blacklist.txt');
+ const reportPath = path.join(__dirname, './report.txt');
  
  const platformsPath = path.join(__dirname, './platforms');
  
- compiler.compile(filtersDir, logPath, domainBlacklistFile, platformsPath, whitelist, blacklist);
+ compiler.compile(filtersDir, logPath, reportPath, platformsPath, whitelist, blacklist);
 ```
 
 ## Tests

@@ -4,13 +4,11 @@ module.exports = (function () {
      * @typedef {Object} fs
      * @property {function} readFileSync
      */
-    const fs = require('fs');
 
     const logger = require('./utils/log.js');
     const ruleParser = require('./rule/rule-parser.js');
     const RuleTypes = require('./rule/rule-types.js');
     const RuleMasks = require('./rule/rule-masks.js');
-    const Rule = require('./rule/rule.js');
     const extendedCssValidator = require('./utils/extended-css-validator.js');
     const scriptlets = require('scriptlets');
     const { redirects } = scriptlets;
@@ -79,98 +77,6 @@ module.exports = (function () {
             excluded.push(warning);
             excluded.push(rule);
         }
-    };
-
-    let domainsBlacklist = [];
-
-    /**
-     * Initializes validator
-     *
-     * @param domainBlacklistFile
-     */
-    const init = function (domainBlacklistFile) {
-        try {
-            const s = fs.readFileSync(domainBlacklistFile, { encoding: 'utf-8' });
-            if (s) {
-                domainsBlacklist = s.split('\n');
-            } else {
-                domainsBlacklist = [];
-            }
-        } catch (e) {
-            domainsBlacklist = [];
-        }
-    };
-
-    /**
-     * Filters blacklisted domains
-     *
-     * @param domains
-     * @param rule
-     * @param excluded
-     * @returns boolean
-     */
-    const removeBlacklistedDomains = function (domains, rule, excluded) {
-        if (domainsBlacklist.length === 0) {
-            return domains;
-        }
-
-        return domains.filter((d) => {
-            if (domainsBlacklist.indexOf(d) >= 0) {
-                logger.error(`Blacklisted domain: ${d}`);
-                excludeRule(excluded, `! ${d} is blacklisted: `, rule);
-                return false;
-            }
-
-            return true;
-        });
-    };
-
-    /**
-     * Validates list of rules with black list of domains
-     * returns modified list of rules without blacklisted domain options
-     */
-    const blacklistDomains = function (list, excluded) {
-        const result = [];
-
-        list.forEach((line) => {
-            let corrected = line;
-            const rule = ruleParser.parseRule(line);
-
-            if (rule.ruleType === RuleTypes.UrlBlocking) {
-                const { modifiers } = rule;
-                if (modifiers.domain) {
-                    const validated = removeBlacklistedDomains(modifiers.domain, line, excluded);
-                    if (validated.length === 0) {
-                        logger.error(`All domains are blacklisted for rule: ${line}`);
-                        excludeRule(excluded, '! All domains are blacklisted for rule:', line);
-                        return;
-                    }
-
-                    modifiers.domain = validated;
-
-                    corrected = rule.buildNewModifiers(modifiers);
-                    if (rule.whiteList) {
-                        corrected = RuleMasks.MASK_WHITE_LIST + corrected;
-                    }
-                }
-            } else if (rule.ruleType === RuleTypes.ElementHiding || rule.ruleType === RuleTypes.Css
-                || rule.ruleType === RuleTypes.Content || rule.ruleType === RuleTypes.Script) {
-                if (rule.domains) {
-                    const validated = removeBlacklistedDomains(rule.domains, line, excluded);
-                    if (validated.length === 0) {
-                        logger.error(`All domains are blacklisted for rule: ${line}`);
-                        excludeRule(excluded, '! All domains are blacklisted for rule:', line);
-                        return;
-                    }
-
-                    corrected = Rule.buildNewLeadingDomainsRuleText(rule.contentPart, validated, rule.mask);
-                }
-            }
-
-            result.push(corrected);
-        });
-
-        return result;
     };
 
     /**
@@ -402,8 +308,6 @@ module.exports = (function () {
     };
 
     return {
-        init,
         validate,
-        blacklistDomains,
     };
 }());

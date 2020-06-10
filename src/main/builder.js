@@ -371,7 +371,6 @@ module.exports = (function () {
         result = exclude(result, trustLevelSettings, excluded);
 
         result = validator.validate(result, excluded);
-        result = validator.blacklistDomains(result, excluded);
 
         return {
             lines: result,
@@ -508,7 +507,6 @@ module.exports = (function () {
      * @param filtersDir
      * @param logFile
      * @param reportFile
-     * @param domainBlacklistFile
      * @param platformsPath
      * @param platformsConfigFile
      * @param whitelist
@@ -518,14 +516,12 @@ module.exports = (function () {
         filtersDir,
         logFile,
         reportFile,
-        domainBlacklistFile,
         platformsPath,
         platformsConfigFile,
         whitelist,
         blacklist
     ) {
         logger.initialize(logFile);
-        validator.init(domainBlacklistFile);
         generator.init(FILTER_FILE, METADATA_FILE, REVISION_FILE, platformsConfigFile, ADGUARD_FILTERS_SERVER_URL);
 
         await parseDirectory(filtersDir, whitelist, blacklist);
