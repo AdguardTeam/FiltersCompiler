@@ -13,12 +13,11 @@ module.exports = (function () {
         throw error;
     });
 
-    const compile = function (path, logPath, reportFile, domainBlacklistFile, platformsPath, whitelist, blacklist) {
+    const compile = function (path, logPath, reportFile, platformsPath, whitelist, blacklist) {
         return builder.build(
             path,
             logPath,
             reportFile,
-            domainBlacklistFile,
             platformsPath,
             platformsConfig,
             whitelist,

@@ -16,7 +16,6 @@ QUnit.test('Test css validation', (assert) => {
     'use strict';
 
     const validator = require('../main/validator.js');
-    validator.init();
 
     let rules = ['example.com##.div'];
     assert.ok(validator.validate(rules).length > 0);
@@ -32,52 +31,16 @@ QUnit.test('Test incorrect rules', (assert) => {
     'use strict';
 
     const validator = require('../main/validator.js');
-    validator.init();
 
     let rules = ['||example.com##.div',
         'test$domain=yandex.ru,google.com'];
     assert.ok(validator.validate(rules).length === 0);
 });
 
-QUnit.test('Test blacklist domains - ulr/css rules', (assert) => {
-    'use strict';
-
-    const before = `
-||graph.com^$domain=google.com
-||graph.facebook.com^$domain=jp.gocro.smartnews.android|onemore.ru|google.com|plus.one
-||image.winudf.com/*/upload/promopure/$~third-party,empty,domain=apkpure.com|yahoo.com
-example.com##.div
-google.com###id
-google.com,one.com##a[href^=/], .container:has(nav) > a[href]:lt($var)
-@@||graph.com^$domain=not-google.com
-`;
-
-    const path = require('path');
-    const domainsBlacklist = path.join(__dirname, './resources/domains-blacklist.txt');
-
-    const validator = require('../main/validator.js');
-    validator.init(domainsBlacklist);
-
-    const after = validator.blacklistDomains(before.trim().split('\n'));
-
-    assert.ok(after);
-    assert.equal(after.length, 5);
-
-    const correct = `
-||graph.facebook.com^$domain=jp.gocro.smartnews.android|onemore.ru|plus.one
-||image.winudf.com/*/upload/promopure/$~third-party,empty,domain=apkpure.com
-example.com##.div
-one.com##a[href^=/], .container:has(nav) > a[href]:lt($var)
-@@||graph.com^$domain=not-google.com`;
-
-    assert.equal(after.join('\n').trim(), correct.trim());
-});
-
 QUnit.test('Test ext-css validation', (assert) => {
     'use strict';
 
     const validator = require('../main/validator.js');
-    validator.init();
 
     let selector = '#main > table.w3-table-all.notranslate:first-child > tbody > tr:nth-child(17) > td.notranslate:nth-child(2)';
     let ruleText = `w3schools.com##${selector}`;
@@ -138,7 +101,6 @@ QUnit.test('Test ext-css validation - complicated cases', (assert) => {
     'use strict';
 
     const validator = require('../main/validator.js');
-    validator.init();
 
     let ruleText;
     let rules;
@@ -192,7 +154,6 @@ QUnit.test('Test ext-css validation - complicated cases', (assert) => {
     'use strict';
 
     const validator = require('../main/validator.js');
-    validator.init();
 
     let ruleText;
     let rules;
@@ -226,7 +187,6 @@ QUnit.test('Test ext-css validation - invalid pseudo classes', (assert) => {
     'use strict';
 
     const validator = require('../main/validator.js');
-    validator.init();
 
     let ruleText;
     let rules;
@@ -245,7 +205,6 @@ QUnit.test('Test content rules validation', (assert) => {
     'use strict';
 
     const validator = require('../main/validator.js');
-    validator.init();
 
     let rules = ['~nigma.ru,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]'];
     assert.ok(validator.validate(rules).length > 0);
@@ -255,130 +214,10 @@ QUnit.test('Test content rules validation', (assert) => {
     assert.ok(validator.validate(rules).length > 0);
 });
 
-QUnit.test('Test blacklist domains - content/script rules', (assert) => {
-    'use strict';
-
-    const before = `
-example.com$$script[data-src="banner1"]
-google.com$$script[data-src="banner2"]
-google.com,one.com$$script[data-src="banner3"]
-example.com#%#window.__gaq1 = undefined;
-google.com#%#window.__gaq2 = undefined;
-google.com,one.com#%#window.__gaq3 = undefined;
-`;
-
-    const path = require('path');
-    const domainsBlacklist = path.join(__dirname, './resources/domains-blacklist.txt');
-
-    const validator = require('../main/validator.js');
-    validator.init(domainsBlacklist);
-
-    const after = validator.blacklistDomains(before.trim().split('\n'));
-
-    assert.ok(after);
-    assert.equal(after.length, 4);
-
-    const correct = `
-example.com$$script[data-src="banner1"]
-one.com$$script[data-src="banner3"]
-example.com#%#window.__gaq1 = undefined;
-one.com#%#window.__gaq3 = undefined;`;
-
-    assert.equal(after.join('\n').trim(), correct.trim());
-});
-
-QUnit.test('Test blacklist domains - cosmetic css rules', (assert) => {
-    'use strict';
-
-    const before = `
-example.com,google.com#$#body { background-color: #111!important; }
-one.com#$#body { background-color: #333!important; }
-two.com,google.com#$#body { background-color: #333!important; }
-google.com,one.com$$script[data-src="banner3"]
-`;
-
-    const path = require('path');
-    const domainsBlacklist = path.join(__dirname, './resources/domains-blacklist.txt');
-
-    const validator = require('../main/validator.js');
-    validator.init(domainsBlacklist);
-
-    const after = validator.blacklistDomains(before.trim().split('\n'));
-
-    assert.ok(after);
-    assert.equal(after.length, 4);
-
-    const correct = `
-example.com#$#body { background-color: #111!important; }
-one.com#$#body { background-color: #333!important; }
-two.com#$#body { background-color: #333!important; }
-one.com$$script[data-src="banner3"]
-`;
-
-    assert.equal(after.join('\n').trim(), correct.trim());
-});
-
-QUnit.test('Test blacklist domains - no domain rules', (assert) => {
-    'use strict';
-
-    const before = `###PopUpWnd
-||graph.com
-google.com###id
-example.com##.div
-`;
-
-    const path = require('path');
-    const domainsBlacklist = path.join(__dirname, './resources/domains-blacklist.txt');
-
-    const validator = require('../main/validator.js');
-    validator.init(domainsBlacklist);
-
-    const after = validator.blacklistDomains(before.trim().split('\n'));
-
-    assert.ok(after);
-    assert.equal(after.length, 3);
-
-    const correct = `###PopUpWnd
-||graph.com
-example.com##.div`;
-
-    assert.equal(after.join('\n').trim(), correct.trim());
-});
-
-QUnit.test('Test blacklist domains - replace rules', (assert) => {
-    'use strict';
-
-    const before = `###PopUpWnd
-||graph.com
-google.com###id
-example.com##.div
-||news.yandex.*/*/*-*-*-*-$replace=/Ya\[([0-9]{10\,15})\]\([\s\S]*\)\$/,script,important,domain=news.yandex.by|news.yandex.com|news.yandex.fr|news.yandex.kz|news.yandex.ru|news.yandex.ua|google.com
-`;
-
-    const path = require('path');
-    const domainsBlacklist = path.join(__dirname, './resources/domains-blacklist.txt');
-
-    const validator = require('../main/validator.js');
-    validator.init(domainsBlacklist);
-
-    const after = validator.blacklistDomains(before.trim().split('\n'));
-
-    assert.ok(after);
-    assert.equal(after.length, 4);
-
-    const correct = `###PopUpWnd
-||graph.com
-example.com##.div
-||news.yandex.*/*/*-*-*-*-$replace=/Ya\[([0-9]{10\,15})\]\([\s\S]*\)\$/,script,important,domain=news.yandex.by|news.yandex.com|news.yandex.fr|news.yandex.kz|news.yandex.ru|news.yandex.ua`;
-
-    assert.equal(after.join('\n').trim(), correct.trim());
-});
-
 QUnit.test('Test validation - various rules', (assert) => {
     'use strict';
 
     const validator = require('../main/validator.js');
-    validator.init();
 
     let rules = ['||onedrive.su/code/bshow.php$empty,important,~websocket'];
     assert.ok(validator.validate(rules).length > 0);
@@ -440,7 +279,6 @@ QUnit.test('Test validation - validate redirect option', (assert) => {
     'use strict';
 
     const validator = require('../main/validator.js');
-    validator.init();
 
 
     const validRedirectRule1 = 'onedrive.su/code/bshow.php$redirect';
@@ -468,7 +306,6 @@ QUnit.test('Test validation - validate rules with $', (assert) => {
     'use strict';
 
     const validator = require('../main/validator.js');
-    validator.init();
 
 
     const validRedirectRule1 = 'zen.yandex.by,zen.yandex.com,zen.yandex.com.tr,zen.yandex.fr,zen.yandex.kz,zen.yandex.ru,zen.yandex.ua#?#.feed__item:-abp-has(*:-abp-contains(/^реклама$/i))';
@@ -487,7 +324,6 @@ QUnit.test('Test validation - incorrect domain option', (assert) => {
     'use strict';
 
     const validator = require('../main/validator.js');
-    validator.init();
 
     let rules = ['|http*$domain='];
     assert.ok(validator.validate(rules).length === 0);
@@ -501,7 +337,6 @@ QUnit.test('Test validation - incorrect domain option', (assert) => {
 
 QUnit.test('Test validation - cosmetic css rules', (assert) => {
     const validator = require('../main/validator.js');
-    validator.init();
 
     let rules = ['example.com#$#body { background: black; }'];
     assert.ok(validator.validate(rules).length === 1);
@@ -534,7 +369,6 @@ QUnit.test('Test validation - cosmetic css rules', (assert) => {
 
 QUnit.test('Test ##^script:has-text and $$script[tag-containts] rules', (assert) => {
     const validator = require('../main/validator.js');
-    validator.init();
 
     let rules = ['example.com##^script:contains(/.+banner/)'];
     assert.ok(validator.validate(rules).length === 0);
@@ -582,7 +416,6 @@ QUnit.test('Test scriptlets lib validator', (assert) => {
 
 QUnit.test('Test scriptlets validator', (assert) => {
     const validator = require('../main/validator.js');
-    validator.init();
 
     let rules = [
         'test.com#%#//scriptlet("ubo-abort-current-inline-script.js", "Math.random", "adbDetect")',
@@ -612,7 +445,6 @@ QUnit.test('Test scriptlets validator', (assert) => {
 
 QUnit.test('Test redirects validator', (assert) => {
     const validator = require('../main/validator.js');
-    validator.init();
 
     let rules = ['||delivery.tf1.fr/pub$media,redirect=noopmp3-0.1s,domain=tf1.fr',
         '||example.com/banner$image,redirect=32x32-transparent.png',
@@ -668,7 +500,6 @@ QUnit.test('Test blocking rules with regexp', (assert) => {
     'use strict';
 
     const validator = require('../main/validator.js');
-    validator.init();
 
     let rules = [
         '/ex[[ampl[[e\.com\///.*\/banner/$script',
