@@ -1,0 +1,18 @@
+{
+  "filterId": 6,
+  "name": "Obsolete Test Filter",
+  "description": "Obsolete Test Filter description",
+  "timeAdded": 1404115015843,
+  "homepage": "https://easylist.adblockplus.org/",
+  "expires": "2 days",
+  "displayNumber": 200,
+  "groupId": 3,
+  "subscriptionUrl": "https://filters.adtidy.org/extension/chromium/filters/2.txt",
+  "tags": [
+    "purpose:ads",
+    "lang:en",
+    "lang:pl",
+    "obsolete"
+  ],
+  "trustLevel": "high"
+}

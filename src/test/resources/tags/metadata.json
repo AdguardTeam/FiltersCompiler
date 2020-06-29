@@ -18,5 +18,9 @@
   {
     "tagId": 10,
     "keyword": "recommended"
+  },
+  {
+    "tagId": 46,
+    "keyword": "obsolete"
   }
-] 
+]

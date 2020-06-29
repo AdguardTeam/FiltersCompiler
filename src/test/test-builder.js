@@ -24,7 +24,9 @@ QUnit.test('Test builder', async (assert) => {
     const filtersDir = path.join(__dirname, './resources/filters');
     const logFile = path.join(__dirname, './resources/log.txt');
     const reportFile = path.join(__dirname, './resources/report.txt');
-    await builder.build(filtersDir, logFile, reportFile);
+    const platformsPath = path.join(__dirname, './resources/platforms');
+    const platformsConfigFile = path.join(__dirname, './resources/platforms.json');
+    await builder.build(filtersDir, logFile, reportFile, platformsPath, platformsConfigFile);
 
     let revision = readFile(path.join(filtersDir, 'filter_3_Test', 'revision.json'));
     assert.ok(revision);
@@ -207,8 +209,17 @@ QUnit.test('Test builder - platforms', async (assert) => {
     assert.equal(filtersMetadata.filters[0].tags[0], 1);
     assert.equal(filtersMetadata.filters[0].trustLevel, 'full');
 
-    const filtersI18nMetadata = readFile(path.join(platforms, 'test', 'filters_i18n.json'));
+    // Obsolete Filter test
+    assert.notOk(filtersMetadata.filters.some((filter) => filter.filterId === 6));
+    assert.notOk(filtersMetadata.filters.some((filter) => filter.name === 'Obsolete Test Filter'));
+
+    let filtersI18nMetadata = readFile(path.join(platforms, 'test', 'filters_i18n.json'));
     assert.ok(filtersI18nMetadata);
+    filtersI18nMetadata = JSON.parse(filtersI18nMetadata);
+    const filtersI18nMetadataFilters = Object.keys(filtersI18nMetadata.filters);
+
+    // Obsolete Filter test
+    assert.notOk(filtersI18nMetadataFilters.some((filter) => filter === '6'));
 
     const localScriptRules = readFile(path.join(platforms, 'test', 'local_script_rules.txt'));
     assert.notOk(localScriptRules);
