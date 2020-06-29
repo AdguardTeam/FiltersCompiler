@@ -421,11 +421,12 @@ module.exports = (() => {
     const excludeObsoleteFilters = (localizationsFilters, obsoleteFilters) => {
         const localisedFiltersIds = Object.keys(localizationsFilters);
         const result = { ...localizationsFilters };
-        localisedFiltersIds.forEach((id) => {
-            if (obsoleteFilters.some((obsoleteFilter) => obsoleteFilter.filterId === id - 0)) {
-                delete result[id - 0];
+        obsoleteFilters.forEach((filter) => {
+            if (localisedFiltersIds.some((id) => filter.filterId.toString() === id)) {
+                delete result[filter.filterId];
             }
         });
+
         return result;
     };
 
