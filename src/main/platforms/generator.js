@@ -419,14 +419,10 @@ module.exports = (() => {
      * @return {object} result
      */
     const excludeObsoleteFilters = (localizationsFilters, obsoleteFilters) => {
-        const localisedFiltersIds = Object.keys(localizationsFilters);
         const result = { ...localizationsFilters };
         obsoleteFilters.forEach((filter) => {
-            if (localisedFiltersIds.some((id) => filter.filterId.toString() === id)) {
-                delete result[filter.filterId];
-            }
+            delete result[filter.filterId];
         });
-
         return result;
     };
 
