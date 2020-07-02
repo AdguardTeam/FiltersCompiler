@@ -1,5 +1,5 @@
 
-FiltersCompiler report 6/10/2020 4:30:25 AM:
+FiltersCompiler report 6/29/2020 11:11:04 PM:
 
 Filter ID: 2
 Filter name: AdGuard Base filter
@@ -24,6 +24,12 @@ Compiled rules: 46
 Excluded rules: 12
 URL: https://filters.adtidy.org/extension/chromium/filters/2.txt
 ---------------------------
+Filter ID: 6
+Filter name: Obsolete Test Filter
+Compiled rules: 8
+Excluded rules: 0
+URL: https://filters.adtidy.org/extension/chromium/filters/2.txt
+---------------------------
 Filter ID: 3
 Filter name: Test Filter
 Filter is DISABLED!
@@ -39,6 +45,12 @@ Filter ID: 5
 Filter name: Trust Level Test Filter
 Compiled rules: 46
 Excluded rules: 12
+URL: https://filters.adtidy.org/extension/chromium/filters/2.txt
+---------------------------
+Filter ID: 6
+Filter name: Obsolete Test Filter
+Compiled rules: 8
+Excluded rules: 0
 URL: https://filters.adtidy.org/extension/chromium/filters/2.txt
 ---------------------------
 Filter ID: 2
@@ -64,6 +76,12 @@ Compiled rules: 46
 Excluded rules: 12
 URL: https://filters.adtidy.org/extension/chromium/filters/2.txt
 ---------------------------
+Filter ID: 6
+Filter name: Obsolete Test Filter
+Compiled rules: 8
+Excluded rules: 0
+URL: https://filters.adtidy.org/extension/chromium/filters/2.txt
+---------------------------
 Filter ID: 3
 Filter name: Test Filter
 Filter is DISABLED!
@@ -79,6 +97,12 @@ Filter ID: 5
 Filter name: Trust Level Test Filter
 Compiled rules: 46
 Excluded rules: 12
+URL: https://filters.adtidy.org/extension/chromium/filters/2.txt
+---------------------------
+Filter ID: 6
+Filter name: Obsolete Test Filter
+Compiled rules: 8
+Excluded rules: 0
 URL: https://filters.adtidy.org/extension/chromium/filters/2.txt
 ---------------------------
 Filter ID: 3

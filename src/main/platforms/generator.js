@@ -413,9 +413,27 @@ module.exports = (() => {
     };
 
     /**
-     * Writes metadata files
+     * Excludes obsolete filters data from localizations
+     * @param {object} localizationsFilters
+     * @param {array} obsoleteFilters
+     * @return {object} result
      */
-    const writeFiltersMetadata = function (platformsPath, filtersDir, filtersMetadata) {
+    const excludeObsoleteFilters = (localizationsFilters, obsoleteFilters) => {
+        const result = { ...localizationsFilters };
+        obsoleteFilters.forEach((filter) => {
+            delete result[filter.filterId];
+        });
+        return result;
+    };
+
+    /**
+     * Writes metadata files
+     * @param {string} platformsPath
+     * @param {string} filtersDir
+     * @param {array} filtersMetadata
+     * @param {array} obsoleteFilters
+     */
+    const writeFiltersMetadata = function (platformsPath, filtersDir, filtersMetadata, obsoleteFilters) {
         logger.info('Writing filters metadata');
 
         const groups = JSON.parse(readFile(path.join(filtersDir, '../groups', 'metadata.json')));
@@ -454,10 +472,11 @@ module.exports = (() => {
 
             logger.info(`Writing filters localizations: ${config.path}`);
             const filtersI18nFile = path.join(platformDir, FILTERS_I18N_METADATA_FILE);
+            const localisedFilters = excludeObsoleteFilters(localizations.filters, obsoleteFilters);
             const i18nMetadata = {
                 groups: localizations.groups,
                 tags: localizations.tags,
-                filters: localizations.filters,
+                filters: localisedFilters,
             };
             if (platform === 'MAC') {
                 delete i18nMetadata.tags;
@@ -755,6 +774,13 @@ module.exports = (() => {
     };
 
     /**
+     * Checks if filter has 'obsolete' tag
+     * @param {object} metadata
+     * @returns {boolean}
+     */
+    const isObsoleteFilter = (metadata) => metadata.tags && metadata.tags.some((tag) => tag === 'obsolete');
+
+    /**
      * Parses directory recursive
      *
      * @param filtersDir
@@ -762,8 +788,16 @@ module.exports = (() => {
      * @param platformsPath
      * @param whitelist
      * @param blacklist
+     * @param obsoleteFiltersMetadata
      */
-    const parseDirectory = function (filtersDir, filtersMetadata, platformsPath, whitelist, blacklist) {
+    const parseDirectory = function (
+        filtersDir,
+        filtersMetadata,
+        platformsPath,
+        whitelist,
+        blacklist,
+        obsoleteFiltersMetadata
+    ) {
         const items = fs.readdirSync(filtersDir);
         // eslint-disable-next-line no-restricted-syntax
         for (const directory of items) {
@@ -774,10 +808,22 @@ module.exports = (() => {
                     logger.info(`Building filter platforms: ${directory}`);
                     buildFilter(filterDir, platformsPath, whitelist, blacklist);
                     logger.info(`Building filter platforms: ${directory} done`);
-
-                    filtersMetadata.push(loadFilterMetadata(filterDir));
+                    const filterMetadata = loadFilterMetadata(filterDir);
+                    // collects metadata for normal and obsolete filters separately
+                    if (isObsoleteFilter(filterMetadata)) {
+                        obsoleteFiltersMetadata.push(filterMetadata);
+                    } else {
+                        filtersMetadata.push(filterMetadata);
+                    }
                 } else {
-                    parseDirectory(filterDir, filtersMetadata, platformsPath, whitelist, blacklist);
+                    parseDirectory(
+                        filterDir,
+                        filtersMetadata,
+                        platformsPath,
+                        whitelist,
+                        blacklist,
+                        obsoleteFiltersMetadata
+                    );
                 }
             }
         }
@@ -805,10 +851,11 @@ module.exports = (() => {
         createDir(platformsPath);
 
         const filtersMetadata = [];
+        const obsoleteFiltersMetadata = [];
 
-        parseDirectory(filtersDir, filtersMetadata, platformsPath, whitelist, blacklist);
+        parseDirectory(filtersDir, filtersMetadata, platformsPath, whitelist, blacklist, obsoleteFiltersMetadata);
 
-        writeFiltersMetadata(platformsPath, filtersDir, filtersMetadata);
+        writeFiltersMetadata(platformsPath, filtersDir, filtersMetadata, obsoleteFiltersMetadata);
         writeLocalScriptRules(platformsPath);
     };
 
