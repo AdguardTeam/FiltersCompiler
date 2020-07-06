@@ -427,6 +427,18 @@ module.exports = (() => {
     };
 
     /**
+     * Removes obsolete filters metadata
+     * @param {object} metadata
+     * @return {object} result
+     */
+    const removeObsoleteFilters = (metadata) => {
+        const OBSOLETE_TAG_ID = 46;
+        const result = { ...metadata };
+        result.filters = metadata.filters.filter((filter) => !filter.tags.includes(OBSOLETE_TAG_ID));
+        return result;
+    };
+
+    /**
      * Writes metadata files
      * @param {string} platformsPath
      * @param {string} filtersDir
@@ -467,7 +479,7 @@ module.exports = (() => {
             if (platform === 'MAC') {
                 metadata = workaround.rewriteMetadataForOldMac(metadata);
             } else {
-                metadata = workaround.removeObsoleteFilters(metadata);
+                metadata = removeObsoleteFilters(metadata);
             }
 
             fs.writeFileSync(filtersFile, JSON.stringify(metadata, null, '\t'), 'utf8');
