@@ -141,6 +141,18 @@ module.exports = (() => {
         return result;
     };
 
+    /**
+     * Removes obsolete filters metadata
+     * @param {object} metadata
+     * @return {object} result
+     */
+    const removeObsoleteFilters = (metadata) => {
+        const OBSOLETE_TAG_ID = 46;
+        const result = { ...metadata };
+        result.filters = metadata.filters.filter((filter) => !filter.tags.includes(OBSOLETE_TAG_ID));
+        return result;
+    };
+
     return {
         overrideRule,
         rewriteHeader,
@@ -149,5 +161,6 @@ module.exports = (() => {
         removeAdblockVersion,
         rewriteMetadataForOldMac,
         modifyBaseFilterHeader,
+        removeObsoleteFilters,
     };
 })();
