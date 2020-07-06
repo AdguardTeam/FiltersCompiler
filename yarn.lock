@@ -944,9 +944,9 @@ file-entry-cache@^5.0.1:
   dependencies:
     flat-cache "^2.0.1"
 
-"filters-downloader@git+https://github.com/AdguardTeam/FiltersDownloader.git#v1.0.11":
-  version "1.0.11"
-  resolved "git+https://github.com/AdguardTeam/FiltersDownloader.git#42ffb08fadfa07cdf1d92d53c654bdf39b9186f9"
+"filters-downloader@git+https://github.com/AdguardTeam/FiltersDownloader.git#v1.0.14":
+  version "1.0.14"
+  resolved "git+https://github.com/AdguardTeam/FiltersDownloader.git#cdeb139a07668f86a131e5155e86efe5ca534ed0"
   dependencies:
     axios "^0.18.0"
 
