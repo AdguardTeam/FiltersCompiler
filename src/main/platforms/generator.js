@@ -427,6 +427,18 @@ module.exports = (() => {
     };
 
     /**
+     * Removes obsolete filters metadata
+     * @param {object} metadata
+     * @return {object} result
+     */
+    const removeObsoleteFilters = (metadata) => {
+        const OBSOLETE_TAG_ID = 46;
+        const result = { ...metadata };
+        result.filters = metadata.filters.filter((filter) => !filter.tags.includes(OBSOLETE_TAG_ID));
+        return result;
+    };
+
+    /**
      * Writes metadata files
      * @param {string} platformsPath
      * @param {string} filtersDir
@@ -466,13 +478,21 @@ module.exports = (() => {
             metadata = rewriteSubscriptionUrls(metadata, config);
             if (platform === 'MAC') {
                 metadata = workaround.rewriteMetadataForOldMac(metadata);
+            } else {
+                metadata = removeObsoleteFilters(metadata);
             }
 
             fs.writeFileSync(filtersFile, JSON.stringify(metadata, null, '\t'), 'utf8');
 
             logger.info(`Writing filters localizations: ${config.path}`);
             const filtersI18nFile = path.join(platformDir, FILTERS_I18N_METADATA_FILE);
-            const localisedFilters = excludeObsoleteFilters(localizations.filters, obsoleteFilters);
+
+            let localisedFilters = {};
+            if (platform === 'MAC') {
+                localisedFilters = { ...localizations.filters };
+            } else {
+                localisedFilters = excludeObsoleteFilters(localizations.filters, obsoleteFilters);
+            }
             const i18nMetadata = {
                 groups: localizations.groups,
                 tags: localizations.tags,
@@ -809,11 +829,9 @@ module.exports = (() => {
                     buildFilter(filterDir, platformsPath, whitelist, blacklist);
                     logger.info(`Building filter platforms: ${directory} done`);
                     const filterMetadata = loadFilterMetadata(filterDir);
-                    // collects metadata for normal and obsolete filters separately
+                    filtersMetadata.push(filterMetadata);
                     if (isObsoleteFilter(filterMetadata)) {
                         obsoleteFiltersMetadata.push(filterMetadata);
-                    } else {
-                        filtersMetadata.push(filterMetadata);
                     }
                 } else {
                     parseDirectory(
