@@ -9108,24 +9108,6 @@
       "$id": "#/properties/filters",
       "type": "object",
       "title": "The Filters Schema",
-      "required": [
-        "1",
-        "2",
-        "3",
-        "4",
-        "5",
-        "6",
-        "7",
-        "8",
-        "9",
-        "10",
-        "11",
-        "12",
-        "13",
-        "14",
-        "15",
-        "16"
-      ],
       "properties": {
         "1": {
           "$id": "#/properties/filters/properties/1",
