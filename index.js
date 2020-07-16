@@ -1,8 +1,5 @@
-/* globals require, __dirname, process */
-
+/* eslint-disable global-require */
 module.exports = (function () {
-    'use strict';
-
     const path = require('path');
     const builder = require('./src/main/builder.js');
     const schemaValidator = require('./src/main/json-validator.js');

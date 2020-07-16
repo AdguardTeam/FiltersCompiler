@@ -1,11 +1,11 @@
-/* globals require, QUnit, __dirname */
-
+/* eslint-disable max-len */
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
+const optimization = require('../main/optimization.js');
+const builder = require('../main/builder.js');
 
 QUnit.test('Test builder', async (assert) => {
-    'use strict';
-
     const readFile = function (path) {
         try {
             return fs.readFileSync(path, { encoding: 'utf-8' });
@@ -14,10 +14,7 @@ QUnit.test('Test builder', async (assert) => {
         }
     };
 
-    const optimization = require('../main/optimization.js');
     optimization.disableOptimization();
-
-    const builder = require('../main/builder.js');
     assert.ok(builder);
 
     const filtersDir = path.join(__dirname, './resources/filters');
@@ -36,8 +33,6 @@ QUnit.test('Test builder', async (assert) => {
 
     const filterText = readFile(path.join(filtersDir, 'filter_3_Test', 'filter.txt')).trim();
     assert.ok(filterText);
-
-    const os = require('os');
 
     let filterLines = filterText.split(os.EOL);
     assert.equal(filterLines.length, 23);
@@ -118,8 +113,6 @@ QUnit.test('Test builder', async (assert) => {
 });
 
 QUnit.test('Test builder - build lists', async (assert) => {
-    'use strict';
-
     const readFile = function (path) {
         try {
             return fs.readFileSync(path, { encoding: 'utf-8' });
@@ -128,10 +121,8 @@ QUnit.test('Test builder - build lists', async (assert) => {
         }
     };
 
-    const optimization = require('../main/optimization.js');
-    optimization.disableOptimization();
 
-    const builder = require('../main/builder.js');
+    optimization.disableOptimization();
     assert.ok(builder);
 
     const filtersDir = path.join(__dirname, './resources/filters');
@@ -155,11 +146,6 @@ QUnit.test('Test builder - build lists', async (assert) => {
 });
 
 QUnit.test('Test builder - platforms', async (assert) => {
-    'use strict';
-
-    const path = require('path');
-    const fs = require('fs');
-
     const readFile = function (path) {
         try {
             return fs.readFileSync(path, { encoding: 'utf-8' });
@@ -168,11 +154,7 @@ QUnit.test('Test builder - platforms', async (assert) => {
         }
     };
 
-    const optimization = require('../main/optimization.js');
     optimization.disableOptimization();
-
-    const builder = require('../main/builder.js');
-    const generator = require('../main/platforms/generator.js');
 
     const filtersDir = path.join(__dirname, './resources/filters');
     const logFile = path.join(__dirname, './resources/log_platforms.txt');

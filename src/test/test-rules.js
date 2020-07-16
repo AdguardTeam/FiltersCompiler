@@ -1,13 +1,10 @@
-/* globals require, QUnit */
+const RuleTypes = require('../main/rule/rule-types.js');
+const ruleParser = require('../main/rule/rule-parser.js');
+const Rule = require('../main/rule/rule.js');
 
-QUnit.test("Test url rules changing modifiers", (assert) => {
-    'use strict';
-
-    const RuleTypes = require('../main/rule/rule-types.js');
-    const ruleParser = require('../main/rule/rule-parser.js');
-
-    let line = '||example.com^$domain=domain-one.org|domain-two.org';
-    let rule = ruleParser.parseRule(line);
+QUnit.test('Test url rules changing modifiers', (assert) => {
+    const line = '||example.com^$domain=domain-one.org|domain-two.org';
+    const rule = ruleParser.parseRule(line);
     assert.ok(rule);
     assert.equal(rule.ruleText, line);
     assert.equal(rule.ruleType, RuleTypes.UrlBlocking);
@@ -19,15 +16,11 @@ QUnit.test("Test url rules changing modifiers", (assert) => {
 
     rule.modifiers.domain.push('domain-three.org');
 
-    let changed = rule.buildNewModifiers(rule.modifiers);
+    const changed = rule.buildNewModifiers(rule.modifiers);
     assert.equal(changed, '||example.com^$domain=domain-one.org|domain-two.org|domain-three.org');
 });
 
-QUnit.test("Test rules builds", (assert) => {
-    'use strict';
-
-    const Rule = require('../main/rule/rule.js');
-
+QUnit.test('Test rules builds', (assert) => {
     let ruleText = Rule.buildNewLeadingDomainsRuleText('selector', ['one.com', 'two.com'], '##');
     assert.ok(ruleText);
     assert.equal(ruleText, 'one.com,two.com##selector');

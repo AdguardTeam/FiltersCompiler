@@ -19,7 +19,7 @@
   "main": "index.js",
   "scripts": {
     "test": "node ./src/test/testrunner.js",
-    "lint": "eslint ./src/main/"
+    "lint": "eslint ."
   },
   "husky": {
     "hooks": {

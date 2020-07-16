@@ -1,10 +1,6 @@
-/* globals require, QUnit */
+const version = require('../main/utils/version.js');
 
-QUnit.test("Test versions", (assert) => {
-    'use strict';
-
-    const version = require('../main/utils/version.js');
-
+QUnit.test('Test versions', (assert) => {
     let v = version.increment('0.0.0.0');
     assert.equal('0.0.0.1', v);
 
@@ -14,4 +10,3 @@ QUnit.test("Test versions", (assert) => {
     v = version.increment('99.99.99.99');
     assert.equal('100.0.0.0', v);
 });
-

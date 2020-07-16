@@ -1,11 +1,7 @@
-/* globals require, QUnit, __dirname */
+const path = require('path');
+const schemaValidator = require('../main/json-validator.js');
 
-QUnit.test("Test json validator", (assert) => {
-    'use strict';
-
-    const path = require('path');
-    const schemaValidator = require('../main/json-validator.js');
-
+QUnit.test('Test json validator', (assert) => {
     assert.ok(schemaValidator);
 
     const platformsPath = path.join(__dirname, './resources/platforms');

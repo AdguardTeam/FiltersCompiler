@@ -1,17 +1,6 @@
-/* globals require, QUnit */
-
-/**
- * @typedef {Object} assert
- * @property {function} equal
- * @property {function} ok
- * @property {function} notOk
- */
+const testRunner = require('qunit');
 
 (() => {
-    "use strict";
-
-    const testRunner = require("qunit");
-
     testRunner.setup({
         log: {
             // log assertions overview
@@ -29,65 +18,66 @@
             // log global coverage (all files)
             globalCoverage: true,
             // log currently testing code file
-            testing: false
+            testing: false,
         },
         // max amount of ms child can be blocked, after that we assume running an infinite loop
-        maxBlockDuration: 50000
+        maxBlockDuration: 50000,
     });
 
-    const testCallback = function (err, report) {
+    const testCallback = function (err) {
         if (err) {
+            // eslint-disable-next-line no-console
             console.error(err);
         }
     };
 
     testRunner.run({
-        code: "./src/main/utils/version.js",
-        tests: "./src/test/test-version.js"
+        code: './src/main/utils/version.js',
+        tests: './src/test/test-version.js',
     }, testCallback);
 
     testRunner.run({
-        code: "./src/main/rule/rule-parser.js",
-        tests: "./src/test/test-rule-parser.js"
+        code: './src/main/rule/rule-parser.js',
+        tests: './src/test/test-rule-parser.js',
     }, testCallback);
 
     testRunner.run({
-        code: "./src/main/rule/rule.js",
-        tests: "./src/test/test-rules.js"
+        code: './src/main/rule/rule.js',
+        tests: './src/test/test-rules.js',
     }, testCallback);
 
     testRunner.run({
-        code: "./src/main/converter.js",
-        tests: "./src/test/test-converter.js"
+        code: './src/main/converter.js',
+        tests: './src/test/test-converter.js',
     }, testCallback);
 
     testRunner.run({
-        code: "./src/main/validator.js",
-        tests: "./src/test/test-validator.js"
+        code: './src/main/validator.js',
+        tests: './src/test/test-validator.js',
     }, testCallback);
 
     testRunner.run({
-        code: "./src/main/sorting.js",
-        tests: "./src/test/test-sorting.js"
+        code: './src/main/sorting.js',
+        tests: './src/test/test-sorting.js',
     }, testCallback);
 
     testRunner.run({
-        code: "./src/main/optimization.js",
-        tests: "./src/test/test-optimization.js"
+        code: './src/main/optimization.js',
+        tests: './src/test/test-optimization.js',
     }, testCallback);
 
     testRunner.run({
-        code: "./src/main/platforms/filter.js",
-        tests: "./src/test/test-platforms-filter.js"
+        code: './src/main/platforms/filter.js',
+        tests: './src/test/test-platforms-filter.js',
     }, testCallback);
 
     testRunner.run({
-        code: "./src/main/builder.js",
-        tests: "./src/test/test-builder.js"
+        code: './src/main/builder.js',
+        tests: './src/test/test-builder.js',
     }, testCallback);
 
     testRunner.run({
-        code: "./src/main/json-validator.js",
-        tests: "./src/test/test-json-validator.js"
+        code: './src/main/json-validator.js',
+        tests: './src/test/test-json-validator.js',
     }, testCallback);
 })();

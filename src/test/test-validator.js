@@ -1,4 +1,6 @@
-/* globals require, QUnit, __dirname */
+/* eslint-disable max-len */
+const scriptlets = require('scriptlets');
+const validator = require('../main/validator.js');
 
 /**
  * @typedef {Object} assert
@@ -13,10 +15,6 @@
  */
 
 QUnit.test('Test css validation', (assert) => {
-    'use strict';
-
-    const validator = require('../main/validator.js');
-
     let rules = ['example.com##.div'];
     assert.ok(validator.validate(rules).length > 0);
     rules = ['example.com###div-id'];
@@ -28,20 +26,12 @@ QUnit.test('Test css validation', (assert) => {
 });
 
 QUnit.test('Test incorrect rules', (assert) => {
-    'use strict';
-
-    const validator = require('../main/validator.js');
-
-    let rules = ['||example.com##.div',
+    const rules = ['||example.com##.div',
         'test$domain=yandex.ru,google.com'];
     assert.ok(validator.validate(rules).length === 0);
 });
 
 QUnit.test('Test ext-css validation', (assert) => {
-    'use strict';
-
-    const validator = require('../main/validator.js');
-
     let selector = '#main > table.w3-table-all.notranslate:first-child > tbody > tr:nth-child(17) > td.notranslate:nth-child(2)';
     let ruleText = `w3schools.com##${selector}`;
     let rules = [ruleText];
@@ -98,10 +88,6 @@ QUnit.test('Test ext-css validation', (assert) => {
 });
 
 QUnit.test('Test ext-css validation - complicated cases', (assert) => {
-    'use strict';
-
-    const validator = require('../main/validator.js');
-
     let ruleText;
     let rules;
 
@@ -151,10 +137,6 @@ QUnit.test('Test ext-css validation - complicated cases', (assert) => {
 });
 
 QUnit.test('Test ext-css validation - complicated cases', (assert) => {
-    'use strict';
-
-    const validator = require('../main/validator.js');
-
     let ruleText;
     let rules;
 
@@ -184,10 +166,6 @@ QUnit.test('Test ext-css validation - complicated cases', (assert) => {
 });
 
 QUnit.test('Test ext-css validation - invalid pseudo classes', (assert) => {
-    'use strict';
-
-    const validator = require('../main/validator.js');
-
     let ruleText;
     let rules;
 
@@ -202,10 +180,6 @@ QUnit.test('Test ext-css validation - invalid pseudo classes', (assert) => {
 });
 
 QUnit.test('Test content rules validation', (assert) => {
-    'use strict';
-
-    const validator = require('../main/validator.js');
-
     let rules = ['~nigma.ru,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]'];
     assert.ok(validator.validate(rules).length > 0);
     rules = ['~nigma.ru,google.com$$div[id=\"ad_text\"][tag-content=\"teas\"\"ernet\"][max-length=\"500\"][min-length=\"50\"][wildcard=\"*.adriver.*\"][parent-search-level=\"15\"][parent-elements=\"td,table\"]'];
@@ -215,10 +189,6 @@ QUnit.test('Test content rules validation', (assert) => {
 });
 
 QUnit.test('Test validation - various rules', (assert) => {
-    'use strict';
-
-    const validator = require('../main/validator.js');
-
     let rules = ['||onedrive.su/code/bshow.php$empty,important,~websocket'];
     assert.ok(validator.validate(rules).length > 0);
 
@@ -276,11 +246,6 @@ QUnit.test('Test validation - various rules', (assert) => {
 });
 
 QUnit.test('Test validation - validate redirect option', (assert) => {
-    'use strict';
-
-    const validator = require('../main/validator.js');
-
-
     const validRedirectRule1 = 'onedrive.su/code/bshow.php$redirect';
     const validRedirectRule2 = 'onedrive.su/code/bshow.php$important,redirect';
     const validImportantRule3 = 'onedrive.su/code/bshow.php$important';
@@ -303,11 +268,6 @@ QUnit.test('Test validation - validate redirect option', (assert) => {
 });
 
 QUnit.test('Test validation - validate rules with $', (assert) => {
-    'use strict';
-
-    const validator = require('../main/validator.js');
-
-
     const validRedirectRule1 = 'zen.yandex.by,zen.yandex.com,zen.yandex.com.tr,zen.yandex.fr,zen.yandex.kz,zen.yandex.ru,zen.yandex.ua#?#.feed__item:-abp-has(*:-abp-contains(/^реклама$/i))';
 
     const rules = [
@@ -321,10 +281,6 @@ QUnit.test('Test validation - validate rules with $', (assert) => {
 });
 
 QUnit.test('Test validation - incorrect domain option', (assert) => {
-    'use strict';
-
-    const validator = require('../main/validator.js');
-
     let rules = ['|http*$domain='];
     assert.ok(validator.validate(rules).length === 0);
 
@@ -336,8 +292,6 @@ QUnit.test('Test validation - incorrect domain option', (assert) => {
 });
 
 QUnit.test('Test validation - cosmetic css rules', (assert) => {
-    const validator = require('../main/validator.js');
-
     let rules = ['example.com#$#body { background: black; }'];
     assert.ok(validator.validate(rules).length === 1);
 
@@ -368,8 +322,6 @@ QUnit.test('Test validation - cosmetic css rules', (assert) => {
 });
 
 QUnit.test('Test ##^script:has-text and $$script[tag-containts] rules', (assert) => {
-    const validator = require('../main/validator.js');
-
     let rules = ['example.com##^script:contains(/.+banner/)'];
     assert.ok(validator.validate(rules).length === 0);
 
@@ -378,8 +330,6 @@ QUnit.test('Test ##^script:has-text and $$script[tag-containts] rules', (assert)
 });
 
 QUnit.test('Test scriptlets lib validator', (assert) => {
-    const scriptlets = require('scriptlets');
-
     let result = scriptlets.isValidScriptletName('abort-on-property-read');
     assert.equal(result, true);
 
@@ -415,8 +365,6 @@ QUnit.test('Test scriptlets lib validator', (assert) => {
 });
 
 QUnit.test('Test scriptlets validator', (assert) => {
-    const validator = require('../main/validator.js');
-
     let rules = [
         'test.com#%#//scriptlet("ubo-abort-current-inline-script.js", "Math.random", "adbDetect")',
         'example.com#@%#//scriptlet("ubo-disable-newtab-links.js")',
@@ -444,8 +392,6 @@ QUnit.test('Test scriptlets validator', (assert) => {
 });
 
 QUnit.test('Test redirects validator', (assert) => {
-    const validator = require('../main/validator.js');
-
     let rules = ['||delivery.tf1.fr/pub$media,redirect=noopmp3-0.1s,domain=tf1.fr',
         '||example.com/banner$image,redirect=32x32-transparent.png',
         '||example.com/*.mp4$media,redirect=noopmp4-1s',
@@ -463,7 +409,8 @@ QUnit.test('Test redirects validator', (assert) => {
         '||example.com/*.mp4$media,redirect=noopmp4_1s'];
     assert.equal(validator.validate(rules).length, 0);
 
-    const {redirects} = require('scriptlets');
+    // TODO we really should test scriptlets in this library?
+    const { redirects } = scriptlets;
 
     let rule = '||example.com^$script,redirect=noopjs.js';
     assert.equal(redirects.isValidAdgRedirectRule(rule), false);
@@ -497,10 +444,6 @@ QUnit.test('Test redirects validator', (assert) => {
 });
 
 QUnit.test('Test blocking rules with regexp', (assert) => {
-    'use strict';
-
-    const validator = require('../main/validator.js');
-
     let rules = [
         '/ex[[ampl[[e\.com\///.*\/banner/$script',
         '/^htt[[[ps?:\/\/.*(bitly|bit)\.(com|ly)\//$domain=1337x.to',

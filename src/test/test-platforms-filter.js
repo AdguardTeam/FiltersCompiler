@@ -1,32 +1,28 @@
-/* globals require, QUnit */
+const filter = require('../main/platforms/filter.js');
 
-QUnit.test("Test hints", (assert) => {
-    'use strict';
-
-    const filter = require('../main/platforms/filter.js');
-
+QUnit.test('Test hints', (assert) => {
     const config = {
-        "platform": "test",
-        "path": "hints",
-        "configuration": {
-            "removeRulePatterns": false,
-            "ignoreRuleHints": false
-        }
+        'platform': 'test',
+        'path': 'hints',
+        'configuration': {
+            'removeRulePatterns': false,
+            'ignoreRuleHints': false,
+        },
     };
 
     const before = [
-        "! Comment",
-        "example.com",
-        "!+ PLATFORM(test, windows)",
-        "included_platform",
-        "!+ NOT_PLATFORM( windows, test )",
-        "excluded_platform",
-        "!+ PLATFORM(test) NOT_PLATFORM(windows)",
-        "included_platform_2",
-        "!+ NOT_OPTIMIZED",
-        "not_optimized",
-        "!+ INVALID_HINT",
-        "invalid_hint"
+        '! Comment',
+        'example.com',
+        '!+ PLATFORM(test, windows)',
+        'included_platform',
+        '!+ NOT_PLATFORM( windows, test )',
+        'excluded_platform',
+        '!+ PLATFORM(test) NOT_PLATFORM(windows)',
+        'included_platform_2',
+        '!+ NOT_OPTIMIZED',
+        'not_optimized',
+        '!+ INVALID_HINT',
+        'invalid_hint',
     ];
 
     const after = filter.cleanupRules(before, config, 0);
@@ -42,63 +38,59 @@ QUnit.test("Test hints", (assert) => {
     assert.ok(after.indexOf('invalid_hint') >= 0);
 });
 
-QUnit.test("Test optimization hints", (assert) => {
-    'use strict';
-
-    const filter = require('../main/platforms/filter.js');
-
+QUnit.test('Test optimization hints', (assert) => {
     const config = {
-        "platform": "test",
-        "path": "hints",
-        "configuration": {
-            "removeRulePatterns": false,
-            "ignoreRuleHints": false
-        }
+        'platform': 'test',
+        'path': 'hints',
+        'configuration': {
+            'removeRulePatterns': false,
+            'ignoreRuleHints': false,
+        },
     };
 
     const optimizationConfig = {
-        "groups": [
+        'groups': [
             {
-                "config": {
-                    "type": "WHITELIST",
-                    "scope": "DOMAIN",
-                    "hits": 1
+                'config': {
+                    'type': 'WHITELIST',
+                    'scope': 'DOMAIN',
+                    'hits': 1,
                 },
-                "rules": {
-                    "optimized.com": 0,
-                    "other.com": 4,
-                    "not_optimized": 1
-                }
+                'rules': {
+                    'optimized.com': 0,
+                    'other.com': 4,
+                    'not_optimized': 1,
+                },
             },
             {
-                "config": {
-                    "type": "ELEMHIDE",
-                    "scope": "DOMAIN",
-                    "hits": 70
+                'config': {
+                    'type': 'ELEMHIDE',
+                    'scope': 'DOMAIN',
+                    'hits': 70,
                 },
-                "rules": {
-                    "###optimized": 0,
-                    "###rule2": 4,
-                    "###rule3": 1
-                }
-            }
+                'rules': {
+                    '###optimized': 0,
+                    '###rule2': 4,
+                    '###rule3': 1,
+                },
+            },
         ],
-        "percent": 10
+        'percent': 10,
     };
 
-    //TODO: Check optimization percent
+    // TODO: Check optimization percent
 
     const before = [
-        "! Comment",
-        "example.com",
-        "optimized.com",
-        "###optimized",
-        "!+ NOT_OPTIMIZED",
-        "not_optimized",
-        "!#safari_cb_affinity(general)",
-        "some.affinity.ru#@#.ad-zone",
-        "!",
-        "!#safari_cb_affinity"
+        '! Comment',
+        'example.com',
+        'optimized.com',
+        '###optimized',
+        '!+ NOT_OPTIMIZED',
+        'not_optimized',
+        '!#safari_cb_affinity(general)',
+        'some.affinity.ru#@#.ad-zone',
+        '!',
+        '!#safari_cb_affinity',
     ];
 
     const after = filter.cleanupAndOptimizeRules(before, config, optimizationConfig, 0);
@@ -116,30 +108,26 @@ QUnit.test("Test optimization hints", (assert) => {
     assert.ok(after.indexOf('!#safari_cb_affinity') >= 0);
 });
 
-QUnit.test("Test remove rule patterns", (assert) => {
-    'use strict';
-
-    const filter = require('../main/platforms/filter.js');
-
+QUnit.test('Test remove rule patterns', (assert) => {
     const config = {
-        "platform": "test",
-        "path": "hints",
-        "configuration": {
-            "removeRulePatterns": [
-                "\\[-ext-",
-                ":has\\(",
-                "\\$stealth"
+        'platform': 'test',
+        'path': 'hints',
+        'configuration': {
+            'removeRulePatterns': [
+                '\\[-ext-',
+                ':has\\(',
+                '\\$stealth',
             ],
-            "ignoreRuleHints": false
-        }
+            'ignoreRuleHints': false,
+        },
     };
 
     const before = [
-        "! Comment",
-        "example.com",
-        "example.com$stealth",
-        "javarchive.com##.sidebar_list > .widget_text:has(a[title = \"ads\"])",
-        "aranzulla.it##body > div[id][class][-ext-has=\"a[href^='/locked-no-script.php']\"]"
+        '! Comment',
+        'example.com',
+        'example.com$stealth',
+        'javarchive.com##.sidebar_list > .widget_text:has(a[title = "ads"])',
+        "aranzulla.it##body > div[id][class][-ext-has=\"a[href^='/locked-no-script.php']\"]",
     ];
 
     const after = filter.cleanupRules(before, config, 0);
