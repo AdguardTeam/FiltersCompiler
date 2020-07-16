@@ -1,6 +1,5 @@
 /* globals require, QUnit, __dirname */
 
-
 const path = require('path');
 const fs = require('fs');
 

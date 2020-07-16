@@ -29,8 +29,8 @@ example.com#@%#//scriptlet('ubo-nano-setInterval-booster.js', 'some.example', '1
 test.com#%#//scriptlet('ubo-json-prune.js')
 test.com#@%#//scriptlet('ubo-abort-on-property-read.js', 'some.prop')
 !
-||example.com/test/$media,mp4,domain=test.com
-||test.com/cams/video_file/*.mp4$media,mp4
+||example.com/test/$media,redirect=noopmp4-1s,domain=test.com
+||test.com/cams/video_file/*.mp4$media,redirect=noopmp4-1s
 ||example.com/images/*.mp4
 test.com,mp4upload.com###overlay
 !
