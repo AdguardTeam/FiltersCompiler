@@ -10,17 +10,36 @@ module.exports = (() => {
     const { redirects } = scriptlets;
 
     /**
+     * Excludes rule
+     * @param {string} rule
+     * @param {array} excluded
+     * @param {string} message
+     */
+    const excludeRule = (rule, excluded, message) => {
+        if (excluded) {
+            excluded.push(`! ${message}`);
+            excluded.push(rule);
+        }
+    };
+
+    /**
      * Converts rules to AdGuard syntax
      * @param {array} rulesList
+     * @param {array} [excluded]
      * @return {array} result
      */
-    const convertRulesToAdgSyntax = function (rulesList) {
+    const convertRulesToAdgSyntax = function (rulesList, excluded) {
         const result = [];
 
         for (let i = 0; i < rulesList.length; i += 1) {
             const rule = rulesList[i];
-            const converted = RuleConverter.convertRule(rule);
-            result.push(...converted);
+            try {
+                const converted = RuleConverter.convertRule(rule);
+                result.push(...converted);
+            } catch (e) {
+                const message = `Unable to convert rule to AdGuard syntax: ${rule}`;
+                excludeRule(rule, excluded, message);
+            }
         }
 
         return result;
