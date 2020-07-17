@@ -46,10 +46,10 @@ const testRunner = require('qunit');
         tests: './src/test/test-rules.js',
     }, testCallback);
 
-    testRunner.run({
-        code: './src/main/converter.js',
-        tests: './src/test/test-converter.js',
-    }, testCallback);
+    // testRunner.run({
+    //     code: './src/main/converter.js',
+    //     tests: './src/test/converter.test.js',
+    // }, testCallback);
 
     testRunner.run({
         code: './src/main/validator.js',

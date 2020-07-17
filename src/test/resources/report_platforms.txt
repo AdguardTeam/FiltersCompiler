@@ -1,5 +1,5 @@
 
-FiltersCompiler report 7/16/2020 7:13:41 PM:
+FiltersCompiler report 7/17/2020 11:35:27 AM:
 
 Filter ID: 2
 Filter name: AdGuard Base filter
