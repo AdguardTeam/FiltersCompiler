@@ -1,3 +1,4 @@
+// TODO move all tests from qunit to jest
 const testRunner = require('qunit');
 
 (() => {
@@ -64,11 +65,6 @@ const testRunner = require('qunit');
     testRunner.run({
         code: './src/main/platforms/filter.js',
         tests: './src/test/test-platforms-filter.js',
-    }, testCallback);
-
-    testRunner.run({
-        code: './src/main/builder.js',
-        tests: './src/test/test-builder.js',
     }, testCallback);
 
     testRunner.run({

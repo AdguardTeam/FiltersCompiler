@@ -1,85 +1,10 @@
 
-FiltersCompiler report 7/17/2020 3:29:46 PM:
+FiltersCompiler report 7/17/2020 6:42:56 PM:
 
 Filter ID: 2
 Filter name: AdGuard Base filter
 Compiled rules: 51
 Excluded rules: 18
-URL: https://filters.adtidy.org/extension/chromium/filters/2.txt
----------------------------
-Filter ID: 3
-Filter name: Test Filter
-Filter is DISABLED!
-URL: https://easylist-downloads.adblockplus.org/easylist.txt
----------------------------
-Filter ID: 4
-Filter name: Directives Filter
-Compiled rules: 27
-Excluded rules: 0
-URL: https://example.com/
----------------------------
-Filter ID: 5
-Filter name: Trust Level Test Filter
-Compiled rules: 46
-Excluded rules: 12
-URL: https://filters.adtidy.org/extension/chromium/filters/2.txt
----------------------------
-Filter ID: 6
-Filter name: Obsolete Test Filter
-Compiled rules: 8
-Excluded rules: 0
-URL: https://filters.adtidy.org/extension/chromium/filters/2.txt
----------------------------
-Filter ID: 3
-Filter name: Test Filter
-Filter is DISABLED!
-URL: https://easylist-downloads.adblockplus.org/easylist.txt
----------------------------
-Filter ID: 4
-Filter name: Directives Filter
-Compiled rules: 27
-Excluded rules: 0
-URL: https://example.com/
----------------------------
-Filter ID: 5
-Filter name: Trust Level Test Filter
-Compiled rules: 46
-Excluded rules: 12
-URL: https://filters.adtidy.org/extension/chromium/filters/2.txt
----------------------------
-Filter ID: 6
-Filter name: Obsolete Test Filter
-Compiled rules: 8
-Excluded rules: 0
-URL: https://filters.adtidy.org/extension/chromium/filters/2.txt
----------------------------
-Filter ID: 2
-Filter name: AdGuard Base filter
-Compiled rules: 51
-Excluded rules: 18
-URL: https://filters.adtidy.org/extension/chromium/filters/2.txt
----------------------------
-Filter ID: 3
-Filter name: Test Filter
-Filter is DISABLED!
-URL: https://easylist-downloads.adblockplus.org/easylist.txt
----------------------------
-Filter ID: 4
-Filter name: Directives Filter
-Compiled rules: 27
-Excluded rules: 0
-URL: https://example.com/
----------------------------
-Filter ID: 5
-Filter name: Trust Level Test Filter
-Compiled rules: 46
-Excluded rules: 12
-URL: https://filters.adtidy.org/extension/chromium/filters/2.txt
----------------------------
-Filter ID: 6
-Filter name: Obsolete Test Filter
-Compiled rules: 8
-Excluded rules: 0
 URL: https://filters.adtidy.org/extension/chromium/filters/2.txt
 ---------------------------
 Filter ID: 3
