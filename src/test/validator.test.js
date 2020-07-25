@@ -5,7 +5,7 @@ const validator = require('../main/validator.js');
 // Mock log to hide error messages
 jest.mock('../main/utils/log');
 
-describe('converter', () => {
+describe('validator', () => {
     it('Test css validation', () => {
         let rules = ['example.com##.div'];
         expect(validator.validate(rules).length).toBeGreaterThan(0);
