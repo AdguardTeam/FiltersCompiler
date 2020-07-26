@@ -12,7 +12,7 @@
     "jsdom": "13.0.0",
     "md5": "2.2.1",
     "moment": "^2.24.0",
-    "scriptlets": "https://github.com/AdguardTeam/Scriptlets.git#v1.2.4",
+    "scriptlets": "https://github.com/AdguardTeam/Scriptlets.git#v1.2.5",
     "utf8": "^3.0.0"
   },
   "main": "index.js",
