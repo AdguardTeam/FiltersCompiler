@@ -4,7 +4,7 @@ const sorter = require('../main/sorting.js');
 // Mock log to hide error messages
 jest.mock('../main/utils/log');
 
-describe('version', () => {
+describe('sorting test', () => {
     it('Test sorting script', () => {
         const before = `
 !
