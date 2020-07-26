@@ -105,7 +105,7 @@ describe('Test builder', () => {
 
         filterContent = await readFile(path.join(__dirname, 'resources/platforms/ios', 'filters', '5.txt'));
         filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(48);
+        expect(filterLines.length).toBe(50);
 
         // expect(filterLines.indexOf('||example.com/images/*.mp4')).toBeTruthy();
         // expect(filterLines.indexOf('test.com,mp4upload.com###overlay')).toBeTruthy();
