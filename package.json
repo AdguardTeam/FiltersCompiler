@@ -12,14 +12,12 @@
     "jsdom": "13.0.0",
     "md5": "2.2.1",
     "moment": "^2.24.0",
-    "qunit": "1.0.0",
     "scriptlets": "https://github.com/AdguardTeam/Scriptlets.git#v1.2.4",
     "utf8": "^3.0.0"
   },
   "main": "index.js",
   "scripts": {
-    "test": "node ./src/test/testrunner.js",
-    "jest": "jest",
+    "test": "jest",
     "lint": "eslint ."
   },
   "husky": {
