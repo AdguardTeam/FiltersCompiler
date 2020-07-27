@@ -29,7 +29,7 @@
         "path": "ios",
         "configuration": {
             "removeRulePatterns": [
-                "\\$(.*,)?mp4",
+                "\\$(.*,)?redirect=noopmp4-1s",
                 "\\$(.*,)?app",
                 "\\$(.*,)?replace="
             ],
