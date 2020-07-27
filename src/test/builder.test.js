@@ -5,6 +5,9 @@ const os = require('os');
 const optimization = require('../main/optimization.js');
 const builder = require('../main/builder.js');
 
+// Mock log to hide error messages
+jest.mock('../main/utils/log');
+
 const readFile = (path) => {
     try {
         return fs.readFile(path, { encoding: 'utf-8' });
@@ -105,18 +108,18 @@ describe('Test builder', () => {
 
         filterContent = await readFile(path.join(__dirname, 'resources/platforms/ios', 'filters', '5.txt'));
         filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(50);
+        // expect(filterLines.length).toBe(48);
 
-        // expect(filterLines.indexOf('||example.com/images/*.mp4')).toBeTruthy();
-        // expect(filterLines.indexOf('test.com,mp4upload.com###overlay')).toBeTruthy();
-        // expect(filterLines.indexOf('||example.com/test/$media,mp4,domain=test.com')).toBeFalsy();
-        // expect(filterLines.indexOf('||test.com/cams/video_file/*.mp4$media,mp4')).toBeFalsy();
-        // expect(filterLines.indexOf('||test.com/res/js/*.js$replace=/\\"OK\\/banners/\\"OK\\/banners__\\//')).toBeFalsy();
-        // expect(filterLines.indexOf('||example.com^$~script,~stylesheet,~xmlhttprequest,replace=/popunder_url/popunder_url_/')).toBeFalsy();
-        // expect(filterLines.indexOf('||test.com/Forums2008/JS/replaceLinks.js')).toBeTruthy();
-        // expect(filterLines.indexOf('@@||test.com^$generichide,app=iexplore.exe')).toBeFalsy();
-        // expect(filterLines.indexOf('example.com##div.grid_1[class$="app"]')).toBeTruthy();
-        // expect(filterLines.indexOf('||app-test.com^$third-party')).toBeTruthy();
+        expect(filterLines.includes('||example.com/images/*.mp4')).toBeTruthy();
+        expect(filterLines.includes('test.com,mp4upload.com###overlay')).toBeTruthy();
+        expect(filterLines.includes('||example.com/test/$media,mp4,domain=test.com')).toBeFalsy();
+        expect(filterLines.includes('||test.com/cams/video_file/*.mp4$media,mp4')).toBeFalsy();
+        expect(filterLines.includes('||test.com/res/js/*.js$replace=/\\"OK\\/banners/\\"OK\\/banners__\\//')).toBeFalsy();
+        expect(filterLines.includes('||example.com^$~script,~stylesheet,~xmlhttprequest,replace=/popunder_url/popunder_url_/')).toBeFalsy();
+        expect(filterLines.includes('||test.com/Forums2008/JS/replaceLinks.js')).toBeTruthy();
+        expect(filterLines.includes('@@||test.com^$generichide,app=iexplore.exe')).toBeFalsy();
+        expect(filterLines.includes('example.com##div.grid_1[class$="app"]')).toBeTruthy();
+        expect(filterLines.indexOf('||app-test.com^$third-party')).toBeTruthy();
     });
 
     // it('Builds lists', async (assert) => {
