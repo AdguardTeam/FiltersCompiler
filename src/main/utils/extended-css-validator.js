@@ -1,23 +1,6 @@
 /* eslint-disable global-require */
 module.exports = (function () {
     /**
-     * Loads module from string source
-     *
-     * @param src string
-     * @returns {*}
-     */
-    function requireFromString(src) {
-        const Module = module.constructor;
-        const m = new Module();
-        // eslint-disable-next-line no-undef
-        m._compile(src, __filename);
-        return m.exports;
-    }
-
-    // Read external library as string
-    const extendedCssString = require('fs').readFileSync(require.resolve('../third-party/extended-css.js'));
-
-    /**
      * ExtendedCss is not supposed to work without window environment,
      * so we pass some wrapper dummy.
      */
@@ -29,8 +12,7 @@ module.exports = (function () {
     global.navigator = global.window.navigator;
     global.Element = global.window.Element;
 
-    // Load module from string, adding module exports at the end
-    const ExtendedCss = requireFromString(`${extendedCssString}\r\nmodule.exports = ExtendedCss;`);
+    const ExtendedCss = require('extended-css');
 
     /**
      * Validates css selector

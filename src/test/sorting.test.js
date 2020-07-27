@@ -1,11 +1,12 @@
-/* globals require, QUnit */
+/* eslint-disable max-len */
+const sorter = require('../main/sorting.js');
 
-QUnit.test("Test sorting script", (assert) => {
-    'use strict';
+// Mock log to hide error messages
+jest.mock('../main/utils/log');
 
-    const sorter = require('../main/sorting.js');
-
-    const before = `
+describe('sorting test', () => {
+    it('Test sorting script', () => {
+        const before = `
 !
 ||graph.facebook.com^$domain=jp.gocro.smartnews.android
 ||graph.facebook.com^$domain=com.zynga.crosswordswithfriends
@@ -62,11 +63,11 @@ anistar.me##body > div[class^="heade-"]
 chatovod.ru##.chatlist > tbody > tr[class="bold"]:not([class^="chatitem"])
 ||chatovod.ru/i/promo2/workle.png`;
 
-    let after = sorter.sort(before.split('\n'));
-    assert.ok(after);
-    assert.equal(after.length, 45);
+        const after = sorter.sort(before.split('\n'));
+        expect(after).toBeDefined();
+        expect(after).toHaveLength(45);
 
-    const correct = `!
+        const correct = `!
 ||graph.facebook.com^$domain=com.urbandroid.sleep|com.zynga.crosswordswithfriends|jp.gocro.smartnews.android
 ! razlozhi.ru|yandex.by|yandex.com.tr|yandex.kz|yandex.ru|yandex.ua|syl.ru
 /:\/\/(otzovik.com)\/[a-zA-Z0-9-_]*=\//$script,domain=otzovik.com
@@ -112,35 +113,28 @@ seedoff.cc##div[id*="Composite"]
 ||r.mradx.net/img/D2/C79060.mp4
 ||simpsonsua.com.ua/photos/baner-reklama/`;
 
-    for (let i = 0; i < after.length; i++) {
-        assert.equal(after[i].trim(), correct.split('\n')[i].trim(), after[i]);
-    }
+        for (let i = 0; i < after.length; i += 1) {
+            expect(after[i].trim()).toBe(correct.split('\n')[i].trim());
+        }
+    });
 
-});
-
-QUnit.test("Test sorting script - elemhide rules", (assert) => {
-    'use strict';
-
-    const before = `
+    it('Test sorting script - elemhide rules', () => {
+        const before = `
 bgoperator.ru##.l-index__side_a > canvas[width="188"][height="312"]
 chatovod.ru##.chatlist > tbody > tr[class="bold"]:not([class^="chatitem"])
 myfin1.by,myfin2.by##.menu_level_1 > li.left_bt
 myfin3.by,myfin2.by##.menu_level_1 > li.left_bt`;
 
-    const sorter = require('../main/sorting.js');
+        const after = sorter.sort(before.split('\n'));
+        expect(after).toBeDefined();
+        expect(after).toHaveLength(3);
+        expect(after[0]).toBe('chatovod.ru##.chatlist > tbody > tr[class="bold"]:not([class^="chatitem"])');
+        expect(after[1]).toBe('bgoperator.ru##.l-index__side_a > canvas[width="188"][height="312"]');
+        expect(after[2]).toBe('myfin1.by,myfin2.by,myfin3.by##.menu_level_1 > li.left_bt');
+    });
 
-    const after = sorter.sort(before.split('\n'));
-    assert.ok(after);
-    assert.equal(after.length, 3);
-    assert.equal(after[0], 'chatovod.ru##.chatlist > tbody > tr[class="bold"]:not([class^="chatitem"])');
-    assert.equal(after[1], 'bgoperator.ru##.l-index__side_a > canvas[width="188"][height="312"]');
-    assert.equal(after[2], 'myfin1.by,myfin2.by,myfin3.by##.menu_level_1 > li.left_bt');
-});
-
-QUnit.test("Test sorting script - url blocking rules", (assert) => {
-    'use strict';
-
-    const before = `
+    it('Test sorting script - url blocking rules', () => {
+        const before = `
 ||graph.facebook.com^$domain=jp.gocro.smartnews.android|onemore.ru
 ||graph.facebook.com^$domain=com.zynga.crosswordswithfriends
 ||graph.facebook.com^$domain=com.urbandroid.sleep
@@ -150,34 +144,29 @@ QUnit.test("Test sorting script - url blocking rules", (assert) => {
 r.mradx.net/img/20/9D02B4.ogg
 ||r.mradx.net/img/D2/C79060.mp4`;
 
-    const sorter = require('../main/sorting.js');
+        const after = sorter.sort(before.split('\n'));
 
-    const after = sorter.sort(before.split('\n'));
+        expect(after);
+        expect(after).toHaveLength(6);
+        expect(after[0]).toBe('r.mradx.net/img/20/9D02B4.ogg');
+        expect(after[1]).toBe('||chatovod.ru/i/promo2/workle.png');
+        expect(after[2]).toBe('||graph.facebook.com^$domain=com.urbandroid.imp,important');
+        expect(after[3]).toBe('||graph.facebook.com^$domain=com.urbandroid.sleep|com.zynga.crosswordswithfriends|jp.gocro.smartnews.android|onemore.ru');
+        expect(after[4]).toBe('||image.winudf.com/*/upload/promopure/$~third-party,empty,domain=apkpure.com');
+        expect(after[5]).toBe('||r.mradx.net/img/D2/C79060.mp4');
+    });
 
-    assert.ok(after);
-    assert.equal(after.length, 6);
-    assert.equal(after[0], 'r.mradx.net/img/20/9D02B4.ogg');
-    assert.equal(after[1], '||chatovod.ru/i/promo2/workle.png');
-    assert.equal(after[2], '||graph.facebook.com^$domain=com.urbandroid.imp,important');
-    assert.equal(after[3], '||graph.facebook.com^$domain=com.urbandroid.sleep|com.zynga.crosswordswithfriends|jp.gocro.smartnews.android|onemore.ru');
-    assert.equal(after[4], '||image.winudf.com/*/upload/promopure/$~third-party,empty,domain=apkpure.com');
-    assert.equal(after[5], '||r.mradx.net/img/D2/C79060.mp4');
-});
-
-QUnit.test("Test sorting script - comments", (assert) => {
-    'use strict';
-
-    const before = `! razlozhi.ru|yandex.by|yandex.com.tr|yandex.kz|yandex.ru|yandex.ua|syl.ru
+    it('Test sorting script - comments', () => {
+        const before = `! razlozhi.ru|yandex.by|yandex.com.tr|yandex.kz|yandex.ru|yandex.ua|syl.ru
 /:\/\/(otzovik.com)\/[a-zA-Z0-9-_]*=\//$script,domain=otzovik.com
 /:\/\/(otzovik.com)\/[a-zA-Z0-9-_]*==\//$script,domain=otzovik.com
 !
 ! comment`;
 
-    const sorter = require('../main/sorting.js');
+        const after = sorter.sort(before.split('\n'));
 
-    const after = sorter.sort(before.split('\n'));
-
-    assert.ok(after);
-    assert.equal(after.length, 5);
-    assert.equal(after.join('\n').trim(), before.trim());
+        expect(after).toBeDefined();
+        expect(after).toHaveLength(5);
+        expect(after.join('\n').trim()).toBe(before.trim());
+    });
 });

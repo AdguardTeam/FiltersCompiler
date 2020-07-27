@@ -3,32 +3,34 @@
   "version": "1.0.57",
   "description": "Adguard filters compiler",
   "homepage": "http://adguard.com",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "lint": "eslint ."
+  },
   "dependencies": {
+    "@adguard/tsurlfilter": "^0.1.0",
     "ajv": "^6.10.2",
     "child_process": ">=1.0.2",
     "crypto": "1.0.1",
+    "extended-css": "https://github.com/AdguardTeam/ExtendedCss.git#v1.2.9",
     "filters-downloader": "git+https://github.com/AdguardTeam/FiltersDownloader.git#v1.0.14",
-    "jsdom": "13.0.0",
+    "jsdom": "^16.3.0",
     "md5": "2.2.1",
     "moment": "^2.24.0",
-    "qunit": "1.0.0",
     "scriptlets": "https://github.com/AdguardTeam/Scriptlets.git#v1.2.5",
     "utf8": "^3.0.0"
-  },
-  "main": "index.js",
-  "scripts": {
-    "test": "node ./src/test/testrunner.js",
-    "lint": "eslint ./src/main/"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "yarn lint"
-    }
   },
   "devDependencies": {
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.1.0",
     "eslint-plugin-import": "^2.20.2",
-    "husky": "^4.2.3"
+    "husky": "^4.2.3",
+    "jest": "^26.1.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn lint"
+    }
   }
 }
