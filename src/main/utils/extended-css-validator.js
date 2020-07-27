@@ -12,7 +12,7 @@ module.exports = (function () {
     global.navigator = global.window.navigator;
     global.Element = global.window.Element;
 
-    const ExtendedCss = require('../third-party/extended-css.js');
+    const ExtendedCss = require('extended-css');
 
     /**
      * Validates css selector

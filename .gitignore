@@ -4,6 +4,8 @@ node_modules
 yarn-error.log
 src/test/resources/platforms/*
 src/test/resources/log.txt
+src/test/resources/report.txt
+src/test/resources/report_platforms.txt
 src/test/resources/log_platforms.txt
 src/test/resources/filters/*/diff.txt
 src/test/resources/filters/*/filter.txt
