@@ -45,7 +45,13 @@ module.exports = (() => {
      * @returns {boolean}
      */
     const validateDir = (dir, validator, schemas, oldSchemas, filtersRequiredAmount) => {
-        const items = fs.readdirSync(dir);
+        let items;
+        try {
+            items = fs.readdirSync(dir);
+        } catch (e) {
+            logger.log(e.message);
+            return false;
+        }
         // eslint-disable-next-line no-restricted-syntax
         for (const f of items) {
             const item = path.join(dir, f);
