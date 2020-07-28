@@ -18,21 +18,18 @@ describe('rule parser', () => {
         expect(rule).toBeDefined();
         expect(rule.ruleText).toBe(line);
         expect(rule.ruleType).toBe(RuleTypes.ElementHiding);
-        expect(rule.mask).toBe('##');
 
         line = 'example.com$$script[data-src="banner"]';
         rule = ruleParser.parseRule(line);
         expect(rule).toBeDefined();
         expect(rule.ruleText).toBe(line);
         expect(rule.ruleType).toBe(RuleTypes.Content);
-        expect(rule.mask).toBe('$$');
 
         line = 'example.org#%#window.__gaq = undefined;';
         rule = ruleParser.parseRule(line);
         expect(rule).toBeDefined();
         expect(rule.ruleText).toBe(line);
         expect(rule.ruleType).toBe(RuleTypes.Script);
-        expect(rule.mask).toBe('#%#');
 
         line = 'test-common-rule.com$xmlhttprequest';
         rule = ruleParser.parseRule(line);

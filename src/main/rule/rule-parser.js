@@ -259,8 +259,6 @@ const parseRule = function (ruleText) {
             || ruleType === RuleTypes.Content || ruleType === RuleTypes.Script || ruleType === RuleTypes.ExtCss) {
         rule.contentPart = ruleText.substring(ruleText.indexOf(mask) + mask.length);
         rule.domains = ruleText.substring(0, ruleText.indexOf(mask)).split(',');
-        rule.mask = mask;
-
         if (ruleType === RuleTypes.Content) {
             rule.contentAttributes = parseContentRuleAttributes(ruleText);
         }
