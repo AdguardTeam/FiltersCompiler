@@ -38,6 +38,7 @@ module.exports = (() => {
                 result.push(...converted);
             } catch (e) {
                 const message = `Unable to convert rule to AdGuard syntax: ${rule}`;
+                logger.log(message);
                 excludeRule(rule, excluded, message);
             }
         }
