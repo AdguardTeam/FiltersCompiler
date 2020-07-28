@@ -467,7 +467,7 @@ module.exports = (function () {
         logger.info('Writing revision file..');
 
         // eslint-disable-next-line no-buffer-constructor
-        const hash = Buffer.from(md5(compiledData, { asString: true })).toString('base64').trim();
+        const hash = new Buffer(md5(compiledData, { asString: true })).toString('base64').trim();
         const revisionFile = path.join(currentDir, REVISION_FILE);
         const revision = makeRevision(revisionFile, hash);
         writeFile(revisionFile, JSON.stringify(revision, null, '\t'));
