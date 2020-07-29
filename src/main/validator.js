@@ -1,4 +1,5 @@
 const scriptlets = require('scriptlets');
+const { RuleUtils } = require('@adguard/tsurlfilter');
 const logger = require('./utils/log.js');
 const ruleParser = require('./rule/rule-parser.js');
 const RuleTypes = require('./rule/rule-types.js');
@@ -260,17 +261,9 @@ const isValidCssRule = (ruleString, rule, excluded) => {
 };
 
 /**
- * Checks if the rule is comment
- *
- * @param {object} rule
- * @returns {boolean}
- */
-const isComment = (rule) => rule.ruleType === RuleTypes.Comment;
-
-/**
  * Validates list of rules
  *
- * @param list
+ * @param {string[]} list of rule texts
  * @param excluded
  * @returns {Array}
  */
@@ -279,17 +272,17 @@ const validate = function (list, excluded) {
         return [];
     }
 
-    return list.filter((s) => {
-        const rule = ruleParser.parseRule(s);
+    return list.filter((ruleText) => {
+        const rule = ruleParser.parseRule(ruleText);
 
-        if (isComment(rule)) {
+        if (RuleUtils.isComment(ruleText)) {
             return true;
         }
 
-        if (isShortRule(s, excluded)
-            || !isValidElementHidingRule(s, rule, excluded)
-            || !isValidUrlBlockingRule(s, rule, excluded)
-            || !isValidCssRule(s, rule, excluded)
+        if (isShortRule(ruleText, excluded)
+            || !isValidElementHidingRule(ruleText, rule, excluded)
+            || !isValidUrlBlockingRule(ruleText, rule, excluded)
+            || !isValidCssRule(ruleText, rule, excluded)
             || !isValidScriptlet(rule, excluded)
             || !isValidRedirectRule(rule, excluded)) {
             return false;
