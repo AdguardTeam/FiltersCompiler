@@ -10,3 +10,6 @@ test.com#@%#Object.defineProperty(window, 'abcde', { get: function() { return []
 example.com##^script:has-text(/.advert/)
 ! Invalid selector:
 rybnik.com.pl##^iframe[name]:not([class]):not([id]):not([src])[style="display:none"]
+Unknown modifier: app=iexplore.exe in rule @@||test.com^$generichide,app=iexplore.exe
+@@||test.com^$generichide,app=iexplore.exe
+The rule is too short: 

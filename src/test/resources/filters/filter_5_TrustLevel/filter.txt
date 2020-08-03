@@ -36,7 +36,6 @@ test.com,mp4upload.com###overlay
 !
 ||example.com^$~script,~stylesheet,~xmlhttprequest,replace=/popunder_url/popunder_url_/
 ||test.com/Forums2008/JS/replaceLinks.js
-@@||test.com^$generichide,app=iexplore.exe
 example.com##div.grid_1[class$="app"]
 ||app-test.com^$third-party
 !
