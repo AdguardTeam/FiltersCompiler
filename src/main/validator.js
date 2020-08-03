@@ -3,6 +3,7 @@ const {
     RuleFactory,
     CosmeticRuleType,
     CosmeticRule,
+    RuleConverter,
 } = require('@adguard/tsurlfilter');
 const logger = require('./utils/log.js');
 const extendedCssValidator = require('./utils/extended-css-validator.js');
@@ -21,10 +22,11 @@ const excludeRule = (excluded, warning, rule) => {
 };
 
 /**
- * Validates list of rules
+ * Removes invalid rules from the list of rules
+ * and logs process in the excluded list
  *
  * @param {string[]} list of rule texts
- * @param excluded
+ * @param {string[]} excluded - list of messages with validation results
  * @returns {Array}
  */
 // TODO test excluded text messages
@@ -38,21 +40,30 @@ const validate = function (list, excluded) {
             return true;
         }
 
-        const validationResult = RuleValidator.validate(ruleText);
+        const convertedRules = RuleConverter.convertRule(ruleText);
 
-        if (!validationResult.valid) {
-            excludeRule(excluded, validationResult.error, ruleText);
-            return false;
-        }
+        for (let i = 0; i < convertedRules.length; i += 1) {
+            const convertedRuleText = convertedRules[i];
 
-        const rule = RuleFactory.createRule(ruleText);
+            const validationResult = RuleValidator.validate(convertedRuleText);
 
-        // It is impossible to bundle jsdom into tsurlfilter, so we check if rules are valid in the compiler
-        if (rule instanceof CosmeticRule && rule.getType() === CosmeticRuleType.ElementHiding) {
-            if (!extendedCssValidator.validateCssSelector(rule.getContent())) {
-                logger.error(`Invalid selector: ${ruleText}`);
-                excludeRule(excluded, '! Invalid selector:', rule.getText());
+            if (!validationResult.valid) {
+                // log source rule text to the excluded log
+                logger.error(`Invalid rule: ${ruleText}`);
+                excludeRule(excluded, validationResult.error, ruleText);
                 return false;
+            }
+
+            const rule = RuleFactory.createRule(convertedRuleText);
+
+            // It is impossible to bundle jsdom into tsurlfilter, so we check if rules are valid in the compiler
+            if (rule instanceof CosmeticRule && rule.getType() === CosmeticRuleType.ElementHiding) {
+                if (!extendedCssValidator.validateCssSelector(rule.getContent())) {
+                    logger.error(`Invalid selector: ${ruleText}`);
+                    // log source rule text to the excluded log
+                    excludeRule(excluded, '! Invalid selector:', ruleText);
+                    return false;
+                }
             }
         }
 

@@ -218,9 +218,8 @@ describe('validator', () => {
             'example.com##div[class^="textLink" "textColor" i]'];
         expect(validator.validate(rules)).toHaveLength(0);
 
-        // TODO Unknown modifier: rewrite=abp-resource:blank-mp3
-        // rules = ['||delivery.tf1.fr/pub$media,rewrite=abp-resource:blank-mp3,domain=tf1.fr'];
-        // expect(validator.validate(rules).length).toBeGreaterThan(0);
+        rules = ['||delivery.tf1.fr/pub$media,rewrite=abp-resource:blank-mp3,domain=tf1.fr'];
+        expect(validator.validate(rules).length).toBeGreaterThan(0);
 
         rules = ['||delivery.tf1.fr/pub$media,rewrite=resource:blank-mp3,domain=tf1.fr',
             '||delivery.tf1.fr/pub$media,rewrite,domain=tf1.fr'];
