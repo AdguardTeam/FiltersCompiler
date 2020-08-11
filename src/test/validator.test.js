@@ -188,9 +188,8 @@ describe('validator', () => {
         let rules = ['||onedrive.su/code/bshow.php$empty,important,~websocket'];
         expect(validator.validate(rules)).toHaveLength(1);
 
-        // TODO figure out how to handle $all modifier
-        // rules = ['||4ksport.pl^$all'];
-        // expect(validator.validate(rules)).toHaveLength(1);
+        rules = ['||4ksport.pl^$all'];
+        expect(validator.validate(rules)).toHaveLength(1);
 
         rules = ['||onedrive.su/code/bshow.php$cookie=cookie_name'];
         expect(validator.validate(rules).length).toBeGreaterThan(0);
@@ -398,21 +397,25 @@ describe('validator', () => {
     });
 
     it('Test redirects validator', () => {
-        let rules = ['||delivery.tf1.fr/pub$media,redirect=noopmp3-0.1s,domain=tf1.fr',
+        let rules = [
+            '||delivery.tf1.fr/pub$media,redirect=noopmp3-0.1s,domain=tf1.fr',
             '||example.com/banner$image,redirect=32x32-transparent.png',
             '||example.com/*.mp4$media,redirect=noopmp4-1s',
-            '||googletagservices.com/test.js$domain=test.com,redirect=googletagservices-gpt'];
+            '||googletagservices.com/test.js$domain=test.com,redirect=googletagservices-gpt',
+        ];
         expect(validator.validate(rules)).toHaveLength(4);
 
-        rules = ['||podu.me/ads/audio/*.mp3$redirect=noopmp3-0.1s',
-            '||podu.me/ads/audio/*.mp3$media,redirect=noopmp3-0.1s'];
+        rules = [
+            '||podu.me/ads/audio/*.mp3$redirect=noopmp3-0.1s',
+            '||podu.me/ads/audio/*.mp3$media,redirect=noopmp3-0.1s',
+        ];
         expect(validator.validate(rules)).toHaveLength(2);
 
-        rules = ['||example.com^$script,redirect=noopjs.js',
+        rules = [
+            '||example.com^$script,redirect=noopjs.js',
             '||example.com/banner$image,redirect=3x3.png',
-            '||googletagservices.com/test.js$domain=test.com,redirect=googletagservices_gpt.js',
-            '||example.com/banner$image,redirect=1x1.gif',
-            '||example.com/*.mp4$media,redirect=noopmp4_1s'];
+            '||example.com/*.mp4$media,redirect=noopmp4_1s',
+        ];
         expect(validator.validate(rules)).toHaveLength(0);
 
         // TODO we really should test scriptlets in this library?
