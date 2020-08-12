@@ -61,10 +61,9 @@ describe('validator', () => {
         rules = [ruleText];
         expect(validator.validate(rules).length).toBeGreaterThan(0);
 
-        // TODO: Failed with ExtendedCss validation
-        // ruleText = "drive2.ru##.l-main.js-main div.c-block:has(div.c-header:contains(Реклама))";
-        // rules = [ruleText];
-        // assert.ok(validator.validate(rules).length > 0);
+        ruleText = 'drive2.ru##.l-main.js-main div.c-block:has(div.c-header:contains(Реклама))';
+        rules = [ruleText];
+        expect(validator.validate(rules)).toHaveLength(1);
 
         ruleText = 'drive2.ru##.l-main.js-main div.c-block:has(> div.c-header)';
         rules = [ruleText];
@@ -184,6 +183,11 @@ describe('validator', () => {
         expect(validator.validate(rules).length).toBeGreaterThan(0);
     });
 
+    it('stealth modifier can exists only in whitelist rules', () => {
+        const rules = ['||onedrive.su/code/bshow.php$stealth'];
+        expect(validator.validate(rules)).toHaveLength(0);
+    });
+
     it('Test validation - various rules', () => {
         let rules = ['||onedrive.su/code/bshow.php$empty,important,~websocket'];
         expect(validator.validate(rules)).toHaveLength(1);
@@ -193,10 +197,6 @@ describe('validator', () => {
 
         rules = ['||onedrive.su/code/bshow.php$cookie=cookie_name'];
         expect(validator.validate(rules).length).toBeGreaterThan(0);
-
-        // TODO is it true that "modifier Stealth cannot be used in blacklist rule?"?
-        // rules = ['||onedrive.su/code/bshow.php$empty,important,stealth'];
-        // expect(validator.validate(rules).length).toBeGreaterThan(0);
 
         rules = ['samdan.com.tr,esquire.com.tr##div[data-mbzone="Textlink" i] > div#id_d_textlink'];
         expect(validator.validate(rules).length).toBeGreaterThan(0);
@@ -367,7 +367,25 @@ describe('validator', () => {
         expect(result).toBeFalsy();
     });
 
-    it('Test scriptlets validator', () => {
+    it('detects invalid scriptlet rules', () => {
+        let rules = [
+            'test.com#%#//scriptlet("ubo-abort-current-inline-scripts.js", "Math.random", "adbDetect")',
+            'example.com#%#//scriptlet("abp-abort-current-inline-script ", "console.log", "Hello")',
+            'example.com#@%#//scriptlet("abort-on--property-write", "adblock.check")',
+        ];
+
+        expect(validator.validate(rules)).toHaveLength(0);
+
+        rules = [
+            'test.com#%#//scriptlet(abort-current-inline-script", "Math.random", "adbDetect")',
+            'example.com#@%#//scriptlet("ubo-nano-setInterval-booster.js, "some.example", "1000")',
+            'example.com#%#//scriptlet("abp-abort-current-inline-script", console.log", "Hello")',
+        ];
+
+        expect(validator.validate(rules)).toHaveLength(0);
+    });
+
+    it('Test valid scriptlets', () => {
         const rules = [
             'test.com#%#//scriptlet("ubo-abort-current-inline-script.js", "Math.random", "adbDetect")',
             'example.com#@%#//scriptlet("ubo-disable-newtab-links.js")',
@@ -377,23 +395,8 @@ describe('validator', () => {
             'example.com#%#//scriptlet("prevent-adfly")',
             'example.com#@%#//scriptlet("ubo-nano-setInterval-booster", "some.example", "1000")',
         ];
+
         expect(validator.validate(rules)).toHaveLength(7);
-
-        // TODO check why these rules are not valid
-        // rules = [
-        //     'test.com#%#//scriptlet("ubo-abort-current-inline-scripts.js", "Math.random", "adbDetect")',
-        //     'example.com#%#//scriptlet("abp-abort-current-inline-script ", "console.log", "Hello")',
-        //     'example.com#@%#//scriptlet("abort-on--property-write", "adblock.check")',
-        // ];
-        //
-        // expect(validator.validate(rules)).toHaveLength(0);
-
-        // rules = [
-        //     'test.com#%#//scriptlet(abort-current-inline-script", "Math.random", "adbDetect")',
-        //     'example.com#@%#//scriptlet("ubo-nano-setInterval-booster.js, "some.example", "1000")',
-        //     'example.com#%#//scriptlet("abp-abort-current-inline-script", console.log", "Hello")',
-        // ];
-        // expect(validator.validate(rules)).toHaveLength(0);
     });
 
     it('Test redirects validator', () => {
@@ -418,7 +421,6 @@ describe('validator', () => {
         ];
         expect(validator.validate(rules)).toHaveLength(0);
 
-        // TODO we really should test scriptlets in this library?
         const { redirects } = scriptlets;
 
         let rule = '||example.com^$script,redirect=noopjs.js';

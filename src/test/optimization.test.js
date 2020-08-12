@@ -10,8 +10,6 @@ describe('optimization', () => {
         expect(filtersOptimizationPercent.config.length).toBeGreaterThan(0);
 
         expect(optimization.getFilterOptimizationConfig(1)).toBeDefined();
-    // TODO what is purpose of this line?
-    // assert.ok(optimization.getFilterOptimizationConfig(4) === null);
     });
 
     it('Test optimization skip rule', () => {
