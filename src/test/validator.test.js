@@ -454,15 +454,14 @@ describe('validator', () => {
     });
 
     it('Test blocking rules with regexp', () => {
-        // TODO check why these rules are not valid
-        // rules = [
-        //     '/ex[[ampl[[e\.com\///.*\/banner/$script',
-        //     '/^htt[[[ps?:\/\/.*(bitly|bit)\.(com|ly)\//$domain=1337x.to',
-        //     '/\.sharesix\.com/.*[a-zA-Z0-9]({4}/$script',
-        // ];
-        // expect(validator.validate(rules)).toHaveLength(0);
+        let rules = [
+            '/ex[[ampl[[e\.com\///.*\/banner/$script',
+            '/^htt[[[ps?:\/\/.*(bitly|bit)\.(com|ly)\//$domain=1337x.to',
+            '/\.sharesix\.com/.*[a-zA-Z0-9]({4}/$script',
+        ];
+        expect(validator.validate(rules)).toHaveLength(0);
 
-        const rules = [
+        rules = [
             '/^https:\/\/([a-z]+\.)?sythe\.org\/\[=%#@$&!^].*[\w\W]{20,}/$image',
             '/^https?:\/\/.*(bitly|bit)\.(com|ly)\//$domain=1337x.to',
             '/^https?:\/\/.*(powvideo|powvldeo|povvideo).*\.*[?&$=&!]/$script,subdocument',

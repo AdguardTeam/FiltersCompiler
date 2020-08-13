@@ -29,7 +29,6 @@ const excludeRule = (excluded, warning, rule) => {
  * @param {string[]} excluded - list of messages with validation results
  * @returns {Array}
  */
-// TODO test excluded text messages
 const validate = function (list, excluded) {
     if (!list) {
         return [];
