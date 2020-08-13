@@ -1,11 +1,14 @@
 const path = require('path');
-const { setLogger } = require('@adguard/tsurlfilter');
+const { setLogger, setConfiguration, Compatibility } = require('@adguard/tsurlfilter');
 const builder = require('./src/main/builder.js');
 const schemaValidator = require('./src/main/json-validator.js');
 const logger = require('./src/main/utils/log');
 
 // Sets RuleConverter to use logger of current library
 setLogger(logger);
+
+// Sets configuration compatibility
+setConfiguration({ compatibility: Compatibility.compiler });
 
 const platformsConfig = path.join(__dirname, './platforms.json');
 const jsonSchemasConfigDir = path.join(__dirname, './schemas/');

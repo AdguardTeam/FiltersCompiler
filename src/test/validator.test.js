@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const scriptlets = require('scriptlets');
+// const { setConfiguration, Compatibility } = require('@adguard/tsurlfilter');
 const validator = require('../main/validator.js');
+
+// Sets configuration compatibility
+// setConfiguration({ compatibility: Compatibility.compiler });
 
 // Mock log to hide error messages
 jest.mock('../main/utils/log');
@@ -467,5 +471,13 @@ describe('validator', () => {
             '/^https?:\/\/.*(powvideo|powvldeo|povvideo).*\.*[?&$=&!]/$script,subdocument',
         ];
         expect(validator.validate(rules)).toHaveLength(3);
+    });
+
+    it('Validates modificators', () => {
+        const validRule = '@@||test.com^$generichide,app=iexplore.exe';
+        expect(validator.validate([validRule])).toHaveLength(1);
+
+        const invalidRule = '@@||test.com^$generichide,invalid_modificator';
+        expect(validator.validate([invalidRule])).toHaveLength(0);
     });
 });
