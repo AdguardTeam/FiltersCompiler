@@ -303,9 +303,8 @@ describe('validator', () => {
         rules = ['example.com#$#body { background: \\75 rl("https://some.jpg"); }'];
         expect(validator.validate(rules)).toHaveLength(0);
 
-        // TODO fix in the tsurlfilter, allow url in the selector part
-        // rules = ['example.com#$#body[style*="background-image: url()"] { margin-top: 45px !important; }'];
-        // expect(validator.validate(rules)).toHaveLength(1);
+        rules = ['example.com#$#body[style*="background-image: url()"] { margin-top: 45px !important; }'];
+        expect(validator.validate(rules)).toHaveLength(1);
 
         rules = ['example.com#$#body[style*="background-image: url(\'https://some.jpg\')"] { background: url() !important; }'];
         expect(validator.validate(rules)).toHaveLength(0);
