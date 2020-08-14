@@ -8,7 +8,7 @@ const logger = require('./src/main/utils/log');
 setLogger(logger);
 
 // Sets configuration compatibility
-setConfiguration({ compatibility: Compatibility.compiler });
+setConfiguration({ compatibility: Compatibility.corelibs });
 
 const platformsConfig = path.join(__dirname, './platforms.json');
 const jsonSchemasConfigDir = path.join(__dirname, './schemas/');

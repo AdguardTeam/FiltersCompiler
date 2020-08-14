@@ -1,10 +1,10 @@
 /* eslint-disable max-len */
 const scriptlets = require('scriptlets');
-// const { setConfiguration, Compatibility } = require('@adguard/tsurlfilter');
+const { setConfiguration, Compatibility } = require('@adguard/tsurlfilter');
 const validator = require('../main/validator.js');
 
 // Sets configuration compatibility
-// setConfiguration({ compatibility: Compatibility.compiler });
+setConfiguration({ compatibility: Compatibility.corelibs });
 
 // Mock log to hide error messages
 jest.mock('../main/utils/log');
