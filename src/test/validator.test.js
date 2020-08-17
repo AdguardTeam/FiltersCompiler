@@ -263,11 +263,11 @@ describe('validator', () => {
 
         const validateRules = validator.validate(rules);
 
-        expect(validateRules.includes(validRedirect1)).toBeTruthy();
-        expect(validateRules.includes(validRedirect2)).toBeTruthy();
-        expect(validateRules.includes(validImportant3)).toBeTruthy();
-        expect(validateRules.includes(invalidRedirect4)).toBeFalsy();
-        expect(validateRules.includes(invalidRedirect5)).toBeFalsy();
+        expect(validateRules).toContain(validRedirect1);
+        expect(validateRules).toContain(validRedirect2);
+        expect(validateRules).toContain(validImportant3);
+        expect(validateRules).not.toContain(invalidRedirect4);
+        expect(validateRules).not.toContain(invalidRedirect5);
         expect(validator.validate(rules)).toHaveLength(3);
     });
 
