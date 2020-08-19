@@ -10,4 +10,3 @@ test.com#@%#Object.defineProperty(window, 'abcde', { get: function() { return []
 example.com##^script:has-text(/.advert/)
 ! Invalid selector:
 rybnik.com.pl##^iframe[name]:not([class]):not([id]):not([src])[style="display:none"]
-The rule is too short: 

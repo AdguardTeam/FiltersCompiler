@@ -174,6 +174,9 @@ describe('validator', () => {
         ruleText = 'yandex.ru##[-ext-has=test]:matches(.whatisthis), .todaystripe:contains(test)';
         rules = [ruleText];
         expect(validator.validate(rules)).toHaveLength(0);
+
+        ruleText = 'sport-express.ru#?#aside[class$="sidebar"] div[class]:has(> div[id*="ScriptRootC"])';
+        expect(validator.validate([ruleText])).toHaveLength(1);
     });
 
     it('Test content rules validation', () => {
@@ -238,7 +241,7 @@ describe('validator', () => {
         expect(validator.validate(rules)).toHaveLength(0);
 
         let actual = validator.validate(['']);
-        let expected = [];
+        let expected = [''];
         expect(actual).toStrictEqual(expected);
 
         actual = validator.validate(undefined);

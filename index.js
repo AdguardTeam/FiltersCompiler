@@ -1,5 +1,5 @@
 const path = require('path');
-const { setLogger, setConfiguration, Compatibility } = require('@adguard/tsurlfilter');
+const { setLogger, setConfiguration, CompatibilityTypes } = require('@adguard/tsurlfilter');
 const builder = require('./src/main/builder.js');
 const schemaValidator = require('./src/main/json-validator.js');
 const logger = require('./src/main/utils/log');
@@ -8,7 +8,7 @@ const logger = require('./src/main/utils/log');
 setLogger(logger);
 
 // Sets configuration compatibility
-setConfiguration({ compatibility: Compatibility.corelibs });
+setConfiguration({ compatibility: CompatibilityTypes.corelibs });
 
 const platformsConfig = path.join(__dirname, './platforms.json');
 const jsonSchemasConfigDir = path.join(__dirname, './schemas/');
