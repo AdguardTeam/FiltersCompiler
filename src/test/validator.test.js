@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const scriptlets = require('scriptlets');
+const { setConfiguration, CompatibilityTypes } = require('@adguard/tsurlfilter');
 const validator = require('../main/validator.js');
+
+// Sets configuration compatibility
+setConfiguration({ compatibility: CompatibilityTypes.corelibs });
 
 // Mock log to hide error messages
 jest.mock('../main/utils/log');
@@ -61,10 +65,9 @@ describe('validator', () => {
         rules = [ruleText];
         expect(validator.validate(rules).length).toBeGreaterThan(0);
 
-        // TODO: Failed with ExtendedCss validation
-        // ruleText = "drive2.ru##.l-main.js-main div.c-block:has(div.c-header:contains(Реклама))";
-        // rules = [ruleText];
-        // assert.ok(validator.validate(rules).length > 0);
+        ruleText = 'drive2.ru##.l-main.js-main div.c-block:has(div.c-header:contains(Реклама))';
+        rules = [ruleText];
+        expect(validator.validate(rules)).toHaveLength(1);
 
         ruleText = 'drive2.ru##.l-main.js-main div.c-block:has(> div.c-header)';
         rules = [ruleText];
@@ -87,11 +90,11 @@ describe('validator', () => {
 
         ruleText = 'doodhwali.com##.container .col-xs-12 .col-xs-12 > .yellow:not(:nth-child(3))';
         rules = [ruleText];
-        expect(validator.validate(rules).length).toBeGreaterThan(0);
+        expect(validator.validate(rules)).toHaveLength(1);
 
-        ruleText = 'w3schools.com##.todaystripe:after';
+        ruleText = 'w3schools.com##.todaystripe::after';
         rules = [ruleText];
-        expect(validator.validate(rules).length).toBeGreaterThan(0);
+        expect(validator.validate(rules)).toHaveLength(1);
 
         ruleText = 'puls4.com##.media-actions-list > li:not(:nth-child(3)):not(:nth-child(4))';
         rules = [ruleText];
@@ -130,7 +133,7 @@ describe('validator', () => {
         expect(validator.validate(rules)).toHaveLength(0);
     });
 
-    it('Test ext-css validation - complicated cases', () => {
+    it('Test ext-css validation - complicated cases 2', () => {
         let ruleText;
         let rules;
 
@@ -165,12 +168,15 @@ describe('validator', () => {
 
         ruleText = 'yandex.ru##[-ext-has=test]:matches(.whatisthis)';
         rules = [ruleText];
-        expect(validator.validate(rules).length).toBeGreaterThan(0);
+        expect(validator.validate(rules)).toHaveLength(0);
 
         // Invalid pseudo class
         ruleText = 'yandex.ru##[-ext-has=test]:matches(.whatisthis), .todaystripe:contains(test)';
         rules = [ruleText];
         expect(validator.validate(rules)).toHaveLength(0);
+
+        ruleText = 'sport-express.ru#?#aside[class$="sidebar"] div[class]:has(> div[id*="ScriptRootC"])';
+        expect(validator.validate([ruleText])).toHaveLength(1);
     });
 
     it('Test content rules validation', () => {
@@ -184,17 +190,19 @@ describe('validator', () => {
         expect(validator.validate(rules).length).toBeGreaterThan(0);
     });
 
+    it('stealth modifier can exists only in whitelist rules', () => {
+        const rules = ['||onedrive.su/code/bshow.php$stealth'];
+        expect(validator.validate(rules)).toHaveLength(0);
+    });
+
     it('Test validation - various rules', () => {
         let rules = ['||onedrive.su/code/bshow.php$empty,important,~websocket'];
-        expect(validator.validate(rules).length).toBeGreaterThan(0);
+        expect(validator.validate(rules)).toHaveLength(1);
 
         rules = ['||4ksport.pl^$all'];
-        expect(validator.validate(rules).length).toBeGreaterThan(0);
+        expect(validator.validate(rules)).toHaveLength(1);
 
         rules = ['||onedrive.su/code/bshow.php$cookie=cookie_name'];
-        expect(validator.validate(rules).length).toBeGreaterThan(0);
-
-        rules = ['||onedrive.su/code/bshow.php$empty,important,stealth'];
         expect(validator.validate(rules).length).toBeGreaterThan(0);
 
         rules = ['samdan.com.tr,esquire.com.tr##div[data-mbzone="Textlink" i] > div#id_d_textlink'];
@@ -242,24 +250,27 @@ describe('validator', () => {
     });
 
     it('Test validation - validate redirect option', () => {
-        const validRedirectRule1 = 'onedrive.su/code/bshow.php$redirect';
-        const validRedirectRule2 = 'onedrive.su/code/bshow.php$important,redirect';
-        const validImportantRule3 = 'onedrive.su/code/bshow.php$important';
-        const nonValidRule = 'onedrive.su/code/bshow.php$nonvalid';
+        const validRedirect1 = 'onedrive.su/code/bshow.php$redirect=nooptext';
+        const validRedirect2 = 'onedrive.su/code/bshow.php$important,redirect=nooptext';
+        const validImportant3 = 'onedrive.su/code/bshow.php$important';
+        const invalidRedirect4 = 'onedrive.su/code/bshow.php$redirect'; // empty redirect modifier
+        const invalidRedirect5 = 'onedrive.su/code/bshow.php$redirect=nooptxt'; // error in redirect title
 
         const rules = [
-            validRedirectRule1,
-            validRedirectRule2,
-            validImportantRule3,
-            nonValidRule,
+            validRedirect1,
+            validRedirect2,
+            validImportant3,
+            invalidRedirect4,
+            invalidRedirect5,
         ];
 
         const validateRules = validator.validate(rules);
 
-        expect(validateRules.indexOf(validRedirectRule1)).toBeGreaterThanOrEqual(0);
-        expect(validateRules.indexOf(validRedirectRule2)).toBeGreaterThanOrEqual(0);
-        expect(validateRules.indexOf(validImportantRule3)).toBeGreaterThanOrEqual(0);
-        expect(validateRules.indexOf(nonValidRule)).toBe(-1);
+        expect(validateRules).toContain(validRedirect1);
+        expect(validateRules).toContain(validRedirect2);
+        expect(validateRules).toContain(validImportant3);
+        expect(validateRules).not.toContain(invalidRedirect4);
+        expect(validateRules).not.toContain(invalidRedirect5);
         expect(validator.validate(rules)).toHaveLength(3);
     });
 
@@ -288,7 +299,9 @@ describe('validator', () => {
     });
 
     it('Test validation - cosmetic css rules', () => {
-        let rules = ['example.com#$#body { background: black; }'];
+        let rules;
+
+        rules = ['example.com#$#body { background: black; }'];
         expect(validator.validate(rules)).toHaveLength(1);
 
         rules = ['example.com#$#body { background: url("https://some.jpg"); }'];
@@ -360,8 +373,26 @@ describe('validator', () => {
         expect(result).toBeFalsy();
     });
 
-    it('Test scriptlets validator', () => {
+    it('detects invalid scriptlet rules', () => {
         let rules = [
+            'test.com#%#//scriptlet("ubo-abort-current-inline-scripts.js", "Math.random", "adbDetect")',
+            'example.com#%#//scriptlet("abp-abort-current-inline-script ", "console.log", "Hello")',
+            'example.com#@%#//scriptlet("abort-on--property-write", "adblock.check")',
+        ];
+
+        expect(validator.validate(rules)).toHaveLength(0);
+
+        rules = [
+            'test.com#%#//scriptlet(abort-current-inline-script", "Math.random", "adbDetect")',
+            'example.com#@%#//scriptlet("ubo-nano-setInterval-booster.js, "some.example", "1000")',
+            'example.com#%#//scriptlet("abp-abort-current-inline-script", console.log", "Hello")',
+        ];
+
+        expect(validator.validate(rules)).toHaveLength(0);
+    });
+
+    it('Test valid scriptlets', () => {
+        const rules = [
             'test.com#%#//scriptlet("ubo-abort-current-inline-script.js", "Math.random", "adbDetect")',
             'example.com#@%#//scriptlet("ubo-disable-newtab-links.js")',
             'example.com#%#//scriptlet("abp-abort-current-inline-script", "console.log", "Hello")',
@@ -370,42 +401,32 @@ describe('validator', () => {
             'example.com#%#//scriptlet("prevent-adfly")',
             'example.com#@%#//scriptlet("ubo-nano-setInterval-booster", "some.example", "1000")',
         ];
+
         expect(validator.validate(rules)).toHaveLength(7);
-
-        rules = [
-            'test.com#%#//scriptlet("ubo-abort-current-inline-scripts.js", "Math.random", "adbDetect")',
-            'example.com#%#//scriptlet("abp-abort-current-inline-script ", "console.log", "Hello")',
-            'example.com#@%#//scriptlet("abort-on--property-write", "adblock.check")',
-        ];
-        expect(validator.validate(rules)).toHaveLength(0);
-
-        rules = [
-            'test.com#%#//scriptlet(abort-current-inline-script", "Math.random", "adbDetect")',
-            'example.com#@%#//scriptlet("ubo-nano-setInterval-booster.js, "some.example", "1000")',
-            'example.com#%#//scriptlet("abp-abort-current-inline-script", console.log", "Hello")',
-        ];
-        expect(validator.validate(rules)).toHaveLength(0);
     });
 
     it('Test redirects validator', () => {
-        let rules = ['||delivery.tf1.fr/pub$media,redirect=noopmp3-0.1s,domain=tf1.fr',
+        let rules = [
+            '||delivery.tf1.fr/pub$media,redirect=noopmp3-0.1s,domain=tf1.fr',
             '||example.com/banner$image,redirect=32x32-transparent.png',
             '||example.com/*.mp4$media,redirect=noopmp4-1s',
-            '||googletagservices.com/test.js$domain=test.com,redirect=googletagservices-gpt'];
+            '||googletagservices.com/test.js$domain=test.com,redirect=googletagservices-gpt',
+        ];
         expect(validator.validate(rules)).toHaveLength(4);
 
-        rules = ['||podu.me/ads/audio/*.mp3$redirect=noopmp3-0.1s',
-            '||podu.me/ads/audio/*.mp3$media,redirect=noopmp3-0.1s'];
+        rules = [
+            '||podu.me/ads/audio/*.mp3$redirect=noopmp3-0.1s',
+            '||podu.me/ads/audio/*.mp3$media,redirect=noopmp3-0.1s',
+        ];
         expect(validator.validate(rules)).toHaveLength(2);
 
-        rules = ['||example.com^$script,redirect=noopjs.js',
+        rules = [
+            '||example.com^$script,redirect=noopjs.js',
             '||example.com/banner$image,redirect=3x3.png',
-            '||googletagservices.com/test.js$domain=test.com,redirect=googletagservices_gpt.js',
-            '||example.com/banner$image,redirect=1x1.gif',
-            '||example.com/*.mp4$media,redirect=noopmp4_1s'];
+            '||example.com/*.mp4$media,redirect=noopmp4_1s',
+        ];
         expect(validator.validate(rules)).toHaveLength(0);
 
-        // TODO we really should test scriptlets in this library?
         const { redirects } = scriptlets;
 
         let rule = '||example.com^$script,redirect=noopjs.js';
@@ -453,5 +474,13 @@ describe('validator', () => {
             '/^https?:\/\/.*(powvideo|powvldeo|povvideo).*\.*[?&$=&!]/$script,subdocument',
         ];
         expect(validator.validate(rules)).toHaveLength(3);
+    });
+
+    it('Validates modificators', () => {
+        const validRule = '@@||test.com^$generichide,app=iexplore.exe';
+        expect(validator.validate([validRule])).toHaveLength(1);
+
+        const invalidRule = '@@||test.com^$generichide,invalid_modificator';
+        expect(validator.validate([invalidRule])).toHaveLength(0);
     });
 });
