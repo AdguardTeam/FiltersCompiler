@@ -483,4 +483,24 @@ describe('validator', () => {
         const invalidRule = '@@||test.com^$generichide,invalid_modificator';
         expect(validator.validate([invalidRule])).toHaveLength(0);
     });
+
+    it('Test removeparam rules validation', () => {
+        let rules = ['$removeparam=gclid|yclid|fbclid'];
+        expect(validator.validate(rules).length).toBe(1);
+
+        rules = ['||test.com^$removeparam=qwerty'];
+        expect(validator.validate(rules).length).toBe(1);
+
+        rules = ['||test.com^$removeparam=/qwerty/i'];
+        expect(validator.validate(rules).length).toBe(1);
+
+        rules = ['@@||example.com$removeparam'];
+        expect(validator.validate(rules).length).toBe(1);
+
+        rules = ['example.com$removeparam'];
+        expect(validator.validate(rules).length).toBe(0);
+
+        rules = ['||example.com$removeparam'];
+        expect(validator.validate(rules).length).toBe(0);
+    });
 });
