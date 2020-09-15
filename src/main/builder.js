@@ -30,7 +30,7 @@ module.exports = (function () {
     const workaround = require('./utils/workaround.js');
     const webutils = require('./utils/webutils.js');
 
-    const FilterDownloader = require('filters-downloader');
+    const FiltersDownloader = require('filters-downloader');
 
     const TEMPLATE_FILE = 'template.txt';
     const FILTER_FILE = 'filter.txt';
@@ -308,8 +308,8 @@ module.exports = (function () {
             checkRedirects(result, options.url);
 
             // resolved includes
-            const originUrl = externalInclude ? FilterDownloader.getFilterUrlOrigin(options.url) : currentDir;
-            result = await FilterDownloader.resolveIncludes(result, originUrl);
+            const originUrl = externalInclude ? FiltersDownloader.getFilterUrlOrigin(options.url) : currentDir;
+            result = await FiltersDownloader.resolveIncludes(result, originUrl);
 
             if (options.exclude) {
                 const optionsExcludePath = path.join(currentDir, options.exclude);
@@ -360,7 +360,7 @@ module.exports = (function () {
             }
         }
 
-        result = await FilterDownloader.resolveIncludes(result, currentDir);
+        result = await FiltersDownloader.resolveIncludes(result, currentDir);
 
         result = converter.convertRulesToAdgSyntax(result, excluded);
 
