@@ -13,7 +13,7 @@ module.exports = (() => {
     const optimization = require('../optimization');
 
     const RuleMasks = require('../rule/rule-masks.js');
-    const FilterDownloader = require('filters-downloader');
+    const FiltersDownloader = require('filters-downloader');
 
     const RULES_SEPARATOR = '\r\n';
     const filterIdsPool = [];
@@ -743,7 +743,7 @@ module.exports = (() => {
         // eslint-disable-next-line guard-for-in,no-restricted-syntax
         for (const platform in platformPathsConfig) {
             const config = platformPathsConfig[platform];
-            let rules = FilterDownloader.resolveConditions(originalRules, config.defines);
+            let rules = FiltersDownloader.resolveConditions(originalRules, config.defines);
             rules = filter.cleanupRules(rules, config, filterId);
             rules = removeRuleDuplicates(rules);
             const optimizedRules = filter.cleanupAndOptimizeRules(rules, config, optimizationConfig, filterId);
