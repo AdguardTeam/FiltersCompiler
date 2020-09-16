@@ -30,7 +30,7 @@ const convertRulesToAdgSyntax = function (rulesList, excluded) {
     for (let i = 0; i < rulesList.length; i += 1) {
         const rule = rulesList[i];
         try {
-            const converted = RuleConverter.convertRule(rule, { ignoreAll: true });
+            const converted = RuleConverter.convertRule(rule, { ignoreAllModifier: true });
             result.push(...converted);
         } catch (e) {
             const message = `Unable to convert rule to AdGuard syntax: ${rule}`;

@@ -13,12 +13,12 @@
     "ajv": "^6.10.2",
     "child_process": ">=1.0.2",
     "crypto": "1.0.1",
-    "extended-css": "https://github.com/AdguardTeam/ExtendedCss.git#v1.2.9",
+    "extended-css": "https://github.com/AdguardTeam/ExtendedCss.git#v1.3.1",
     "filters-downloader": "git+https://github.com/AdguardTeam/FiltersDownloader.git#v1.1.0",
     "jsdom": "^16.3.0",
     "md5": "2.2.1",
     "moment": "^2.24.0",
-    "scriptlets": "https://github.com/AdguardTeam/Scriptlets.git#v1.2.5",
+    "scriptlets": "https://github.com/AdguardTeam/Scriptlets.git#v1.3.4",
     "utf8": "^3.0.0"
   },
   "devDependencies": {
