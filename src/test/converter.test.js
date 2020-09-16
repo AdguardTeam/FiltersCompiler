@@ -16,6 +16,9 @@ describe('converter', () => {
         c = converter.convertRulesToAdgSyntax(['example.com#@#h1:style(background-color: blue !important)']);
         expect(c[0]).toBe('example.com#@$#h1 { background-color: blue !important }');
 
+        c = converter.convertRulesToAdgSyntax(['yourconroenews.com#@##siteNav:style(transform: none !important;)']);
+        expect(c[0]).toBe('yourconroenews.com#@$##siteNav { transform: none !important; }');
+
         c = converter.convertRulesToAdgSyntax(['apkmirror.com##body .google-ad-leaderboard-smaller:style(position: absolute!important; left: -4000px!important; display:block!important;)']);
         expect(c[0]).toBe('apkmirror.com#$#body .google-ad-leaderboard-smaller { position: absolute!important; left: -4000px!important; display:block!important; }');
 
