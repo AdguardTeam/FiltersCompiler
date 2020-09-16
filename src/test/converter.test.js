@@ -352,4 +352,11 @@ describe('converter', () => {
         expected = 'besplatka.ua,forumodua.com#$?#body > div:not([id]):not([class]):not([style]):empty { remove: true; }';
         expect(actual[0]).toBe(expected);
     });
+
+    it('does not convert rules with $all modifier', () => {
+        const rule = '||example.org^$all';
+        const actual = converter.convertRulesToAdgSyntax([rule]);
+        expect(actual).toHaveLength(1);
+        expect(actual[0]).toBe(rule);
+    });
 });
