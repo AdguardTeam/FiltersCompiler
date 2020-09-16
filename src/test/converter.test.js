@@ -362,4 +362,25 @@ describe('converter', () => {
         expect(actual).toHaveLength(1);
         expect(actual[0]).toBe(rule);
     });
+
+    describe('Pseudo elements with one colon', () => {
+        it('converts hiding :before', () => {
+            const rule = 'hotline.ua##.reset-scroll:before';
+            const result = converter.convertRulesToAdgSyntax([rule]);
+            expect(result).toHaveLength(1);
+            expect(result[0]).toBe('hotline.ua##.reset-scroll::before');
+        });
+
+        it('does not add redundant colons', () => {
+            const rule = 'hotline.ua##.reset-scroll::before';
+            expect(converter.convertRulesToAdgSyntax([rule])[0]).toBe(rule);
+        });
+
+        it('converts cosmetic :after', () => {
+            const rule = 'militaria.pl#$##layout-wrapper:after { height:0!important }';
+            const result = converter.convertRulesToAdgSyntax([rule]);
+            expect(result).toHaveLength(1);
+            expect(result[0]).toBe('militaria.pl#$##layout-wrapper::after { height:0!important }');
+        });
+    });
 });
