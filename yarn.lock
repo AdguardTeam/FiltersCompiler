@@ -2,15 +2,15 @@
 # yarn lockfile v1
 
 
-"@adguard/tsurlfilter@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@adguard/tsurlfilter/-/tsurlfilter-0.2.0.tgz#f32ceb5a2669751c4415e9dd78b248a185cb49c7"
-  integrity sha512-KGhiyulfcyUAxhe+XibywMH4UaU9DtIm5T99p911iOhzgGayIHNzmI/FGDge7iCDDXVdWJtzlMKO+LD+xavjcg==
+"@adguard/tsurlfilter@0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@adguard/tsurlfilter/-/tsurlfilter-0.3.1.tgz#84df2e1e94e6ecd2628c03314916ba66252057df"
+  integrity sha512-iKuHFGLK/z6Oo55HRFiJlEDFtKXpsx9yy87NAB1Lw2WkJ2jSuuAyVAQUHbsCsvYNAzyHKLUzgdiP/AbPZKv1Hg==
   dependencies:
     consola "^2.12.2"
-    extended-css "git+https://github.com/AdguardTeam/ExtendedCss.git#v1.2.13"
+    extended-css "git+https://github.com/AdguardTeam/ExtendedCss.git#v1.3.1"
     is-ip "^3.1.0"
-    scriptlets "git+https://github.com/AdguardTeam/Scriptlets.git#v1.3.1"
+    scriptlets "git+https://github.com/AdguardTeam/Scriptlets.git#v1.3.4"
     text-encoding "git+https://github.com/AdguardTeam/text-encoding.git#v0.7.1"
     tldts "^5.6.45"
 
@@ -1736,13 +1736,14 @@ extend@~3.0.2:
   resolved "https://registry.yarnpkg.com/extend/-/extend-3.0.2.tgz#f8b1136b4071fbd8eb140aff858b1019ec2915fa"
   integrity sha512-fjquC59cD7CyW6urNXK0FBufkZcoiGG80wTuPujX590cB5Ttln20E2UB4S/WARVqhXffZl2LNgS+gQdPIIim/g==
 
-"extended-css@git+https://github.com/AdguardTeam/ExtendedCss.git#v1.2.13":
-  version "1.2.13"
-  resolved "git+https://github.com/AdguardTeam/ExtendedCss.git#2db7ddedbee569d902765585b60f7b65cb24f1ca"
+"extended-css@git+https://github.com/AdguardTeam/ExtendedCss.git#v1.3.1":
+  version "1.3.1"
+  uid "77b357484ee938ed2ab40488fccfdc8d92e138a2"
+  resolved "git+https://github.com/AdguardTeam/ExtendedCss.git#77b357484ee938ed2ab40488fccfdc8d92e138a2"
 
-"extended-css@https://github.com/AdguardTeam/ExtendedCss.git#v1.2.9":
-  version "1.2.9"
-  resolved "https://github.com/AdguardTeam/ExtendedCss.git#3f6f3fcf7d61a0eca55a29c6c0f1ef490d37538d"
+"extended-css@https://github.com/AdguardTeam/ExtendedCss.git#v1.3.1":
+  version "1.3.1"
+  resolved "https://github.com/AdguardTeam/ExtendedCss.git#77b357484ee938ed2ab40488fccfdc8d92e138a2"
 
 external-editor@^3.0.3:
   version "3.1.0"
@@ -3873,9 +3874,10 @@ saxes@^5.0.0:
   dependencies:
     xmlchars "^2.2.0"
 
-"scriptlets@git+https://github.com/AdguardTeam/Scriptlets.git#v1.3.1":
-  version "1.3.1"
-  resolved "git+https://github.com/AdguardTeam/Scriptlets.git#c26ef4d3e89d7dc43618352f122b20c08518dd1d"
+"scriptlets@git+https://github.com/AdguardTeam/Scriptlets.git#v1.3.4":
+  version "1.3.4"
+  uid "5acee837102e040a541be437968723b1ba0b742b"
+  resolved "git+https://github.com/AdguardTeam/Scriptlets.git#5acee837102e040a541be437968723b1ba0b742b"
   dependencies:
     "@babel/runtime" "^7.7.2"
     axios "^0.19.0"
@@ -3883,9 +3885,9 @@ saxes@^5.0.0:
     dotenv "^8.2.0"
     js-yaml "^3.13.1"
 
-"scriptlets@https://github.com/AdguardTeam/Scriptlets.git#v1.2.5":
-  version "1.2.5"
-  resolved "https://github.com/AdguardTeam/Scriptlets.git#8f79543af7d2124a2fe90e32e63a6dea967ee2d0"
+"scriptlets@https://github.com/AdguardTeam/Scriptlets.git#v1.3.4":
+  version "1.3.4"
+  resolved "https://github.com/AdguardTeam/Scriptlets.git#5acee837102e040a541be437968723b1ba0b742b"
   dependencies:
     "@babel/runtime" "^7.7.2"
     axios "^0.19.0"

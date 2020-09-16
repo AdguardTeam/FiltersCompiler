@@ -747,8 +747,8 @@ module.exports = (() => {
             rules = filter.cleanupRules(rules, config, filterId);
             rules = removeRuleDuplicates(rules);
             const optimizedRules = filter.cleanupAndOptimizeRules(rules, config, optimizationConfig, filterId);
-            logger.info(`Filter ${filterId}. Rules ${originalRules.length} => ${rules.length} =>`
-                + `${optimizedRules.length}. PlatformPath: '${config.path}'`);
+            // eslint-disable-next-line max-len
+            logger.info(`Filter ${filterId}. Rules ${originalRules.length} => ${rules.length} => ${optimizedRules.length}. PlatformPath: '${config.path}'`);
 
             const platformDir = path.join(platformsPath, config.path, PLATFORM_FILTERS_DIR);
             writeFilterRules(filterId, platformDir, config, header, rules, false);
