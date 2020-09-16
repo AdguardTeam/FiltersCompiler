@@ -169,8 +169,8 @@ module.exports = (() => {
             // eslint-disable-next-line no-restricted-syntax
             for (const pattern of config.configuration.removeRulePatterns) {
                 if (ruleText.match(new RegExp(pattern))) {
-                    logger.log(`${ruleText} removed with removeRulePattern ${pattern}`
-                        + `in filter ${filterId} for ${config.platform} platform`);
+                    // eslint-disable-next-line max-len
+                    logger.log(`${ruleText} removed with removeRulePattern ${pattern} in filter ${filterId} for ${config.platform} platform`);
                     return true;
                 }
             }
