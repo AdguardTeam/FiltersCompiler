@@ -1,6 +1,6 @@
 {
   "name": "adguard-filters-compiler",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Adguard filters compiler",
   "homepage": "http://adguard.com",
   "main": "index.js",
@@ -9,7 +9,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@adguard/tsurlfilter": "^0.3.0",
+    "@adguard/tsurlfilter": "0.3.1",
     "ajv": "^6.10.2",
     "child_process": ">=1.0.2",
     "crypto": "1.0.1",
