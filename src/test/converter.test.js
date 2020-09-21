@@ -336,6 +336,9 @@ describe('converter', () => {
         actual = converter.convertAdgRedirectsToUbo(['']);
         expected = '';
         expect(actual[0]).toBe(expected);
+
+        actual = converter.convertAdgRedirectsToUbo(['', undefined]);
+        expect(actual).toHaveLength(2);
     });
 
     it('converts :remove() rules', () => {

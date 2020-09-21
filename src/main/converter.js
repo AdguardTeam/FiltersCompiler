@@ -53,7 +53,7 @@ const convertRulesToAdgSyntax = function (rulesList, excluded) {
 const convertToUbo = (rules, ruleType, validateMethod, convertMethod) => {
     const modified = [];
     rules.forEach((rule) => {
-        if (validateMethod(rule)) {
+        if (rule && validateMethod(rule)) {
             try {
                 const convertedRule = convertMethod(rule);
                 logger.log(`AdGuard ${ruleType} ${rule} converted to uBlock: ${convertedRule}`);
