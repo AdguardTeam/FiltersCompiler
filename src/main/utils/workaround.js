@@ -111,10 +111,10 @@ module.exports = (() => {
     /**
      * Removes `[Adblock Plus x.x]` strings
      *
-     * @param inclusionContent
+     * @param lines
      */
-    const removeAdblockVersion = function (inclusionContent) {
-        return inclusionContent.replace(/!?.?\[Adblock.*?\]\r?\n?/g, '');
+    const removeAdblockVersion = function (lines) {
+        return lines.join('\n').replace(/!?.?\[Adblock.*?\]\r?\n?/g, '').split('\n');
     };
 
     /**
