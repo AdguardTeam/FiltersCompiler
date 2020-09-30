@@ -9,7 +9,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@adguard/tsurlfilter": "0.3.1",
+    "@adguard/tsurlfilter": "0.3.2",
     "ajv": "^6.10.2",
     "child_process": ">=1.0.2",
     "crypto": "1.0.1",
