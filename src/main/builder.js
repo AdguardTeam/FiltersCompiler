@@ -302,14 +302,15 @@ module.exports = (function () {
         const included = externalInclude ? webutils.downloadFile(options.url) : readFile(path.join(currentDir, options.url));
 
         if (included) {
-            result = workaround.removeAdblockVersion(included);
-            result = splitLines(result);
+            result = splitLines(included);
 
             checkRedirects(result, options.url);
 
             // resolved includes
             const originUrl = externalInclude ? FiltersDownloader.getFilterUrlOrigin(options.url) : currentDir;
             result = await FiltersDownloader.resolveIncludes(result, originUrl);
+
+            result = workaround.removeAdblockVersion(result);
 
             if (options.exclude) {
                 const optionsExcludePath = path.join(currentDir, options.exclude);
