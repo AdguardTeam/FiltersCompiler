@@ -84,6 +84,12 @@ describe('validator', () => {
         expect(validator.validate(rules)).toHaveLength(0);
     });
 
+    it('Validates with extended css abp pseudo classes', () => {
+        const rules = ['kostrzyn.pl#?#.aktperbox:-abp-contains(Rozmaitości) > div:-abp-has(div)'];
+        const result = validator.validate(rules);
+        expect(result).toHaveLength(1);
+    });
+
     it('Test ext-css validation - complicated cases', () => {
         let ruleText;
         let rules;
@@ -275,16 +281,16 @@ describe('validator', () => {
     });
 
     it('Test validation - validate rules with $', () => {
-        const validRedirectRule1 = 'zen.yandex.by,zen.yandex.com,zen.yandex.com.tr,zen.yandex.fr,zen.yandex.kz,zen.yandex.ru,zen.yandex.ua#?#.feed__item:-abp-has(*:-abp-contains(/^реклама$/i))';
+        const validRule = 'zen.yandex.ru,zen.yandex.ua#?#.feed__item:-abp-has(*:-abp-contains(/^реклама$/i))';
 
         const rules = [
-            validRedirectRule1,
+            validRule,
         ];
 
         const validateRules = validator.validate(rules);
 
-        expect(validateRules.indexOf(validRedirectRule1)).toBeGreaterThan(-1);
-        expect(validateRules.length).toBeGreaterThan(0);
+        expect(validateRules).toContain(validRule);
+        expect(validateRules).toHaveLength(1);
     });
 
     it('Test validation - incorrect domain option', () => {
