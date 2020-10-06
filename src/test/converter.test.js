@@ -49,6 +49,15 @@ describe('converter', () => {
         expect(c[0]).toEqual('');
     });
 
+    it('collects logs for converted rules', () => {
+        const rule = 'example.com##h1:style(background-color: blue !important)';
+        const excluded = [];
+        const c = converter.convertRulesToAdgSyntax([rule], excluded);
+        const expectedConvertedRule = 'example.com#$#h1 { background-color: blue !important }';
+        expect(c[0]).toBe(expectedConvertedRule);
+        expect(excluded[0]).toBe(`! Rule "${rule}" converted to: "${[...[expectedConvertedRule]]}"`);
+    });
+
     it('converts first-party replaced by ~third-party', () => {
         let actual = converter.convertRulesToAdgSyntax(['||www.ynet.co.il^$important,websocket,first-party']);
         let expected = '||www.ynet.co.il^$important,websocket,~third-party';
