@@ -102,6 +102,11 @@ describe('converter', () => {
         expected = '||zive.cz^*+$stylesheet,script';
         expect(actual[0]).toBe(expected);
 
+        // does not converts "css" substrings outside of options
+        const rule = 'csoonline.com,csswizardry.com##.ad';
+        actual = converter.convertRulesToAdgSyntax([rule]);
+        expect(actual[0]).toBe(rule);
+
         actual = converter.convertRulesToAdgSyntax(['||zive.cz^*+$frame']);
         expected = '||zive.cz^*+$subdocument';
         expect(actual[0]).toBe(expected);
@@ -305,49 +310,56 @@ describe('converter', () => {
         expect(actual[0]).toBe(expected);
     });
 
-    it('converts redirects', () => {
-        let actual = converter.convertRulesToAdgSyntax(['||example.com/banner$image,redirect=1x1.gif']);
-        let expected = '||example.com/banner$image,redirect=1x1-transparent.gif';
-        expect(actual[0]).toBe(expected);
+    describe('converts redirects', () => {
+        it('converts redirects', () => {
+            let actual = converter.convertRulesToAdgSyntax(['||example.com/banner$image,redirect=1x1.gif']);
+            let expected = '||example.com/banner$image,redirect=1x1-transparent.gif';
+            expect(actual[0]).toBe(expected);
 
-        actual = converter.convertRulesToAdgSyntax(['||example.com^$script,rewrite=abp-resource:blank-js']);
-        expected = '||example.com^$script,redirect=noopjs';
-        expect(actual[0]).toBe(expected);
+            actual = converter.convertRulesToAdgSyntax(['||example.com^$script,rewrite=abp-resource:blank-js']);
+            expected = '||example.com^$script,redirect=noopjs';
+            expect(actual[0]).toBe(expected);
 
-        actual = converter.convertRulesToAdgSyntax(['||googletagservices.com/test.js$domain=test.com,redirect=googletagservices_gpt.js']);
-        expected = '||googletagservices.com/test.js$domain=test.com,redirect=googletagservices-gpt';
-        expect(actual[0]).toBe(expected);
+            actual = converter.convertRulesToAdgSyntax(['||googletagservices.com/test.js$domain=test.com,redirect=googletagservices_gpt.js']);
+            expected = '||googletagservices.com/test.js$domain=test.com,redirect=googletagservices-gpt';
+            expect(actual[0]).toBe(expected);
 
-        actual = converter.convertRulesToAdgSyntax(['||delivery.tf1.fr/pub$media,rewrite=abp-resource:blank-mp3,domain=tf1.fr']);
-        expected = '||delivery.tf1.fr/pub$media,redirect=noopmp3-0.1s,domain=tf1.fr';
-        expect(actual[0]).toBe(expected);
+            actual = converter.convertRulesToAdgSyntax(['||delivery.tf1.fr/pub$media,rewrite=abp-resource:blank-mp3,domain=tf1.fr']);
+            expected = '||delivery.tf1.fr/pub$media,redirect=noopmp3-0.1s,domain=tf1.fr';
+            expect(actual[0]).toBe(expected);
 
-        actual = converter.convertAdgRedirectsToUbo(['||example.com/banner$image,redirect=32x32-transparent.png']);
-        expected = '||example.com/banner$image,redirect=32x32.png';
-        expect(actual[0]).toBe(expected);
+            actual = converter.convertAdgRedirectsToUbo(['||example.com/banner$image,redirect=32x32-transparent.png']);
+            expected = '||example.com/banner$image,redirect=32x32.png';
+            expect(actual[0]).toBe(expected);
 
-        actual = converter.convertAdgRedirectsToUbo(['||example.com^$script,redirect=noopjs']);
-        expected = '||example.com^$script,redirect=noop.js';
-        expect(actual[0]).toBe(expected);
+            actual = converter.convertAdgRedirectsToUbo(['||example.com^$script,redirect=noopjs']);
+            expected = '||example.com^$script,redirect=noop.js';
+            expect(actual[0]).toBe(expected);
 
-        actual = converter.convertAdgRedirectsToUbo(['||example.com/banner$image,redirect=1x1-transparent.gif']);
-        expected = '||example.com/banner$image,redirect=1x1.gif';
-        expect(actual[0]).toBe(expected);
+            actual = converter.convertAdgRedirectsToUbo(['||example.com/banner$image,redirect=1x1-transparent.gif']);
+            expected = '||example.com/banner$image,redirect=1x1.gif';
+            expect(actual[0]).toBe(expected);
 
-        actual = converter.convertAdgRedirectsToUbo(['||*/ad/$redirect=noopmp3-0.1s,domain=huaren.tv']);
-        expected = [];
-        expect(actual).toEqual(expected);
+            actual = converter.convertAdgRedirectsToUbo(['||*/ad/$redirect=noopmp3-0.1s,domain=huaren.tv']);
+            expected = [];
+            expect(actual).toEqual(expected);
 
-        actual = converter.convertAdgRedirectsToUbo(['||example.com^$redirect=noopjs']);
-        expected = [];
-        expect(actual).toEqual(expected);
+            actual = converter.convertAdgRedirectsToUbo(['||example.com^$redirect=noopjs']);
+            expected = [];
+            expect(actual).toEqual(expected);
 
-        actual = converter.convertAdgRedirectsToUbo(['']);
-        expected = '';
-        expect(actual[0]).toBe(expected);
+            actual = converter.convertAdgRedirectsToUbo(['']);
+            expected = '';
+            expect(actual[0]).toBe(expected);
 
-        actual = converter.convertAdgRedirectsToUbo(['', undefined]);
-        expect(actual).toHaveLength(2);
+            actual = converter.convertAdgRedirectsToUbo(['', undefined]);
+            expect(actual).toHaveLength(2);
+        });
+
+        it('does not add unnecessary symbols while converting redirects', () => {
+            const actual = converter.convertRulesToAdgSyntax(['intermarche.pl#%#document.cookie = "interapp_redirect=false; path=/;";']);
+            expect(actual[0]).toBe('intermarche.pl#%#document.cookie = "interapp_redirect=false; path=/;";');
+        });
     });
 
     it('converts :remove() rules', () => {
