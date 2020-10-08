@@ -49,7 +49,6 @@ module.exports = (function () {
 
     const NOT_OPTIMIZED_HINT = '!+ NOT_OPTIMIZED';
 
-
     let currentDir;
 
     /**
