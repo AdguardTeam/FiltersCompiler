@@ -254,7 +254,6 @@ describe('Test builder', () => {
         expect(filterLines.indexOf('excluded_platform') >= 0).toBeTruthy();
         expect(filterLines.indexOf('test_domain#%#testScript();') >= 0).toBeTruthy();
 
-
         filterContent = await readFile(path.join(platforms, 'hints', 'filters', '2.txt'));
         expect(filterContent).toBeTruthy();
 
