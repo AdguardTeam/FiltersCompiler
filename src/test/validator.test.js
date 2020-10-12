@@ -102,6 +102,10 @@ describe('validator', () => {
         rules = [ruleText];
         expect(validator.validate(rules)).toHaveLength(1);
 
+        ruleText = 'comingsoon.net##.fixed-header.affix .main-menu-container::after, .main-nav .menu-item:first-child';
+        rules = [ruleText];
+        expect(validator.validate(rules).length).toBe(1);
+
         ruleText = 'puls4.com##.media-actions-list > li:not(:nth-child(3)):not(:nth-child(4))';
         rules = [ruleText];
         expect(validator.validate(rules).length).toBeGreaterThan(0);

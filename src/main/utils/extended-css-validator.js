@@ -29,7 +29,7 @@ module.exports = (function () {
             }
 
             // skip :before and :after selectors
-            if (selectorText.match(/[^:\s]([:]{1,2}before(\s|$))|[^:\s]([:]{1,2}after(\s|$))/ig)) {
+            if (selectorText.match(/[^:\s]([:]{1,2}before(\s|,|$))|[^:\s]([:]{1,2}after(\s|,|$))/ig)) {
                 return true;
             }
 
