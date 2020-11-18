@@ -24,7 +24,7 @@ module.exports = (() => {
         },
     };
 
-    const WARNING_TYPES = {
+    const WARNING_REASONS = {
         MISSED_FILES: 'missed files',
         NO_MESSAGES: 'empty file or no messages in file',
         INVALID_DATA_OBJ: 'invalid or absent message key/value',
@@ -93,8 +93,8 @@ module.exports = (() => {
     const prepareWarnings = (warnings) => {
         const output = warnings
             .reduce((acc, data) => {
-                const [type, details] = data;
-                acc.push({ type, details });
+                const [reason, details] = data;
+                acc.push({ reason, details });
                 return acc;
             }, []);
         return output;
@@ -102,7 +102,7 @@ module.exports = (() => {
 
     /**
      * @typedef {Object} Warning
-     * @property {string} type
+     * @property {string} reason
      * @property {string[]} details
      */
 
@@ -120,7 +120,7 @@ module.exports = (() => {
         results.forEach((res) => {
             logger.error(`- ${res.locale}:`);
             res.warnings.forEach((warning) => {
-                logger.error(`  - ${warning.type}:`);
+                logger.error(`  - ${warning.reason}:`);
                 warning.details.forEach((detail) => {
                     logger.error(`      ${detail}`);
                 });
@@ -157,7 +157,7 @@ module.exports = (() => {
             const missedFiles = requiredFiles
                 .filter((el) => !filesList.includes(el));
             if (missedFiles.length !== 0) {
-                localeWarnings.push([WARNING_TYPES.MISSED_FILES, missedFiles]);
+                localeWarnings.push([WARNING_REASONS.MISSED_FILES, missedFiles]);
             }
 
             const presentFiles = requiredFiles
@@ -170,12 +170,12 @@ module.exports = (() => {
                 try {
                     messagesData = JSON.parse(readFile(messagesPath));
                 } catch (e) {
-                    localeWarnings.push([WARNING_TYPES.NO_MESSAGES, [fileName]]);
+                    localeWarnings.push([WARNING_REASONS.NO_MESSAGES, [fileName]]);
                     return;
                 }
 
                 if (messagesData.length === 0) {
-                    localeWarnings.push([WARNING_TYPES.NO_MESSAGES, [fileName]]);
+                    localeWarnings.push([WARNING_REASONS.NO_MESSAGES, [fileName]]);
                 }
 
                 messagesData.forEach((obj) => {
@@ -185,7 +185,7 @@ module.exports = (() => {
                     const id = fileName.slice(0, -extensionLength);
                     if (!areValidMessagesKeys(messagesKeys, id)
                         || !areValidMessagesValues(messagesValues)) {
-                        localeWarnings.push([WARNING_TYPES.INVALID_DATA_OBJ, prepareWarningDetails(obj)]);
+                        localeWarnings.push([WARNING_REASONS.INVALID_DATA_OBJ, prepareWarningDetails(obj)]);
                     }
                 });
             });

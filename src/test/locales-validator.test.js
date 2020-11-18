@@ -14,13 +14,13 @@ describe('locales validator', () => {
                 locale: 'ko',
                 warnings: [
                     {
-                        type: 'empty file or no messages in file',
+                        reason: 'empty file or no messages in file',
                         details: [
                             'groups.json',
                         ],
                     },
                     {
-                        type: 'invalid or absent message key/value',
+                        reason: 'invalid or absent message key/value',
                         details: [
                             '"tag.1.description": "Blocks ads"',
                         ],
@@ -31,13 +31,13 @@ describe('locales validator', () => {
                 locale: 'ru',
                 warnings: [
                     {
-                        type: 'missed files',
+                        reason: 'missed files',
                         details: [
                             'tags.json',
                         ],
                     },
                     {
-                        type: 'invalid or absent message key/value',
+                        reason: 'invalid or absent message key/value',
                         details: [
                             '"group.3.name": ""',
                         ],
