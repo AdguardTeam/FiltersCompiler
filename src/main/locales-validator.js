@@ -34,13 +34,7 @@ module.exports = (() => {
      * Sync reads file content
      * @param filePath - path to locales file
      */
-    const readFile = function (filePath) {
-        try {
-            return fs.readFileSync(path.resolve(__dirname, filePath), 'utf8');
-        } catch (e) {
-            return null;
-        }
-    };
+    const readFile = (filePath) => fs.readFileSync(path.resolve(__dirname, filePath), 'utf8');
 
     /**
      * Sync reads directory content
