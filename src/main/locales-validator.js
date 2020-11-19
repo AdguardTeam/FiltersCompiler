@@ -30,6 +30,11 @@ module.exports = (() => {
         INVALID_DATA_OBJ: 'invalid or absent message key/value',
     };
 
+    const WARNING_TYPES = {
+        CRITICAL: 'critical',
+        LOW: 'low',
+    };
+
     /**
      * Sync reads file content
      * @param filePath - path to locales file
@@ -93,8 +98,8 @@ module.exports = (() => {
     const prepareWarnings = (warnings) => {
         const output = warnings
             .reduce((acc, data) => {
-                const [reason, details] = data;
-                acc.push({ reason, details });
+                const [type, reason, details] = data;
+                acc.push({ type, reason, details });
                 return acc;
             }, []);
         return output;
@@ -102,6 +107,7 @@ module.exports = (() => {
 
     /**
      * @typedef {Object} Warning
+     * @property {string} type
      * @property {string} reason
      * @property {string[]} details
      */
@@ -115,25 +121,36 @@ module.exports = (() => {
     /**
      * Logs collected results of locales validation
      * @param {Result[]} results
+     * @returns {string}
      */
-    const logResults = (results) => {
+    const createLog = (results) => {
+        const log = [];
+        log.push('There are issues with:');
         results.forEach((res) => {
-            logger.error(`- ${res.locale}:`);
+            log.push(`- ${res.locale}:`);
             res.warnings.forEach((warning) => {
-                logger.error(`  - ${warning.reason}:`);
+                log.push(`  - ${warning.type} priority - ${warning.reason}:`);
                 warning.details.forEach((detail) => {
-                    logger.error(`      ${detail}`);
+                    log.push(`      ${detail}`);
                 });
             });
         });
+        return log.join('\n');
     };
+
+    /**
+     * @typedef {Object} ValidationResult
+     * @property {boolean} ok
+     * @property {Result[]} data
+     * @property {string} log
+     */
 
     /**
      * Validates locales messages
      * @param {string} dirPath relative path to locales directory
-     * @returns {Result[]}
+     * @returns {ValidationResult}
      */
-    const validate = (dirPath) => {
+    const validate = (dirPath, requiredLocales) => {
         logger.info('Validating locales...');
         const results = [];
         let locales;
@@ -157,7 +174,12 @@ module.exports = (() => {
             const missedFiles = requiredFiles
                 .filter((el) => !filesList.includes(el));
             if (missedFiles.length !== 0) {
-                localeWarnings.push([WARNING_REASONS.MISSED_FILES, missedFiles]);
+                localeWarnings.push([
+                    // if there are missedFiles, we consider it's critical
+                    WARNING_TYPES.CRITICAL,
+                    WARNING_REASONS.MISSED_FILES,
+                    missedFiles,
+                ]);
             }
 
             const presentFiles = requiredFiles
@@ -170,12 +192,26 @@ module.exports = (() => {
                 try {
                     messagesData = JSON.parse(readFile(messagesPath));
                 } catch (e) {
-                    localeWarnings.push([WARNING_REASONS.NO_MESSAGES, [fileName]]);
+                    localeWarnings.push([
+                        // if there is invalid data format, we consider it's critical
+                        WARNING_TYPES.CRITICAL,
+                        WARNING_REASONS.NO_MESSAGES,
+                        [fileName],
+                    ]);
                     return;
                 }
 
                 if (messagesData.length === 0) {
-                    localeWarnings.push([WARNING_REASONS.NO_MESSAGES, [fileName]]);
+                    // for some locales there is no translations
+                    // so it should bt critical only for required (our) locales
+                    const warningType = requiredLocales.includes(locale)
+                        ? WARNING_TYPES.CRITICAL
+                        : WARNING_TYPES.LOW;
+                    localeWarnings.push([
+                        warningType,
+                        WARNING_REASONS.NO_MESSAGES,
+                        [fileName],
+                    ]);
                 }
 
                 messagesData.forEach((obj) => {
@@ -185,7 +221,12 @@ module.exports = (() => {
                     const id = fileName.slice(0, -extensionLength);
                     if (!areValidMessagesKeys(messagesKeys, id)
                         || !areValidMessagesValues(messagesValues)) {
-                        localeWarnings.push([WARNING_REASONS.INVALID_DATA_OBJ, prepareWarningDetails(obj)]);
+                        localeWarnings.push([
+                            // invalid messages data object is always critical
+                            WARNING_TYPES.CRITICAL,
+                            WARNING_REASONS.INVALID_DATA_OBJ,
+                            prepareWarningDetails(obj),
+                        ]);
                     }
                 });
             });
@@ -198,12 +239,23 @@ module.exports = (() => {
 
         if (results.length === 0) {
             logger.info('Validation result: OK');
-        } else {
-            logger.error('There are issues with:');
-            logResults(results);
+            return { ok: true };
         }
 
-        return results;
+        const isOK = !results
+            .find((res) => {
+                const isCriticalWarning = res.warnings
+                    .find((warning) => warning.type === WARNING_TYPES.CRITICAL);
+                return isCriticalWarning;
+            });
+        const resultsLog = createLog(results);
+        if (isOK) {
+            logger.warn(resultsLog);
+        } else {
+            logger.error(resultsLog);
+        }
+
+        return { ok: isOK, data: results, log: resultsLog };
     };
 
     return {

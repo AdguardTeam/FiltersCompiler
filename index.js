@@ -34,8 +34,8 @@ const validateJSONSchema = function (platformsPath, requiredFiltersAmount) {
     return schemaValidator.validate(platformsPath, jsonSchemasConfigDir, requiredFiltersAmount);
 };
 
-const validateLocales = function (localesDirPath) {
-    return localesValidator.validate(localesDirPath);
+const validateLocales = function (localesDirPath, requiredLocales) {
+    return localesValidator.validate(localesDirPath, requiredLocales);
 };
 
 module.exports = {
