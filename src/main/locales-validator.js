@@ -243,9 +243,9 @@ module.exports = (() => {
         }
 
         const isOK = !results
-            .find((res) => {
+            .some((res) => {
                 const isCriticalWarning = res.warnings
-                    .find((warning) => warning.type === WARNING_TYPES.CRITICAL);
+                    .some((warning) => warning.type === WARNING_TYPES.CRITICAL);
                 return isCriticalWarning;
             });
         const resultsLog = createLog(results);
