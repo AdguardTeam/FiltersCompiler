@@ -101,7 +101,7 @@ const convertAdgRedirectsToUbo = (rules) => {
     return convertToUbo(
         rules,
         'redirect',
-        redirects.isAdgRedirectCompatibleWithUbo,
+        redirects.isValidAdgRedirectRule,
         redirects.convertAdgRedirectToUbo
     );
 };
