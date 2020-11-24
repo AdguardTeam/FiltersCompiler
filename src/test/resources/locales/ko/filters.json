@@ -1,0 +1,14 @@
+[
+	{
+		"filter.1.name": "Russian filter",
+		"filter.1.description": "Adguard Russian filter. Filter that enables blocking of ads on websites in Russian."
+	},
+	{
+		"filter.2.name": "English filter",
+		"filter.2.description": "EasyList + Adguard English filter. Filter list that specifically removes adverts on English language websites."
+	},
+	{
+		"filter.6.name": "Obsolete Test filter",
+		"filter.6.description": "Obsolete Test filter description."
+	}
+]

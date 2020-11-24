@@ -2,6 +2,7 @@ const path = require('path');
 const { setLogger, setConfiguration, CompatibilityTypes } = require('@adguard/tsurlfilter');
 const builder = require('./src/main/builder.js');
 const schemaValidator = require('./src/main/json-validator.js');
+const localesValidator = require('./src/main/locales-validator.js');
 const logger = require('./src/main/utils/log');
 
 // Sets RuleConverter to use logger of current library
@@ -33,7 +34,12 @@ const validateJSONSchema = function (platformsPath, requiredFiltersAmount) {
     return schemaValidator.validate(platformsPath, jsonSchemasConfigDir, requiredFiltersAmount);
 };
 
+const validateLocales = function (localesDirPath, requiredLocales) {
+    return localesValidator.validate(localesDirPath, requiredLocales);
+};
+
 module.exports = {
     compile,
     validateJSONSchema,
+    validateLocales,
 };
