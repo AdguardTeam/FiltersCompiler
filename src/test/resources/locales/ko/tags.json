@@ -1,0 +1,21 @@
+[
+	{
+		"tag.1.description": "Blocks ads"
+	},
+	{
+		"tag.2.description": "Blocks trackers",
+		"tag.2.name": "Blocks trackers"
+	},
+	{
+		"tag.4.description": "Security-related filter",
+		"tag.4.name": "Security-related filter"
+	},
+	{
+		"tag.10.name": "Filter is recommended to be used with AdGuard",
+		"tag.10.description": "Filter is recommended to be used with AdGuard"
+	},
+	{
+		"tag.5.description": "Filter is for blocking annoyances",
+		"tag.5.name": "Filter is for blocking annoyances"
+	}
+]
