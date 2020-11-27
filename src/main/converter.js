@@ -101,7 +101,10 @@ const convertAdgRedirectsToUbo = (rules) => {
     return convertToUbo(
         rules,
         'redirect',
+        // validate AdGuard redirect rules
         redirects.isValidAdgRedirectRule,
+        // and skip ubo-unsupported redirects for ubo filters
+        // https://github.com/AdguardTeam/AdguardFilters/issues/68028
         redirects.convertAdgRedirectToUbo
     );
 };
