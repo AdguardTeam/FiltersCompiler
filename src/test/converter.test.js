@@ -348,6 +348,10 @@ describe('converter', () => {
             expected = [];
             expect(actual).toEqual(expected);
 
+            actual = converter.convertAdgRedirectsToUbo(['||example.com/ad/vmap/*$xmlhttprequest,redirect=noopvast-2.0']);
+            expected = [];
+            expect(actual).toEqual(expected);
+
             actual = converter.convertAdgRedirectsToUbo(['']);
             expected = '';
             expect(actual[0]).toBe(expected);
