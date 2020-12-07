@@ -340,13 +340,19 @@ describe('converter', () => {
             expected = '||example.com/banner$image,redirect=1x1.gif';
             expect(actual[0]).toBe(expected);
 
+            // add missed source types
+            // noopmp3-0.1s:
             actual = converter.convertAdgRedirectsToUbo(['||*/ad/$redirect=noopmp3-0.1s,domain=huaren.tv']);
-            expected = [];
-            expect(actual).toEqual(expected);
-
+            expected = '||*/ad/$redirect=noop-0.1s.mp3,domain=huaren.tv,media';
+            expect(actual[0]).toBe(expected);
+            // noopjs:
             actual = converter.convertAdgRedirectsToUbo(['||example.com^$redirect=noopjs']);
-            expected = [];
-            expect(actual).toEqual(expected);
+            expected = '||example.com^$redirect=noop.js,script';
+            expect(actual[0]).toBe(expected);
+            // nooptext:
+            actual = converter.convertAdgRedirectsToUbo(['||ad.example.com^$redirect=nooptext,important']);
+            expected = '||ad.example.com^$redirect=noop.txt,important,subdocument,stylesheet,script,xmlhttprequest,other';
+            expect(actual[0]).toBe(expected);
 
             actual = converter.convertAdgRedirectsToUbo(['||example.com/ad/vmap/*$xmlhttprequest,redirect=noopvast-2.0']);
             expected = [];
