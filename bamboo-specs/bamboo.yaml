@@ -5,7 +5,7 @@ plan:
   key: FILTRCOMPSPECS
   name: filters-compiler - test
 variables:
-  dockerNode: node:14.15.1-alpine3.12
+  dockerNode: adguard/jsl-builder:15.8.0--1.22.5--1
 
 stages:
   - Test:
@@ -29,12 +29,11 @@ Test:
         interpreter: SHELL
         scripts:
           - |-
-            apk update
-            apk add git
-            apk add yarn
-            apk add curl
             yarn install
             yarn run test
+            chown -R $HOST_UID:$HOST_GID /usr/local/share/.cache/yarn/v6
+
+        environment: HOST_UID='500' HOST_GID='500'
   requirements:
     - adg-docker: 'true'
 
