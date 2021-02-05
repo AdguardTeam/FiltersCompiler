@@ -1,0 +1,58 @@
+---
+version: 2
+plan:
+  project-key: AJL
+  key: FILTRCOMPSPECS
+  name: filters-compiler - test
+variables:
+  dockerNode: node:14.15.1-alpine3.12
+
+stages:
+  - Test:
+      manual: 'false'
+      final: 'false'
+      jobs:
+        - Test
+
+Test:
+  key: TEST
+  docker:
+    image: ${bamboo.dockerNode}
+    volumes:
+      ${bamboo.tmp.directory}/yarn: /usr/local/share/.cache/yarn/v6
+    docker-run-arguments:
+      - --net=host
+  tasks:
+    - checkout:
+        force-clean-build: 'true'
+    - script:
+        interpreter: SHELL
+        scripts:
+          - |-
+            apk update
+            apk add git
+            apk add yarn
+            apk add curl
+            yarn install
+            yarn run test
+  requirements:
+    - adg-docker: 'true'
+
+branches:
+  create: for-pull-request
+  delete:
+    after-deleted-days: '1'
+    after-inactive-days: '5'
+  link-to-jira: 'true'
+
+notifications:
+  - events:
+      - plan-status-changed
+    recipients:
+      - webhook:
+          name: Build webhook
+          url: http://jirahub.service.eu.consul/v1/webhook/bamboo?channel=adguard-qa
+
+labels: []
+other:
+  concurrent-build-plugin: system-default
