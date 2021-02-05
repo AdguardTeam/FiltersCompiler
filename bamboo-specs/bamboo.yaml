@@ -31,9 +31,14 @@ Test:
           - |-
             yarn install
             yarn run test
-            chown -R $HOST_UID:$HOST_GID /usr/local/share/.cache/yarn/v6
 
-        environment: HOST_UID='500' HOST_GID='500'
+  final-tasks:
+    - script:
+        interpreter: SHELL
+        scripts:
+          - |-
+            chown -R ${bamboo.hostUid}:${bamboo.hostGid} /usr/local/share/.cache/yarn/v6
+    - clean
   requirements:
     - adg-docker: 'true'
 
