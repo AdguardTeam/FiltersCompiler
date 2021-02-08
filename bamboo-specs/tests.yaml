@@ -2,7 +2,7 @@
 version: 2
 plan:
   project-key: AJL
-  key: FILTRCOMPTESTS
+  key: FILTRCOMPSPECS
   name: filters-compiler - test
 variables:
   dockerNode: adguard/jsl-builder:15.8.0--1.22.5--1
