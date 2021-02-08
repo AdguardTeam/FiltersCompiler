@@ -6,7 +6,8 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "increment": "yarn version --patch --no-git-tag-version"
   },
   "dependencies": {
     "@adguard/tsurlfilter": "0.3.5",
