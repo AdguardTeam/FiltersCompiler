@@ -5,7 +5,7 @@ plan:
   key: FILTRCOMPSPECS
   name: filters-compiler - test
 variables:
-  dockerNode: adguard/jsl-builder:15.8.0--1.22.5--1
+  dockerJslBuilder: adguard/jsl-builder:15.8.0--1.22.5--1
 
 stages:
   - Test:
@@ -17,7 +17,7 @@ stages:
 Test:
   key: TEST
   docker:
-    image: "${bamboo.dockerNode}"
+    image: "${bamboo.dockerJslBuilder}"
     volumes:
       ${system.YARN_DIR}: "${bamboo.yarnCache}"
   tasks:
@@ -29,7 +29,6 @@ Test:
           - |-
             yarn install
             yarn run test
-
   final-tasks:
     - clean
   requirements:
