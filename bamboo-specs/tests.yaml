@@ -19,9 +19,7 @@ Test:
   docker:
     image: "${bamboo.dockerNode}"
     volumes:
-      ${bamboo.tmp.directory}/yarn: "${bamboo.yarnCache}"
-    docker-run-arguments:
-      - --net=host
+      ${system.YARN_DIR}: "${bamboo.yarnCache}"
   tasks:
     - checkout:
         force-clean-build: 'true'
@@ -33,11 +31,6 @@ Test:
             yarn run test
 
   final-tasks:
-    - script:
-        interpreter: SHELL
-        scripts:
-          - |-
-            chown -R "${bamboo.hostUid}":"${bamboo.hostGid}" "${bamboo.yarnCache}"
     - clean
   requirements:
     - adg-docker: 'true'
@@ -57,6 +50,6 @@ notifications:
           name: Build webhook
           url: http://jirahub.service.eu.consul/v1/webhook/bamboo?channel=adguard-qa
 
-labels: [ ]
+labels: []
 other:
   concurrent-build-plugin: system-default
