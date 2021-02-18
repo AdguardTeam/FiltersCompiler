@@ -5,7 +5,7 @@ plan:
   key: FILTRCOMPINC
   name: filters-compiler - increment version
 variables:
-  dockerNode: adguard/jsl-builder:15.8.0--1.22.5--1
+  dockerJslBuilder: adguard/jsl-builder:15.8.0--1.22.5--1
 
 stages:
   - Increment:
@@ -17,11 +17,9 @@ stages:
 Increment:
   key: INCR
   docker:
-    image: ${bamboo.dockerNode}
+    image: ${bamboo.dockerJslBuilder}
     volumes:
-      ${bamboo.tmp.directory}/yarn: "${bamboo.yarnCache}"
-    docker-run-arguments:
-      - --net=host
+      ${system.YARN_DIR}: "${bamboo.yarnCache}"
   tasks:
     - checkout:
         force-clean-build: 'true'
