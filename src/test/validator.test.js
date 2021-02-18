@@ -373,6 +373,9 @@ describe('validator', () => {
         result = scriptlets.isAdgScriptletRule('test.com#%#//scriptlet("abort-on-property-read", "some.prop")');
         expect(result).toBeTruthy();
 
+        result = scriptlets.isAdgScriptletRule('arctic.de#%#//scriptlet(\'set-cookie-reload\', \'cookie-preference\', \'1\')');
+        expect(result).toBeTruthy();
+
         result = scriptlets.isAdgScriptletRule('test.com#@#script:inject(abort-on-property-read.js, some.prop)');
         expect(result).toBeFalsy();
 
@@ -399,6 +402,12 @@ describe('validator', () => {
         ];
 
         expect(validator.validate(rules)).toHaveLength(0);
+
+        rules = [
+            'arctic.de#%#//scriptlet(\'set-cookie-reload\', \'cookie-preference\', \'1\')',
+        ];
+
+        expect(validator.validate(rules)).toHaveLength(1);
     });
 
     it('Test valid scriptlets', () => {

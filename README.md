@@ -26,8 +26,12 @@ The package could be run with the following command:
  compiler.compile(filtersDir, logPath, reportPath, platformsPath, whitelist, blacklist);
 ```
 
-## Tests
+### Tests
 
 ```
  yarn test
 ```
+
+### Development
+
+In order to add support for new scriptlets and redirects, you should update both `scriptlets` and `@adguard/tsurlfilter` (**with updated scriptlets**).
