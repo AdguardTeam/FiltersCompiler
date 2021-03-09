@@ -18,12 +18,12 @@ process.on('unhandledRejection', (error) => {
     throw error;
 });
 
-const compile = function (path, logPath, reportFile, platformsOptions, whitelist, blacklist) {
+const compile = function (path, logPath, reportFile, platformsPath, whitelist, blacklist) {
     return builder.build(
         path,
         logPath,
         reportFile,
-        platformsOptions,
+        platformsPath,
         platformsConfig,
         whitelist,
         blacklist

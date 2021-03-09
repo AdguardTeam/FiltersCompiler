@@ -439,20 +439,13 @@ module.exports = (() => {
     };
 
     /**
-     * Checks if platform is in the list to compile
-     * @param platform
-     * @param platformsList
-     */
-    const excludedPlatform = (platform, platformsList) => platformsList.length && !platformsList.includes(platform);
-
-    /**
      * Writes metadata files
-     * @param {Object} platformsOptions
+     * @param {string} platformsPath
      * @param {string} filtersDir
      * @param {array} filtersMetadata
      * @param {array} obsoleteFilters
      */
-    const writeFiltersMetadata = function (platformsOptions, filtersDir, filtersMetadata, obsoleteFilters) {
+    const writeFiltersMetadata = function (platformsPath, filtersDir, filtersMetadata, obsoleteFilters) {
         logger.info('Writing filters metadata');
 
         const groups = JSON.parse(readFile(path.join(filtersDir, '../groups', 'metadata.json')));
@@ -476,10 +469,7 @@ module.exports = (() => {
         // eslint-disable-next-line guard-for-in,no-restricted-syntax
         for (const platform in platformPathsConfig) {
             const config = platformPathsConfig[platform];
-            if (excludedPlatform(config.platform, platformsOptions.list)) {
-                continue;
-            }
-            const platformDir = path.join(platformsOptions.path, config.path);
+            const platformDir = path.join(platformsPath, config.path);
             createDir(platformDir);
 
             logger.info(`Writing filters metadata: ${config.path}`);
@@ -521,18 +511,15 @@ module.exports = (() => {
     /**
      * Separates script rules from AG filters into specified file.
      *
-     * @param platformsOptions
+     * @param platformsPath
      */
-    const writeLocalScriptRules = function (platformsOptions) {
+    const writeLocalScriptRules = function (platformsPath) {
         logger.info('Writing local script rules');
 
         // eslint-disable-next-line guard-for-in,no-restricted-syntax
         for (const platform in platformPathsConfig) {
             const config = platformPathsConfig[platform];
-            if (excludedPlatform(config.platform, platformsOptions.list)) {
-                continue;
-            }
-            const platformDir = path.join(platformsOptions.path, config.path);
+            const platformDir = path.join(platformsPath, config.path);
 
             const rules = [];
             const rulesJson = {
@@ -726,11 +713,11 @@ module.exports = (() => {
      * Builds platforms for filter
      *
      * @param filterDir
-     * @param platformsOptions
+     * @param platformsPath
      * @param whitelist
      * @param blacklist
      */
-    const buildFilter = function (filterDir, platformsOptions, whitelist, blacklist) {
+    const buildFilter = function (filterDir, platformsPath, whitelist, blacklist) {
         const originalRules = readFile(path.join(filterDir, filterFile)).split('\r\n');
 
         const metadataFilePath = path.join(filterDir, metadataFile);
@@ -756,9 +743,6 @@ module.exports = (() => {
         // eslint-disable-next-line guard-for-in,no-restricted-syntax
         for (const platform in platformPathsConfig) {
             const config = platformPathsConfig[platform];
-            if (excludedPlatform(config.platform, platformsOptions.list)) {
-                continue;
-            }
             let rules = FiltersDownloader.resolveConditions(originalRules, config.defines);
             rules = filter.cleanupRules(rules, config, filterId);
             rules = removeRuleDuplicates(rules);
@@ -766,7 +750,7 @@ module.exports = (() => {
             // eslint-disable-next-line max-len
             logger.info(`Filter ${filterId}. Rules ${originalRules.length} => ${rules.length} => ${optimizedRules.length}. PlatformPath: '${config.path}'`);
 
-            const platformDir = path.join(platformsOptions.path, config.path, PLATFORM_FILTERS_DIR);
+            const platformDir = path.join(platformsPath, config.path, PLATFORM_FILTERS_DIR);
             writeFilterRules(filterId, platformDir, config, header, rules, false);
 
             // add '(Optimized)' to the '! Title:' for optimized filters
@@ -821,7 +805,7 @@ module.exports = (() => {
      *
      * @param filtersDir
      * @param filtersMetadata
-     * @param platformsOptions
+     * @param platformsPath
      * @param whitelist
      * @param blacklist
      * @param obsoleteFiltersMetadata
@@ -829,7 +813,7 @@ module.exports = (() => {
     const parseDirectory = function (
         filtersDir,
         filtersMetadata,
-        platformsOptions,
+        platformsPath,
         whitelist,
         blacklist,
         obsoleteFiltersMetadata
@@ -842,7 +826,7 @@ module.exports = (() => {
                 const metadataFilePath = path.join(filterDir, metadataFile);
                 if (fs.existsSync(metadataFilePath)) {
                     logger.info(`Building filter platforms: ${directory}`);
-                    buildFilter(filterDir, platformsOptions, whitelist, blacklist);
+                    buildFilter(filterDir, platformsPath, whitelist, blacklist);
                     logger.info(`Building filter platforms: ${directory} done`);
                     const filterMetadata = loadFilterMetadata(filterDir);
                     filtersMetadata.push(filterMetadata);
@@ -853,7 +837,7 @@ module.exports = (() => {
                     parseDirectory(
                         filterDir,
                         filtersMetadata,
-                        platformsOptions,
+                        platformsPath,
                         whitelist,
                         blacklist,
                         obsoleteFiltersMetadata
@@ -867,12 +851,12 @@ module.exports = (() => {
      * Generates platforms builds
      *
      * @param {String} filtersDir
-     * @param {Object} platformsOptions
+     * @param {String} platformsPath
      * @param whitelist
      * @param blacklist
      */
-    const generate = function (filtersDir, platformsOptions, whitelist, blacklist) {
-        if (!platformsOptions || !platformsOptions.path) {
+    const generate = function (filtersDir, platformsPath, whitelist, blacklist) {
+        if (!platformsPath) {
             logger.warn('Platforms build output path is not specified');
             return;
         }
@@ -882,15 +866,15 @@ module.exports = (() => {
             return;
         }
 
-        createDir(platformsOptions.path);
+        createDir(platformsPath);
 
         const filtersMetadata = [];
         const obsoleteFiltersMetadata = [];
 
-        parseDirectory(filtersDir, filtersMetadata, platformsOptions, whitelist, blacklist, obsoleteFiltersMetadata);
+        parseDirectory(filtersDir, filtersMetadata, platformsPath, whitelist, blacklist, obsoleteFiltersMetadata);
 
-        writeFiltersMetadata(platformsOptions, filtersDir, filtersMetadata, obsoleteFiltersMetadata);
-        writeLocalScriptRules(platformsOptions);
+        writeFiltersMetadata(platformsPath, filtersDir, filtersMetadata, obsoleteFiltersMetadata);
+        writeLocalScriptRules(platformsPath);
     };
 
     return {

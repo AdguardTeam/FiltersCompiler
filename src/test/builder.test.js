@@ -28,12 +28,7 @@ describe('Test builder', () => {
         const platformsPath = path.join(__dirname, './resources/platforms');
         const platformsConfigFile = path.join(__dirname, './resources/platforms.json');
 
-        const platformsOptions = {
-            path: platformsPath,
-            list: [],
-        };
-
-        await builder.build(filtersDir, logFile, reportFile, platformsOptions, platformsConfigFile);
+        await builder.build(filtersDir, logFile, reportFile, platformsPath, platformsConfigFile);
 
         let revision = await readFile(path.join(filtersDir, 'filter_3_Test', 'revision.json'));
 
@@ -160,18 +155,14 @@ describe('Test builder', () => {
         const filtersDir = path.join(__dirname, './resources/filters');
         const logFile = path.join(__dirname, './resources/log_platforms.txt');
         const reportFile = path.join(__dirname, './resources/report_platforms.txt');
-        const platformsPath = path.join(__dirname, './resources/platforms');
-        const platformsOptions = {
-            path: platformsPath,
-            list: [],
-        };
+        const platforms = path.join(__dirname, './resources/platforms');
         const platformsConfig = path.join(__dirname, './resources/platforms.json');
-        await builder.build(filtersDir, logFile, reportFile, null, platformsOptions, platformsConfig);
+        await builder.build(filtersDir, logFile, reportFile, null, platforms, platformsConfig);
 
         const filterText = await readFile(path.join(filtersDir, 'filter_3_Test', 'filter.txt'));
         expect(filterText).toBeTruthy();
 
-        let filtersMetadata = await readFile(path.join(platformsPath, 'test', 'filters.json'));
+        let filtersMetadata = await readFile(path.join(platforms, 'test', 'filters.json'));
         expect(filtersMetadata).toBeTruthy();
         filtersMetadata = JSON.parse(filtersMetadata);
         expect(filtersMetadata.filters).toBeTruthy();
@@ -199,7 +190,7 @@ describe('Test builder', () => {
         expect(filtersMetadata.filters.some((filter) => filter.filterId === 6)).toBeFalsy();
         expect(filtersMetadata.filters.some((filter) => filter.name === 'Obsolete Test Filter')).toBeFalsy();
 
-        let filtersI18nMetadata = await readFile(path.join(platformsPath, 'test', 'filters_i18n.json'));
+        let filtersI18nMetadata = await readFile(path.join(platforms, 'test', 'filters_i18n.json'));
         expect(filtersI18nMetadata).toBeTruthy();
         filtersI18nMetadata = JSON.parse(filtersI18nMetadata);
         const filtersI18nMetadataFilters = Object.keys(filtersI18nMetadata.filters);
@@ -207,18 +198,18 @@ describe('Test builder', () => {
         // Obsolete Filter test
         expect(filtersI18nMetadataFilters.some((filter) => filter === '6')).toBeFalsy();
 
-        const localScriptRules = await readFile(path.join(platformsPath, 'test', 'local_script_rules.txt'));
+        const localScriptRules = await readFile(path.join(platforms, 'test', 'local_script_rules.txt'));
         expect(localScriptRules).toBeFalsy();
         const localScriptRulesLines = localScriptRules.split('\r\n');
         expect(localScriptRulesLines.indexOf('test_domain#%#testScript();') === -1).toBeTruthy();
 
-        let localScriptRulesJson = await readFile(path.join(platformsPath, 'test', 'local_script_rules.json'));
+        let localScriptRulesJson = await readFile(path.join(platforms, 'test', 'local_script_rules.json'));
         expect(localScriptRulesJson).toBeTruthy();
         localScriptRulesJson = JSON.parse(localScriptRulesJson);
         expect(localScriptRulesJson.comment).toBeTruthy();
         expect(localScriptRulesJson.rules).toBeTruthy();
 
-        let filterContent = await readFile(path.join(platformsPath, 'test', 'filters', '2.txt'));
+        let filterContent = await readFile(path.join(platforms, 'test', 'filters', '2.txt'));
         expect(filterContent).toBeTruthy();
 
         let filterLines = filterContent.split('\r\n');
@@ -238,19 +229,19 @@ describe('Test builder', () => {
         expect(filterLines.indexOf('example.com#%#AG_onLoad(function() { AG_removeElementBySelector(\'span[class="intexta"]\'); });') === -1).toBeTruthy();
         expect(filterLines.indexOf('test.com##+js(abort-on-property-read, Object.prototype.getBanner)') >= 0).toBeTruthy();
 
-        filterContent = await readFile(path.join(platformsPath, 'test', 'filters', '2_optimized.txt'));
+        filterContent = await readFile(path.join(platforms, 'test', 'filters', '2_optimized.txt'));
         expect(filterContent).toBeTruthy();
         filterLines = filterContent.split('\r\n');
         expect(filterLines.length).toBe(26);
         expect(filterLines[2]).toBe('! Title: AdGuard Base filter + EasyList (Optimized)');
 
-        filterContent = await readFile(path.join(platformsPath, 'test', 'filters', '2_without_easylist.txt'));
+        filterContent = await readFile(path.join(platforms, 'test', 'filters', '2_without_easylist.txt'));
         expect(filterContent).toBeTruthy();
         filterLines = filterContent.split('\r\n');
         expect(filterLines.length).toBe(28);
         expect(filterLines[2]).toBe('! Title: AdGuard Base filter');
 
-        filterContent = await readFile(path.join(platformsPath, 'config/test', 'filters', '2.txt'));
+        filterContent = await readFile(path.join(platforms, 'config/test', 'filters', '2.txt'));
         expect(filterContent).toBeTruthy();
 
         filterLines = filterContent.split('\r\n');
@@ -263,7 +254,7 @@ describe('Test builder', () => {
         expect(filterLines.indexOf('excluded_platform') >= 0).toBeTruthy();
         expect(filterLines.indexOf('test_domain#%#testScript();') >= 0).toBeTruthy();
 
-        filterContent = await readFile(path.join(platformsPath, 'hints', 'filters', '2.txt'));
+        filterContent = await readFile(path.join(platforms, 'hints', 'filters', '2.txt'));
         expect(filterContent).toBeTruthy();
 
         filterLines = filterContent.split('\r\n');
@@ -277,7 +268,7 @@ describe('Test builder', () => {
         expect(filterLines.indexOf('test_domain#%#testScript();') >= 0).toBeTruthy();
 
         // Check MAC platform
-        let filtersMetadataMAC = await readFile(path.join(platformsPath, 'mac', 'filters.json'));
+        let filtersMetadataMAC = await readFile(path.join(platforms, 'mac', 'filters.json'));
         expect(filtersMetadataMAC).toBeTruthy();
         filtersMetadataMAC = JSON.parse(filtersMetadataMAC);
         expect(Object.keys(filtersMetadataMAC).length).toEqual(2);
@@ -314,7 +305,7 @@ describe('Test builder', () => {
         expect(englishFilter.tags).toBe(undefined);
         expect(englishFilter.trustLevel).toBe(undefined);
 
-        let filtersI18nMetadataMAC = await readFile(path.join(platformsPath, 'mac', 'filters_i18n.json'));
+        let filtersI18nMetadataMAC = await readFile(path.join(platforms, 'mac', 'filters_i18n.json'));
         expect(filtersI18nMetadataMAC).toBeTruthy();
         filtersI18nMetadataMAC = JSON.parse(filtersI18nMetadataMAC);
         expect(filtersI18nMetadataMAC).toBeTruthy();
@@ -338,7 +329,7 @@ describe('Test builder', () => {
         expect(filterLines.indexOf('!#include') >= 0).toBeFalsy();
 
         // platform specify includes
-        filterContent = await readFile(path.join(platformsPath, 'mac', 'filters', '4_optimized.txt'));
+        filterContent = await readFile(path.join(platforms, 'mac', 'filters', '4_optimized.txt'));
         expect(filterContent).toBeTruthy();
 
         filterLines = filterContent.split('\r\n');
@@ -349,7 +340,7 @@ describe('Test builder', () => {
         expect(filterLines.indexOf('directives_not_stripped') >= 0).toBeFalsy();
 
         // Check condition directives for platforms
-        filterContent = await readFile(path.join(platformsPath, 'test', 'filters', '4.txt'));
+        filterContent = await readFile(path.join(platforms, 'test', 'filters', '4.txt'));
         expect(filterContent).toBeTruthy();
 
         filterLines = filterContent.split('\r\n');
@@ -358,7 +349,7 @@ describe('Test builder', () => {
         expect(filterLines[2].endsWith('(Optimized)')).toBeFalsy();
         expect(filterLines.indexOf('if_not_ublock') < 0).toBeTruthy();
 
-        filterContent = await readFile(path.join(platformsPath, 'test', 'filters', '4_optimized.txt'));
+        filterContent = await readFile(path.join(platforms, 'test', 'filters', '4_optimized.txt'));
         expect(filterContent).toBeTruthy();
 
         filterLines = filterContent.split('\r\n');
@@ -367,7 +358,7 @@ describe('Test builder', () => {
         expect(filterLines[2].endsWith('(Optimized)')).toBeTruthy();
         expect(filterLines.indexOf('if_not_ublock') < 0).toBeTruthy();
 
-        filterContent = await readFile(path.join(platformsPath, 'mac', 'filters', '5.txt'));
+        filterContent = await readFile(path.join(platforms, 'mac', 'filters', '5.txt'));
         expect(filterContent).toBeTruthy();
 
         filterLines = filterContent.split('\r\n');
