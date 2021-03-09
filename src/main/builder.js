@@ -507,7 +507,7 @@ module.exports = (function () {
      * @param filtersDir
      * @param logFile
      * @param reportFile
-     * @param platformsPath
+     * @param platformsOptions
      * @param platformsConfigFile
      * @param whitelist
      * @param blacklist
@@ -516,7 +516,7 @@ module.exports = (function () {
         filtersDir,
         logFile,
         reportFile,
-        platformsPath,
+        platformsOptions,
         platformsConfigFile,
         whitelist,
         blacklist
@@ -527,7 +527,7 @@ module.exports = (function () {
         await parseDirectory(filtersDir, whitelist, blacklist);
 
         logger.info('Generating platforms');
-        generator.generate(filtersDir, platformsPath, whitelist, blacklist);
+        generator.generate(filtersDir, platformsOptions, whitelist, blacklist);
         logger.info('Generating platforms done');
         report.create(reportFile);
     };
