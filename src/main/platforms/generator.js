@@ -317,6 +317,17 @@ module.exports = (() => {
     };
 
     /**
+     * Removes metadata of filters excluded from the current platform
+     * @param metadata
+     * @param platform
+     */
+    const removeRedundantFiltersMetadata = (metadata, platform) => {
+        metadata.filters = metadata.filters.filter((filter) => !filter.platforms
+            || (filter.platforms && filter.platforms.includes(platform)));
+        return metadata;
+    };
+
+    /**
      * Parses object info
      * Splits string {mask}{id}.{message} like "group.1.name" etc.
      *
@@ -476,6 +487,8 @@ module.exports = (() => {
             const filtersFile = path.join(platformDir, FILTERS_METADATA_FILE);
             let metadata = { groups, tags, filters: filtersMetadata };
             metadata = rewriteSubscriptionUrls(metadata, config);
+            metadata = removeRedundantFiltersMetadata(metadata, config.platform);
+
             if (platform === 'MAC') {
                 metadata = workaround.rewriteMetadataForOldMac(metadata);
             } else {
@@ -744,6 +757,9 @@ module.exports = (() => {
         for (const platform in platformPathsConfig) {
             const config = platformPathsConfig[platform];
             if (metadata.platforms && !metadata.platforms.includes(config.platform)) {
+                // if `platforms` property is presented in metadata
+                // build filters only for included platforms
+                // https://github.com/AdguardTeam/FiltersCompiler/issues/101
                 continue;
             }
             let rules = FiltersDownloader.resolveConditions(originalRules, config.defines);
