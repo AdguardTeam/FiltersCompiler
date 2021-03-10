@@ -2,6 +2,7 @@
 const path = require('path');
 const fs = require('fs').promises;
 const os = require('os');
+const { existsSync } = require('fs');
 const optimization = require('../main/optimization.js');
 const builder = require('../main/builder.js');
 
@@ -366,5 +367,42 @@ describe('Test builder', () => {
 
         expect(filterLines.indexOf('||example.com^$script,redirect=noopjs') >= 0).toBeTruthy();
         expect(filterLines.indexOf('||example.com/banner$image,redirect=1x1-transparent.gif') >= 0).toBeTruthy();
+
+        // Test building filters only for platforms from metadata `platforms list`
+        filterContent = existsSync(path.join(platforms, 'test', 'filters', '4.txt'));
+        expect(filterContent).toBeTruthy();
+        filterContent = existsSync(path.join(platforms, 'test', 'filters', '4_optimized.txt'));
+        expect(filterContent).toBeTruthy();
+        let metadata = await readFile(path.join(platforms, 'test', 'filters.json'));
+        metadata = JSON.parse(metadata);
+        expect(metadata).toBeTruthy();
+        expect(metadata.filters.some((f) => f.filterId === 4)).toBeTruthy();
+
+        filterContent = existsSync(path.join(platforms, 'mac', 'filters', '4.txt'));
+        expect(filterContent).toBeTruthy();
+        filterContent = existsSync(path.join(platforms, 'mac', 'filters', '4_optimized.txt'));
+        expect(filterContent).toBeTruthy();
+        metadata = await readFile(path.join(platforms, 'mac', 'filters.json'));
+        metadata = JSON.parse(metadata);
+        expect(metadata).toBeTruthy();
+        expect(metadata.filters.some((f) => f.filterId === 4)).toBeTruthy();
+
+        filterContent = existsSync(path.join(platforms, 'ios', 'filters', '4.txt'));
+        expect(filterContent).toBeFalsy();
+        filterContent = existsSync(path.join(platforms, 'ios', 'filters', '4_optimized.txt'));
+        expect(filterContent).toBeFalsy();
+        metadata = await readFile(path.join(platforms, 'ios', 'filters.json'));
+        metadata = JSON.parse(metadata);
+        expect(metadata).toBeTruthy();
+        expect(metadata.filters.some((f) => f.filterId === 4)).toBeFalsy();
+
+        filterContent = existsSync(path.join(platforms, 'test2', 'filters', '4.txt'));
+        expect(filterContent).toBeFalsy();
+        filterContent = existsSync(path.join(platforms, 'test2', 'filters', '4_optimized.txt'));
+        expect(filterContent).toBeFalsy();
+        metadata = await readFile(path.join(platforms, 'test2', 'filters.json'));
+        metadata = JSON.parse(metadata);
+        expect(metadata).toBeTruthy();
+        expect(metadata.filters.some((f) => f.filterId === 4)).toBeFalsy();
     });
 });
