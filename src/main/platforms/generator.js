@@ -743,6 +743,9 @@ module.exports = (() => {
         // eslint-disable-next-line guard-for-in,no-restricted-syntax
         for (const platform in platformPathsConfig) {
             const config = platformPathsConfig[platform];
+            if (metadata.platforms && !metadata.platforms.includes(config.platform)) {
+                continue;
+            }
             let rules = FiltersDownloader.resolveConditions(originalRules, config.defines);
             rules = filter.cleanupRules(rules, config, filterId);
             rules = removeRuleDuplicates(rules);
