@@ -10,5 +10,5 @@
   "subscriptionUrl": "https://example.com/",
   "tags": [],
   "trustLevel": "full",
-  "platforms": ["mac", "ext_ublock"]
+  "platformsIncluded": ["mac", "ext_ublock"]
 }
