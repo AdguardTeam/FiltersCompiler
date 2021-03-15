@@ -317,6 +317,22 @@ module.exports = (() => {
     };
 
     /**
+     * Removes redundant metadata for included or excluded filters for the current platform
+     * @param metadata
+     * @param platform
+     */
+    const removeRedundantFiltersMetadata = (metadata, platform) => {
+        // leaves only included filters metadata
+        metadata.filters = metadata.filters.filter((filter) => !filter.platformsIncluded
+            || (filter.platformsIncluded && filter.platformsIncluded.includes(platform)));
+        // removes excluded filters metadata
+        metadata.filters = metadata.filters.filter((filter) => !filter.platformsExcluded
+            || (filter.platformsExcluded && !filter.platformsExcluded.includes(platform)));
+
+        return metadata;
+    };
+
+    /**
      * Parses object info
      * Splits string {mask}{id}.{message} like "group.1.name" etc.
      *
@@ -476,6 +492,8 @@ module.exports = (() => {
             const filtersFile = path.join(platformDir, FILTERS_METADATA_FILE);
             let metadata = { groups, tags, filters: filtersMetadata };
             metadata = rewriteSubscriptionUrls(metadata, config);
+            metadata = removeRedundantFiltersMetadata(metadata, config.platform);
+
             if (platform === 'MAC') {
                 metadata = workaround.rewriteMetadataForOldMac(metadata);
             } else {
@@ -743,6 +761,13 @@ module.exports = (() => {
         // eslint-disable-next-line guard-for-in,no-restricted-syntax
         for (const platform in platformPathsConfig) {
             const config = platformPathsConfig[platform];
+            if ((metadata.platformsIncluded && !metadata.platformsIncluded.includes(config.platform))
+                || (metadata.platformsExcluded && metadata.platformsExcluded.includes(config.platform))) {
+                // if `platformsIncluded` or `platformsExcluded` property is presented in metadata
+                // build filters only for included or except excluded platforms
+                // https://github.com/AdguardTeam/FiltersCompiler/issues/101
+                continue;
+            }
             let rules = FiltersDownloader.resolveConditions(originalRules, config.defines);
             rules = filter.cleanupRules(rules, config, filterId);
             rules = removeRuleDuplicates(rules);

@@ -9,5 +9,6 @@
   "groupId": 2,
   "subscriptionUrl": "https://example.com/",
   "tags": [],
-  "trustLevel": "full"
+  "trustLevel": "full",
+  "platformsIncluded": ["mac", "ext_ublock"]
 }

@@ -1,17 +1,17 @@
 {
-  "filterId": 3,
-  "name": "Test Filter",
+  "filterId": 7,
+  "name": "Test Platforms Filter",
   "description": "Test Filter description",
   "timeAdded": 1404115015843,
   "homepage": "https://easylist.adblockplus.org/",
   "expires": "2 days",
-  "displayNumber": 101,
-  "groupId": 2,
+  "displayNumber": 110,
+  "groupId": 3,
   "subscriptionUrl": "https://easylist-downloads.adblockplus.org/easylist.txt",
   "tags": [
     "purpose:ads", "lang:en", "lang:pl"
   ],
-  "disabled": true,
   "trustLevel": "low",
-  "platformsExcluded": ["mac"]
+  "platformsIncluded": ["mac", "ios", "chromium"],
+  "platformsExcluded": ["ios"]
 }
