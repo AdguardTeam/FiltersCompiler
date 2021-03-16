@@ -1,0 +1,7 @@
+! Homepage: http://adguard.com/filters.html#english
+! License: http://creativecommons.org/licenses/by-sa/3.0/
+!
+! Some test rules
+||test.com^
+||example.com^$third-party
+somesite.com##.main-banner
