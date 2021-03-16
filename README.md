@@ -34,7 +34,9 @@ The package could be run with the following command:
 
 ### Development
 
-In order to add support for new scriptlets and redirects, you should update both `scriptlets` and `@adguard/tsurlfilter` (**with updated scriptlets**).
+In order to add support for new scriptlets and redirects, you should update `@adguard/tsurlfilter` with updated scriptlets.
+
+For fixing scriptlets converting or validation you should update `scriptlets`.
 
 ### Filters metadata
 

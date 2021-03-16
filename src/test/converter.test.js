@@ -142,6 +142,11 @@ describe('converter', () => {
         expected = 'example.org##+js(set-constant, constName, value"12345")';
         expect(actual[0]).toBe(expected);
 
+        // set-constant with empty string arg
+        actual = converter.convertAdgScriptletsToUbo(["example.org#%#//scriptlet('set-constant', 'arg.name', '')"]);
+        expected = 'example.org##+js(set-constant, arg.name, \'\')';
+        expect(actual[0]).toBe(expected);
+
         actual = converter.convertAdgScriptletsToUbo(['']);
         expected = '';
         expect(actual[0]).toBe(expected);
