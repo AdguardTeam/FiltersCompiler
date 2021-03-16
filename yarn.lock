@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@adguard/tsurlfilter@0.4.7":
-  version "0.4.7"
-  resolved "https://registry.yarnpkg.com/@adguard/tsurlfilter/-/tsurlfilter-0.4.7.tgz#583bbf079d3ae2d5df7705fe5cb102d3f5c7a36e"
-  integrity sha512-Ob8rnkG/+1uGzHBkv2uBmEWkWcKwBx5udke3mVJDjIQ7sB4rZ+3HxGt40HzciBb+D7RlX+tKvlWgIx10TwusjQ==
+"@adguard/tsurlfilter@0.4.10":
+  version "0.4.10"
+  resolved "https://registry.yarnpkg.com/@adguard/tsurlfilter/-/tsurlfilter-0.4.10.tgz#68969d5e7272d0abcf0ee98eecfbe8ab8551573d"
+  integrity sha512-S8CdBc7fGETbwIlImVp8bIPBTERhaAYhDux9Fzg8BIIiwJFcMga9FHJMp6SkmjKNeEtS30UF2CDHp0VIxb55vQ==
   dependencies:
     consola "^2.12.2"
     extended-css "git+https://github.com/AdguardTeam/ExtendedCss.git#v1.3.10"
