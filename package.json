@@ -19,7 +19,7 @@
     "jsdom": "^16.3.0",
     "md5": "2.2.1",
     "moment": "^2.24.0",
-    "scriptlets": "git+https://github.com/AdguardTeam/Scriptlets.git#v1.3.14",
+    "scriptlets": "git+https://github.com/AdguardTeam/Scriptlets.git#v1.3.15",
     "utf8": "^3.0.0"
   },
   "devDependencies": {
