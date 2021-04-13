@@ -390,18 +390,18 @@ describe('Test builder', () => {
 
         // check if Directives Filter was NOT built for ios platform and metadata was NOT added to it's filters.json
         filterContent = existsSync(path.join(platforms, 'ios', 'filters', '4.txt'));
-        expect(filterContent).toBeFalsy();
+        expect(filterContent).toBeTruthy();
         filterContent = existsSync(path.join(platforms, 'ios', 'filters', '4_optimized.txt'));
-        expect(filterContent).toBeFalsy();
+        expect(filterContent).toBeTruthy();
         metadata = await readFile(path.join(platforms, 'ios', 'filters.json'));
         metadata = JSON.parse(metadata);
         expect(metadata).toBeTruthy();
         expect(metadata.filters.some((f) => f.filterId === 4)).toBeFalsy();
         // check if Directives Filter was NOT built for test2 platform and metadata was NOT added to it's filters.json
         filterContent = existsSync(path.join(platforms, 'test2', 'filters', '4.txt'));
-        expect(filterContent).toBeFalsy();
+        expect(filterContent).toBeTruthy();
         filterContent = existsSync(path.join(platforms, 'test2', 'filters', '4_optimized.txt'));
-        expect(filterContent).toBeFalsy();
+        expect(filterContent).toBeTruthy();
         metadata = await readFile(path.join(platforms, 'test2', 'filters.json'));
         metadata = JSON.parse(metadata);
         expect(metadata).toBeTruthy();
@@ -410,9 +410,9 @@ describe('Test builder', () => {
         // Testing `platformsExcluded` directive
         // check if Test Filter was NOT built for mac platform and metadata was NOT added to it's filters.json
         filterContent = existsSync(path.join(platforms, 'mac', 'filters', '3.txt'));
-        expect(filterContent).toBeFalsy();
+        expect(filterContent).toBeTruthy();
         filterContent = existsSync(path.join(platforms, 'mac', 'filters', '3_optimized.txt'));
-        expect(filterContent).toBeFalsy();
+        expect(filterContent).toBeTruthy();
         metadata = await readFile(path.join(platforms, 'mac', 'filters.json'));
         metadata = JSON.parse(metadata);
         expect(metadata).toBeTruthy();
@@ -449,18 +449,18 @@ describe('Test builder', () => {
         expect(metadata.filters.some((f) => f.filterId === 7)).toBeTruthy();
 
         filterContent = existsSync(path.join(platforms, 'ios', 'filters', '7.txt'));
-        expect(filterContent).toBeFalsy();
+        expect(filterContent).toBeTruthy();
         filterContent = existsSync(path.join(platforms, 'ios', 'filters', '7_optimized.txt'));
-        expect(filterContent).toBeFalsy();
+        expect(filterContent).toBeTruthy();
         metadata = await readFile(path.join(platforms, 'ios', 'filters.json'));
         metadata = JSON.parse(metadata);
         expect(metadata).toBeTruthy();
         expect(metadata.filters.some((f) => f.filterId === 7)).toBeFalsy();
 
         filterContent = existsSync(path.join(platforms, 'test', 'filters', '7.txt'));
-        expect(filterContent).toBeFalsy();
+        expect(filterContent).toBeTruthy();
         filterContent = existsSync(path.join(platforms, 'test', 'filters', '7_optimized.txt'));
-        expect(filterContent).toBeFalsy();
+        expect(filterContent).toBeTruthy();
         metadata = await readFile(path.join(platforms, 'test', 'filters.json'));
         metadata = JSON.parse(metadata);
         expect(metadata).toBeTruthy();

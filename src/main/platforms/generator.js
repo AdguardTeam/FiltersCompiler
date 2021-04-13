@@ -761,13 +761,6 @@ module.exports = (() => {
         // eslint-disable-next-line guard-for-in,no-restricted-syntax
         for (const platform in platformPathsConfig) {
             const config = platformPathsConfig[platform];
-            if ((metadata.platformsIncluded && !metadata.platformsIncluded.includes(config.platform))
-                || (metadata.platformsExcluded && metadata.platformsExcluded.includes(config.platform))) {
-                // if `platformsIncluded` or `platformsExcluded` property is presented in metadata
-                // build filters only for included or except excluded platforms
-                // https://github.com/AdguardTeam/FiltersCompiler/issues/101
-                continue;
-            }
             let rules = FiltersDownloader.resolveConditions(originalRules, config.defines);
             rules = filter.cleanupRules(rules, config, filterId);
             rules = removeRuleDuplicates(rules);
