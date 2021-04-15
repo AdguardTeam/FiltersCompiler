@@ -16,6 +16,8 @@ stages:
 
 Test:
   key: TEST
+  other:
+    clean-working-dir: true
   docker:
     image: "${bamboo.dockerJslBuilder}"
     volumes:
@@ -29,8 +31,6 @@ Test:
           - |-
             yarn install
             yarn run test
-  final-tasks:
-    - clean
   requirements:
     - adg-docker: 'true'
 
