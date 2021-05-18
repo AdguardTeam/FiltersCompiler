@@ -517,9 +517,20 @@ describe('validator', () => {
         expect(validator.validate(rules).length).toBe(1);
 
         rules = ['example.com$removeparam'];
-        expect(validator.validate(rules).length).toBe(0);
+        expect(validator.validate(rules).length).toBe(1);
 
         rules = ['||example.com$removeparam'];
+        expect(validator.validate(rules).length).toBe(1);
+
+        rules = ['||example.org^$removeparam=p,object'];
+        expect(validator.validate(rules).length).toBe(0);
+    });
+
+    it('validates $redirect-rule modifier', () => {
+        let rules = ['/adsbygoogle.$redirect-rule=noopmp4-1s,script,domain=nekopoi.web.id'];
+        expect(validator.validate(rules).length).toBe(1);
+
+        rules = ['example.org/ads.js$script,redirect-rule'];
         expect(validator.validate(rules).length).toBe(0);
     });
 });
