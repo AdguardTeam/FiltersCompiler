@@ -10,7 +10,7 @@
     "increment": "yarn version --patch --no-git-tag-version"
   },
   "dependencies": {
-    "@adguard/tsurlfilter": "0.4.28",
+    "@adguard/tsurlfilter": "0.4.31",
     "ajv": "^6.10.2",
     "child_process": ">=1.0.2",
     "crypto": "1.0.1",

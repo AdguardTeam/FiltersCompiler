@@ -267,7 +267,7 @@ describe('converter', () => {
         expect(actual[0]).toBe(expected);
     });
 
-    it('converts ABP scriptlest to Adguard scriptlet', () => {
+    it('converts ABP scriptlets to Adguard scriptlet', () => {
         let actual = converter.convertRulesToAdgSyntax(['test.com#$#abort-on-property-read adsShown']);
         let expected = "test.com#%#//scriptlet('abp-abort-on-property-read', 'adsShown')";
         expect(actual[0]).toBe(expected);
@@ -279,6 +279,14 @@ describe('converter', () => {
         actual = converter.convertRulesToAdgSyntax(['example.com#@$#abort-on-property-write adblock.check']);
         expected = "example.com#@%#//scriptlet('abp-abort-on-property-write', 'adblock.check')";
         expect(actual[0]).toBe(expected);
+    });
+
+    it('works if multiple abp scriptlets are converted properly', () => {
+        const actual = converter.convertRulesToAdgSyntax(["example.org#$#json-prune ad 'vinfo'; abort-on-property-write aoipwb"]);
+
+        expect(actual).toHaveLength(2);
+        expect(actual).toContain("example.org#%#//scriptlet('abp-json-prune', 'ad', 'vinfo')");
+        expect(actual).toContain("example.org#%#//scriptlet('abp-abort-on-property-write', 'aoipwb')");
     });
 
     it('converts ghide to generichide and ehide to elemhide conversion', () => {
@@ -420,6 +428,18 @@ describe('converter', () => {
             const result = converter.convertRulesToAdgSyntax([rule]);
             expect(result).toHaveLength(1);
             expect(result[0]).toBe('militaria.pl#$##layout-wrapper::after { height:0!important }');
+        });
+
+        it('does not convert mess pseudos with scriptlets', () => {
+            let rule = 'example.org#$#selector:style()';
+            let result = converter.convertRulesToAdgSyntax([rule]);
+            expect(result).toHaveLength(1);
+            expect(result).toContain(rule);
+
+            rule = 'yamareco.com#$#body.header_bg_ad.modal-open:style(padding-right: auto !important;overflow: auto!important)';
+            result = converter.convertRulesToAdgSyntax([rule]);
+            expect(result).toHaveLength(1);
+            expect(result).toContain(rule);
         });
     });
 });
