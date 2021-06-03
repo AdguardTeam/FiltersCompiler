@@ -10,7 +10,7 @@
     "increment": "yarn version --patch --no-git-tag-version"
   },
   "dependencies": {
-    "@adguard/tsurlfilter": "0.5.8",
+    "@adguard/tsurlfilter": "0.5.9",
     "ajv": "^6.10.2",
     "child_process": ">=1.0.2",
     "crypto": "1.0.1",
@@ -19,7 +19,7 @@
     "jsdom": "^16.3.0",
     "md5": "2.2.1",
     "moment": "^2.24.0",
-    "scriptlets": "git+https://github.com/AdguardTeam/Scriptlets.git#v1.3.18",
+    "scriptlets": "git+https://github.com/AdguardTeam/Scriptlets.git#v1.3.19",
     "utf8": "^3.0.0"
   },
   "devDependencies": {
