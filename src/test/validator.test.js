@@ -533,4 +533,25 @@ describe('validator', () => {
         rules = ['example.org/ads.js$script,redirect-rule'];
         expect(validator.validate(rules).length).toBe(0);
     });
+
+    it('validates xpath rules', () => {
+        const list = [
+            'parenting.pl##:xpath(//div[count(*)=1][*[count(*)=1]/*[count(*)=1]/*[count(*)=1]/*[count(*)=0]])',
+            'stooq.pl,stooq.com##:xpath(//*[@align="center"]/*[@id][contains(text(),"REKLAMA")])',
+            '~www.wp.pl,wp.pl##:xpath(//div[count(*)=3][img[@class][@src]][*[count(*)=1]/*[count(*)=1]/*[count(*)=1]/*[count(*)=1]/*[count(*)=0]])',
+        ];
+        expect(validator.validate(list)).toHaveLength(list.length);
+    });
+
+    it('validates xpath selectors', () => {
+        const list = [
+            'airbnb.com##:xpath(.//*[@data-hypernova-key="p3sticky_navigationbundlejs"])',
+            'elka.pl,miedziowe.pl##:xpath(//*[@align="center"][contains(text(), \'reklama\')])',
+            'google.com##:xpath(.//*[@id=\'gbw\']/div/div/div[2]//div[3][@aria-label="promo"])',
+            'quora.com##:xpath(.//*[@class="fixed_footer_gradient"])',
+            'www.wp.pl##:xpath(//div[@data-st-area=\'Zakupy\'][count(*)=2][not(header)])',
+            'www.dobreprogramy.pl##:xpath(//div[contains(text(), \'REKLAMA\')])',
+        ];
+        expect(validator.validate(list)).toHaveLength(list.length);
+    });
 });

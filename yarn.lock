@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@adguard/tsurlfilter@0.5.7":
-  version "0.5.7"
-  resolved "https://registry.yarnpkg.com/@adguard/tsurlfilter/-/tsurlfilter-0.5.7.tgz#d3ba0661f2ffdc4bcd7b3ad471278f6fa93f4b49"
-  integrity sha512-Y2XTwP10uBIEJb1VkmRfqEjucwWbs+5HjjAmYB+Vv6pFZVRjsrbflvb/Y8MtULriq4ywE6Wg7qYeHOVIsOGSWg==
+"@adguard/tsurlfilter@0.5.8":
+  version "0.5.8"
+  resolved "https://registry.yarnpkg.com/@adguard/tsurlfilter/-/tsurlfilter-0.5.8.tgz#dc4299d32b3d6e04042b9c6d9bce4bc2f8c26718"
+  integrity sha512-+GkC5wm+M3Fld6lxAM7L2tN0YzoeyO8RE2zOlFI8tZBk9bfwlwo7C0fG2NRkyx3n9AZ5LCTVMrXTYPl6VjstCQ==
   dependencies:
     "@types/punycode" "^2.1.0"
     consola "^2.12.2"
