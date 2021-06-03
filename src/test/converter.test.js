@@ -341,6 +341,29 @@ describe('converter', () => {
             expected = '||delivery.tf1.fr/pub$media,redirect=noopmp3-0.1s,domain=tf1.fr';
             expect(actual[0]).toBe(expected);
 
+            actual = converter.convertRulesToAdgSyntax(['/blockadblock.$script,redirect=nobab.js']);
+            expected = '/blockadblock.$script,redirect=prevent-bab';
+            expect(actual[0]).toBe(expected);
+
+            actual = converter.convertAdgRedirectsToUbo(['/blockadblock.$script,redirect=prevent-bab']);
+            expected = '/blockadblock.$script,redirect=nobab.js';
+            expect(actual[0]).toBe(expected);
+
+            // https://github.com/AdguardTeam/Scriptlets/issues/127
+            actual = converter.convertAdgRedirectsToUbo(['||googletagmanager.com/gtm.js$script,redirect=googletagmanager-gtm,domain=morningstar.nl']);
+            expected = '||googletagmanager.com/gtm.js$script,redirect=google-analytics_ga.js,domain=morningstar.nl';
+            expect(actual[0]).toBe(expected);
+
+            // media type for 'empty' redirect
+            actual = converter.convertAdgRedirectsToUbo(['||example.org^$media,redirect=empty']);
+            expected = '||example.org^$media,redirect=empty';
+            expect(actual[0]).toBe(expected);
+
+            // no source type is allowed for 'empty' redirect
+            actual = converter.convertAdgRedirectsToUbo(['||example.org^$redirect=empty']);
+            expected = '||example.org^$redirect=empty';
+            expect(actual[0]).toBe(expected);
+
             actual = converter.convertAdgRedirectsToUbo(['||example.com/banner$image,redirect=32x32-transparent.png']);
             expected = '||example.com/banner$image,redirect=32x32.png';
             expect(actual[0]).toBe(expected);
@@ -364,7 +387,7 @@ describe('converter', () => {
             expect(actual[0]).toBe(expected);
             // nooptext:
             actual = converter.convertAdgRedirectsToUbo(['||ad.example.com^$redirect=nooptext,important']);
-            expected = '||ad.example.com^$redirect=noop.txt,important,subdocument,stylesheet,script,xmlhttprequest,other';
+            expected = '||ad.example.com^$redirect=noop.txt,important,image,media,subdocument,stylesheet,script,xmlhttprequest,other';
             expect(actual[0]).toBe(expected);
 
             actual = converter.convertAdgRedirectsToUbo(['||example.com/ad/vmap/*$xmlhttprequest,redirect=noopvast-2.0']);
