@@ -477,6 +477,9 @@ describe('validator', () => {
 
         rule = '||strm.yandex.ru/get/$script,redirect=noopvast-2.0,domain=kinopoisk.ru';
         expect(redirects.isValidAdgRedirectRule(rule)).toBeTruthy();
+
+        rule = '||googletagmanager.com/gtm.js$script,redirect=googletagmanager-gtm,domain=morningstar.nl';
+        expect(redirects.isValidAdgRedirectRule(rule)).toBeTruthy();
     });
 
     it('Test blocking rules with regexp', () => {
