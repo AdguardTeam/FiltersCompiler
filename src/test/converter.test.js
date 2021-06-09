@@ -147,6 +147,11 @@ describe('converter', () => {
         expected = 'example.org##+js(set-constant, arg.name, \'\')';
         expect(actual[0]).toBe(expected);
 
+        // multiple selectors for remove-attr/class
+        actual = converter.convertAdgScriptletsToUbo(['example.org#%#//scriptlet(\'remove-class\', \'promo\', \'a.class, div#id, div > #ad > .test\')']);
+        expected = 'example.org##+js(remove-class, promo, a.class\\, div#id\\, div > #ad > .test)';
+        expect(actual[0]).toBe(expected);
+
         actual = converter.convertAdgScriptletsToUbo(['']);
         expected = '';
         expect(actual[0]).toBe(expected);
@@ -231,6 +236,11 @@ describe('converter', () => {
 
         actual = scriptlets.convertScriptletToAdg('test.com##+js(abort-current-inline-script, $, popup)');
         expected = "test.com#%#//scriptlet('ubo-abort-current-inline-script.js', '$', 'popup')";
+        expect(actual[0]).toBe(expected);
+
+        // multiple selectors for remove-attr/class
+        actual = scriptlets.convertScriptletToAdg('ubisoft.com##+js(ra, href, area[href*="discordapp.com/"]\\, area[href*="facebook.com/"]\\, area[href*="instagram.com/"])');
+        expected = 'ubisoft.com#%#//scriptlet(\'ubo-ra.js\', \'href\', \'area[href*="discordapp.com/"], area[href*="facebook.com/"], area[href*="instagram.com/"]\')';
         expect(actual[0]).toBe(expected);
 
         actual = scriptlets.convertScriptletToAdg('example.org#$#hide-if-has-and-matches-style \'d[id^="_"]\' \'div > s\' \'display: none\'; hide-if-contains /.*/ .p \'a[href^="/ad__c?"]\'');
