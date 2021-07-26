@@ -141,9 +141,7 @@ module.exports = (() => {
         return result;
     };
 
-    // DandelionSprout duplicates the filter directory in the include directive in his filters,
-    // so we have separate case to resolve origin url:
-    // for the moment the filter url is
+    // for the moment the DandelionSprout filters url is
     // eslint-disable-next-line max-len
     // https://raw.githubusercontent.com/DandelionSprout/adfilt/master/NorwegianExperimentalList%20alternate%20versions/NordicFiltersAdGuard.txt
     // but the include is `!#include NorwegianExperimentalList%20alternate%20versions/NordicFilters-NotFirefox.txt`
