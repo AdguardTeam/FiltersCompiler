@@ -309,12 +309,8 @@ module.exports = (function () {
             logger.info(`Resolving origin url for ${options.url}`);
             let originUrl = externalInclude ? FiltersDownloader.getFilterUrlOrigin(options.url) : currentDir;
 
-            // DandelionSprout duplicates the filter directory in the include directive in his filters,
-            // so we have separate case to resolve origin url
-            // eslint-disable-next-line max-len
-            const dandelionsproutFiltersUrl = 'https://raw.githubusercontent.com/DandelionSprout/adfilt/master/NorwegianExperimentalList%20alternate%20versions';
-            if (externalInclude && options.url.includes(dandelionsproutFiltersUrl)) {
-                originUrl = originUrl.substring(0, originUrl.lastIndexOf('/'));
+            if (externalInclude) {
+                originUrl = workaround.resoleOriginUrlForDandelionFilters(options.url, originUrl);
             }
 
             logger.info(`Origin url is ${originUrl}`);

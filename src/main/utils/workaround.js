@@ -141,6 +141,19 @@ module.exports = (() => {
         return result;
     };
 
+    // DandelionSprout duplicates the filter directory in the include directive in his filters,
+    // so we have separate case to resolve origin url:
+    // for the moment the filter url is
+    // eslint-disable-next-line max-len
+    // https://raw.githubusercontent.com/DandelionSprout/adfilt/master/NorwegianExperimentalList%20alternate%20versions/NordicFiltersAdGuard.txt
+    // but the include is `!#include NorwegianExperimentalList%20alternate%20versions/NordicFilters-NotFirefox.txt`
+    // so the origin url should be https://raw.githubusercontent.com/DandelionSprout/adfilt/master/
+    const resoleOriginUrlForDandelionFilters = (url, originUrl) => {
+        // eslint-disable-next-line max-len
+        const dandelionsproutFiltersUrl = 'https://raw.githubusercontent.com/DandelionSprout/adfilt/master/NorwegianExperimentalList%20alternate%20versions';
+        return url.includes(dandelionsproutFiltersUrl) ? originUrl.substring(0, originUrl.lastIndexOf('/')) : originUrl;
+    };
+
     return {
         overrideRule,
         rewriteHeader,
@@ -149,5 +162,6 @@ module.exports = (() => {
         removeAdblockVersion,
         rewriteMetadataForOldMac,
         modifyBaseFilterHeader,
+        resoleOriginUrlForDandelionFilters,
     };
 })();
