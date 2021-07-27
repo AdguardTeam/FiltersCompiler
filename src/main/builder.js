@@ -310,7 +310,7 @@ module.exports = (function () {
             let originUrl = externalInclude ? FiltersDownloader.getFilterUrlOrigin(options.url) : currentDir;
 
             if (externalInclude) {
-                originUrl = workaround.resoleOriginUrlForDandelionFilters(options.url, originUrl);
+                originUrl = workaround.rewriteOriginUrl(options.url, originUrl);
             }
 
             logger.info(`Origin url is ${originUrl}`);

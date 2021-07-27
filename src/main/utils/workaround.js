@@ -141,12 +141,18 @@ module.exports = (() => {
         return result;
     };
 
-    // for the moment the DandelionSprout filters url is
-    // eslint-disable-next-line max-len
-    // https://raw.githubusercontent.com/DandelionSprout/adfilt/master/NorwegianExperimentalList%20alternate%20versions/NordicFiltersAdGuard.txt
-    // but the include is `!#include NorwegianExperimentalList%20alternate%20versions/NordicFilters-NotFirefox.txt`
-    // so the origin url should be https://raw.githubusercontent.com/DandelionSprout/adfilt/master/
-    const resoleOriginUrlForDandelionFilters = (url, originUrl) => {
+    /**
+     * Rewrites origin url for DandelionSprout filters
+     * for the moment the filters url is
+     * `.../DandelionSprout/adfilt/master/NorwegianExperimentalList%20alternate%20versions/NordicFiltersAdGuard.txt`
+     * but the include is `!#include NorwegianExperimentalList%20alternate%20versions/NordicFilters-NotFirefox.txt`
+     * so the origin url should be https://raw.githubusercontent.com/DandelionSprout/adfilt/master/
+     * @param url
+     * @param originUrl
+     * @return {string|*}
+     */
+
+    const rewriteOriginUrl = (url, originUrl) => {
         // eslint-disable-next-line max-len
         const dandelionsproutFiltersUrl = 'https://raw.githubusercontent.com/DandelionSprout/adfilt/master/NorwegianExperimentalList%20alternate%20versions';
         return url.includes(dandelionsproutFiltersUrl) ? originUrl.substring(0, originUrl.lastIndexOf('/')) : originUrl;
@@ -160,6 +166,6 @@ module.exports = (() => {
         removeAdblockVersion,
         rewriteMetadataForOldMac,
         modifyBaseFilterHeader,
-        resoleOriginUrlForDandelionFilters,
+        rewriteOriginUrl,
     };
 })();
