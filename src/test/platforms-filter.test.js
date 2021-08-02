@@ -80,6 +80,8 @@ describe('platforms filter', () => {
                 },
             ],
             'percent': 10,
+            'minPercent': 5,
+            'maxPercent': 71,
         };
 
         // TODO: Check optimization percent

@@ -211,7 +211,8 @@ module.exports = (() => {
         const filterRulesCount = rules.length;
         const optimizedRulesCount = optimizedRules.length;
 
-        const resultOptimizationPercent = (optimizedRulesCount / filterRulesCount) * 100;
+        // do not count decimal part of number
+        const resultOptimizationPercent = Math.floor((optimizedRulesCount / filterRulesCount) * 100);
 
         const expectedOptimizationPercent = optimizationConfig.percent;
         const minOptimizationPercent = optimizationConfig.minPercent;
