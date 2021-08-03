@@ -80,9 +80,8 @@ const validate = function (list, excluded) {
  * @param filterId
  */
 const checkAffinityDirectives = (filterId, lines) => {
-    // eslint-disable-next-line max-len
-    const affinityOpenCount = lines.reduce((count, line) => (line.startsWith(AFFINITY_DIRECTIVE_OPEN) ? count + 1 : count), 0);
-    const affinityCloseCount = lines.reduce((count, line) => (line === AFFINITY_DIRECTIVE ? count + 1 : count), 0);
+    const affinityOpenCount = lines.filter((line) => line.startsWith(AFFINITY_DIRECTIVE_OPEN)).length;
+    const affinityCloseCount = lines.filter((line) => (line === AFFINITY_DIRECTIVE)).length;
 
     if (affinityOpenCount !== affinityCloseCount) {
         throw new Error(`Error validating !#safari_cb_affinity directive in filter ${filterId}`);
