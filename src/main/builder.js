@@ -334,12 +334,32 @@ module.exports = (function () {
     };
 
     /**
+     * Checks  the amount of opening and closing !#safari_cb_affinity directives
+     *
+     * @param lines
+     * @param filterId
+     */
+    const validateAffinityDirectives = (filterId, lines) => {
+        const AFFINITY_DIRECTIVE = '!#safari_cb_affinity'; // used as closing directive
+        const AFFINITY_DIRECTIVE_OPEN = `${AFFINITY_DIRECTIVE}(`;
+
+        // eslint-disable-next-line max-len
+        const affinityOpenCount = lines.reduce((count, line) => (line.startsWith(AFFINITY_DIRECTIVE_OPEN) ? count + 1 : count), 0);
+        const affinityCloseCount = lines.reduce((count, line) => (line === AFFINITY_DIRECTIVE ? count + 1 : count), 0);
+
+        if (affinityOpenCount !== affinityCloseCount) {
+            throw new Error(`Error validating !#safari_cb_affinity directive in filter ${filterId}`);
+        }
+    };
+
+    /**
      * Compiles filter lines
      *
      * @param template
      * @param trustLevelSettings
+     * @param filterId
      */
-    const compile = async function (template, trustLevelSettings) {
+    const compile = async function (template, trustLevelSettings, filterId) {
         let result = [];
         const excluded = [];
 
@@ -371,6 +391,7 @@ module.exports = (function () {
         result = exclude(result, trustLevelSettings, excluded);
 
         result = validator.validate(result, excluded);
+        validateAffinityDirectives(filterId, result);
 
         return {
             lines: result,
@@ -451,7 +472,7 @@ module.exports = (function () {
         const trustLevelSettings = path.resolve(__dirname, TRUST_LEVEL_DIR, `exclusions-${trustLevel}.txt`);
 
         logger.info('Compiling...');
-        const result = await compile(template, trustLevelSettings);
+        const result = await compile(template, trustLevelSettings, filterId);
         const compiled = result.lines;
         const { excluded } = result;
         report.addFilter(metadata, result);

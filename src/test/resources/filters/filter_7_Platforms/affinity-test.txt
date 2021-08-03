@@ -1,0 +1,10 @@
+||test1.ru
+||test2.ru
+||test3.ru
+!#safari_cb_affinity(security)
+||test4.ru
+||test5.ru
+!#safari_cb_affinity
+||test6.ru
+||test7.ru
+
