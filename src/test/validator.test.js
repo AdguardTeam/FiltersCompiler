@@ -591,6 +591,33 @@ describe('validator', () => {
             '!#safari_cb_affinity(security)',
             '||test2.ru',
             '||test3.ru',
+            '!#safari_cb_affinity(privacy)',
+            '||test4.ru',
+            '||test5.ru',
+            '!#safari_cb_affinity',
+            '||test6.ru',
+            '||test7.ru',
+            '||test8.ru',
+            '!#safari_cb_affinity',
+        ];
+        expect(() => validator.checkAffinityDirectives(rules)).not.toThrow();
+
+        rules = [
+            '||test1.ru',
+            '||test2.ru',
+            '!#safari_cb_affinity',
+            '||test3.ru',
+            '||test4.ru',
+            '||test5.ru',
+            '!#safari_cb_affinity(privacy)',
+        ];
+        expect(() => validator.checkAffinityDirectives(rules)).toThrow('Error validating !#safari_cb_affinity directive');
+
+        rules = [
+            '||test1.ru',
+            '!#safari_cb_affinity(security)',
+            '||test2.ru',
+            '||test3.ru',
             '!#safari_cb_affinity',
             '||test4.ru',
             '||test5.ru',
@@ -610,7 +637,22 @@ describe('validator', () => {
             '||test5.ru',
             '!#safari_cb_affinity(privacy)',
             '||test6.ru',
-            '||test7.ru',
+        ];
+        expect(() => validator.checkAffinityDirectives(rules)).toThrow('Error validating !#safari_cb_affinity directive');
+
+        rules = [
+            '||test1.ru',
+            '||test2.ru',
+            '!#safari_cb_affinity',
+            '||test3.ru',
+        ];
+        expect(() => validator.checkAffinityDirectives(rules)).toThrow('Error validating !#safari_cb_affinity directive');
+
+        rules = [
+            '!#safari_cb_affinity(social)',
+            '||test1.ru',
+            '||test2.ru',
+            '||test3.ru',
         ];
         expect(() => validator.checkAffinityDirectives(rules)).toThrow('Error validating !#safari_cb_affinity directive');
     });

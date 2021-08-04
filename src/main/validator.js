@@ -74,15 +74,31 @@ const validate = function (list, excluded) {
 };
 
 /**
- * Checks  the amount of opening and closing !#safari_cb_affinity directives
+ * Validates !#safari_cb_affinity directives
  *
  * @param lines
  */
 const checkAffinityDirectives = (lines) => {
-    const affinityOpenCount = lines.filter((line) => line.startsWith(AFFINITY_DIRECTIVE_OPEN)).length;
-    const affinityCloseCount = lines.filter((line) => (line === AFFINITY_DIRECTIVE)).length;
+    if (!(lines && lines.length)) {
+        // skip empty filter
+        return;
+    }
+    const stack = [];
 
-    if (affinityOpenCount !== affinityCloseCount) {
+    lines.forEach((line) => {
+        if (line.startsWith(AFFINITY_DIRECTIVE_OPEN)) {
+            stack.push(line);
+        }
+        if (line === AFFINITY_DIRECTIVE) {
+            if (!stack[stack.length - 1]) {
+                throw new Error('Error validating !#safari_cb_affinity directive');
+            } else if (stack[stack.length - 1].startsWith(AFFINITY_DIRECTIVE_OPEN)) {
+                stack.pop();
+            }
+        }
+    });
+
+    if (stack.length) {
         throw new Error('Error validating !#safari_cb_affinity directive');
     }
 };
