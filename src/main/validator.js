@@ -77,14 +77,13 @@ const validate = function (list, excluded) {
  * Checks  the amount of opening and closing !#safari_cb_affinity directives
  *
  * @param lines
- * @param filterId
  */
-const checkAffinityDirectives = (filterId, lines) => {
+const checkAffinityDirectives = (lines) => {
     const affinityOpenCount = lines.filter((line) => line.startsWith(AFFINITY_DIRECTIVE_OPEN)).length;
     const affinityCloseCount = lines.filter((line) => (line === AFFINITY_DIRECTIVE)).length;
 
     if (affinityOpenCount !== affinityCloseCount) {
-        throw new Error(`Error validating !#safari_cb_affinity directive in filter ${filterId}`);
+        throw new Error('Error validating !#safari_cb_affinity directive');
     }
 };
 

@@ -338,9 +338,8 @@ module.exports = (function () {
      *
      * @param template
      * @param trustLevelSettings
-     * @param filterId
      */
-    const compile = async function (template, trustLevelSettings, filterId) {
+    const compile = async function (template, trustLevelSettings) {
         let result = [];
         const excluded = [];
 
@@ -372,7 +371,7 @@ module.exports = (function () {
         result = exclude(result, trustLevelSettings, excluded);
 
         result = validator.validate(result, excluded);
-        validator.checkAffinityDirectives(filterId, result);
+        validator.checkAffinityDirectives(result);
 
         return {
             lines: result,
@@ -453,7 +452,12 @@ module.exports = (function () {
         const trustLevelSettings = path.resolve(__dirname, TRUST_LEVEL_DIR, `exclusions-${trustLevel}.txt`);
 
         logger.info('Compiling...');
-        const result = await compile(template, trustLevelSettings, filterId);
+        let result;
+        try {
+            result = await compile(template, trustLevelSettings);
+        } catch (e) {
+            throw new Error(`Error compiling filter ${filterId} has occurred: ${e.message}`);
+        }
         const compiled = result.lines;
         const { excluded } = result;
         report.addFilter(metadata, result);

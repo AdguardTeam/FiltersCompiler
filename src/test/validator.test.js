@@ -557,4 +557,61 @@ describe('validator', () => {
         ];
         expect(validator.validate(list)).toHaveLength(list.length);
     });
+
+    it('checkAffinityDirectives test', () => {
+        let rules = [
+            '||test1.ru',
+            '!#safari_cb_affinity(security)',
+            '||test2.ru',
+            '||test3.ru',
+            '!#safari_cb_affinity',
+            '||test4.ru',
+            '||test5.ru',
+            '!#safari_cb_affinity(privacy)',
+            '||test6.ru',
+            '||test7.ru',
+            '||test8.ru',
+            '!#safari_cb_affinity',
+            '||test9.ru',
+            '||test10.ru',
+            '||test11.ru',
+            '||test12.ru',
+            '!#safari_cb_affinity(social)',
+            '||test13.ru',
+            '||test14.ru',
+            '||test15.ru',
+            '!#safari_cb_affinity',
+            '||test16.ru',
+            '||test17.ru',
+        ];
+        expect(() => validator.checkAffinityDirectives(rules)).not.toThrow();
+
+        rules = [
+            '||test1.ru',
+            '!#safari_cb_affinity(security)',
+            '||test2.ru',
+            '||test3.ru',
+            '!#safari_cb_affinity',
+            '||test4.ru',
+            '||test5.ru',
+            '!#safari_cb_affinity(privacy)',
+            '||test6.ru',
+            '||test7.ru',
+        ];
+        expect(() => validator.checkAffinityDirectives(rules)).toThrow('Error validating !#safari_cb_affinity directive');
+
+        rules = [
+            '||test1.ru',
+            '||test2.ru',
+            '!#safari_cb_affinity',
+            '||test3.ru',
+            '!#safari_cb_affinity',
+            '||test4.ru',
+            '||test5.ru',
+            '!#safari_cb_affinity(privacy)',
+            '||test6.ru',
+            '||test7.ru',
+        ];
+        expect(() => validator.checkAffinityDirectives(rules)).toThrow('Error validating !#safari_cb_affinity directive');
+    });
 });
