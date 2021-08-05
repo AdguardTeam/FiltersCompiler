@@ -8,6 +8,9 @@ const {
 const logger = require('./utils/log.js');
 const extendedCssValidator = require('./utils/extended-css-validator.js');
 
+const AFFINITY_DIRECTIVE = '!#safari_cb_affinity'; // used as closing directive
+const AFFINITY_DIRECTIVE_OPEN = `${AFFINITY_DIRECTIVE}(`;
+
 /**
  * Push rule with warning message to excluded
  * @param {array} excluded
@@ -70,6 +73,36 @@ const validate = function (list, excluded) {
     });
 };
 
+/**
+ * Validates !#safari_cb_affinity directives
+ *
+ * @param lines
+ */
+const checkAffinityDirectives = (lines) => {
+    if (!(lines && lines.length)) {
+        // skip empty filter
+        return true;
+    }
+    const stack = [];
+
+    for (let i = 0; i < lines.length; i += 1) {
+        const line = lines[i];
+        if (line.startsWith(AFFINITY_DIRECTIVE_OPEN)) {
+            stack.push(line);
+            continue;
+        }
+        if (line === AFFINITY_DIRECTIVE) {
+            const pop = stack.pop();
+            if (!(pop && pop.startsWith(AFFINITY_DIRECTIVE_OPEN))) {
+                return false;
+            }
+        }
+    }
+
+    return !stack.length;
+};
+
 module.exports = {
     validate,
+    checkAffinityDirectives,
 };

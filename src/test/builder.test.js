@@ -466,4 +466,11 @@ describe('Test builder', () => {
         expect(metadata).toBeTruthy();
         expect(metadata.filters.some((f) => f.filterId === 7)).toBeFalsy();
     });
+
+    it('Validate affinity directives', async () => {
+        optimization.disableOptimization();
+
+        const filtersDir = path.join(__dirname, './resources/bad-filters');
+        await expect(builder.build(filtersDir, null, null, null, null, null)).rejects.toThrow('Error validating !#safari_cb_affinity directive in filter 8');
+    });
 });

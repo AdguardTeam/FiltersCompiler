@@ -1,0 +1,15 @@
+{
+  "filterId": 8,
+  "name": "Test Affinity Directive Filter",
+  "description": "Test Filter description",
+  "timeAdded": 1404115015843,
+  "homepage": "https://easylist.adblockplus.org/",
+  "expires": "2 days",
+  "displayNumber": 120,
+  "groupId": 5,
+  "subscriptionUrl": "https://easylist-downloads.adblockplus.org/easylist.txt",
+  "tags": [
+    "purpose:ads", "lang:en"
+  ],
+  "trustLevel": "high"
+}
