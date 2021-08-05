@@ -452,12 +452,12 @@ module.exports = (function () {
         const trustLevelSettings = path.resolve(__dirname, TRUST_LEVEL_DIR, `exclusions-${trustLevel}.txt`);
 
         logger.info('Compiling...');
-        let result;
-        try {
-            result = await compile(template, trustLevelSettings);
-        } catch (e) {
-            throw new Error(`Error compiling filter ${filterId} has occurred: ${e.message}`);
+        const result = await compile(template, trustLevelSettings);
+
+        if (!validator.checkAffinityDirectives(result.lines)) {
+            throw new Error(`Error validating !#safari_cb_affinity directive in filter ${filterId}`);
         }
+
         const compiled = result.lines;
         const { excluded } = result;
         report.addFilter(metadata, result);

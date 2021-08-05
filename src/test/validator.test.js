@@ -584,7 +584,7 @@ describe('validator', () => {
             '||test16.ru',
             '||test17.ru',
         ];
-        expect(() => validator.checkAffinityDirectives(rules)).not.toThrow();
+        expect(validator.checkAffinityDirectives(rules)).toBeTruthy();
 
         rules = [
             '||test1.ru',
@@ -600,7 +600,7 @@ describe('validator', () => {
             '||test8.ru',
             '!#safari_cb_affinity',
         ];
-        expect(() => validator.checkAffinityDirectives(rules)).not.toThrow();
+        expect(validator.checkAffinityDirectives(rules)).toBeTruthy();
 
         rules = [
             '||test1.ru',
@@ -611,7 +611,7 @@ describe('validator', () => {
             '||test5.ru',
             '!#safari_cb_affinity(privacy)',
         ];
-        expect(() => validator.checkAffinityDirectives(rules)).toThrow('Error validating !#safari_cb_affinity directive');
+        expect(validator.checkAffinityDirectives(rules)).toBeFalsy();
 
         rules = [
             '||test1.ru',
@@ -625,7 +625,7 @@ describe('validator', () => {
             '||test6.ru',
             '||test7.ru',
         ];
-        expect(() => validator.checkAffinityDirectives(rules)).toThrow('Error validating !#safari_cb_affinity directive');
+        expect(validator.checkAffinityDirectives(rules)).toBeFalsy();
 
         rules = [
             '||test1.ru',
@@ -638,7 +638,7 @@ describe('validator', () => {
             '!#safari_cb_affinity(privacy)',
             '||test6.ru',
         ];
-        expect(() => validator.checkAffinityDirectives(rules)).toThrow('Error validating !#safari_cb_affinity directive');
+        expect(validator.checkAffinityDirectives(rules)).toBeFalsy();
 
         rules = [
             '||test1.ru',
@@ -646,7 +646,7 @@ describe('validator', () => {
             '!#safari_cb_affinity',
             '||test3.ru',
         ];
-        expect(() => validator.checkAffinityDirectives(rules)).toThrow('Error validating !#safari_cb_affinity directive');
+        expect(validator.checkAffinityDirectives(rules)).toBeFalsy();
 
         rules = [
             '!#safari_cb_affinity(social)',
@@ -654,6 +654,6 @@ describe('validator', () => {
             '||test2.ru',
             '||test3.ru',
         ];
-        expect(() => validator.checkAffinityDirectives(rules)).toThrow('Error validating !#safari_cb_affinity directive');
+        expect(validator.checkAffinityDirectives(rules)).toBeFalsy();
     });
 });

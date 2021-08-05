@@ -81,26 +81,25 @@ const validate = function (list, excluded) {
 const checkAffinityDirectives = (lines) => {
     if (!(lines && lines.length)) {
         // skip empty filter
-        return;
+        return true;
     }
     const stack = [];
 
-    lines.forEach((line) => {
+    for (let i = 0; i < lines.length; i += 1) {
+        const line = lines[i];
         if (line.startsWith(AFFINITY_DIRECTIVE_OPEN)) {
             stack.push(line);
+            continue;
         }
         if (line === AFFINITY_DIRECTIVE) {
-            if (!stack[stack.length - 1]) {
-                throw new Error('Error validating !#safari_cb_affinity directive');
-            } else if (stack[stack.length - 1].startsWith(AFFINITY_DIRECTIVE_OPEN)) {
-                stack.pop();
+            const pop = stack.pop();
+            if (!(pop && pop.startsWith(AFFINITY_DIRECTIVE_OPEN))) {
+                return false;
             }
         }
-    });
-
-    if (stack.length) {
-        throw new Error('Error validating !#safari_cb_affinity directive');
     }
+
+    return !stack.length;
 };
 
 module.exports = {
