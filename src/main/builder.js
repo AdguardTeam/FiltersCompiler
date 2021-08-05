@@ -371,7 +371,6 @@ module.exports = (function () {
         result = exclude(result, trustLevelSettings, excluded);
 
         result = validator.validate(result, excluded);
-        validator.checkAffinityDirectives(result);
 
         return {
             lines: result,
