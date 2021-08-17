@@ -6,3 +6,8 @@
 ||test.com^
 ||example.com^$third-party
 somesite.com##.main-banner
+!#safari_cb_affinity(security)
+||example1.org
+!+ PLATFORM(ios)
+||example2.org
+!#safari_cb_affinity

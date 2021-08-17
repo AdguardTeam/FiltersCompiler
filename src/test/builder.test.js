@@ -465,6 +465,19 @@ describe('Test builder', () => {
         metadata = JSON.parse(metadata);
         expect(metadata).toBeTruthy();
         expect(metadata.filters.some((f) => f.filterId === 7)).toBeFalsy();
+
+        // test hint PLATFORM inside of !#safari_cb_affinity directive
+        filterContent = await readFile(path.join(platforms, 'ios', 'filters', '7.txt'));
+        expect(filterContent).toBeTruthy();
+        filterLines = filterContent.split('\r\n');
+        expect(filterLines.includes('||example1.org')).toBeTruthy();
+        expect(filterLines.includes('||example2.org')).toBeTruthy();
+
+        filterContent = await readFile(path.join(platforms, 'mac', 'filters', '7.txt'));
+        expect(filterContent).toBeTruthy();
+        filterLines = filterContent.split('\r\n');
+        expect(filterLines.includes('||example1.org')).toBeTruthy();
+        expect(filterLines.includes('||example2.org')).toBeFalsy();
     });
 
     it('Validate affinity directives', async () => {
