@@ -568,6 +568,10 @@ module.exports = (() => {
                 }
             }
 
+            // https://github.com/AdguardTeam/AdguardBrowserExtension/issues/1847
+            // remove scriptlet rules in local_script_rules.json for chrome browser extension
+            rulesJson.rules = workaround.removeScriptletRules(rulesJson.rules, platform);
+
             fs.writeFileSync(
                 path.join(platformDir, LOCAL_SCRIPT_RULES_FILE),
                 rules.join(RULES_SEPARATOR),
