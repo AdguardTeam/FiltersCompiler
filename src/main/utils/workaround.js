@@ -2,13 +2,6 @@
 module.exports = (() => {
     const RuleMasks = require('../rule/rule-masks.js');
 
-    const browserExtensionPlatforms = {
-        EXTENSION_CHROMIUM: 'EXTENSION_CHROMIUM',
-        EXTENSION_FIREFOX: 'EXTENSION_FIREFOX',
-        EXTENSION_EDGE: 'EXTENSION_EDGE',
-        EXTENSION_OPERA: 'EXTENSION_OPERA',
-    };
-
     const SCRIPTLET_MASK = '//scriptlet';
 
     /**
@@ -151,17 +144,11 @@ module.exports = (() => {
     };
 
     /**
-     * Removes scriptlet rules for browser extensions
+     * Removes scriptlet rules
      * @param {array} rules
-     * @param {string} platform
      * @return {array} rules
      */
-    const removeScriptletRules = (rules, platform) => {
-        if (Object.values(browserExtensionPlatforms).includes(platform)) {
-            return rules.filter((rule) => !rule.script.startsWith(SCRIPTLET_MASK));
-        }
-        return rules;
-    };
+    const removeScriptletRules = (rules) => rules.filter((rule) => !rule.script.startsWith(SCRIPTLET_MASK));
 
     return {
         overrideRule,
