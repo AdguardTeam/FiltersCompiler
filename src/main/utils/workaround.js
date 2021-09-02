@@ -2,6 +2,8 @@
 module.exports = (() => {
     const RuleMasks = require('../rule/rule-masks.js');
 
+    const SCRIPTLET_MASK = '//scriptlet';
+
     /**
      * CSS rules with width and height attributes break SVG rendering
      * https://github.com/AdguardTeam/AdguardBrowserExtension/issues/683
@@ -141,6 +143,13 @@ module.exports = (() => {
         return result;
     };
 
+    /**
+     * Removes scriptlet rules
+     * @param {array} rules
+     * @return {array} rules
+     */
+    const removeScriptletRules = (rules) => rules.filter((rule) => !rule.script.startsWith(SCRIPTLET_MASK));
+
     return {
         overrideRule,
         rewriteHeader,
@@ -149,5 +158,6 @@ module.exports = (() => {
         removeAdblockVersion,
         rewriteMetadataForOldMac,
         modifyBaseFilterHeader,
+        removeScriptletRules,
     };
 })();

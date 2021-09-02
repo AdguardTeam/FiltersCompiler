@@ -76,5 +76,17 @@
         "defines": {
             "adguard": true
         }
+    },
+    "EXTENSION_CHROMIUM": {
+        "platform": "ext_chromium",
+        "path": "chromium",
+        "configuration": {
+            "removeRulePatterns": false,
+            "ignoreRuleHints": false
+        },
+        "defines": {
+            "adguard": true,
+            "adguard_ext_chromium": true
+        }
     }
 }

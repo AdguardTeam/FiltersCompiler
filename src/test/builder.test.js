@@ -199,7 +199,7 @@ describe('Test builder', () => {
         // Obsolete Filter test
         expect(filtersI18nMetadataFilters.some((filter) => filter === '6')).toBeFalsy();
 
-        const localScriptRules = await readFile(path.join(platforms, 'test', 'local_script_rules.txt'));
+        let localScriptRules = await readFile(path.join(platforms, 'test', 'local_script_rules.txt'));
         expect(localScriptRules).toBeFalsy();
         const localScriptRulesLines = localScriptRules.split('\r\n');
         expect(localScriptRulesLines.indexOf('test_domain#%#testScript();') === -1).toBeTruthy();
@@ -478,6 +478,13 @@ describe('Test builder', () => {
         filterLines = filterContent.split('\r\n');
         expect(filterLines.includes('||example1.org')).toBeTruthy();
         expect(filterLines.includes('||example2.org')).toBeFalsy();
+
+        // test removing scriptlet rules in local_script_rules.json for chrome browser extension
+        localScriptRulesJson = await readFile(path.join(platforms, 'chromium', 'local_script_rules.json'));
+        expect(localScriptRulesJson).toBeTruthy();
+        localScriptRules = JSON.parse(localScriptRulesJson);
+        expect(localScriptRules.rules).toBeTruthy();
+        expect(localScriptRules.rules.some((rule) => rule.script.startsWith('//scriptlet'))).toBeFalsy();
     });
 
     it('Validate affinity directives', async () => {
