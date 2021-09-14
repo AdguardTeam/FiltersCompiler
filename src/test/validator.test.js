@@ -526,6 +526,9 @@ describe('validator', () => {
         expect(validator.validate(rules).length).toBe(1);
 
         rules = ['||example.org^$removeparam=p,object'];
+        expect(validator.validate(rules).length).toBe(1);
+
+        rules = ['||example.org^$removeparam=p,popup'];
         expect(validator.validate(rules).length).toBe(0);
     });
 
