@@ -2,6 +2,7 @@ const { RuleConverter } = require('@adguard/tsurlfilter');
 
 const scriptlets = require('scriptlets');
 const logger = require('./utils/log.js');
+const cosmeticRuleModifiers = require('./rule/cosmetic-rule-modifiers');
 
 const { redirects } = scriptlets;
 
@@ -109,8 +110,21 @@ const convertAdgRedirectsToUbo = (rules) => {
     );
 };
 
+const convertAdgPathModifierToUbo = (rules) => {
+    if (!rules) {
+        return [];
+    }
+    return convertToUbo(
+        rules,
+        '$path',
+        cosmeticRuleModifiers.isAdgCosmeticRuleWithPathModifier,
+        cosmeticRuleModifiers.convertAdgPathModifierToUbo
+    );
+};
+
 module.exports = {
     convertRulesToAdgSyntax,
     convertAdgScriptletsToUbo,
     convertAdgRedirectsToUbo,
+    convertAdgPathModifierToUbo,
 };
