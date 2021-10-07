@@ -672,6 +672,7 @@ module.exports = (() => {
         // Exclude script rules.
         // Modify title for base filter
         if (config.platform === 'ext_ublock') {
+            rulesList = converter.convertAdgPathModifierToUbo(rulesList);
             rulesList = converter.convertAdgScriptletsToUbo(rulesList);
             rulesList = converter.convertAdgRedirectsToUbo(rulesList);
             rulesList = excludeScriptRules(rulesList);
