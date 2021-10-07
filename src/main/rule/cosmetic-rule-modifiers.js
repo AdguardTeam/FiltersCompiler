@@ -1,4 +1,5 @@
 const { CosmeticRuleParser } = require('@adguard/tsurlfilter');
+const scriptlets = require('scriptlets');
 
 const isAdgCosmeticRuleWithPathModifier = (rule) => {
     try {
@@ -40,16 +41,24 @@ const convertAdgPathModifierToUbo = (rule) => {
 
     const domains = [];
 
-    if (restrictedDomains) {
-        domains.push(...restrictedDomains);
-    }
-
     if (permittedDomains) {
         domains.push(...permittedDomains);
     }
 
-    // TODO: handle scriplets rules with path modifier
-    return `${domains.join(',')}${marker}:matches-path(${path})${content}`;
+    if (restrictedDomains) {
+        domains.push(...restrictedDomains.map((domain) => `~${domain}`));
+    }
+
+    const domainsPattern = domains.join(',');
+
+    const isScriplet = content.startsWith('//scriptlet');
+
+    if (isScriplet) {
+        const uboScriptletRule = scriptlets.convertAdgToUbo(`${domainsPattern}${marker}${content}`);
+        return `${uboScriptletRule}:matches-path(${path})`;
+    }
+
+    return `${domainsPattern}${marker}:matches-path(${path})${content}`;
 };
 
 module.exports = {
