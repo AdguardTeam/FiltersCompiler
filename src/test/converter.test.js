@@ -475,4 +475,35 @@ describe('converter', () => {
             expect(result).toContain(rule);
         });
     });
+
+    it('converts cosmetic rule modifiers to UBlock syntax', () => {
+        const rules = [
+            {
+                source: '[$path=/page]ya.ru##p',
+                expected: 'ya.ru##:matches-path(/page)p',
+            },
+            {
+                source: '[$path=/page]ya.ru#@#p',
+                expected: 'ya.ru#@#:matches-path(/page)p',
+            },
+            {
+                source: String.raw`[$path=/\\/(sub1|sub2)\\/page\\.html/]ya.ru##p`,
+                expected: String.raw`ya.ru##:matches-path(/\/(sub1|sub2)\/page\.html/)p`,
+            },
+            {
+                source: '[$path=/sexykpopidol]blog.livedoor.jp###containerWrap > #container > .blog-title-outer + #content.hfeed',
+                expected: 'blog.livedoor.jp##:matches-path(/sexykpopidol)#containerWrap > #container > .blog-title-outer + #content.hfeed',
+            },
+            {
+                source: String.raw`[$path=/\\/\[a|b|\,\]\\/page\\.html/]exapmle.com## #test`,
+                expected: String.raw`exapmle.com##:matches-path(/\/[a|b|,]\/page\.html/)#test`,
+            },
+        ];
+
+        rules.forEach((rule) => {
+            const res = converter.convertAdgPathModifierToUbo([rule.source]);
+
+            expect({ source: rule.source, expected: res[0] }).toEqual(rule);
+        });
+    });
 });
