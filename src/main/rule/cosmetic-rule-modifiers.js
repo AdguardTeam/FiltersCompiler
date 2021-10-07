@@ -51,9 +51,9 @@ const convertAdgPathModifierToUbo = (rule) => {
 
     const domainsPattern = domains.join(',');
 
-    const isScriplet = content.startsWith('//scriptlet');
+    const isScriptlet = content.startsWith('//scriptlet');
 
-    if (isScriplet) {
+    if (isScriptlet) {
         const uboScriptletRule = scriptlets.convertAdgToUbo(`${domainsPattern}${marker}${content}`);
         return `${uboScriptletRule}:matches-path(${path})`;
     }
