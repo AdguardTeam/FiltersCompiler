@@ -30,7 +30,8 @@ Test:
         scripts:
           - |-
             yarn install
-            yarn run test
+            yarn test
+            rm -rf node_modules
   requirements:
     - adg-docker: 'true'
 
