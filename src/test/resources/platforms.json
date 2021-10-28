@@ -29,9 +29,24 @@
         "path": "ios",
         "configuration": {
             "removeRulePatterns": [
-                "\\$(.*,)?redirect=noopmp4-1s",
+                "\\$\\$|\\$\\@\\$",
+                "\\$(.*,)?mp4",
+                "\\$(.*,)?replace=",
+                "\\$stealth",
+                ",stealth",
+                "\\$cookie",
+                ",cookie",
+                "important,replace=",
                 "\\$(.*,)?app",
-                "\\$(.*,)?replace="
+                "\\$protobuf",
+                "important,protobuf",
+                "\\$redirect=",
+                ",redirect=",
+                "\\$empty",
+                ",empty",
+                "\\$webrtc",
+                "\\$csp=",
+                "\\$network"
             ],
             "ignoreRuleHints": false,
             "adbHeader": "![Test ios filter]"

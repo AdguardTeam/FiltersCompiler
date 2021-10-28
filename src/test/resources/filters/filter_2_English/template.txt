@@ -30,3 +30,12 @@ test_domain#%#testScript();
 test.com#%#var isadblock=1;
 example.com#%#AG_onLoad(function() { AG_removeElementBySelector('span[class="intexta"]'); });
 test.com#%#//scriptlet('ubo-abort-on-property-read.js', 'Object.prototype.getBanner')
+example.net#$?#.main-content { margin-top: 0!important; }
+test.com#@$?#.banner { padding: 0!important; }
+example.net#?#.banner:matches-css(width: 360px)
+test.com#@?#.banner:matches-css(height: 200px)
+!
+||example.org^$cookie=test
+@@||example.com^$stealth
+||example.com^$webrtc,domain=example.org
+||example.org^$csp=frame-src 'none'
