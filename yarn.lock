@@ -10,6 +10,14 @@
     "@babel/runtime" "^7.7.2"
     js-yaml "^3.13.1"
 
+"@adguard/scriptlets@^1.5.4":
+  version "1.5.4"
+  resolved "https://registry.yarnpkg.com/@adguard/scriptlets/-/scriptlets-1.5.4.tgz#4530809e091536a695e70a8630774802c0deb5ac"
+  integrity sha512-qJSAD1MuO5RCa6dhBM3AzoBwZdKEg/hDz4E4c+l7HWLTPN6YMODE5wXYXCvCrcAsJe1v28DWqjbTlkwxb/vghg==
+  dependencies:
+    "@babel/runtime" "^7.7.2"
+    js-yaml "^3.13.1"
+
 "@adguard/tsurlfilter@0.7.17":
   version "0.7.17"
   resolved "https://registry.yarnpkg.com/@adguard/tsurlfilter/-/tsurlfilter-0.7.17.tgz#960ba6a4f2ec9cf26d69cc2f6267f2c933a6ae98"
@@ -1016,9 +1024,9 @@ camelcase@^6.0.0:
   integrity sha512-c7wVvbw3f37nuobQNtgsgG9POC9qMbNuMQmTCqZv23b6MIz0fcYpBiOlv9gEN/hdLdnZTDQhg6e9Dq5M1vKvfg==
 
 caniuse-lite@^1.0.30001181:
-  version "1.0.30001194"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001194.tgz#3d16ff3d734a5a7d9818402c28b1f636c5be5bed"
-  integrity sha512-iDUOH+oFeBYk5XawYsPtsx/8fFpndAPUQJC7gBTfxHM8xw5nOZv7ceAD4frS1MKCLUac7QL5wdAJiFQlDRjXlA==
+  version "1.0.30001291"
+  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001291.tgz"
+  integrity sha512-roMV5V0HNGgJ88s42eE70sstqGW/gwFndosYrikHthw98N5tLnOTxFqMLQjZVRxTWFlJ4rn+MsgXrR7MDPY4jA==
 
 capture-exit@^2.0.0:
   version "2.0.0"
@@ -3916,13 +3924,6 @@ saxes@^5.0.0:
   integrity sha512-5LBh1Tls8c9xgGjw3QrMwETmTMVk0oFgvrFSvWx62llR2hcEInrKNZ2GZCCuuy2lvWrdl5jhbpeqc5hRYKFOcw==
   dependencies:
     xmlchars "^2.2.0"
-
-"scriptlets@git+https://github.com/AdguardTeam/Scriptlets.git#v1.4.3":
-  version "1.4.4"
-  resolved "git+https://github.com/AdguardTeam/Scriptlets.git#334c4dac505e4b89ff7c28eae35e09957907707c"
-  dependencies:
-    "@babel/runtime" "^7.7.2"
-    js-yaml "^3.13.1"
 
 semver-compare@^1.0.0:
   version "1.0.0"

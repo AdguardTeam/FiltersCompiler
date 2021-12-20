@@ -1,5 +1,6 @@
 const { CosmeticRuleParser } = require('@adguard/tsurlfilter');
-const scriptlets = require('scriptlets');
+// const scriptlets = require('scriptlets');
+const Scriptlets = require('@adguard/scriptlets');
 
 const isAdgCosmeticRuleWithPathModifier = (rule) => {
     try {
@@ -54,7 +55,7 @@ const convertAdgPathModifierToUbo = (rule) => {
     const isScriptlet = content.startsWith('//scriptlet');
 
     if (isScriptlet) {
-        const uboScriptletRule = scriptlets.convertAdgToUbo(`${domainsPattern}${marker}${content}`);
+        const uboScriptletRule = Scriptlets.convertAdgToUbo(`${domainsPattern}${marker}${content}`);
         return `${uboScriptletRule}:matches-path(${path})`;
     }
 
