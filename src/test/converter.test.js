@@ -1,5 +1,4 @@
 /* eslint-disable max-len */
-// const scriptlets = require('scriptlets');
 const Scriptlets = require('@adguard/scriptlets');
 const converter = require('../main/converter.js');
 

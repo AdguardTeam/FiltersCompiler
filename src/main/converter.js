@@ -1,7 +1,6 @@
 const { RuleConverter } = require('@adguard/tsurlfilter');
-
-// const scriptlets = require('scriptlets');
 const Scriptlets = require('@adguard/scriptlets');
+
 const logger = require('./utils/log.js');
 const cosmeticRuleModifiers = require('./rule/cosmetic-rule-modifiers');
 

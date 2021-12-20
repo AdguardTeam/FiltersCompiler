@@ -1,5 +1,4 @@
 /* eslint-disable max-len */
-// const scriptlets = require('scriptlets');
 const Scriptlets = require('@adguard/scriptlets');
 const { setConfiguration, CompatibilityTypes } = require('@adguard/tsurlfilter');
 const validator = require('../main/validator.js');
