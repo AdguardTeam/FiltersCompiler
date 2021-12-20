@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-const scriptlets = require('scriptlets');
+const Scriptlets = require('@adguard/scriptlets');
 const converter = require('../main/converter.js');
 
 // Mock log to hide error messages
@@ -210,40 +210,40 @@ describe('converter', () => {
     });
 
     it('scriptlets converter is working', () => {
-        let actual = scriptlets.convertUboToAdg('example.com#@#+js(nano-setInterval-booster.js, some.example, 1000)');
+        let actual = Scriptlets.convertUboToAdg('example.com#@#+js(nano-setInterval-booster.js, some.example, 1000)');
         let expected = "example.com#@%#//scriptlet('ubo-nano-setInterval-booster.js', 'some.example', '1000')";
         expect(actual[0]).toBe(expected);
 
-        actual = scriptlets.convertAdgToUbo('example.org#%#//scriptlet("ubo-abort-on-property-read.js", "alert")');
+        actual = Scriptlets.convertAdgToUbo('example.org#%#//scriptlet("ubo-abort-on-property-read.js", "alert")');
         expected = 'example.org##+js(abort-on-property-read, alert)';
         expect(actual).toBe(expected);
 
-        actual = scriptlets.convertAdgToUbo('example.org#%#//scriptlet("abort-on-property-write", "adblock.check")');
+        actual = Scriptlets.convertAdgToUbo('example.org#%#//scriptlet("abort-on-property-write", "adblock.check")');
         expected = 'example.org##+js(abort-on-property-write, adblock.check)';
         expect(actual).toBe(expected);
 
-        actual = scriptlets.convertAbpToAdg('test.com#$#abort-on-property-read adsShown');
+        actual = Scriptlets.convertAbpToAdg('test.com#$#abort-on-property-read adsShown');
         expected = "test.com#%#//scriptlet('abp-abort-on-property-read', 'adsShown')";
         expect(actual[0]).toBe(expected);
 
-        actual = scriptlets.convertScriptletToAdg('example.com#@#+js(nano-setInterval-booster.js, some.example, 1000)');
+        actual = Scriptlets.convertScriptletToAdg('example.com#@#+js(nano-setInterval-booster.js, some.example, 1000)');
         expected = "example.com#@%#//scriptlet('ubo-nano-setInterval-booster.js', 'some.example', '1000')";
         expect(actual[0]).toBe(expected);
 
-        actual = scriptlets.convertScriptletToAdg('test.com#$#abort-on-property-read adsShown');
+        actual = Scriptlets.convertScriptletToAdg('test.com#$#abort-on-property-read adsShown');
         expected = "test.com#%#//scriptlet('abp-abort-on-property-read', 'adsShown')";
         expect(actual[0]).toBe(expected);
 
-        actual = scriptlets.convertScriptletToAdg('test.com##+js(abort-current-inline-script, $, popup)');
+        actual = Scriptlets.convertScriptletToAdg('test.com##+js(abort-current-inline-script, $, popup)');
         expected = "test.com#%#//scriptlet('ubo-abort-current-inline-script.js', '$', 'popup')";
         expect(actual[0]).toBe(expected);
 
         // multiple selectors for remove-attr/class
-        actual = scriptlets.convertScriptletToAdg('ubisoft.com##+js(ra, href, area[href*="discordapp.com/"]\\, area[href*="facebook.com/"]\\, area[href*="instagram.com/"])');
+        actual = Scriptlets.convertScriptletToAdg('ubisoft.com##+js(ra, href, area[href*="discordapp.com/"]\\, area[href*="facebook.com/"]\\, area[href*="instagram.com/"])');
         expected = 'ubisoft.com#%#//scriptlet(\'ubo-ra.js\', \'href\', \'area[href*="discordapp.com/"], area[href*="facebook.com/"], area[href*="instagram.com/"]\')';
         expect(actual[0]).toBe(expected);
 
-        actual = scriptlets.convertScriptletToAdg('example.org#$#hide-if-has-and-matches-style \'d[id^="_"]\' \'div > s\' \'display: none\'; hide-if-contains /.*/ .p \'a[href^="/ad__c?"]\'');
+        actual = Scriptlets.convertScriptletToAdg('example.org#$#hide-if-has-and-matches-style \'d[id^="_"]\' \'div > s\' \'display: none\'; hide-if-contains /.*/ .p \'a[href^="/ad__c?"]\'');
         expected = [
             'example.org#%#//scriptlet(\'abp-hide-if-has-and-matches-style\', \'d[id^="_"]\', \'div > s\', \'display: none\')',
             'example.org#%#//scriptlet(\'abp-hide-if-contains\', \'/.*/\', \'.p\', \'a[href^="/ad__c?"]\')',
