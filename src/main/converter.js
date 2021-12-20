@@ -1,10 +1,10 @@
 const { RuleConverter } = require('@adguard/tsurlfilter');
-const Scriptlets = require('@adguard/scriptlets');
+const scriptlets = require('@adguard/scriptlets');
 
 const logger = require('./utils/log.js');
 const cosmeticRuleModifiers = require('./rule/cosmetic-rule-modifiers');
 
-const { redirects } = Scriptlets;
+const { redirects } = scriptlets;
 
 /**
  * Excludes rule
@@ -85,8 +85,8 @@ const convertAdgScriptletsToUbo = (rules) => {
     return convertToUbo(
         rules,
         'scriptlet',
-        Scriptlets.isAdgScriptletRule,
-        Scriptlets.convertAdgToUbo
+        scriptlets.isAdgScriptletRule,
+        scriptlets.convertAdgToUbo
     );
 };
 
