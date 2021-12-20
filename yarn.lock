@@ -2,14 +2,6 @@
 # yarn lockfile v1
 
 
-"@adguard/scriptlets@^1.4.4":
-  version "1.4.4"
-  resolved "https://registry.yarnpkg.com/@adguard/scriptlets/-/scriptlets-1.4.4.tgz#959cef45458ec01e7d89360a90b0e9bd31db20da"
-  integrity sha512-ZH4yzIAqlTA4HNtZQHipPbRmXWcNBtgKP/N1GbKe2hjskPc742iA0AHn01ko0rfcUe4tmT6Ua0IHKJKHpymLng==
-  dependencies:
-    "@babel/runtime" "^7.7.2"
-    js-yaml "^3.13.1"
-
 "@adguard/scriptlets@^1.5.4":
   version "1.5.4"
   resolved "https://registry.yarnpkg.com/@adguard/scriptlets/-/scriptlets-1.5.4.tgz#4530809e091536a695e70a8630774802c0deb5ac"
@@ -18,12 +10,12 @@
     "@babel/runtime" "^7.7.2"
     js-yaml "^3.13.1"
 
-"@adguard/tsurlfilter@0.7.17":
-  version "0.7.17"
-  resolved "https://registry.yarnpkg.com/@adguard/tsurlfilter/-/tsurlfilter-0.7.17.tgz#960ba6a4f2ec9cf26d69cc2f6267f2c933a6ae98"
-  integrity sha512-tI/r9NC20Sau9rNHC8eIZvgsqCHEwVKK+y29K/9ZW5050FwTah+9HWmyruNC1vJrKbg2xHTXYylKlgjnkv1fYA==
+"@adguard/tsurlfilter@^0.7.41":
+  version "0.7.41"
+  resolved "https://registry.yarnpkg.com/@adguard/tsurlfilter/-/tsurlfilter-0.7.41.tgz#bf792e7b0ed6f1a5ff56077b19dc760d048a8d7e"
+  integrity sha512-LH6yHsbEf6OzuimbkDo2H96Y4ciwYIUlQGQZYuQ87XKRIFEUVH56Fin7Uv+VgkBgGSCZqiUVEuqSObaYQRn95Q==
   dependencies:
-    "@adguard/scriptlets" "^1.4.4"
+    "@adguard/scriptlets" "^1.5.4"
     "@types/ip6addr" "^0.2.3"
     "@types/netmask" "^1.0.30"
     "@types/punycode" "^2.1.0"
@@ -37,6 +29,7 @@
     punycode "^2.1.1"
     text-encoding "git+https://github.com/AdguardTeam/text-encoding.git#v0.7.1"
     tldts "^5.6.45"
+    webextension-polyfill "^0.8.0"
 
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.12.13":
   version "7.12.13"
@@ -4573,6 +4566,11 @@ walker@^1.0.7, walker@~1.0.5:
   integrity sha1-L3+bj9ENZ3JisYqITijRlhjgKPs=
   dependencies:
     makeerror "1.0.x"
+
+webextension-polyfill@^0.8.0:
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/webextension-polyfill/-/webextension-polyfill-0.8.0.tgz#f80e9f4b7f81820c420abd6ffbebfa838c60e041"
+  integrity sha512-a19+DzlT6Kp9/UI+mF9XQopeZ+n2ussjhxHJ4/pmIGge9ijCDz7Gn93mNnjpZAk95T4Tae8iHZ6sSf869txqiQ==
 
 webidl-conversions@^5.0.0:
   version "5.0.0"
