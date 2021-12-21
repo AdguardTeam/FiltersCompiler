@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-const Scriptlets = require('@adguard/scriptlets');
+const scriptlets = require('@adguard/scriptlets');
 const { setConfiguration, CompatibilityTypes } = require('@adguard/tsurlfilter');
 const validator = require('../main/validator.js');
 
@@ -349,40 +349,40 @@ describe('validator', () => {
     });
 
     it('Test scriptlets lib validator', () => {
-        let result = Scriptlets.isValidScriptletName('abort-on-property-read');
+        let result = scriptlets.isValidScriptletName('abort-on-property-read');
         expect(result).toBeTruthy();
 
-        result = Scriptlets.isValidScriptletName('abort-on--property-read');
+        result = scriptlets.isValidScriptletName('abort-on--property-read');
         expect(result).toBeFalsy();
 
-        result = Scriptlets.isValidScriptletRule('test.com#%#//scriptlet("ubo-abort-current-inline-script.js", "Math.random", "adbDetect")');
+        result = scriptlets.isValidScriptletRule('test.com#%#//scriptlet("ubo-abort-current-inline-script.js", "Math.random", "adbDetect")');
         expect(result).toBeTruthy();
 
-        result = Scriptlets.isUboScriptletRule('example.com#@#+js(nano-setInterval-booster.js, some.example, 1000)');
+        result = scriptlets.isUboScriptletRule('example.com#@#+js(nano-setInterval-booster.js, some.example, 1000)');
         expect(result).toBeTruthy();
 
-        result = Scriptlets.isUboScriptletRule('test.com##script:inject(json-prune.js)');
+        result = scriptlets.isUboScriptletRule('test.com##script:inject(json-prune.js)');
         expect(result).toBeTruthy();
 
-        result = Scriptlets.isUboScriptletRule('test.com#%#//scriptlet(\'ubo-json-prune.js\')');
+        result = scriptlets.isUboScriptletRule('test.com#%#//scriptlet(\'ubo-json-prune.js\')');
         expect(result).toBeFalsy();
 
-        result = Scriptlets.isAdgScriptletRule('test.com#%#//scriptlet(\'ubo-json-prune.js\')');
+        result = scriptlets.isAdgScriptletRule('test.com#%#//scriptlet(\'ubo-json-prune.js\')');
         expect(result).toBeTruthy();
 
-        result = Scriptlets.isAdgScriptletRule('test.com#%#//scriptlet("abort-on-property-read", "some.prop")');
+        result = scriptlets.isAdgScriptletRule('test.com#%#//scriptlet("abort-on-property-read", "some.prop")');
         expect(result).toBeTruthy();
 
-        result = Scriptlets.isAdgScriptletRule('arctic.de#%#//scriptlet(\'set-cookie-reload\', \'cookie-preference\', \'1\')');
+        result = scriptlets.isAdgScriptletRule('arctic.de#%#//scriptlet(\'set-cookie-reload\', \'cookie-preference\', \'1\')');
         expect(result).toBeTruthy();
 
-        result = Scriptlets.isAdgScriptletRule('test.com#@#script:inject(abort-on-property-read.js, some.prop)');
+        result = scriptlets.isAdgScriptletRule('test.com#@#script:inject(abort-on-property-read.js, some.prop)');
         expect(result).toBeFalsy();
 
-        result = Scriptlets.isAbpSnippetRule('example.com#@$#abort-on-property-write adblock.check');
+        result = scriptlets.isAbpSnippetRule('example.com#@$#abort-on-property-write adblock.check');
         expect(result).toBeTruthy();
 
-        result = Scriptlets.isAbpSnippetRule('test.com#@#script:inject(abort-on-property-read.js, some.prop)');
+        result = scriptlets.isAbpSnippetRule('test.com#@#script:inject(abort-on-property-read.js, some.prop)');
         expect(result).toBeFalsy();
     });
 
@@ -446,7 +446,7 @@ describe('validator', () => {
         ];
         expect(validator.validate(rules)).toHaveLength(0);
 
-        const { redirects } = Scriptlets;
+        const { redirects } = scriptlets;
 
         let rule = '||example.com^$script,redirect=noopjs.js';
         expect(redirects.isValidAdgRedirectRule(rule)).toBeFalsy();
