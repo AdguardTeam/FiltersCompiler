@@ -240,7 +240,16 @@ describe('converter', () => {
 
         // multiple selectors for remove-attr/class
         actual = scriptlets.convertScriptletToAdg('ubisoft.com##+js(ra, href, area[href*="discordapp.com/"]\\, area[href*="facebook.com/"]\\, area[href*="instagram.com/"])');
-        expected = 'ubisoft.com#%#//scriptlet(\'ubo-ra.js\', \'href\', \'area[href*="discordapp.com/"], area[href*="facebook.com/"], area[href*="instagram.com/"]\')';
+        expected = "ubisoft.com#%#//scriptlet('ubo-ra.js', 'href', 'area[href*=\"discordapp.com/\"], area[href*=\"facebook.com/\"], area[href*=\"instagram.com/\"]')";
+        expect(actual[0]).toBe(expected);
+
+        // https://github.com/AdguardTeam/Scriptlets/issues/194
+        actual = scriptlets.convertScriptletToAdg('example.org##+js(rc, cookie--not-set, , stay)');
+        expected = "example.org#%#//scriptlet('ubo-rc.js', 'cookie--not-set', '', 'stay')";
+        expect(actual[0]).toBe(expected);
+
+        actual = scriptlets.convertScriptletToAdg('memo-book.pl##+js(rc, .locked, body\\, html, stay)');
+        expected = "memo-book.pl#%#//scriptlet('ubo-rc.js', '.locked', 'body, html', 'stay')";
         expect(actual[0]).toBe(expected);
 
         actual = scriptlets.convertScriptletToAdg('example.org#$#hide-if-has-and-matches-style \'d[id^="_"]\' \'div > s\' \'display: none\'; hide-if-contains /.*/ .p \'a[href^="/ad__c?"]\'');
