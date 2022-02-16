@@ -10,24 +10,12 @@
     "@babel/runtime" "^7.7.2"
     js-yaml "^3.13.1"
 
-"@adguard/scriptlets@^1.5.4":
-  version "1.5.4"
-  resolved "https://registry.yarnpkg.com/@adguard/scriptlets/-/scriptlets-1.5.4.tgz#4530809e091536a695e70a8630774802c0deb5ac"
-  integrity sha512-qJSAD1MuO5RCa6dhBM3AzoBwZdKEg/hDz4E4c+l7HWLTPN6YMODE5wXYXCvCrcAsJe1v28DWqjbTlkwxb/vghg==
+"@adguard/tsurlfilter@^0.7.60":
+  version "0.7.60"
+  resolved "https://registry.yarnpkg.com/@adguard/tsurlfilter/-/tsurlfilter-0.7.60.tgz#60f97905e6633ff4bc8a8a0ec76f6fb4f445c73f"
+  integrity sha512-kLJcsewTTSl5NsanHpiLd5QDJtK9PKWU3wHdoWsZVevXWg0pSYIepbE/rzAR8sszBpkUjadrjrafnGv5qJD1+g==
   dependencies:
-    "@babel/runtime" "^7.7.2"
-    js-yaml "^3.13.1"
-
-"@adguard/tsurlfilter@^0.7.43":
-  version "0.7.43"
-  resolved "https://registry.yarnpkg.com/@adguard/tsurlfilter/-/tsurlfilter-0.7.43.tgz#78241c8292d16428bf80169f730b358a357cc6cd"
-  integrity sha512-UJ2osIHgs4W/5o7AI5ARKN499cSPS9ZEmac+fW2mgq1QyB2QPf6yG9cJxocAqTtavqZChZgV/ROTBi9PMTTbmg==
-  dependencies:
-    "@adguard/scriptlets" "^1.5.4"
-    "@types/ip6addr" "^0.2.3"
-    "@types/netmask" "^1.0.30"
-    "@types/punycode" "^2.1.0"
-    consola "^2.12.2"
+    "@adguard/scriptlets" "^1.5.18"
     extended-css "git+https://github.com/AdguardTeam/ExtendedCss.git#v1.3.13"
     ip6addr "^0.2.3"
     is-cidr "^4.0.2"
@@ -584,11 +572,6 @@
   dependencies:
     "@types/node" "*"
 
-"@types/ip6addr@^0.2.3":
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/@types/ip6addr/-/ip6addr-0.2.3.tgz#9318f51591d76d20222ebe407a2323fccdcc6e7c"
-  integrity sha512-oe7hzc+P9DU6+gql8+bLKuUf4WL4aakyCSXZMZq2cjhhGK75qYwH1zJ4s94XOlnb4cAhrGKwnbrmMBaqDK8+Ww==
-
 "@types/istanbul-lib-coverage@*", "@types/istanbul-lib-coverage@^2.0.0", "@types/istanbul-lib-coverage@^2.0.1":
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/@types/istanbul-lib-coverage/-/istanbul-lib-coverage-2.0.3.tgz#4ba8ddb720221f432e443bd5f9117fd22cfd4762"
@@ -613,11 +596,6 @@
   resolved "https://registry.yarnpkg.com/@types/json5/-/json5-0.0.29.tgz#ee28707ae94e11d2b827bcbe5270bcea7f3e71ee"
   integrity sha1-7ihweulOEdK4J7y+UnC86n8+ce4=
 
-"@types/netmask@^1.0.30":
-  version "1.0.30"
-  resolved "https://registry.yarnpkg.com/@types/netmask/-/netmask-1.0.30.tgz#b68005e3e3c19f517ced4610bb69dce2e0c5babb"
-  integrity sha512-Kl1xAICLv1Y7/WsNXkPKldRMz3QmXUYMIzr3rMXnIBDy9c4/sYG7V6P6u7Ja3w+uNtNQrRudJduqVoYX/DxfZg==
-
 "@types/node@*":
   version "14.14.31"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.14.31.tgz#72286bd33d137aa0d152d47ec7c1762563d34055"
@@ -637,11 +615,6 @@
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/@types/prettier/-/prettier-2.2.1.tgz#374e31645d58cb18a07b3ecd8e9dede4deb2cccd"
   integrity sha512-DxZZbyMAM9GWEzXL+BMZROWz9oo6A9EilwwOMET2UVu2uZTqMWS5S69KVtuVKaRjCUpcrOXRalet86/OpG4kqw==
-
-"@types/punycode@^2.1.0":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@types/punycode/-/punycode-2.1.0.tgz#89e4f3d09b3f92e87a80505af19be7e0c31d4e83"
-  integrity sha512-PG5aLpW6PJOeV2fHRslP4IOMWn+G+Uq8CfnyJ+PDS8ndCbU+soO+fB3NKCKo0p/Jh2Y4aPaiQZsrOXFdzpcA6g==
 
 "@types/stack-utils@^2.0.0":
   version "2.0.0"
@@ -1199,11 +1172,6 @@ confusing-browser-globals@^1.0.10:
   version "1.0.10"
   resolved "https://registry.yarnpkg.com/confusing-browser-globals/-/confusing-browser-globals-1.0.10.tgz#30d1e7f3d1b882b25ec4933d1d1adac353d20a59"
   integrity sha512-gNld/3lySHwuhaVluJUKLePYirM3QNCKzVxqAdhJII9/WXKVX5PURzMVJspS1jTslSqjeuG4KMVTSouit5YPHA==
-
-consola@^2.12.2:
-  version "2.15.3"
-  resolved "https://registry.yarnpkg.com/consola/-/consola-2.15.3.tgz#2e11f98d6a4be71ff72e0bdf07bd23e12cb61550"
-  integrity sha512-9vAdYbHj6x2fLKC4+oPH0kFzY/orMZyG2Aj+kNylHxKGJ/Ed4dpNyAQYwJOdqO4zdM7XpVHmyejQDcQHrnuXbw==
 
 contains-path@^0.1.0:
   version "0.1.0"
