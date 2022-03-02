@@ -42,6 +42,8 @@
                 "important,protobuf",
                 "\\$redirect=",
                 ",redirect=",
+                "\\$redirect-rule=",
+                ",redirect-rule=",
                 "\\$empty",
                 ",empty",
                 "\\$webrtc",

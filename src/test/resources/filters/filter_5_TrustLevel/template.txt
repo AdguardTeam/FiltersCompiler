@@ -58,3 +58,4 @@ example.com##div.grid_1[class$="app"]
 ||example.com/banner$image,redirect=3x2.png
 ||test.com^$script,rewrite=abp-resource:blank-js
 ||example.com/*.mp4$media,redirect=noopmp4-1s
+||example.com^$script,redirect-rule=noopjs

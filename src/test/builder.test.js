@@ -74,7 +74,7 @@ describe('Test builder', () => {
 
         let filterContent = await readFile(path.join(__dirname, 'resources/platforms/test', 'filters', '5.txt'));
         filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(52);
+        expect(filterLines.length).toBe(53);
 
         expect(filterLines.includes('||adsnet.com/*/700x350.gif$domain=example.com')).toBeTruthy();
         expect(filterLines.includes('example.com##+js(set-constant, ads, false)')).toBeTruthy();
@@ -91,10 +91,11 @@ describe('Test builder', () => {
         expect(filterLines.includes('||example.com/banner$image,redirect=3x2.png')).toBeTruthy();
         expect(filterLines.includes('||test.com^$script,redirect=noop.js')).toBeTruthy();
         expect(filterLines.includes('||example.com/*.mp4$media,redirect=noop-1s.mp4')).toBeTruthy();
+        expect(filterLines.includes('||example.com^$script,redirect-rule=noopjs')).toBeTruthy();
 
         filterContent = await readFile(path.join(__dirname, 'resources/platforms/test2', 'filters', '5.txt'));
         filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(52);
+        expect(filterLines.length).toBe(53);
 
         expect(filterLines.includes('test.com#%#//scriptlet(\'abp-abort-on-property-read\', \'adsShown\')')).toBeTruthy();
         expect(filterLines.includes('example.com#@%#//scriptlet(\'abp-abort-on-property-write\', \'adblock.check\')')).toBeTruthy();
@@ -106,6 +107,7 @@ describe('Test builder', () => {
         expect(filterLines.includes('||example.com/banner$image,redirect=3x2-transparent.png')).toBeTruthy();
         expect(filterLines.includes('||test.com^$script,redirect=noopjs')).toBeTruthy();
         expect(filterLines.includes('||example.com/*.mp4$media,redirect=noopmp4-1s')).toBeTruthy();
+        expect(filterLines.includes('||example.com^$script,redirect-rule=noopjs')).toBeTruthy();
 
         filterContent = await readFile(path.join(__dirname, 'resources/platforms/ios', 'filters', '5.txt'));
         filterLines = filterContent.split('\r\n');
@@ -118,6 +120,7 @@ describe('Test builder', () => {
         expect(filterLines.includes('||test.com/cams/video_file/*.mp4$media,mp4')).toBeFalsy();
         expect(filterLines.includes('||example.com/test/$media,redirect=noopmp4-1s,domain=test.com')).toBeFalsy();
         expect(filterLines.includes('||test.com/cams/video_file/*.mp4$media,redirect=noopmp4-1s')).toBeFalsy();
+        expect(filterLines.includes('||example.com^$script,redirect-rule=noopjs')).toBeFalsy();
         expect(filterLines.includes('||test.com/res/js/*.js$replace=/\\"OK\\/banners/\\"OK\\/banners__\\//')).toBeFalsy();
         expect(filterLines.includes('||example.com^$~script,~stylesheet,~xmlhttprequest,replace=/popunder_url/popunder_url_/')).toBeFalsy();
         expect(filterLines.includes('||test.com/Forums2008/JS/replaceLinks.js')).toBeTruthy();
@@ -382,7 +385,7 @@ describe('Test builder', () => {
         expect(filterContent).toBeTruthy();
 
         filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(51);
+        expect(filterLines.length).toBe(52);
 
         expect(filterLines.indexOf('||example.com^$script,redirect=noopjs') >= 0).toBeTruthy();
         expect(filterLines.indexOf('||example.com/banner$image,redirect=1x1-transparent.gif') >= 0).toBeTruthy();
