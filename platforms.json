@@ -63,6 +63,8 @@
                 "important,protobuf",
                 "\\$redirect=",
                 ",redirect=",
+                "\\$redirect-rule=",
+                ",redirect-rule=",
                 "\\$empty",
                 ",empty",
                 "\\$webrtc",
@@ -140,6 +142,8 @@
                 ",extension",
                 "\\$redirect=",
                 ",redirect=",
+                "\\$redirect-rule=",
+                ",redirect-rule=",
                 "\\$empty",
                 ",empty",
                 "\\$webrtc"
@@ -168,6 +172,8 @@
                 ",extension",
                 "\\$redirect=",
                 ",redirect=",
+                "\\$redirect-rule=",
+                ",redirect-rule=",
                 "\\$empty=",
                 ",empty=",
                 "#%#//scriptlet"
@@ -238,7 +244,9 @@
                 "#@\\?#",
                 "#@\\$\\?#",
                 "\\$redirect=",
-                ",redirect="
+                ",redirect=",
+                "\\$redirect-rule=",
+                ",redirect-rule="
             ],
             "ignoreRuleHints": false
         },
