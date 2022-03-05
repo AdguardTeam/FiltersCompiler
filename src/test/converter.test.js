@@ -184,6 +184,10 @@ describe('converter', () => {
         let expected = '||www.ynet.co.il^$important,websocket,~third-party,domain=www.ynet.co.il';
         expect(actual[0]).toBe(expected);
 
+        actual = converter.convertRulesToAdgSyntax(['*$image,redirect-rule=1x1.gif,domain=seznamzpravy.cz']);
+        expected = '*$image,redirect-rule=1x1-transparent.gif,domain=seznamzpravy.cz';
+        expect(actual[0]).toBe(expected);
+
         actual = converter.convertRulesToAdgSyntax(['||20il.co.il^$important,websocket,1p']);
         expected = '||20il.co.il^$important,websocket,~third-party';
         expect(actual[0]).toBe(expected);
