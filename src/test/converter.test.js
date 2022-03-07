@@ -49,6 +49,22 @@ describe('converter', () => {
         expect(c[0]).toEqual('');
     });
 
+    it('keeps cosmetic rule as is', () => {
+        const source = 'ferra.ru##div[data-render-state] + div[class^="jsx-"][class$=" undefined"]';
+        const expected = source;
+
+        const c = converter.convertRulesToAdgSyntax([source]);
+        expect(c).toEqual([expected]);
+    });
+
+    it('keeps cosmetic JS rule as is', () => {
+        const source = 'example.org#%#var str = /[class$=" undefined"]/; console.log(str);';
+        const expected = source;
+
+        const c = converter.convertRulesToAdgSyntax([source]);
+        expect(c).toEqual([expected]);
+    });
+
     it('collects logs for converted rules', () => {
         const rule = 'example.com##h1:style(background-color: blue !important)';
         const excluded = [];
