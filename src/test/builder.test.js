@@ -91,7 +91,7 @@ describe('Test builder', () => {
         expect(filterLines.includes('||example.com/banner$image,redirect=3x2.png')).toBeTruthy();
         expect(filterLines.includes('||test.com^$script,redirect=noop.js')).toBeTruthy();
         expect(filterLines.includes('||example.com/*.mp4$media,redirect=noop-1s.mp4')).toBeTruthy();
-        expect(filterLines.includes('||example.com^$script,redirect-rule=noopjs')).toBeTruthy();
+        expect(filterLines.includes('||example.com^$script,redirect-rule=noop.js')).toBeTruthy();
 
         filterContent = await readFile(path.join(__dirname, 'resources/platforms/test2', 'filters', '5.txt'));
         filterLines = filterContent.split('\r\n');

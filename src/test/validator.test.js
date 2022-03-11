@@ -229,7 +229,6 @@ describe('validator', () => {
         expect(validator.validate(rules)).toHaveLength(5);
 
         rules = ['example.com##div[class^="textLink"i]',
-            'example.com##div[class^=textLink i]',
             'example.com##div[class name="textLink" i]',
             'example.com##div[class^="textLink" "textColor" i]'];
         expect(validator.validate(rules)).toHaveLength(0);
@@ -658,5 +657,16 @@ describe('validator', () => {
             '||test3.ru',
         ];
         expect(validator.checkAffinityDirectives(rules)).toBeFalsy();
+    });
+
+    it('Validates element hiding rules without quotes', () => {
+        const rules = [
+            '##div[class*=smart-banner i]:not(.smart-banner-visible)',
+            '##div[class*=smartbanner i]',
+            '##div[id*=smart-banner i]',
+            '##div[id*=smartbanner i]',
+        ];
+        const result = validator.validate(rules, []);
+        expect(result).toHaveLength(4);
     });
 });
