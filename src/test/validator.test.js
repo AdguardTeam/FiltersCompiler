@@ -659,9 +659,14 @@ describe('validator', () => {
         expect(validator.checkAffinityDirectives(rules)).toBeFalsy();
     });
 
-    // it('Validates element hiding rules without quotes', () => {
-    //     const rules = ['##div[id*=smartbanner i]'];
-    //     const result = validator.validate(rules, []);
-    //     expect(result).toHaveLength(1);
-    // });
+    it('Validates element hiding rules without quotes', () => {
+        const rules = [
+            '##div[class*=smart-banner i]:not(.smart-banner-visible)',
+            '##div[class*=smartbanner i]',
+            '##div[id*=smart-banner i]',
+            '##div[id*=smartbanner i]',
+        ];
+        const result = validator.validate(rules, []);
+        expect(result).toHaveLength(4);
+    });
 });
