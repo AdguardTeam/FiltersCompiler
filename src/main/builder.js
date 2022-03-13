@@ -338,8 +338,9 @@ module.exports = (function () {
      *
      * @param template
      * @param trustLevelSettings
+     * @param filterName
      */
-    const compile = async function (template, trustLevelSettings) {
+    const compile = async function (template, trustLevelSettings, filterName) {
         let result = [];
         const excluded = [];
 
@@ -370,7 +371,7 @@ module.exports = (function () {
         logger.info('Applying trust-level exclusions..');
         result = exclude(result, trustLevelSettings, excluded);
 
-        result = validator.validate(result, excluded);
+        result = validator.validate(result, excluded, filterName);
 
         return {
             lines: result,
@@ -450,8 +451,9 @@ module.exports = (function () {
         // eslint-disable-next-line no-undef
         const trustLevelSettings = path.resolve(__dirname, TRUST_LEVEL_DIR, `exclusions-${trustLevel}.txt`);
 
-        logger.info('Compiling...');
-        const result = await compile(template, trustLevelSettings);
+        const { name } = metadata;
+        logger.info(`Compiling ${name}`);
+        const result = await compile(template, trustLevelSettings, name);
 
         if (!validator.checkAffinityDirectives(result.lines)) {
             throw new Error(`Error validating !#safari_cb_affinity directive in filter ${filterId}`);

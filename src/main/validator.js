@@ -30,9 +30,10 @@ const excludeRule = (excluded, warning, rule) => {
  *
  * @param {string[]} list of rule texts
  * @param {string[]} excluded - list of messages with validation results
+ * @param {string} filterName
  * @returns {Array}
  */
-const validate = function (list, excluded) {
+const validate = function (list, excluded, filterName) {
     if (!list) {
         return [];
     }
@@ -51,7 +52,7 @@ const validate = function (list, excluded) {
 
             if (!validationResult.valid) {
                 // log source rule text to the excluded log
-                logger.error(`Invalid rule: ${ruleText}`);
+                logger.error(`Invalid rule in ${filterName}: ${ruleText}`);
                 excludeRule(excluded, validationResult.error, ruleText);
                 return false;
             }
@@ -61,7 +62,7 @@ const validate = function (list, excluded) {
             // It is impossible to bundle jsdom into tsurlfilter, so we check if rules are valid in the compiler
             if (rule instanceof CosmeticRule && rule.getType() === CosmeticRuleType.ElementHiding) {
                 if (!extendedCssValidator.validateCssSelector(rule.getContent())) {
-                    logger.error(`Invalid selector: ${ruleText}`);
+                    logger.error(`Invalid rule selector in ${filterName}: ${ruleText}`);
                     // log source rule text to the excluded log
                     excludeRule(excluded, '! Invalid selector:', ruleText);
                     return false;
