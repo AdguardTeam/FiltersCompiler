@@ -9,8 +9,9 @@ let reportData = `\nFiltersCompiler report ${reportDate.toLocaleDateString()} ${
  * Adds filters data to report
  * @param {object} metadata
  * @param {object} filterRules
+ * @param {string[]} invalidRules
  */
-const addFilter = (metadata, filterRules) => {
+const addFilter = (metadata, filterRules, invalidRules) => {
     if (metadata && filterRules) {
         const { filterId, name, subscriptionUrl } = metadata;
         const filterLength = filterRules.lines.length;
@@ -21,6 +22,8 @@ const addFilter = (metadata, filterRules) => {
             + `Compiled rules: ${filterLength}\n`
             + `Excluded rules: ${excludedLength}\n`
             + `URL: ${subscriptionUrl}\n`
+            + 'INVALID RULES:\n'
+            + `${invalidRules.join('\n')}\n`
             + '---------------------------\n';
     }
 };
