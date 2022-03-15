@@ -344,6 +344,10 @@ module.exports = (function () {
         let result = [];
         const excluded = [];
 
+        // https://github.com/AdguardTeam/FiltersCompiler/issues/87
+        // collect invalid rules for report
+        const invalid = [];
+
         const lines = splitLines(template);
         // eslint-disable-next-line no-restricted-syntax
         for (const line of lines) {
@@ -371,11 +375,12 @@ module.exports = (function () {
         logger.info('Applying trust-level exclusions..');
         result = exclude(result, trustLevelSettings, excluded);
 
-        result = validator.validate(result, excluded, filterName);
+        result = validator.validate(result, excluded, invalid, filterName);
 
         return {
             lines: result,
             excluded,
+            invalid,
         };
     };
 
@@ -460,8 +465,9 @@ module.exports = (function () {
         }
 
         const compiled = result.lines;
-        const { excluded } = result;
-        report.addFilter(metadata, result);
+        const { excluded, invalid } = result;
+
+        report.addFilter(metadata, result, invalid);
         logger.info(`Compiled length:${compiled.length}`);
         logger.info(`Excluded length:${excluded.length}`);
 

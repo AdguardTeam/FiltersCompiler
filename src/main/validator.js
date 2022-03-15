@@ -30,10 +30,11 @@ const excludeRule = (excluded, warning, rule) => {
  *
  * @param {string[]} list of rule texts
  * @param {string[]} excluded - list of messages with validation results
+ * @param {string[]} invalid
  * @param {string} filterName
  * @returns {Array}
  */
-const validate = function (list, excluded, filterName) {
+const validate = function (list, excluded, invalid = [], filterName) {
     if (!list) {
         return [];
     }
@@ -54,6 +55,7 @@ const validate = function (list, excluded, filterName) {
                 // log source rule text to the excluded log
                 logger.error(`Invalid rule in ${filterName}: ${ruleText}`);
                 excludeRule(excluded, validationResult.error, ruleText);
+                invalid.push(validationResult.error);
                 return false;
             }
 
@@ -65,6 +67,7 @@ const validate = function (list, excluded, filterName) {
                     logger.error(`Invalid rule selector in ${filterName}: ${ruleText}`);
                     // log source rule text to the excluded log
                     excludeRule(excluded, '! Invalid selector:', ruleText);
+                    invalid.push(`Invalid selector: ${ruleText}`);
                     return false;
                 }
             }
