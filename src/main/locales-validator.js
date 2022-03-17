@@ -7,6 +7,15 @@ module.exports = (() => {
     const FULL_REQUIRED_ENDINGS = ['name', 'description'];
     const ONLY_NAME_REQUIRED_ENDINGS = ['name'];
     const LOCALES_FILE_EXTENSION = '.json';
+    const BASE_LOCALE = 'en';
+
+    const FILTERS_LOCALES = 'filters.json';
+    const GROUPS_LOCALES = 'groups.json';
+    const TAGS_LOCALES = 'tags.json';
+
+    const FILTERS_KEY_PREFIX = 'filter';
+    const GROUPS_KEY_PREFIX = 'group';
+    const TAGS_KEY_PREFIX = 'tag';
 
     // each message key should consist of three parts
     // e.g. 'filter.3.name' or 'tag.29.description'
@@ -91,6 +100,82 @@ module.exports = (() => {
     };
 
     /**
+     * Returns object with base locale keys
+     * @param dirPath
+     */
+    const getBaseLocaleKeys = (dirPath) => {
+        const filtersKeys = [];
+        const groupsKeys = [];
+        const tagsKeys = [];
+
+        const baseLocaleFilters = JSON.parse(readFile(path.join(dirPath, BASE_LOCALE, FILTERS_LOCALES)));
+        const baseLocaleGroups = JSON.parse(readFile(path.join(dirPath, BASE_LOCALE, GROUPS_LOCALES)));
+        const baseLocaleTags = JSON.parse(readFile(path.join(dirPath, BASE_LOCALE, TAGS_LOCALES)));
+
+        baseLocaleFilters.forEach((entry) => {
+            filtersKeys.push(Object.keys(entry));
+        });
+        baseLocaleGroups.forEach((entry) => {
+            groupsKeys.push(Object.keys(entry));
+        });
+        baseLocaleTags.forEach((entry) => {
+            tagsKeys.push(Object.keys(entry));
+        });
+
+        return {
+            filters: filtersKeys,
+            groups: groupsKeys,
+            tags: tagsKeys,
+        };
+    };
+
+    /**
+     * Compares messagesData keys to base locale keys
+     * @param baseLocaleKeys
+     * @param messagesData
+     * @param localeWarnings
+     */
+    const compareKeys = (baseLocaleKeys, messagesData, localeWarnings) => {
+        baseLocaleKeys.forEach((baseKeys) => {
+            const allKeysPresented = messagesData.some((data) => {
+                const messageKeys = Object.keys(data);
+                return baseKeys.length === messageKeys.length
+                    && baseKeys.every((key, index) => key === messageKeys[index]);
+            });
+
+            if (!allKeysPresented) {
+                localeWarnings.push([
+                    // invalid messages data object is always critical
+                    WARNING_TYPES.CRITICAL,
+                    WARNING_REASONS.INVALID_DATA_OBJ,
+                    prepareWarningDetails(baseKeys),
+                ]);
+            }
+        });
+    };
+
+    /**
+     * Returns base locale keys according to messageData
+     * @param messagesData
+     * @param baseLocaleKeys
+     */
+    const getBaseLocaleDataKeys = (baseLocaleKeys, messagesData) => {
+        const messagesDataKeys = Object.keys(messagesData[0]);
+        if (!messagesDataKeys.length) {
+            throw new Error(`Invalid messagesData: ${messagesData}`);
+        }
+        if (messagesDataKeys[0].startsWith(FILTERS_KEY_PREFIX)) {
+            return baseLocaleKeys.filters;
+        }
+        if (messagesDataKeys[0].startsWith(GROUPS_KEY_PREFIX)) {
+            return baseLocaleKeys.groups;
+        }
+        if (messagesDataKeys[0].startsWith(TAGS_KEY_PREFIX)) {
+            return baseLocaleKeys.tags;
+        }
+    };
+
+    /**
      * Prepares raw warnings for results
      * @param {Array[]} warnings collected raw warnings
      * @returns {Warning[]}
@@ -167,6 +252,8 @@ module.exports = (() => {
         const requiredFiles = Object.keys(LOCALES_DATA)
             .map((el) => `${el}${LOCALES_FILE_EXTENSION}`);
 
+        const baseLocaleKeys = getBaseLocaleKeys(dirPath);
+
         locales.forEach((locale) => {
             const localeWarnings = [];
             const filesList = readDir(path.join(dirPath, locale));
@@ -212,6 +299,14 @@ module.exports = (() => {
                         WARNING_REASONS.NO_MESSAGES,
                         [fileName],
                     ]);
+                }
+
+                // messagesData could be different types: for filters, groups or tags
+                // get base locale keys according to type of messagesData
+                // and check if all keys from base locale are presented in messagesData
+                if (requiredLocales.includes(locale)) {
+                    const baseLocaleDataKeys = getBaseLocaleDataKeys(baseLocaleKeys, messagesData);
+                    compareKeys(baseLocaleDataKeys, messagesData, localeWarnings);
                 }
 
                 messagesData.forEach((obj) => {
