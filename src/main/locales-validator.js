@@ -103,7 +103,7 @@ module.exports = (() => {
 
         baseLocaleFiles.forEach((fileName) => {
             const baseLocaleData = JSON.parse(readFile(path.join(baseLocalePath, fileName)));
-            baseLocaleKeys[fileName] = baseLocaleData.map((entry) => Object.keys(entry));
+            baseLocaleKeys[fileName] = baseLocaleData.flatMap((entry) => Object.keys(entry));
         });
         return baseLocaleKeys;
     };
@@ -115,19 +115,14 @@ module.exports = (() => {
      * @param localeWarnings
      */
     const compareKeys = (baseLocaleKeys, messagesData, localeWarnings) => {
-        baseLocaleKeys.forEach((baseKeys) => {
-            const allKeysPresented = messagesData.some((data) => {
-                const messageKeys = Object.keys(data);
-                return baseKeys.length === messageKeys.length
-                    && baseKeys.every((key, index) => key === messageKeys[index]);
-            });
+        const messagesDataKeys = messagesData.flatMap((entry) => Object.keys(entry));
 
-            if (!allKeysPresented) {
+        baseLocaleKeys.forEach((entry) => {
+            if (!messagesDataKeys.includes(entry)) {
                 localeWarnings.push([
-                    // invalid messages data object is always critical
                     WARNING_TYPES.CRITICAL,
                     WARNING_REASONS.INVALID_DATA_OBJ,
-                    prepareWarningDetails(baseKeys),
+                    [entry],
                 ]);
             }
         });

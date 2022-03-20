@@ -48,16 +48,22 @@ describe('locales validator', () => {
                         type: 'critical',
                         reason: 'invalid or absent message key/value',
                         details: [
-                            '"0": "filter.6.name"',
-                            '"1": "filter.6.description"',
+                            'filter.6.name',
                         ],
                     },
                     {
                         type: 'critical',
                         reason: 'invalid or absent message key/value',
                         details: [
+                            'filter.6.description',
+                        ],
+                    },
+                    {
+                        details: [
                             '"group.3.name": ""',
                         ],
+                        reason: 'invalid or absent message key/value',
+                        type: 'critical',
                     },
                 ],
             },
