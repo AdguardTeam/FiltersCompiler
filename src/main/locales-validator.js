@@ -9,10 +9,6 @@ module.exports = (() => {
     const LOCALES_FILE_EXTENSION = '.json';
     const BASE_LOCALE = 'en';
 
-    const FILTERS_LOCALES = 'filters.json';
-    const GROUPS_LOCALES = 'groups.json';
-    const TAGS_LOCALES = 'tags.json';
-
     // each message key should consist of three parts
     // e.g. 'filter.3.name' or 'tag.29.description'
     const MESSAGE_KEY_NAME_PARTS_COUNT = 3;
@@ -96,33 +92,20 @@ module.exports = (() => {
     };
 
     /**
-     * Returns object with base locale keys
+     * Returns map of base locale keys
      * @param dirPath
      */
     const getBaseLocaleKeys = (dirPath) => {
-        const filtersKeys = [];
-        const groupsKeys = [];
-        const tagsKeys = [];
+        const baseLocaleKeys = {};
 
-        const baseLocaleFilters = JSON.parse(readFile(path.join(dirPath, BASE_LOCALE, FILTERS_LOCALES)));
-        const baseLocaleGroups = JSON.parse(readFile(path.join(dirPath, BASE_LOCALE, GROUPS_LOCALES)));
-        const baseLocaleTags = JSON.parse(readFile(path.join(dirPath, BASE_LOCALE, TAGS_LOCALES)));
+        const baseLocalePath = path.join(dirPath, BASE_LOCALE);
+        const baseLocaleFiles = readDir(baseLocalePath);
 
-        baseLocaleFilters.forEach((entry) => {
-            filtersKeys.push(Object.keys(entry));
+        baseLocaleFiles.forEach((fileName) => {
+            const baseLocaleData = JSON.parse(readFile(path.join(baseLocalePath, fileName)));
+            baseLocaleKeys[fileName] = baseLocaleData.map((entry) => Object.keys(entry));
         });
-        baseLocaleGroups.forEach((entry) => {
-            groupsKeys.push(Object.keys(entry));
-        });
-        baseLocaleTags.forEach((entry) => {
-            tagsKeys.push(Object.keys(entry));
-        });
-
-        return {
-            filters: filtersKeys,
-            groups: groupsKeys,
-            tags: tagsKeys,
-        };
+        return baseLocaleKeys;
     };
 
     /**
@@ -274,18 +257,10 @@ module.exports = (() => {
                     ]);
                 }
 
-                const baseLocaleKeys = getBaseLocaleKeys(dirPath);
+                const baseLocaleKeysMap = getBaseLocaleKeys(dirPath);
 
-                const baseLocaleKeysMap = {
-                    FILTERS_LOCALES: baseLocaleKeys.filters,
-                    GROUPS_LOCALES: baseLocaleKeys.groups,
-                    TAGS_LOCALES: baseLocaleKeys.tags,
-                };
-
-                // messagesData could be different types: for filters, groups or tags
-                // get base locale keys according to type of messagesData
-                // and check if all keys from base locale are presented in messagesData
                 if (requiredLocales.includes(locale)) {
+                    // check if all keys from base locale are presented in messagesData
                     compareKeys(baseLocaleKeysMap[fileName], messagesData, localeWarnings);
                 }
 
