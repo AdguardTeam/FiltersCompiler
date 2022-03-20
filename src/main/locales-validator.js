@@ -13,10 +13,6 @@ module.exports = (() => {
     const GROUPS_LOCALES = 'groups.json';
     const TAGS_LOCALES = 'tags.json';
 
-    const FILTERS_KEY_PREFIX = 'filter';
-    const GROUPS_KEY_PREFIX = 'group';
-    const TAGS_KEY_PREFIX = 'tag';
-
     // each message key should consist of three parts
     // e.g. 'filter.3.name' or 'tag.29.description'
     const MESSAGE_KEY_NAME_PARTS_COUNT = 3;
@@ -155,27 +151,6 @@ module.exports = (() => {
     };
 
     /**
-     * Returns base locale keys according to messageData
-     * @param messagesData
-     * @param baseLocaleKeys
-     */
-    const getBaseLocaleDataKeys = (baseLocaleKeys, messagesData) => {
-        const messagesDataKeys = Object.keys(messagesData[0]);
-        if (!messagesDataKeys.length) {
-            throw new Error(`Invalid messagesData: ${messagesData}`);
-        }
-        if (messagesDataKeys[0].startsWith(FILTERS_KEY_PREFIX)) {
-            return baseLocaleKeys.filters;
-        }
-        if (messagesDataKeys[0].startsWith(GROUPS_KEY_PREFIX)) {
-            return baseLocaleKeys.groups;
-        }
-        if (messagesDataKeys[0].startsWith(TAGS_KEY_PREFIX)) {
-            return baseLocaleKeys.tags;
-        }
-    };
-
-    /**
      * Prepares raw warnings for results
      * @param {Array[]} warnings collected raw warnings
      * @returns {Warning[]}
@@ -252,8 +227,6 @@ module.exports = (() => {
         const requiredFiles = Object.keys(LOCALES_DATA)
             .map((el) => `${el}${LOCALES_FILE_EXTENSION}`);
 
-        const baseLocaleKeys = getBaseLocaleKeys(dirPath);
-
         locales.forEach((locale) => {
             const localeWarnings = [];
             const filesList = readDir(path.join(dirPath, locale));
@@ -301,12 +274,19 @@ module.exports = (() => {
                     ]);
                 }
 
+                const baseLocaleKeys = getBaseLocaleKeys(dirPath);
+
+                const baseLocaleKeysMap = {
+                    FILTERS_LOCALES: baseLocaleKeys.filters,
+                    GROUPS_LOCALES: baseLocaleKeys.groups,
+                    TAGS_LOCALES: baseLocaleKeys.tags,
+                };
+
                 // messagesData could be different types: for filters, groups or tags
                 // get base locale keys according to type of messagesData
                 // and check if all keys from base locale are presented in messagesData
                 if (requiredLocales.includes(locale)) {
-                    const baseLocaleDataKeys = getBaseLocaleDataKeys(baseLocaleKeys, messagesData);
-                    compareKeys(baseLocaleDataKeys, messagesData, localeWarnings);
+                    compareKeys(baseLocaleKeysMap[fileName], messagesData, localeWarnings);
                 }
 
                 messagesData.forEach((obj) => {
