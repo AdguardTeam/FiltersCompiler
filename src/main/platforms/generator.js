@@ -867,7 +867,8 @@ module.exports = (() => {
                         obsoleteFiltersMetadata.push(filterMetadata);
                     }
                 } else {
-                    parseDirectory(
+                    // eslint-disable-next-line no-await-in-loop
+                    await parseDirectory(
                         filterDir,
                         filtersMetadata,
                         platformsPath,
