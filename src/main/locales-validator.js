@@ -7,6 +7,7 @@ module.exports = (() => {
     const FULL_REQUIRED_ENDINGS = ['name', 'description'];
     const ONLY_NAME_REQUIRED_ENDINGS = ['name'];
     const LOCALES_FILE_EXTENSION = '.json';
+    const BASE_LOCALE = 'en';
 
     // each message key should consist of three parts
     // e.g. 'filter.3.name' or 'tag.29.description'
@@ -91,6 +92,43 @@ module.exports = (() => {
     };
 
     /**
+     * Returns map of base locale keys
+     * @param dirPath
+     */
+    const getBaseLocaleKeys = (dirPath) => {
+        const baseLocaleKeys = {};
+
+        const baseLocalePath = path.join(dirPath, BASE_LOCALE);
+        const baseLocaleFiles = readDir(baseLocalePath);
+
+        baseLocaleFiles.forEach((fileName) => {
+            const baseLocaleData = JSON.parse(readFile(path.join(baseLocalePath, fileName)));
+            baseLocaleKeys[fileName] = baseLocaleData.flatMap((entry) => Object.keys(entry));
+        });
+        return baseLocaleKeys;
+    };
+
+    /**
+     * Compares messagesData keys to base locale keys
+     * @param baseLocaleKeys
+     * @param messagesData
+     * @param localeWarnings
+     */
+    const compareKeys = (baseLocaleKeys, messagesData, localeWarnings) => {
+        const messagesDataKeys = messagesData.flatMap((entry) => Object.keys(entry));
+
+        baseLocaleKeys.forEach((entry) => {
+            if (!messagesDataKeys.includes(entry)) {
+                localeWarnings.push([
+                    WARNING_TYPES.CRITICAL,
+                    WARNING_REASONS.INVALID_DATA_OBJ,
+                    [entry],
+                ]);
+            }
+        });
+    };
+
+    /**
      * Prepares raw warnings for results
      * @param {Array[]} warnings collected raw warnings
      * @returns {Warning[]}
@@ -167,6 +205,8 @@ module.exports = (() => {
         const requiredFiles = Object.keys(LOCALES_DATA)
             .map((el) => `${el}${LOCALES_FILE_EXTENSION}`);
 
+        const baseLocaleKeysMap = getBaseLocaleKeys(dirPath);
+
         locales.forEach((locale) => {
             const localeWarnings = [];
             const filesList = readDir(path.join(dirPath, locale));
@@ -212,6 +252,11 @@ module.exports = (() => {
                         WARNING_REASONS.NO_MESSAGES,
                         [fileName],
                     ]);
+                }
+
+                if (requiredLocales.includes(locale)) {
+                    // check if all keys from base locale are presented in messagesData
+                    compareKeys(baseLocaleKeysMap[fileName], messagesData, localeWarnings);
                 }
 
                 messagesData.forEach((obj) => {
