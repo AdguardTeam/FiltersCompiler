@@ -510,9 +510,11 @@ describe('Test builder', () => {
     });
 
     it('Validate affinity directives', async () => {
+        const platformsConfig = path.join(__dirname, './resources/platforms.json');
+        const platformsPath = path.join(__dirname, './resources/platforms');
         optimization.disableOptimization();
 
         const filtersDir = path.join(__dirname, './resources/bad-filters');
-        await expect(builder.build(filtersDir, null, null, null, null, null)).rejects.toThrow('Error validating !#safari_cb_affinity directive in filter 8');
+        await expect(builder.build(filtersDir, null, null, platformsPath, platformsConfig, null)).rejects.toThrow('Error validating !#safari_cb_affinity directive in filter 8');
     });
 });

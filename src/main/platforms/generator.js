@@ -13,7 +13,8 @@ module.exports = (() => {
     const optimization = require('../optimization');
 
     const RuleMasks = require('../rule/rule-masks.js');
-    const FiltersDownloader = require('filters-downloader');
+    const FiltersDownloader = require('@adguard/filters-downloader');
+    const validator = require('../validator');
 
     const RULES_SEPARATOR = '\r\n';
     const filterIdsPool = [];
@@ -740,7 +741,7 @@ module.exports = (() => {
      * @param whitelist
      * @param blacklist
      */
-    const buildFilter = function (filterDir, platformsPath, whitelist, blacklist) {
+    const buildFilter = async (filterDir, platformsPath, whitelist, blacklist) => {
         const originalRules = readFile(path.join(filterDir, filterFile)).split('\r\n');
 
         const metadataFilePath = path.join(filterDir, metadataFile);
@@ -767,6 +768,14 @@ module.exports = (() => {
         for (const platform in platformPathsConfig) {
             const config = platformPathsConfig[platform];
             let rules = FiltersDownloader.resolveConditions(originalRules, config.defines);
+
+            // eslint-disable-next-line no-await-in-loop
+            rules = await FiltersDownloader.resolveIncludes(rules, filterDir, config.defines);
+
+            if (!validator.checkAffinityDirectives(rules)) {
+                throw new Error(`Error validating !#safari_cb_affinity directive in filter ${filterId}`);
+            }
+
             rules = filter.cleanupRules(rules, config, filterId);
             rules = removeRuleDuplicates(rules);
             const optimizedRules = filter.cleanupAndOptimizeRules(rules, config, optimizationConfig, filterId);
@@ -833,14 +842,14 @@ module.exports = (() => {
      * @param blacklist
      * @param obsoleteFiltersMetadata
      */
-    const parseDirectory = function (
+    const parseDirectory = async (
         filtersDir,
         filtersMetadata,
         platformsPath,
         whitelist,
         blacklist,
         obsoleteFiltersMetadata
-    ) {
+    ) => {
         const items = fs.readdirSync(filtersDir);
         // eslint-disable-next-line no-restricted-syntax
         for (const directory of items) {
@@ -849,7 +858,8 @@ module.exports = (() => {
                 const metadataFilePath = path.join(filterDir, metadataFile);
                 if (fs.existsSync(metadataFilePath)) {
                     logger.info(`Building filter platforms: ${directory}`);
-                    buildFilter(filterDir, platformsPath, whitelist, blacklist);
+                    // eslint-disable-next-line no-await-in-loop
+                    await buildFilter(filterDir, platformsPath, whitelist, blacklist);
                     logger.info(`Building filter platforms: ${directory} done`);
                     const filterMetadata = loadFilterMetadata(filterDir);
                     filtersMetadata.push(filterMetadata);
@@ -878,7 +888,7 @@ module.exports = (() => {
      * @param whitelist
      * @param blacklist
      */
-    const generate = function (filtersDir, platformsPath, whitelist, blacklist) {
+    const generate = async (filtersDir, platformsPath, whitelist, blacklist) => {
         if (!platformsPath) {
             logger.warn('Platforms build output path is not specified');
             return;
@@ -894,7 +904,7 @@ module.exports = (() => {
         const filtersMetadata = [];
         const obsoleteFiltersMetadata = [];
 
-        parseDirectory(filtersDir, filtersMetadata, platformsPath, whitelist, blacklist, obsoleteFiltersMetadata);
+        await parseDirectory(filtersDir, filtersMetadata, platformsPath, whitelist, blacklist, obsoleteFiltersMetadata);
 
         writeFiltersMetadata(platformsPath, filtersDir, filtersMetadata, obsoleteFiltersMetadata);
         writeLocalScriptRules(platformsPath);

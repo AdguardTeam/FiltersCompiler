@@ -11,3 +11,6 @@ somesite.com##.main-banner
 !+ PLATFORM(ios)
 ||example2.org
 !#safari_cb_affinity
+!#if non_existing_variable
+!#include non_existing_file.txt
+!#endif

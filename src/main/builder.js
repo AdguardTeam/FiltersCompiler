@@ -30,7 +30,7 @@ module.exports = (function () {
     const workaround = require('./utils/workaround.js');
     const webutils = require('./utils/webutils.js');
 
-    const FiltersDownloader = require('filters-downloader');
+    const FiltersDownloader = require('@adguard/filters-downloader');
 
     const TEMPLATE_FILE = 'template.txt';
     const FILTER_FILE = 'filter.txt';
@@ -365,8 +365,6 @@ module.exports = (function () {
             }
         }
 
-        result = await FiltersDownloader.resolveIncludes(result, currentDir);
-
         result = converter.convertRulesToAdgSyntax(result, excluded);
 
         const excludeFilePath = path.join(currentDir, EXCLUDE_FILE);
@@ -460,10 +458,6 @@ module.exports = (function () {
         logger.info(`Compiling ${name}`);
         const result = await compile(template, trustLevelSettings, name);
 
-        if (!validator.checkAffinityDirectives(result.lines)) {
-            throw new Error(`Error validating !#safari_cb_affinity directive in filter ${filterId}`);
-        }
-
         const compiled = result.lines;
         const { excluded, invalid } = result;
 
@@ -540,7 +534,7 @@ module.exports = (function () {
         await parseDirectory(filtersDir, whitelist, blacklist);
 
         logger.info('Generating platforms');
-        generator.generate(filtersDir, platformsPath, whitelist, blacklist);
+        await generator.generate(filtersDir, platformsPath, whitelist, blacklist);
         logger.info('Generating platforms done');
         report.create(reportFile);
     };
