@@ -205,6 +205,8 @@ module.exports = (() => {
         const requiredFiles = Object.keys(LOCALES_DATA)
             .map((el) => `${el}${LOCALES_FILE_EXTENSION}`);
 
+        const baseLocaleKeysMap = getBaseLocaleKeys(dirPath);
+
         locales.forEach((locale) => {
             const localeWarnings = [];
             const filesList = readDir(path.join(dirPath, locale));
@@ -251,8 +253,6 @@ module.exports = (() => {
                         [fileName],
                     ]);
                 }
-
-                const baseLocaleKeysMap = getBaseLocaleKeys(dirPath);
 
                 if (requiredLocales.includes(locale)) {
                     // check if all keys from base locale are presented in messagesData
