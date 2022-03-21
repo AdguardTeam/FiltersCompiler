@@ -13,7 +13,7 @@ module.exports = (() => {
     const optimization = require('../optimization');
 
     const RuleMasks = require('../rule/rule-masks.js');
-    const FiltersDownloader = require('@adguard/filters-downloader');
+    const FiltersDownloader = require('filters-downloader');
     const validator = require('../validator');
 
     const RULES_SEPARATOR = '\r\n';
