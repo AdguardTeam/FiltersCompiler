@@ -504,7 +504,16 @@ describe('Test builder', () => {
         const platformsPath = path.join(__dirname, './resources/platforms');
         optimization.disableOptimization();
 
-        const filtersDir = path.join(__dirname, './resources/bad-filters');
-        await expect(builder.build(filtersDir, null, null, platformsPath, platformsConfig, null)).rejects.toThrow('Error validating !#safari_cb_affinity directive in filter 8');
+        const filtersDir = path.join(__dirname, './resources/bad-filters/');
+        await expect(builder.build(filtersDir, null, null, platformsPath, platformsConfig, null, [9])).rejects.toThrow('Error validating !#safari_cb_affinity directive in filter 8');
+    });
+
+    it('Resolve bad include inside condition', async () => {
+        const platformsConfig = path.join(__dirname, './resources/platforms.json');
+        const platformsPath = path.join(__dirname, './resources/platforms');
+        optimization.disableOptimization();
+
+        const filtersDir = path.join(__dirname, './resources/bad-filters/');
+        await expect(builder.build(filtersDir, null, null, platformsPath, platformsConfig, null, [8])).rejects.toThrow('ENOENT: no such file or directory, open \'/Volumes/Dev/compiler/src/test/resources/bad-filters/filter_9_Includes/non-existing-file.txt\'');
     });
 });

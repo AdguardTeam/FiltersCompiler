@@ -1,0 +1,15 @@
+{
+  "filterId": 9,
+  "name": "Test Includes Filter",
+  "description": "Test Filter description",
+  "timeAdded": 1406785015843,
+  "homepage": "https://easylist.adblockplus.org/",
+  "expires": "2 days",
+  "displayNumber": 130,
+  "groupId": 5,
+  "subscriptionUrl": "https://easylist-downloads.adblockplus.org/easylist.txt",
+  "tags": [
+    "purpose:ads", "lang:en"
+  ],
+  "trustLevel": "high"
+}
