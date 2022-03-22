@@ -14,7 +14,6 @@ module.exports = (() => {
 
     const RuleMasks = require('../rule/rule-masks.js');
     const FiltersDownloader = require('filters-downloader');
-    const validator = require('../validator');
 
     const RULES_SEPARATOR = '\r\n';
     const filterIdsPool = [];
@@ -771,10 +770,6 @@ module.exports = (() => {
 
             // eslint-disable-next-line no-await-in-loop
             rules = await FiltersDownloader.resolveIncludes(rules, filterDir, config.defines);
-
-            if (!validator.checkAffinityDirectives(rules)) {
-                throw new Error(`Error validating !#safari_cb_affinity directive in filter ${filterId}`);
-            }
 
             rules = filter.cleanupRules(rules, config, filterId);
             rules = removeRuleDuplicates(rules);

@@ -1801,9 +1801,9 @@ fill-range@^7.0.1:
   dependencies:
     to-regex-range "^5.0.1"
 
-"filters-downloader@git+https://github.com/AdguardTeam/FiltersDownloader.git#v1.1.4":
-  version "1.1.4"
-  resolved "git+https://github.com/AdguardTeam/FiltersDownloader.git#506d2536b4ae6df4181be21766540f216ab6cbd6"
+"filters-downloader@git+https://github.com/AdguardTeam/FiltersDownloader.git#v1.1.12":
+  version "1.1.12"
+  resolved "git+https://github.com/AdguardTeam/FiltersDownloader.git#cf44f54d7e3c7c1a9e60073c77a3b9cf3780b54f"
   dependencies:
     axios "^0.21.1"
 

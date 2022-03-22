@@ -464,6 +464,10 @@ module.exports = (function () {
         logger.info(`Compiling ${name}`);
         const result = await compile(template, trustLevelSettings, name);
 
+        if (!validator.checkAffinityDirectives(result.lines)) {
+            throw new Error(`Error validating !#safari_cb_affinity directive in filter ${filterId}`);
+        }
+
         const compiled = result.lines;
         const { excluded, invalid } = result;
 
