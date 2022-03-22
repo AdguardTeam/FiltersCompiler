@@ -365,6 +365,12 @@ module.exports = (function () {
             }
         }
 
+        try {
+            result = await FiltersDownloader.resolveIncludes(result, currentDir);
+        } catch (e) {
+            logger.warn(`Error resolving includes in ${filterName}: ${e.message}`);
+        }
+
         result = converter.convertRulesToAdgSyntax(result, excluded);
 
         const excludeFilePath = path.join(currentDir, EXCLUDE_FILE);
