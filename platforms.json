@@ -111,7 +111,8 @@
                 "\\$protobuf",
                 "important,protobuf",
                 "\\$extension",
-                ",extension"
+                ",extension",
+                "\\$\\$|\\$\\@\\$"
             ],
             "ignoreRuleHints": false
         },
