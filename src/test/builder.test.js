@@ -505,7 +505,7 @@ describe('Test builder', () => {
         optimization.disableOptimization();
 
         const filtersDir = path.join(__dirname, './resources/bad-filters/');
-        await expect(builder.build(filtersDir, null, null, platformsPath, platformsConfig, null, [9])).rejects.toThrow('Error validating !#safari_cb_affinity directive in filter 8');
+        await expect(builder.build(filtersDir, null, null, platformsPath, platformsConfig, [8])).rejects.toThrow('Error validating !#safari_cb_affinity directive in filter 8');
     });
 
     it('Resolve bad include inside condition', async () => {
@@ -514,6 +514,6 @@ describe('Test builder', () => {
         optimization.disableOptimization();
 
         const filtersDir = path.join(__dirname, './resources/bad-filters/');
-        await expect(builder.build(filtersDir, null, null, platformsPath, platformsConfig, null, [8])).rejects.toThrow(/ENOENT: no such file or directory, open .+\/non-existing-file\.txt/);
+        await expect(builder.build(filtersDir, null, null, platformsPath, platformsConfig, [9])).rejects.toThrow(/ENOENT: no such file or directory, open .+\/non-existing-file\.txt/);
     });
 });

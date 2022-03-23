@@ -768,6 +768,9 @@ module.exports = (() => {
             const config = platformPathsConfig[platform];
             let rules = FiltersDownloader.resolveConditions(originalRules, config.defines);
 
+            // handle includes after resolving conditions:
+            // if there is a bad include after resolving conditions, the generator should be terminated
+            // https://github.com/AdguardTeam/FiltersCompiler/issues/84
             // eslint-disable-next-line no-await-in-loop
             rules = await FiltersDownloader.resolveIncludes(rules, filterDir, config.defines);
 
