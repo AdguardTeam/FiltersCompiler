@@ -514,6 +514,6 @@ describe('Test builder', () => {
         optimization.disableOptimization();
 
         const filtersDir = path.join(__dirname, './resources/bad-filters/');
-        await expect(builder.build(filtersDir, null, null, platformsPath, platformsConfig, null, [8])).rejects.toThrow('ENOENT: no such file or directory, open \'/Volumes/Dev/compiler/src/test/resources/bad-filters/filter_9_Includes/non-existing-file.txt\'');
+        await expect(builder.build(filtersDir, null, null, platformsPath, platformsConfig, null, [8])).rejects.toThrow(/ENOENT: no such file or directory, open .+\/non-existing-file\.txt/);
     });
 });

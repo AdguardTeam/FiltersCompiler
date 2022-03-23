@@ -1,6 +1,0 @@
-! Homepage: http://adguard.com/filters.html#english
-! License: http://creativecommons.org/licenses/by-sa/3.0/
-!
-!#if adguard
-!#include non-existing-file.txt
-!#endif

@@ -365,6 +365,8 @@ module.exports = (function () {
             }
         }
 
+        // bad includes are ignored here because they'll be handled in generator after resolving conditions
+        // https://github.com/AdguardTeam/FiltersCompiler/issues/84
         try {
             result = await FiltersDownloader.resolveIncludes(result, currentDir);
         } catch (e) {
