@@ -365,7 +365,13 @@ module.exports = (function () {
             }
         }
 
-        result = await FiltersDownloader.resolveIncludes(result, currentDir);
+        // bad includes are ignored here because they'll be handled in generator after resolving conditions
+        // https://github.com/AdguardTeam/FiltersCompiler/issues/84
+        try {
+            result = await FiltersDownloader.resolveIncludes(result, currentDir);
+        } catch (e) {
+            logger.warn(`Error resolving includes in ${filterName}: ${e.message}`);
+        }
 
         result = converter.convertRulesToAdgSyntax(result, excluded);
 
@@ -540,7 +546,7 @@ module.exports = (function () {
         await parseDirectory(filtersDir, whitelist, blacklist);
 
         logger.info('Generating platforms');
-        generator.generate(filtersDir, platformsPath, whitelist, blacklist);
+        await generator.generate(filtersDir, platformsPath, whitelist, blacklist);
         logger.info('Generating platforms done');
         report.create(reportFile);
     };
