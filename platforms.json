@@ -277,7 +277,14 @@
                 "\\$protobuf",
                 "important,protobuf",
                 "\\$extension",
-                ",extension"
+                ",extension",
+                "\\$jsinject",
+                ",jsinject",
+                "\\$urlblock",
+                ",urlblock",
+                "\\$content",
+                ",content",
+                "$webrtc"
             ],
             "ignoreRuleHints": false,
             "adbHeader": "![Adblock Plus 2.0]"
