@@ -284,7 +284,9 @@
                 ",urlblock",
                 "\\$content",
                 ",content",
-                "$webrtc"
+                "$webrtc",
+                "#@%#",
+                "#$#@media "
             ],
             "ignoreRuleHints": false,
             "adbHeader": "![Adblock Plus 2.0]"
