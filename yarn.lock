@@ -2,28 +2,28 @@
 # yarn lockfile v1
 
 
-"@adguard/scriptlets@^1.5.24":
-  version "1.5.24"
-  resolved "https://registry.yarnpkg.com/@adguard/scriptlets/-/scriptlets-1.5.24.tgz#aa266e803d0c3798ed3928c556031bc4bdf48919"
-  integrity sha512-lorL/iBUAH/R2NaVVTNK+OmD2RhR0d1YdK2MPTEhnfV2xsC25sI/xccxEqwC0+8/6dVRinI8t9U6U7LKnaWseA==
+"@adguard/scriptlets@^1.6.6":
+  version "1.6.6"
+  resolved "https://registry.yarnpkg.com/@adguard/scriptlets/-/scriptlets-1.6.6.tgz#32cca5a9133b995fd40bbca9c576f1c66aa91d95"
+  integrity sha512-fIzw5iv1iorHV58drGn+vUXKeT0Fun84Q5DnXbo2T1jPasuNgS6TI/w1wEVhdXyNSTfRbFnCCZQ9FaDMUfebAg==
   dependencies:
     "@babel/runtime" "^7.7.2"
     js-yaml "^3.13.1"
 
-"@adguard/tsurlfilter@^0.7.64":
-  version "0.7.64"
-  resolved "https://registry.yarnpkg.com/@adguard/tsurlfilter/-/tsurlfilter-0.7.64.tgz#3d55db6ffd7dfaf18d7977a605d833994d8c40be"
-  integrity sha512-Hnv4QzH76N+YF27P1mg7pB0tksgY8EziOvR+zU7lNqtHnoz0L99od1+sS3uAc03quu/AyqtlSOXdi74E5jGzJQ==
+"@adguard/tsurlfilter@^0.7.74":
+  version "0.7.74"
+  resolved "https://registry.yarnpkg.com/@adguard/tsurlfilter/-/tsurlfilter-0.7.74.tgz#5b51c408d749dd03312edec3c3f7e788e0fea08c"
+  integrity sha512-5W/lljyIhmU1oFbWE9wqHqyjcShxwA1LsGsJad3gCJxwdEiqDtJOWSw3Sbmp2AHF50w0j7YdhsLEl/+z0fjh9g==
   dependencies:
-    "@adguard/scriptlets" "^1.5.24"
-    extended-css "git+https://github.com/AdguardTeam/ExtendedCss.git#v1.3.13"
+    "@adguard/scriptlets" "^1.6.6"
+    extended-css "git+https://github.com/AdguardTeam/ExtendedCss.git#v1.3.14"
     ip6addr "^0.2.3"
     is-cidr "^4.0.2"
     is-ip "^3.1.0"
     lru_map "^0.4.1"
     netmask "^2.0.2"
     punycode "^2.1.1"
-    text-encoding "git+https://github.com/AdguardTeam/text-encoding.git#v0.7.1"
+    text-encoding "git+https://github.com/AdguardTeam/text-encoding.git#v0.7.2"
     tldts "^5.6.45"
     webextension-polyfill "^0.8.0"
 
@@ -1711,9 +1711,9 @@ extend@~3.0.2:
   version "1.3.12"
   resolved "git+https://github.com/AdguardTeam/ExtendedCss.git#241f588d6a3d283e7cc7a747d52d09efed41cde9"
 
-"extended-css@git+https://github.com/AdguardTeam/ExtendedCss.git#v1.3.13":
-  version "1.3.13"
-  resolved "git+https://github.com/AdguardTeam/ExtendedCss.git#66c6c9a390f53325876e54e3de486338b2535a2c"
+"extended-css@git+https://github.com/AdguardTeam/ExtendedCss.git#v1.3.14":
+  version "1.3.14"
+  resolved "git+https://github.com/AdguardTeam/ExtendedCss.git#e8e2b1d1a732d3043b2227b4bd5511300b33ea3d"
 
 external-editor@^3.0.3:
   version "3.1.0"
@@ -4266,9 +4266,9 @@ test-exclude@^6.0.0:
     glob "^7.1.4"
     minimatch "^3.0.4"
 
-"text-encoding@git+https://github.com/AdguardTeam/text-encoding.git#v0.7.1":
-  version "0.7.0"
-  resolved "git+https://github.com/AdguardTeam/text-encoding.git#80dbd7df2b17858e8e9e2da00e9134d4ca63d8ad"
+"text-encoding@git+https://github.com/AdguardTeam/text-encoding.git#v0.7.2":
+  version "0.7.2"
+  resolved "git+https://github.com/AdguardTeam/text-encoding.git#4268d6b7dc0e15f57134545ae1c8c59e9c5ced70"
 
 text-table@^0.2.0:
   version "0.2.0"
