@@ -285,7 +285,6 @@
                 "\\$content",
                 ",content",
                 "$webrtc",
-                "#@%#",
                 "#\\$#@media "
             ],
             "ignoreRuleHints": false,
