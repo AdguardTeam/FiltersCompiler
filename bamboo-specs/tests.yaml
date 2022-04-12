@@ -29,6 +29,8 @@ Test:
         interpreter: SHELL
         scripts:
           - |-
+            set -e
+            set -x
             yarn install
             yarn test
             rm -rf node_modules
