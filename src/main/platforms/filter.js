@@ -23,30 +23,71 @@ module.exports = (() => {
     const NOT_PLATFORM_HINT_REGEXP = /(.*)NOT_PLATFORM\(([^)]+)\)/g;
 
     const NOT_OPTIMIZED_HINT = 'NOT_OPTIMIZED';
+    const NOT_OPTIMIZED_START_HINT = `${NOT_OPTIMIZED_HINT}_START`;
+    const NOT_OPTIMIZED_END_HINT = `${NOT_OPTIMIZED_HINT}_END`;
 
     /**
      * Parses rule hints
      *
      * @param rules rules
      * @param platform Platform
+     * @param filterId Filter id
      */
-    const splitRuleHintLines = function (rules, platform) {
+    const splitRuleHintLines = function (rules, platform, filterId) {
+        if (!rules) {
+            return;
+        }
         const result = [];
-        if (rules) {
-            for (let i = 0; i < rules.length; i += 1) {
-                let rule = rules[i].trim();
-                if (rule.startsWith(HINT_MASK)) {
-                    continue;
+
+        let optimizationStarted = false;
+        let currentHint = null;
+
+        // stack for validation of opening and closing NOT_OPTIMIZED hints
+        const stack = [];
+
+        rules.forEach((rule) => {
+            if (rule.startsWith(HINT_MASK)) {
+                if (rule.includes(NOT_OPTIMIZED_START_HINT)) {
+                    optimizationStarted = true;
+                    stack.push(rule);
+                }
+                if (rule.includes(NOT_OPTIMIZED_END_HINT)) {
+                    optimizationStarted = false;
+                    stack.pop();
+                    if (stack.length) {
+                        throw new Error(`Error validating NOT_OPTIMIZED multiple hints in filter ${filterId}`);
+                    }
                 }
 
-                rule = Workaround.overrideRule(rule, platform);
+                // get current hint without NOT_OPTIMIZED_START_HINT and NOT_OPTIMIZED_END_HINT hints
+                currentHint = rule
+                    .replace(NOT_OPTIMIZED_START_HINT, '')
+                    .replace(NOT_OPTIMIZED_END_HINT, '');
 
-                const hint = i > 0 ? rules[i - 1] : null;
+                if (currentHint === HINT_MASK) {
+                    currentHint = null;
+                }
+                return;
+            }
+
+            rule = Workaround.overrideRule(rule, platform);
+
+            if (currentHint) {
                 result.push({
                     rule,
-                    hint: (hint && hint.startsWith(HINT_MASK)) ? hint : null,
+                    hint: `${currentHint}${optimizationStarted ? ` ${NOT_OPTIMIZED_HINT}` : ''}`,
+                });
+                currentHint = null;
+            } else {
+                result.push({
+                    rule,
+                    hint: optimizationStarted ? `${HINT_MASK}${NOT_OPTIMIZED_HINT}` : null,
                 });
             }
+        });
+
+        if (stack.length) {
+            throw new Error(`Error validating NOT_OPTIMIZED multiple hints in filter ${filterId}`);
         }
 
         return result;
@@ -250,7 +291,7 @@ module.exports = (() => {
      * @param config
      */
     const cleanupRules = function (rules, config, filterId) {
-        const ruleLines = splitRuleHintLines(rules, config.platform);
+        const ruleLines = splitRuleHintLines(rules, config.platform, filterId);
 
         const filtered = ruleLines.filter((r) => !shouldOmitRule(r, config, filterId));
 
@@ -269,7 +310,7 @@ module.exports = (() => {
         config.configuration.removeRulePatterns = config.configuration.removeRulePatterns || [];
         config.configuration.removeRulePatterns.push(COMMENT_REGEXP);
 
-        const ruleLines = splitRuleHintLines(rules, config.platform);
+        const ruleLines = splitRuleHintLines(rules, config.platform, filterId);
 
         const filtered = ruleLines.filter((r) => !shouldOmitRule(r, config, filterId));
 
@@ -293,5 +334,6 @@ module.exports = (() => {
     return {
         cleanupRules,
         cleanupAndOptimizeRules,
+        splitRuleHintLines,
     };
 })();
