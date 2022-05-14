@@ -31,63 +31,24 @@ module.exports = (() => {
      *
      * @param rules rules
      * @param platform Platform
-     * @param filterId Filter id
      */
-    const splitRuleHintLines = function (rules, platform, filterId) {
-        if (!rules) {
-            return;
-        }
+    const splitRuleHintLines = function (rules, platform) {
         const result = [];
-
-        let optimizationStarted = false;
-        let currentHint = null;
-
-        // stack for validation of opening and closing NOT_OPTIMIZED hints
-        const stack = [];
-
-        rules.forEach((rule) => {
-            if (rule.startsWith(HINT_MASK)) {
-                if (rule.includes(NOT_OPTIMIZED_START_HINT)) {
-                    optimizationStarted = true;
-                    stack.push(rule);
-                }
-                if (rule.includes(NOT_OPTIMIZED_END_HINT)) {
-                    optimizationStarted = false;
-                    stack.pop();
-                    if (stack.length) {
-                        throw new Error(`Error validating NOT_OPTIMIZED multiple hints in filter ${filterId}`);
-                    }
+        if (rules) {
+            for (let i = 0; i < rules.length; i += 1) {
+                let rule = rules[i].trim();
+                if (rule.startsWith(HINT_MASK)) {
+                    continue;
                 }
 
-                // get current hint without NOT_OPTIMIZED_START_HINT and NOT_OPTIMIZED_END_HINT hints
-                currentHint = rule
-                    .replace(NOT_OPTIMIZED_START_HINT, '')
-                    .replace(NOT_OPTIMIZED_END_HINT, '');
+                rule = Workaround.overrideRule(rule, platform);
 
-                if (currentHint === HINT_MASK) {
-                    currentHint = null;
-                }
-                return;
-            }
-
-            rule = Workaround.overrideRule(rule, platform);
-
-            if (currentHint) {
+                const hint = i > 0 ? rules[i - 1] : null;
                 result.push({
                     rule,
-                    hint: `${currentHint}${optimizationStarted ? ` ${NOT_OPTIMIZED_HINT}` : ''}`,
-                });
-                currentHint = null;
-            } else {
-                result.push({
-                    rule,
-                    hint: optimizationStarted ? `${HINT_MASK}${NOT_OPTIMIZED_HINT}` : null,
+                    hint: (hint && hint.startsWith(HINT_MASK)) ? hint : null,
                 });
             }
-        });
-
-        if (stack.length) {
-            throw new Error(`Error validating NOT_OPTIMIZED multiple hints in filter ${filterId}`);
         }
 
         return result;
@@ -283,6 +244,53 @@ module.exports = (() => {
         return !incorrect;
     };
 
+    const resolveMultipleNotOptimizedHints = (rules, filterId) => {
+        if (!rules) {
+            return null;
+        }
+        const result = [];
+
+        let optimizationStarted = false;
+
+        rules.forEach((rule) => {
+            if (rule.includes(NOT_OPTIMIZED_START_HINT)) {
+                if (optimizationStarted) {
+                    throw new Error(`Error validating NOT_OPTIMIZED multiple hints in filter ${filterId}`);
+                }
+                optimizationStarted = true;
+            }
+
+            if (rule.includes(NOT_OPTIMIZED_END_HINT)) {
+                optimizationStarted = false;
+            }
+
+            if (rule.startsWith(HINT_MASK)) {
+                // FIXME use regexp
+                const hint = rule.replace(NOT_OPTIMIZED_START_HINT, '')
+                    .replace(NOT_OPTIMIZED_END_HINT, '')
+                    .replace('  ', ' ');
+                if (hint === HINT_MASK) {
+                    return;
+                }
+
+                result.push(`${hint}${optimizationStarted ? ` ${NOT_OPTIMIZED_HINT}` : ''}`);
+                return;
+            }
+
+            if (optimizationStarted && !result[result.length - 1].includes(NOT_OPTIMIZED_HINT)) {
+                result.push(`${HINT_MASK}${NOT_OPTIMIZED_HINT}`);
+            }
+
+            result.push(rule);
+        });
+
+        if (optimizationStarted) {
+            throw new Error(`Error validating NOT_OPTIMIZED multiple hints in filter ${filterId}`);
+        }
+
+        return result;
+    };
+
     /**
      * Filters set of rules with configuration
      *
@@ -291,9 +299,10 @@ module.exports = (() => {
      * @param config
      */
     const cleanupRules = function (rules, config, filterId) {
-        const ruleLines = splitRuleHintLines(rules, config.platform, filterId);
+        const ruleLines = resolveMultipleNotOptimizedHints(rules, filterId);
+        const splittedRules = splitRuleHintLines(ruleLines, config.platform);
 
-        const filtered = ruleLines.filter((r) => !shouldOmitRule(r, config, filterId));
+        const filtered = splittedRules.filter((rule) => !shouldOmitRule(rule, config, filterId));
 
         return joinRuleHintLines(filtered);
     };
@@ -310,7 +319,7 @@ module.exports = (() => {
         config.configuration.removeRulePatterns = config.configuration.removeRulePatterns || [];
         config.configuration.removeRulePatterns.push(COMMENT_REGEXP);
 
-        const ruleLines = splitRuleHintLines(rules, config.platform, filterId);
+        const ruleLines = splitRuleHintLines(rules, config.platform);
 
         const filtered = ruleLines.filter((r) => !shouldOmitRule(r, config, filterId));
 
@@ -334,6 +343,6 @@ module.exports = (() => {
     return {
         cleanupRules,
         cleanupAndOptimizeRules,
-        splitRuleHintLines,
+        resolveMultipleNotOptimizedHints,
     };
 })();

@@ -145,8 +145,8 @@ describe('platforms filter', () => {
         expect(after.indexOf('example.com')).toBeGreaterThanOrEqual(0);
     });
 
-    it('Test NOT_OPTIMIZE wrapper hints', () => {
-        const before = [
+    it('Test NOT_OPTIMIZE hints for multiple rules', () => {
+        const rules = [
             '||test.com^$script,third-party',
             '!+ NOT_OPTIMIZED PLATFORM(android)',
             '||spublicidad.net^',
@@ -162,11 +162,9 @@ describe('platforms filter', () => {
             '!+ NOT_OPTIMIZED_END',
             '||tutonovip.com^$third-party',
             'daemon-hentai.com#@#.publicite',
-            '!+ NOT_OPTIMIZED_START',
+            '!+ NOT_OPTIMIZED_START PLATFORM(ext_chrome)',
             'daemon-hentai.com#%#//scriptlet("abort-on-property-read", "gothamBatAdblock")',
             '! https://github.com/AdguardTeam/AdguardFilters/issues/101140',
-            '@@||infojobs.com.br/*/ads-prebid.js',
-            'strdeport.com.br#%#//scriptlet("set-constant", "adBlockCheck", "true")',
             'elespanol.com##.container > .homeNormalNoMobile',
             '!+ NOT_OPTIMIZED_END',
             'hentai.com##.public',
@@ -174,40 +172,41 @@ describe('platforms filter', () => {
             'rapifutbol.com##div[style="width:300px;"]',
         ];
 
-        const after = filter.splitRuleHintLines(before, 'mac', 10);
+        const expected = [
+            '||test.com^$script,third-party',
+            '!+ NOT_OPTIMIZED PLATFORM(android)',
+            '||spublicidad.net^',
+            '||swi-adserver.com^$third-party',
+            '!+ NOT_OPTIMIZED',
+            '||templates.buscape.com^$third-party',
+            'example.org#@##antiadblock',
+            '!+ NOT_OPTIMIZED',
+            '||tiozao.net^$third-party',
+            '!+ NOT_PLATFORM(ext_ff) NOT_OPTIMIZED',
+            '||todoanimes.com^$script,third-party',
+            '!+ NOT_OPTIMIZED',
+            '||tracking.fsjmp.com^$third-party',
+            '||tutonovip.com^$third-party',
+            'daemon-hentai.com#@#.publicite',
+            '!+ PLATFORM(ext_chrome) NOT_OPTIMIZED',
+            'daemon-hentai.com#%#//scriptlet("abort-on-property-read", "gothamBatAdblock")',
+            '!+ NOT_OPTIMIZED',
+            '! https://github.com/AdguardTeam/AdguardFilters/issues/101140',
+            '!+ NOT_OPTIMIZED',
+            'elespanol.com##.container > .homeNormalNoMobile',
+            'hentai.com##.public',
+            '!+ PLATFORM(mac)',
+            'rapifutbol.com##div[style="width:300px;"]',
+        ];
 
-        expect(after).toBeDefined();
-        expect(after).toHaveLength(17);
+        const result = filter.resolveMultipleNotOptimizedHints(rules, 10);
 
-        expect(after[1].rule).toEqual('||spublicidad.net^');
-        expect(after[1].hint).toEqual('!+ NOT_OPTIMIZED PLATFORM(android)');
-
-        expect(after[2].rule).toEqual('||swi-adserver.com^$third-party');
-        expect(after[2].hint).toBeNull();
-
-        expect(after[3].rule).toEqual('||templates.buscape.com^$third-party');
-        expect(after[3].hint).toEqual('!+ NOT_OPTIMIZED');
-
-        expect(after[5].rule).toEqual('||tiozao.net^$third-party');
-        expect(after[5].hint).toEqual('!+ NOT_OPTIMIZED');
-
-        expect(after[6].rule).toEqual('||todoanimes.com^$script,third-party');
-        expect(after[6].hint).toEqual('!+ NOT_PLATFORM(ext_ff) NOT_OPTIMIZED');
-
-        expect(after[8].rule).toEqual('||tutonovip.com^$third-party');
-        expect(after[8].hint).toBeNull();
-
-        expect(after[12].rule).toEqual('@@||infojobs.com.br/*/ads-prebid.js');
-        expect(after[12].hint).toEqual('!+ NOT_OPTIMIZED');
-
-        expect(after[15].rule).toEqual('hentai.com##.public');
-        expect(after[15].hint).toBeNull();
-
-        expect(after[16].rule).toEqual('rapifutbol.com##div[style="width:300px;"]');
-        expect(after[16].hint).toEqual('!+ PLATFORM(mac)');
+        expect(result).toBeDefined();
+        expect(result).toHaveLength(24);
+        expect(result).toEqual(expected);
     });
 
-    it('Test bad usage of NOT_OPTIMIZE wrapper hints', () => {
+    it('Test bad usage of NOT_OPTIMIZE hints for multiple rules', () => {
         let rules = [
             'example.org#@##antiadblock',
             '!+ NOT_OPTIMIZED_START',
@@ -219,7 +218,7 @@ describe('platforms filter', () => {
             'daemon-hentai.com#%#//scriptlet("abort-on-property-read", "gothamBatAdblock")',
         ];
 
-        expect(() => filter.splitRuleHintLines(rules, 'mac', 10))
+        expect(() => filter.resolveMultipleNotOptimizedHints(rules, 10))
             .toThrow('Error validating NOT_OPTIMIZED multiple hints in filter 10');
 
         rules = [
@@ -233,7 +232,7 @@ describe('platforms filter', () => {
             '!+ NOT_OPTIMIZED_END',
         ];
 
-        expect(() => filter.splitRuleHintLines(rules, 'mac', 10))
+        expect(() => filter.resolveMultipleNotOptimizedHints(rules, 10))
             .toThrow('Error validating NOT_OPTIMIZED multiple hints in filter 10');
 
         rules = [
@@ -244,7 +243,7 @@ describe('platforms filter', () => {
             '||tracking.fsjmp.com^$third-party',
         ];
 
-        expect(() => filter.splitRuleHintLines(rules, 'mac', 10))
+        expect(() => filter.resolveMultipleNotOptimizedHints(rules, 10))
             .toThrow('Error validating NOT_OPTIMIZED multiple hints in filter 10');
     });
 });
