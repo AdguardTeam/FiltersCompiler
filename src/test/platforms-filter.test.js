@@ -202,7 +202,7 @@ describe('platforms filter', () => {
         const result = filter.resolveMultipleNotOptimizedHints(rules, 10);
 
         expect(result).toBeDefined();
-        // expect(result).toHaveLength(24);
+        expect(result).toHaveLength(24);
         expect(result).toEqual(expected);
     });
 
