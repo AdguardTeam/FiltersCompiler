@@ -25,6 +25,7 @@ module.exports = (() => {
     const NOT_OPTIMIZED_HINT = 'NOT_OPTIMIZED';
     const NOT_OPTIMIZED_START_HINT = `${NOT_OPTIMIZED_HINT}_START`;
     const NOT_OPTIMIZED_END_HINT = `${NOT_OPTIMIZED_HINT}_END`;
+    const NOT_OPTIMIZED_HINTS_REGEXP = /(!\+\s|\s?NOT_OPTIMIZED_(START|END)\s?)/g;
 
     /**
      * Parses rule hints
@@ -244,6 +245,11 @@ module.exports = (() => {
         return !incorrect;
     };
 
+    /**
+     * Adds NOT_OPTIMIZED hint for rules wrapped in NOT_OPTIMIZED_START/NOT_OPTIMIZED_END
+     * @param rules
+     * @param filterId
+     */
     const resolveMultipleNotOptimizedHints = (rules, filterId) => {
         if (!rules) {
             return null;
@@ -255,7 +261,7 @@ module.exports = (() => {
         rules.forEach((rule) => {
             if (rule.includes(NOT_OPTIMIZED_START_HINT)) {
                 if (optimizationStarted) {
-                    throw new Error(`Error validating NOT_OPTIMIZED multiple hints in filter ${filterId}`);
+                    throw new Error(`Error validating NOT_OPTIMIZED hints for multiple rules in filter ${filterId}`);
                 }
                 optimizationStarted = true;
             }
@@ -265,15 +271,13 @@ module.exports = (() => {
             }
 
             if (rule.startsWith(HINT_MASK)) {
-                // FIXME use regexp
-                const hint = rule.replace(NOT_OPTIMIZED_START_HINT, '')
-                    .replace(NOT_OPTIMIZED_END_HINT, '')
-                    .replace('  ', ' ');
-                if (hint === HINT_MASK) {
+                // get hint without NOT_OPTIMIZED_START and NOT_OPTIMIZED_END
+                const hint = rule.replace(NOT_OPTIMIZED_HINTS_REGEXP, '');
+                if (!hint) {
                     return;
                 }
 
-                result.push(`${hint}${optimizationStarted ? ` ${NOT_OPTIMIZED_HINT}` : ''}`);
+                result.push(`${HINT_MASK}${hint}${optimizationStarted ? ` ${NOT_OPTIMIZED_HINT}` : ''}`);
                 return;
             }
 
@@ -285,7 +289,7 @@ module.exports = (() => {
         });
 
         if (optimizationStarted) {
-            throw new Error(`Error validating NOT_OPTIMIZED multiple hints in filter ${filterId}`);
+            throw new Error(`Error validating NOT_OPTIMIZED hints for multiple rules in filter ${filterId}`);
         }
 
         return result;

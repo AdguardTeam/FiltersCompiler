@@ -202,7 +202,7 @@ describe('platforms filter', () => {
         const result = filter.resolveMultipleNotOptimizedHints(rules, 10);
 
         expect(result).toBeDefined();
-        expect(result).toHaveLength(24);
+        // expect(result).toHaveLength(24);
         expect(result).toEqual(expected);
     });
 
@@ -219,7 +219,7 @@ describe('platforms filter', () => {
         ];
 
         expect(() => filter.resolveMultipleNotOptimizedHints(rules, 10))
-            .toThrow('Error validating NOT_OPTIMIZED multiple hints in filter 10');
+            .toThrow('Error validating NOT_OPTIMIZED hints for multiple rules in filter 10');
 
         rules = [
             'example.org#@##antiadblock',
@@ -233,7 +233,7 @@ describe('platforms filter', () => {
         ];
 
         expect(() => filter.resolveMultipleNotOptimizedHints(rules, 10))
-            .toThrow('Error validating NOT_OPTIMIZED multiple hints in filter 10');
+            .toThrow('Error validating NOT_OPTIMIZED hints for multiple rules in filter 10');
 
         rules = [
             'example.org#@##antiadblock',
@@ -244,6 +244,6 @@ describe('platforms filter', () => {
         ];
 
         expect(() => filter.resolveMultipleNotOptimizedHints(rules, 10))
-            .toThrow('Error validating NOT_OPTIMIZED multiple hints in filter 10');
+            .toThrow('Error validating NOT_OPTIMIZED hints for multiple rules in filter 10');
     });
 });
