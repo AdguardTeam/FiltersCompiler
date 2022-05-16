@@ -272,12 +272,18 @@ module.exports = (() => {
 
             if (rule.startsWith(HINT_MASK)) {
                 // get hint without NOT_OPTIMIZED_START and NOT_OPTIMIZED_END
-                const hint = rule.replace(NOT_OPTIMIZED_HINTS_REGEXP, '');
+                let hint = rule.replace(NOT_OPTIMIZED_HINTS_REGEXP, '');
                 if (!hint) {
                     return;
                 }
 
-                result.push(`${HINT_MASK}${hint}${optimizationStarted ? ` ${NOT_OPTIMIZED_HINT}` : ''}`);
+                hint = `${HINT_MASK}${hint}`;
+
+                if (optimizationStarted) {
+                    hint += ` ${NOT_OPTIMIZED_HINT}`;
+                }
+
+                result.push(hint);
                 return;
             }
 
