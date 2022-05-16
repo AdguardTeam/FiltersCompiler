@@ -281,7 +281,7 @@ module.exports = (() => {
                 return;
             }
 
-            if (optimizationStarted && !result[result.length - 1].includes(NOT_OPTIMIZED_HINT)) {
+            if (optimizationStarted && result.length && !result[result.length - 1].includes(NOT_OPTIMIZED_HINT)) {
                 result.push(`${HINT_MASK}${NOT_OPTIMIZED_HINT}`);
             }
 
