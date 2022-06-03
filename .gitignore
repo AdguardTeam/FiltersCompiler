@@ -1,3 +1,4 @@
+dist
 node_modules
 .idea
 *.iml
@@ -7,6 +8,7 @@ src/test/resources/log.txt
 src/test/resources/report.txt
 src/test/resources/report_platforms.txt
 src/test/resources/log_platforms.txt
+src/test/resources/bad-filters/*/diff.txt
 src/test/resources/filters/*/diff.txt
 src/test/resources/filters/*/filter.txt
 src/test/resources/filters/*/revision.json
