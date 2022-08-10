@@ -21,10 +21,15 @@ const addFilter = (metadata, filterRules, invalidRules) => {
             + `Filter name: ${name}\n`
             + `Compiled rules: ${filterLength}\n`
             + `Excluded rules: ${excludedLength}\n`
-            + `URL: ${subscriptionUrl}\n`
-            + 'INVALID RULES:\n'
-            + `${invalidRules.join('\n')}\n`
-            + '---------------------------\n';
+            + `URL: ${subscriptionUrl}\n`;
+        // log list of invalid rules only if they exist
+        if (invalidRules.length > 0) {
+            reportData += 'INVALID RULES:\n'
+                + `${invalidRules.join('\n')}\n`;
+        } else {
+            reportData += 'All rules are valid.\n';
+        }
+        reportData += '---------------------------\n';
     }
 };
 
