@@ -527,7 +527,7 @@ module.exports = (function () {
      * @param logFile
      * @param reportFile
      * @param platformsPath
-     * @param platformsConfigFile
+     * @param platformsConfig
      * @param whitelist
      * @param blacklist
      */
@@ -536,12 +536,12 @@ module.exports = (function () {
         logFile,
         reportFile,
         platformsPath,
-        platformsConfigFile,
+        platformsConfig,
         whitelist,
         blacklist
     ) {
         logger.initialize(logFile);
-        generator.init(FILTER_FILE, METADATA_FILE, REVISION_FILE, platformsConfigFile, ADGUARD_FILTERS_SERVER_URL);
+        generator.init(FILTER_FILE, METADATA_FILE, REVISION_FILE, platformsConfig, ADGUARD_FILTERS_SERVER_URL);
 
         await parseDirectory(filtersDir, whitelist, blacklist);
 

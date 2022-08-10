@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 const schemaValidator = require('../main/json-validator.js');
 const builder = require('../main/builder');
@@ -15,7 +16,8 @@ describe('json validator', () => {
         const reportFile = path.join(__dirname, './resources/report.txt');
         const platformsPath = path.join(__dirname, './resources/platforms');
         const platformsConfigFile = path.join(__dirname, './resources/platforms.json');
-        await builder.build(filtersDir, logFile, reportFile, platformsPath, platformsConfigFile);
+        const platformsConfig = JSON.parse(fs.readFileSync(platformsConfigFile, { encoding: 'utf-8' }));
+        await builder.build(filtersDir, logFile, reportFile, platformsPath, platformsConfig);
 
         // Test validation
         const jsonSchemasConfigDir = path.join(__dirname, './resources/schemas');

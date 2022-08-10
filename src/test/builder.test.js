@@ -28,8 +28,9 @@ describe('Test builder', () => {
         const reportFile = path.join(__dirname, './resources/report.txt');
         const platformsPath = path.join(__dirname, './resources/platforms');
         const platformsConfigFile = path.join(__dirname, './resources/platforms.json');
+        const platformsConfig = JSON.parse(await readFile(platformsConfigFile));
 
-        await builder.build(filtersDir, logFile, reportFile, platformsPath, platformsConfigFile);
+        await builder.build(filtersDir, logFile, reportFile, platformsPath, platformsConfig);
 
         let revision = await readFile(path.join(filtersDir, 'filter_3_Test', 'revision.json'));
 
@@ -483,17 +484,17 @@ describe('Test builder', () => {
         const logFile = path.join(__dirname, './resources/log.txt');
         const reportFile = path.join(__dirname, './resources/report.txt');
 
-        await builder.build(filtersDir, logFile, reportFile, null, null, null, [2, 3]);
+        await builder.build(filtersDir, logFile, reportFile, null, {}, null, [2, 3]);
 
         let revision = await readFile(path.join(filtersDir, 'filter_2_English', 'revision.json'));
         expect(revision).toBeTruthy();
 
-        await builder.build(filtersDir, logFile, reportFile, null, null, null, null, [3, 4]);
+        await builder.build(filtersDir, logFile, reportFile, null, {}, null, null, [3, 4]);
 
         revision = await readFile(path.join(filtersDir, 'filter_2_English', 'revision.json'));
         expect(revision).toBeTruthy();
 
-        await builder.build(filtersDir, logFile, reportFile, null, null, null, [2, 3], [3, 4]);
+        await builder.build(filtersDir, logFile, reportFile, null, {}, null, [2, 3], [3, 4]);
 
         revision = await readFile(path.join(filtersDir, 'filter_2_English', 'revision.json'));
         expect(revision).toBeTruthy();

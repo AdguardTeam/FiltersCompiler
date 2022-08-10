@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 const { setLogger, setConfiguration, CompatibilityTypes } = require('@adguard/tsurlfilter');
 const builder = require('./src/main/builder.js');
@@ -11,14 +12,26 @@ setLogger(logger);
 // Sets configuration compatibility
 setConfiguration({ compatibility: CompatibilityTypes.corelibs });
 
-const platformsConfig = path.join(__dirname, './platforms.json');
+const platformsConfigPath = path.join(__dirname, './platforms.json');
 const jsonSchemasConfigDir = path.join(__dirname, './schemas/');
+
+// Reading the default platforms config
+const platformsConfig = JSON.parse(fs.readFileSync(platformsConfigPath, { encoding: 'utf-8' }));
 
 process.on('unhandledRejection', (error) => {
     throw error;
 });
 
-const compile = function (path, logPath, reportFile, platformsPath, whitelist, blacklist) {
+const compile = function (path, logPath, reportFile, platformsPath, whitelist, blacklist, customPlatformsConfig) {
+    if (customPlatformsConfig) {
+        logger.log('Using custom platforms configuration');
+        // eslint-disable-next-line no-restricted-syntax, guard-for-in
+        for (const platform in customPlatformsConfig) {
+            logger.log(`Redefining platform ${platform}`);
+            platformsConfig[platform] = customPlatformsConfig[platform];
+        }
+    }
+
     return builder.build(
         path,
         logPath,

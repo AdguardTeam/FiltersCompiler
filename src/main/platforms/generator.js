@@ -795,17 +795,17 @@ module.exports = (() => {
     /**
      * Initializes service
      *
-     * @param filterFileName
-     * @param metadataFileName
-     * @param revisionFileName
-     * @param platformsConfigFile
-     * @param adguardFiltersServer
+     * @param filterFileName output filter file name.
+     * @param metadataFileName output metadata file name.
+     * @param revisionFileName output revision file name.
+     * @param platformsConfig platforms configuration object.
+     * @param adguardFiltersServer server that will serve the filters that're being built.
      */
     const init = function (
         filterFileName,
         metadataFileName,
         revisionFileName,
-        platformsConfigFile,
+        platformsConfig,
         adguardFiltersServer
     ) {
         filterFile = filterFileName;
@@ -814,13 +814,11 @@ module.exports = (() => {
 
         adguardFiltersServerUrl = adguardFiltersServer;
 
-        const config = readFile(platformsConfigFile);
-        if (!config) {
-            logger.error(`Platforms config file is invalid: ${platformsConfigFile}`);
-            return;
+        if (!platformsConfig) {
+            throw new Error('Platforms config is not defined');
         }
 
-        platformPathsConfig = JSON.parse(config);
+        platformPathsConfig = platformsConfig;
     };
 
     /**

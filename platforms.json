@@ -249,7 +249,8 @@
                 "\\$redirect=",
                 ",redirect=",
                 "\\$redirect-rule=",
-                ",redirect-rule="
+                ",redirect-rule=",
+                "^\\[.+?\\].*#(\\$|\\@|\\?|\\@){0,2}#"
             ],
             "ignoreRuleHints": false
         },

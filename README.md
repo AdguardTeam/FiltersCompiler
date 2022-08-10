@@ -10,7 +10,7 @@ This package is suggested to be used with filters repository with directory stru
 
 The package could be run with the following command:
 
-```
+```javascript
  const whitelist = [1, 3];
  const blacklist = [2];
 
@@ -23,7 +23,26 @@ The package could be run with the following command:
 
  const platformsPath = path.join(__dirname, './platforms');
 
- compiler.compile(filtersDir, logPath, reportPath, platformsPath, whitelist, blacklist);
+ const customPlatformsConfig = {
+    // Here you can redefine some of the platforms from platforms.json
+    // or add new platforms if you need it.
+    "MAC_V3": {
+        "platform": "mac",
+        "path": "mac_v3",
+        "configuration": {
+            "ignoreRuleHints": false,
+            "removeRulePatterns": [
+                "^\\/.*" // remove regex rules for some reason.
+            ],
+        },
+        "defines": {
+            "adguard": true,
+            "adguard_app_mac": true
+        }
+    },
+ };
+
+ compiler.compile(filtersDir, logPath, reportPath, platformsPath, whitelist, blacklist, customPlatformsConfig);
 ```
 
 ### Tests
