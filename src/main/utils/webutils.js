@@ -18,7 +18,8 @@ module.exports = (() => {
     const tryDownloadFile = function (url, retryNum = 0) {
         let args = ['--fail', '--silent', '--user-agent', USER_AGENT, '-L', url];
         if (retryNum) {
-            args.push(`--retry ${retryNum}`);
+            args.push('--retry');
+            args.push(retryNum);
         }
         const options = { encoding: 'utf8', maxBuffer: Infinity };
         const tlsCheck = process.env.TLS;

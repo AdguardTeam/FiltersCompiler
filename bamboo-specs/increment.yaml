@@ -5,7 +5,7 @@ plan:
   key: FILTRCOMPINC
   name: filters-compiler - increment version
 variables:
-  dockerJslBuilder: adguard/jsl-builder:15.8.0--1.22.5--1
+  dockerJslBuilder: adguard/jsl-builder:15.14--2
 
 stages:
   - Increment:
@@ -32,6 +32,10 @@ Increment:
             set -x
             set -e
             ls -alt
+
+            # Fix mixed logs
+            exec 2>&1
+
             yarn increment
             yarn build-txt
     - any-task:
