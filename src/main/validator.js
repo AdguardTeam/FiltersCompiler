@@ -44,7 +44,18 @@ const validate = function (list, excluded, invalid = [], filterName) {
             return true;
         }
 
-        const convertedRules = RuleConverter.convertRule(ruleText);
+        let convertedRules;
+
+        // unsupported UBO HTML rules throws error while conversion
+        // https://github.com/AdguardTeam/tsurlfilter/issues/55
+        try {
+            convertedRules = RuleConverter.convertRule(ruleText);
+        } catch (e) {
+            logger.error(`Invalid rule in ${filterName}: ${ruleText}`);
+            excludeRule(excluded, e.message, ruleText);
+            invalid.push(e.message);
+            return false;
+        }
 
         for (let i = 0; i < convertedRules.length; i += 1) {
             const convertedRuleText = convertedRules[i];

@@ -339,7 +339,7 @@ describe('validator', () => {
         expect(validator.validate(rules)).toHaveLength(0);
     });
 
-    it('Test ##^script:has-text and $$script[tag-containts] rules', () => {
+    it('Test ##^script:has-text and $$script[tag-contains] rules', () => {
         let rules = ['example.com##^script:contains(/.+banner/)'];
         expect(validator.validate(rules)).toHaveLength(0);
 

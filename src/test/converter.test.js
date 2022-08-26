@@ -177,22 +177,27 @@ describe('converter', () => {
         expect(actual).toEqual(expected);
     });
 
-    it('converts ##^script:has-text to $$script[tag-containts]', () => {
+    it('converts ##^script:has-text to $$script[tag-contains]', () => {
         let actual = converter.convertRulesToAdgSyntax(['example.com##^script:has-text(12313)']);
         let expected = 'example.com$$script[tag-content="12313"][max-length="262144"]';
-        expect(actual[0]).toBe(expected);
-
-        actual = converter.convertRulesToAdgSyntax(['example.com##^script:has-text(/\.advert/)']);
-        expected = 'example.com##^script:has-text(/\.advert/)';
         expect(actual[0]).toBe(expected);
 
         actual = converter.convertRulesToAdgSyntax(['example.com##^script:contains(banner)']);
         expected = 'example.com$$script[tag-content="banner"][max-length="262144"]';
         expect(actual[0]).toBe(expected);
 
+        /**
+         * regexp as tag-content arg is not supported by AdGuard HTML filtering rules
+         * https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#tag-content
+         *
+         * so such rules should be discarded
+         * https://github.com/AdguardTeam/tsurlfilter/issues/55
+         */
         actual = converter.convertRulesToAdgSyntax(['example.com##^script:contains(/.+banner/)']);
-        expected = 'example.com##^script:contains(/.+banner/)';
-        expect(actual[0]).toBe(expected);
+        expect(actual[0]).toBe(undefined);
+
+        actual = converter.convertRulesToAdgSyntax(['example.com##^script:has-text(/\.advert/)']);
+        expect(actual[0]).toBe(undefined);
     });
 
     it('converts $1p to $~third-party and $3p to $third-party', () => {

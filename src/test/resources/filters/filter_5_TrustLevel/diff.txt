@@ -6,6 +6,10 @@ example.com##^script:contains(banner)
 ||www.ynet.co.il^$important,websocket,1p,domain=www.ynet.co.il
 ! Rule "@@.com/ads.js|$3p,domain=~3ppt.com']" converted to: "@@.com/ads.js|$third-party,domain=~3ppt.com']"
 @@.com/ads.js|$3p,domain=~3ppt.com']
+! Unable to convert rule to AdGuard syntax: example.com##^script:has-text(/.advert/)
+example.com##^script:has-text(/.advert/)
+! Unable to convert rule to AdGuard syntax: rybnik.com.pl##^iframe[name]:not([class]):not([id]):not([src])[style="display:none"]
+rybnik.com.pl##^iframe[name]:not([class]):not([id]):not([src])[style="display:none"]
 ! Rule "test.com#$#abort-on-property-read adsShown" converted to: "test.com#%#//scriptlet('abp-abort-on-property-read', 'adsShown')"
 test.com#$#abort-on-property-read adsShown
 ! Rule "example.com#@$#abort-on-property-write adblock.check" converted to: "example.com#@%#//scriptlet('abp-abort-on-property-write', 'adblock.check')"
@@ -36,7 +40,3 @@ test.com#%#AG_setConstant("ads", "false");
 test.com#@%#Object.defineProperty(window, 'abcde', { get: function() { return []; } });
 ! ||test.com/res/js/*.js$replace=/\"OK\/banners/\"OK\/banners__\// is excluded by "$replace" in exclusions-high.txt
 ||test.com/res/js/*.js$replace=/\"OK\/banners/\"OK\/banners__\//
-! Invalid selector:
-example.com##^script:has-text(/.advert/)
-! Invalid selector:
-rybnik.com.pl##^iframe[name]:not([class]):not([id]):not([src])[style="display:none"]
