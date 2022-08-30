@@ -105,5 +105,20 @@
             "adguard": true,
             "adguard_ext_chromium": true
         }
+    },
+    "TEST_REPLACEMENTS": {
+        "platform": "test",
+        "path": "replacements",
+        "configuration": {
+            "replacements": [
+                {
+                    "from": "stringtoreplace",
+                    "to": "replacementstring"
+                }
+            ]
+        },
+        "defines": {
+            "adguard": true
+        }
     }
 }

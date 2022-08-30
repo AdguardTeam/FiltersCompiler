@@ -34,6 +34,12 @@ The package could be run with the following command:
             "removeRulePatterns": [
                 "^\\/.*" // remove regex rules for some reason.
             ],
+            "replacements": [
+                {
+                    "from": "regex",
+                    "to": "repl"
+                }
+            ]
         },
         "defines": {
             "adguard": true,

@@ -184,7 +184,7 @@ describe('Test builder', () => {
         expect(filterContent).toBeTruthy();
 
         filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(49);
+        expect(filterLines.length).toBe(50);
 
         expect(filterLines[2]).toBe('! Title: AdGuard Base filter + EasyList');
         expect(filterLines.indexOf('![Adblock Plus 2.0]') >= 0).toBeTruthy();
@@ -203,7 +203,7 @@ describe('Test builder', () => {
         filterContent = await readFile(path.join(platformsPath, 'test', 'filters', '2_optimized.txt'));
         expect(filterContent).toBeTruthy();
         filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(34);
+        expect(filterLines.length).toBe(35);
         expect(filterLines[2]).toBe('! Title: AdGuard Base filter + EasyList (Optimized)');
 
         filterContent = await readFile(path.join(platformsPath, 'test', 'filters', '2_without_easylist.txt'));
@@ -216,7 +216,7 @@ describe('Test builder', () => {
         expect(filterContent).toBeTruthy();
 
         filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(35);
+        expect(filterLines.length).toBe(36);
 
         expect(filterLines.indexOf('test-common-rule.com') >= 0).toBeTruthy();
         expect(filterLines.indexOf('test-common-1-rule.com') >= 0).toBeFalsy();
@@ -229,7 +229,7 @@ describe('Test builder', () => {
         expect(filterContent).toBeTruthy();
 
         filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(48);
+        expect(filterLines.length).toBe(49);
 
         expect(filterLines.indexOf('test-common-rule.com') >= 0).toBeTruthy();
         expect(filterLines.indexOf('test-common-1-rule.com') >= 0).toBeTruthy();
@@ -243,7 +243,7 @@ describe('Test builder', () => {
         expect(filterContent).toBeTruthy();
 
         filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(48);
+        expect(filterLines.length).toBe(49);
 
         expect(filterLines.indexOf('test.com#%#var isadblock=1;') >= 0).toBeTruthy();
         expect(filterLines.indexOf('test.com#%#//scriptlet(\'ubo-abort-on-property-read.js\', \'Object.prototype.getBanner\')') >= 0).toBeTruthy();
@@ -474,6 +474,12 @@ describe('Test builder', () => {
         localScriptRules = JSON.parse(localScriptRulesJson);
         expect(localScriptRules.rules).toBeTruthy();
         expect(localScriptRules.rules.some((rule) => rule.script.startsWith('//scriptlet'))).toBeFalsy();
+
+        // test applying replacements
+        filterContent = await readFile(path.join(platformsPath, 'replacements', 'filters', '2.txt'));
+        filterLines = filterContent.split('\r\n');
+        expect(filterLines.includes('||stringtoreplace^')).toBeFalsy();
+        expect(filterLines.includes('||replacementstring^')).toBeTruthy();
     });
 
     it('Builds lists', async () => {

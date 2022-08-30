@@ -776,6 +776,18 @@ module.exports = (() => {
 
             rules = filter.cleanupRules(rules, config, filterId);
             rules = removeRuleDuplicates(rules);
+
+            // Apply replacement rules
+            if (config.configuration.replacements) {
+                rules = rules.map((rule) => {
+                    // eslint-disable-next-line no-restricted-syntax
+                    for (const repl of config.configuration.replacements) {
+                        rule = rule.replace(new RegExp(repl.from, 'g'), repl.to);
+                    }
+                    return rule;
+                });
+            }
+
             const optimizedRules = filter.cleanupAndOptimizeRules(rules, config, optimizationConfig, filterId);
             // eslint-disable-next-line max-len
             logger.info(`Filter ${filterId}. Rules ${originalRules.length} => ${rules.length} => ${optimizedRules.length}. PlatformPath: '${config.path}'`);

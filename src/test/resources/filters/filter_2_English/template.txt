@@ -39,3 +39,5 @@ test.com#@?#.banner:matches-css(height: 200px)
 @@||example.com^$stealth
 ||example.com^$webrtc,domain=example.org
 ||example.org^$csp=frame-src 'none'
+
+||stringtoreplace^
