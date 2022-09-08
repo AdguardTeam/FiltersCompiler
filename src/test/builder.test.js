@@ -521,15 +521,6 @@ describe('Test builder', () => {
 
         const filtersDir = path.join(__dirname, './resources/bad-filters/');
 
-        try {
-            // Normally the following line should trigger an error
-            await builder.build(filtersDir, null, null, platformsPath, platformsConfig, [9]);
-            throw new Error('Always present error');
-        } catch (error) {
-            expect(error).toHaveProperty('message');
-            // ENOENT: no such file or directory, open 'D:\\FiltersCompiler\\src\\test\\resources\\bad-filters\\filter_9_Includes\\non-existing-file.txt'
-            // ENOENT: no such file or directory, open: non-existing-file.txt
-            expect(error.message).toMatch(/^ENOENT: no such file or directory, open.*non-existing-file\.txt.*$/);
-        }
+        await expect(builder.build(filtersDir, null, null, platformsPath, platformsConfig, [9])).rejects.toThrow(/^ENOENT: no such file or directory, open.*non-existing-file\.txt.*$/);
     });
 });
