@@ -6,7 +6,7 @@ module.exports = (() => {
 
     // Based on: https://github.com/github/linguist/pull/5968/commits/f7c5c39139945576a5f9ff0b41c990e6b6019232
     // eslint-disable-next-line max-len
-    const ADBLOCK_AGENT_PATTERN = /^\[(?<AdblockInfo>\s*(?:[Aa]d[Bb]lock(?:\s+[Pp]lus)?|u[Bb]lock(?:\s+[Oo]rigin)?|[Aa]d[Gg]uard)(?:\s+(?:\d\.?)+)?\s*)(?:;\g<AdblockInfo>)*\]/;
+    const ADBLOCK_AGENT_PATTERN = /^(?:!|#)?\s*\[(?<AdblockInfo>\s*(?:[Aa]d[Bb]lock(?:\s+[Pp]lus)?|u[Bb]lock(?:\s+[Oo]rigin)?|[Aa]d[Gg]uard)(?:\s+(?:\d\.?)+)?\s*)(?:;\g<AdblockInfo>)*\]\s*$/;
 
     /**
      * CSS rules with width and height attributes break SVG rendering
