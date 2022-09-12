@@ -1,7 +1,6 @@
 /* eslint-disable max-len */
 const path = require('path');
 const fs = require('fs').promises;
-const os = require('os');
 const { existsSync } = require('fs');
 const optimization = require('../main/optimization.js');
 const builder = require('../main/builder.js');
@@ -43,7 +42,7 @@ describe('Test builder', () => {
         let filterText = (await readFile(path.join(filtersDir, 'filter_3_Test', 'filter.txt'))).trim();
         expect(filterText).toBeTruthy();
 
-        let filterLines = filterText.split(os.EOL);
+        let filterLines = filterText.split(/\r?\n/);
         expect(filterLines.length).toBe(23);
 
         // Common include
@@ -521,6 +520,7 @@ describe('Test builder', () => {
         optimization.disableOptimization();
 
         const filtersDir = path.join(__dirname, './resources/bad-filters/');
-        await expect(builder.build(filtersDir, null, null, platformsPath, platformsConfig, [9])).rejects.toThrow(/ENOENT: no such file or directory, open .+\/non-existing-file\.txt/);
+
+        await expect(builder.build(filtersDir, null, null, platformsPath, platformsConfig, [9])).rejects.toThrow(/^ENOENT: no such file or directory, open.*non-existing-file\.txt.*$/);
     });
 });
