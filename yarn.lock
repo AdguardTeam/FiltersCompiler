@@ -2,20 +2,20 @@
 # yarn lockfile v1
 
 
-"@adguard/scriptlets@^1.6.39":
-  version "1.6.39"
-  resolved "https://registry.yarnpkg.com/@adguard/scriptlets/-/scriptlets-1.6.39.tgz#f3780dbd1ddf001e920ed3e35bb16e5063ef8b70"
-  integrity sha512-fJxy/9HYxh0NBwosEgdspvc7LXy5CqHldtKQfJIgW2wAzQJgt8/GxlA0YS+IPiu5B05X9cD8rPu0nv4fpw98hA==
+"@adguard/scriptlets@^1.6.51":
+  version "1.6.51"
+  resolved "https://registry.yarnpkg.com/@adguard/scriptlets/-/scriptlets-1.6.51.tgz#60519b1ba7543f9e48c6ba74f853a82d0ab6372d"
+  integrity sha512-R8hYFGgzTQ91sIYSccieQp1vQhrTLPmi7yhXpg5wp6l5UAtHBbc6MfB6/nIr9V+oFI/AcPkegJJckcLC517J6A==
   dependencies:
     "@babel/runtime" "^7.7.2"
     js-yaml "^3.13.1"
 
-"@adguard/tsurlfilter@^1.0.35":
-  version "1.0.35"
-  resolved "https://registry.yarnpkg.com/@adguard/tsurlfilter/-/tsurlfilter-1.0.35.tgz#bc1d970f53cef9466c8438934ad00815dc05afdb"
-  integrity sha512-m57eAmzwvZ16bjgbbfpx6BB0Ot3YBOqDJagybUg/c8744Dt6cKyQBxl2zUZc2/hkE4p8ZPc6TNmmllUetpXOGQ==
+"@adguard/tsurlfilter@^1.0.39":
+  version "1.0.39"
+  resolved "https://registry.yarnpkg.com/@adguard/tsurlfilter/-/tsurlfilter-1.0.39.tgz#310f249380e3134396381fd39d23e5c3417c2fb1"
+  integrity sha512-YuwuUUbidtcuf8usrxrVuCuEi0NBk4PusdVumQC8JjbM9+nuJmfhrjk7SdX/Bg3mQSIOIOcHra2qAVZoGkq7wg==
   dependencies:
-    "@adguard/scriptlets" "^1.6.39"
+    "@adguard/scriptlets" "^1.6.51"
     extended-css "git+https://github.com/AdguardTeam/ExtendedCss.git#v1.3.14"
     ip6addr "^0.2.3"
     is-cidr "^4.0.2"

@@ -11,8 +11,8 @@
     "build-txt": "node tasks/build-txt.js"
   },
   "dependencies": {
-    "@adguard/scriptlets": "^1.6.39",
-    "@adguard/tsurlfilter": "^1.0.35",
+    "@adguard/scriptlets": "^1.6.51",
+    "@adguard/tsurlfilter": "^1.0.39",
     "ajv": "^6.10.2",
     "child_process": ">=1.0.2",
     "crypto": "1.0.1",
