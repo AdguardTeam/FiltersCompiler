@@ -1,4 +1,4 @@
-const filter = require('../main/platforms/filter.js');
+const filter = require('../main/platforms/filter');
 
 // Mock log to hide error messages
 jest.mock('../main/utils/log');

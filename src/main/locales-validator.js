@@ -2,7 +2,7 @@
 module.exports = (() => {
     const fs = require('fs');
     const path = require('path');
-    const logger = require('./utils/log.js');
+    const logger = require('./utils/log');
 
     const FULL_REQUIRED_ENDINGS = ['name', 'description'];
     const ONLY_NAME_REQUIRED_ENDINGS = ['name'];

@@ -5,8 +5,9 @@ const {
     CosmeticRule,
     RuleConverter,
 } = require('@adguard/tsurlfilter');
-const logger = require('./utils/log.js');
-const extendedCssValidator = require('./utils/extended-css-validator.js');
+
+const logger = require('./utils/log');
+const extendedCssValidator = require('./utils/extended-css-validator');
 
 const AFFINITY_DIRECTIVE = '!#safari_cb_affinity'; // used as closing directive
 const AFFINITY_DIRECTIVE_OPEN = `${AFFINITY_DIRECTIVE}(`;
@@ -34,7 +35,7 @@ const excludeRule = (excluded, warning, rule) => {
  * @param {string} filterName
  * @returns {Array}
  */
-const validate = function (list, excluded, invalid = [], filterName) {
+const validate = function (list, excluded, invalid = [], filterName) { // eslint-disable-line default-param-last
     if (!list) {
         return [];
     }

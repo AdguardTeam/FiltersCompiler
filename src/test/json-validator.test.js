@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
-const schemaValidator = require('../main/json-validator.js');
+
+const schemaValidator = require('../main/json-validator');
 const builder = require('../main/builder');
 const optimization = require('../main/optimization');
 

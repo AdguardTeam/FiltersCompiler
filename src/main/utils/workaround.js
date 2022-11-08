@@ -1,6 +1,6 @@
 /* eslint-disable global-require */
 module.exports = (() => {
-    const RuleMasks = require('../rule/rule-masks.js');
+    const RuleMasks = require('../rule/rule-masks');
 
     const SCRIPTLET_MASK = '//scriptlet';
 

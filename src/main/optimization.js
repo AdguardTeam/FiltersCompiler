@@ -1,6 +1,6 @@
 /* eslint-disable global-require */
 module.exports = (() => {
-    const webutils = require('./utils/webutils.js');
+    const webutils = require('./utils/webutils');
 
     // Here we can access optimizable filters and its optimization percentages
     // eslint-disable-next-line max-len

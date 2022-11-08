@@ -1,7 +1,12 @@
+/**
+ * @jest-environment jsdom
+ */
+
 /* eslint-disable max-len */
 const scriptlets = require('@adguard/scriptlets');
 const { setConfiguration, CompatibilityTypes } = require('@adguard/tsurlfilter');
-const validator = require('../main/validator.js');
+
+const validator = require('../main/validator');
 
 // Sets configuration compatibility
 setConfiguration({ compatibility: CompatibilityTypes.corelibs });

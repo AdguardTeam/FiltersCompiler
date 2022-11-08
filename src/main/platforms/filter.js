@@ -11,9 +11,9 @@ module.exports = (() => {
      * and strict mode is on then filter compilation should fail, otherwise original rules must be used
      */
 
-    const logger = require('../utils/log.js');
-    const Workaround = require('../utils/workaround.js');
-    const RuleMasks = require('../rule/rule-masks.js');
+    const logger = require('../utils/log');
+    const Workaround = require('../utils/workaround');
+    const RuleMasks = require('../rule/rule-masks');
     const optimization = require('../optimization');
 
     const HINT_MASK = `${RuleMasks.MASK_HINT} `;

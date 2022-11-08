@@ -20,15 +20,15 @@ module.exports = (function () {
     const path = require('path');
     const md5 = require('md5');
 
-    const version = require('./utils/version.js');
-    const converter = require('./converter.js');
-    const validator = require('./validator.js');
-    const generator = require('./platforms/generator.js');
-    const logger = require('./utils/log.js');
-    const report = require('./utils/report.js');
+    const version = require('./utils/version');
+    const converter = require('./converter');
+    const validator = require('./validator');
+    const generator = require('./platforms/generator');
+    const logger = require('./utils/log');
+    const report = require('./utils/report');
     const RuleMasks = require('./rule/rule-masks');
-    const workaround = require('./utils/workaround.js');
-    const webutils = require('./utils/webutils.js');
+    const workaround = require('./utils/workaround');
+    const webutils = require('./utils/webutils');
 
     const FiltersDownloader = require('filters-downloader');
 

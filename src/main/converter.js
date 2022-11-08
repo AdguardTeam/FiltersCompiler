@@ -1,7 +1,7 @@
 const { RuleConverter } = require('@adguard/tsurlfilter');
 const scriptlets = require('@adguard/scriptlets');
 
-const logger = require('./utils/log.js');
+const logger = require('./utils/log');
 const cosmeticRuleModifiers = require('./rule/cosmetic-rule-modifiers');
 
 const { redirects } = scriptlets;

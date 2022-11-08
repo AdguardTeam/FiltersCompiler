@@ -1,6 +1,6 @@
 /* eslint-disable global-require */
 module.exports = (() => {
-    const logger = require('./log.js');
+    const logger = require('./log');
 
     /**
      * Some sources require proper user-agents and forbid downloading without.

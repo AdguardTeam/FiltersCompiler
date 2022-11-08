@@ -1,6 +1,6 @@
 /* eslint-disable global-require */
 module.exports = (() => {
-    const logger = require('./utils/log.js');
+    const logger = require('./utils/log');
 
     const fs = require('fs');
     const path = require('path');

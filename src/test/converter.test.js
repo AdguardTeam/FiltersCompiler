@@ -1,6 +1,7 @@
 /* eslint-disable max-len */
 const scriptlets = require('@adguard/scriptlets');
-const converter = require('../main/converter.js');
+
+const converter = require('../main/converter');
 
 // Mock log to hide error messages
 jest.mock('../main/utils/log');

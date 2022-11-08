@@ -1,9 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 const { setLogger, setConfiguration, CompatibilityTypes } = require('@adguard/tsurlfilter');
-const builder = require('./src/main/builder.js');
-const schemaValidator = require('./src/main/json-validator.js');
-const localesValidator = require('./src/main/locales-validator.js');
+
+const builder = require('./src/main/builder');
+const schemaValidator = require('./src/main/json-validator');
+const localesValidator = require('./src/main/locales-validator');
 const logger = require('./src/main/utils/log');
 
 // Sets RuleConverter to use logger of current library

@@ -2,8 +2,9 @@
 const path = require('path');
 const fs = require('fs').promises;
 const { existsSync } = require('fs');
-const optimization = require('../main/optimization.js');
-const builder = require('../main/builder.js');
+
+const optimization = require('../main/optimization');
+const builder = require('../main/builder');
 
 // Mock log to hide error messages
 jest.mock('../main/utils/log');

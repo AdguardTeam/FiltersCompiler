@@ -1,4 +1,4 @@
-const optimization = require('../main/optimization.js');
+const optimization = require('../main/optimization');
 
 // Mock log to hide error messages
 jest.mock('../main/utils/log');

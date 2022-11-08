@@ -6,13 +6,14 @@ module.exports = (() => {
     const crypto = require('crypto');
     const moment = require('moment');
 
-    const logger = require('../utils/log.js');
-    const filter = require('./filter.js');
-    const workaround = require('../utils/workaround.js');
-    const converter = require('../converter.js');
+    const logger = require('../utils/log');
+    const filter = require('./filter');
+    const workaround = require('../utils/workaround');
+    const converter = require('../converter');
     const optimization = require('../optimization');
 
-    const RuleMasks = require('../rule/rule-masks.js');
+    const RuleMasks = require('../rule/rule-masks');
+
     const FiltersDownloader = require('filters-downloader');
 
     const RULES_SEPARATOR = '\r\n';

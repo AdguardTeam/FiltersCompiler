@@ -1,5 +1,6 @@
 const path = require('path');
-const localesValidator = require('../main/locales-validator.js');
+
+const localesValidator = require('../main/locales-validator');
 
 // Mock log to hide error messages
 jest.mock('../main/utils/log');

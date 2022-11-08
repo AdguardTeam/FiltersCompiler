@@ -1,4 +1,4 @@
-const version = require('../main/utils/version.js');
+const version = require('../main/utils/version');
 
 // Mock log to hide error messages
 jest.mock('../main/utils/log');
