@@ -1,7 +1,7 @@
 {
   "name": "adguard-filters-compiler",
   "version": "1.1.58",
-  "description": "Adguard filters compiler",
+  "description": "AdGuard filters compiler",
   "homepage": "http://adguard.com",
   "main": "index.js",
   "scripts": {
@@ -11,12 +11,12 @@
     "build-txt": "node tasks/build-txt.js"
   },
   "dependencies": {
+    "@adguard/extended-css": "^2.0.5",
     "@adguard/scriptlets": "^1.6.55",
-    "@adguard/tsurlfilter": "^1.0.42",
+    "@adguard/tsurlfilter": "^1.0.46",
     "ajv": "^6.10.2",
     "child_process": ">=1.0.2",
     "crypto": "1.0.1",
-    "extended-css": "git+https://github.com/AdguardTeam/ExtendedCss.git#v1.3.14",
     "filters-downloader": "git+https://github.com/AdguardTeam/FiltersDownloader.git#v1.1.12",
     "jsdom": "^16.3.0",
     "md5": "2.2.1",

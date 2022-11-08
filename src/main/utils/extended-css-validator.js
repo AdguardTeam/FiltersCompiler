@@ -12,7 +12,7 @@ module.exports = (function () {
     global.navigator = global.window.navigator;
     global.Element = global.window.Element;
 
-    const ExtendedCss = require('extended-css');
+    const { ExtendedCss } = require('@adguard/extended-css');
 
     /**
      * Validates css selector

@@ -2,6 +2,11 @@
 # yarn lockfile v1
 
 
+"@adguard/extended-css@^2.0.5":
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/@adguard/extended-css/-/extended-css-2.0.5.tgz#4160aa6e199b81bda7f77a811fc35c7ae7d87970"
+  integrity sha512-8UGgmsEidg1ab12s1slNK78rNuC/t/qKLjYhR9MidDSgpkGG8oGWQGRumKJgaw2oG22N8Stkl/Kd8lEuy8ugiw==
+
 "@adguard/scriptlets@^1.6.55":
   version "1.6.55"
   resolved "https://registry.yarnpkg.com/@adguard/scriptlets/-/scriptlets-1.6.55.tgz#e32941d1ae02405ce0e0996f550e5dcf39de7929"
@@ -10,13 +15,13 @@
     "@babel/runtime" "^7.7.2"
     js-yaml "^3.13.1"
 
-"@adguard/tsurlfilter@^1.0.42":
-  version "1.0.42"
-  resolved "https://registry.yarnpkg.com/@adguard/tsurlfilter/-/tsurlfilter-1.0.42.tgz#033647c9be5b658b884550602e97729df82e534c"
-  integrity sha512-t72nA2KtkKDPrgHtCHEJtIs6tIltAPC3ne7/nMVcgyd8XGnIUuVxqjsAiYKL9pAKiSJY1m/1VhImqStzu/+kHA==
+"@adguard/tsurlfilter@^1.0.46":
+  version "1.0.46"
+  resolved "https://registry.yarnpkg.com/@adguard/tsurlfilter/-/tsurlfilter-1.0.46.tgz#2108b52192c56aabe0b1602c8cde5fb740942b45"
+  integrity sha512-7WT7jRAoeSNJuFUcfYmR7elipyY+i+tiGUDlwiQZFO7OXsqlSMM1iwcrQhC6wIAiDK6her2nOZP8Nc731Fq5lA==
   dependencies:
+    "@adguard/extended-css" "^2.0.5"
     "@adguard/scriptlets" "^1.6.55"
-    extended-css "git+https://github.com/AdguardTeam/ExtendedCss.git#v1.3.16"
     ip6addr "^0.2.3"
     is-cidr "^4.0.2"
     is-ip "^3.1.0"
@@ -1706,14 +1711,6 @@ extend@~3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/extend/-/extend-3.0.2.tgz#f8b1136b4071fbd8eb140aff858b1019ec2915fa"
   integrity sha512-fjquC59cD7CyW6urNXK0FBufkZcoiGG80wTuPujX590cB5Ttln20E2UB4S/WARVqhXffZl2LNgS+gQdPIIim/g==
-
-"extended-css@git+https://github.com/AdguardTeam/ExtendedCss.git#v1.3.14":
-  version "1.3.14"
-  resolved "git+https://github.com/AdguardTeam/ExtendedCss.git#e8e2b1d1a732d3043b2227b4bd5511300b33ea3d"
-
-"extended-css@git+https://github.com/AdguardTeam/ExtendedCss.git#v1.3.16":
-  version "1.3.16"
-  resolved "git+https://github.com/AdguardTeam/ExtendedCss.git#ad9022e4c6e4b353896aa6048e13c9bd6f09c52e"
 
 external-editor@^3.0.3:
   version "3.1.0"
