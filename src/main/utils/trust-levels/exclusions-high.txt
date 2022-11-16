@@ -7,5 +7,7 @@
 !
 ! The following rules should be excluded:
 $replace
+#%#//scriptlet('trusted-
+#%#//scriptlet("trusted-
 #%#
 #@%#
