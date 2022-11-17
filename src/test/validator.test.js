@@ -16,16 +16,54 @@ jest.mock('../main/utils/log');
 
 describe('validator', () => {
     it('Test css validation', () => {
-        let rules = ['example.com##.div'];
+        let rules;
+
+        // valid selectors
+        rules = ['example.com##.div'];
         expect(validator.validate(rules).length).toBeGreaterThan(0);
 
         rules = ['example.com###div-id'];
         expect(validator.validate(rules).length).toBeGreaterThan(0);
 
+        rules = ['example.com##[style*="border-bottom: none;"]'];
+        expect(validator.validate(rules).length).toBeGreaterThan(0);
+
+        rules = ['example.com##[style^="background-color: rgb(24, 28, 31);"]'];
+        expect(validator.validate(rules).length).toBeGreaterThan(0);
+
+        rules = ['example.com##[data-bind="visible: showCookieWarning"]'];
+        expect(validator.validate(rules).length).toBeGreaterThan(0);
+
+        rules = ['example.com##.ProgressBar-container, .bx-align, .pico-content, .pico-overlay, [style*="z-index: 100000000;"]'];
+        expect(validator.validate(rules).length).toBeGreaterThan(0);
+
+        rules = ['example.com##[onclick^="window.open (\'https://example.com/share?url="]'];
+        expect(validator.validate(rules).length).toBeGreaterThan(0);
+
+        rules = ['example.com##[id^="jsgg"],[style^="height: 90px;"],.ad_text,#ysdiv'];
+        expect(validator.validate(rules).length).toBeGreaterThan(0);
+
+        rules = ['example.com##[style="min-height: 260px;"]:has([id^="adocean"])'];
+        expect(validator.validate(rules).length).toBeGreaterThan(0);
+
+        rules = ['example.com##[style*="border-radius: 3px; margin-bottom: 20px; width: 160px;"]:-abp-has([target="_blank"])'];
+        expect(validator.validate(rules).length).toBeGreaterThan(0);
+
+        // eslint-disable-next-line no-tabs
+        rules = ['example.com##div[style^=" margin-right: auto; margin-left: auto;	text-align: left; padding-top: 0px;	padding-bottom: 10px;"]'];
+        expect(validator.validate(rules).length).toBeGreaterThan(0);
+
+        // invalid selectors:
         rules = ['example.com##a[href^=/], .container:has(nav) > a[href]:lt($var)'];
         expect(validator.validate(rules)).toHaveLength(0);
 
         rules = ['example.com##%'];
+        expect(validator.validate(rules)).toHaveLength(0);
+
+        rules = ['example.com##.4wNET'];
+        expect(validator.validate(rules)).toHaveLength(0);
+
+        rules = ['pasazer.com##.\].slidein.\[.box'];
         expect(validator.validate(rules)).toHaveLength(0);
     });
 
@@ -49,6 +87,26 @@ describe('validator', () => {
         ruleText = `w3schools.com##${selector}`;
         rules = [ruleText];
         expect(validator.validate(rules).length).toBeGreaterThan(0);
+
+        selector = 'body > *:not(div):not(script):matches-css(width:336px)';
+        ruleText = `example.com##${selector}`;
+        rules = [ruleText];
+        expect(validator.validate(rules).length).toBeGreaterThan(0);
+
+        selector = 'div[class*=" "]:matches-css(background-image: /^url\(data:image/png;base64,iVBOR/)';
+        ruleText = `example.com##${selector}`;
+        rules = [ruleText];
+        expect(validator.validate(rules)).toHaveLength(1);
+
+        selector = 'div[class*=" "]:matches-css(background-image: /^url\\(https:\\/\\/sport\\.wp\\.pl\\//)';
+        ruleText = `example.com##${selector}`;
+        rules = [ruleText];
+        expect(validator.validate(rules)).toHaveLength(1);
+
+        selector = '#welcomeMainBanner_welcomeMain div[id*="_containerWrap_"]:has(img[src$="Banner/ad.jpg"]):remove()';
+        ruleText = `example.com##${selector}`;
+        rules = [ruleText];
+        expect(validator.validate(rules)).toHaveLength(1);
 
         selector = '.todaystripe:matches-css-before(display: block)';
         ruleText = `w3schools.com##${selector}`;
@@ -84,6 +142,11 @@ describe('validator', () => {
         expect(validator.validate(rules).length).toBeGreaterThan(0);
 
         selector = "[-ext-has='script:inject(var banner)']";
+        ruleText = `w3schools.com##${selector}`;
+        rules = [ruleText];
+        expect(validator.validate(rules)).toHaveLength(0);
+
+        selector = '.modals.dimmer > .gdpr.visible:upward(1):watch-attr([class])';
         ruleText = `w3schools.com##${selector}`;
         rules = [ruleText];
         expect(validator.validate(rules)).toHaveLength(0);

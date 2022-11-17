@@ -75,11 +75,12 @@ const validate = function (list, excluded, invalid = [], filterName) { // eslint
 
             // It is impossible to bundle jsdom into tsurlfilter, so we check if rules are valid in the compiler
             if (rule instanceof CosmeticRule && rule.getType() === CosmeticRuleType.ElementHiding) {
-                if (!extendedCssValidator.validateCssSelector(rule.getContent())) {
+                const validationResult = extendedCssValidator.validateCssSelector(rule.getContent());
+                if (!validationResult.ok) {
                     logger.error(`Invalid rule selector in ${filterName}: ${ruleText}`);
                     // log source rule text to the excluded log
-                    excludeRule(excluded, '! Invalid selector:', ruleText);
-                    invalid.push(`Invalid selector: ${ruleText}`);
+                    excludeRule(excluded, `! ${validationResult.error} in rule:`, ruleText);
+                    invalid.push(`${validationResult.error} in rule: ${ruleText}`);
                     return false;
                 }
             }
