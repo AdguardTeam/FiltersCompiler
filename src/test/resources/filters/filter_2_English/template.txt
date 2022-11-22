@@ -41,3 +41,6 @@ test.com#@?#.banner:matches-css(height: 200px)
 ||example.org^$csp=frame-src 'none'
 
 ||stringtoreplace^
+!
+example.com#%#//scriptlet('trusted-set-local-storage-item', 'iName', 'iValue')
+example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")

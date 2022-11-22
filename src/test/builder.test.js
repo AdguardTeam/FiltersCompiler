@@ -75,7 +75,7 @@ describe('Test builder', () => {
 
         let filterContent = await readFile(path.join(__dirname, 'resources/platforms/test', 'filters', '5.txt'));
         filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(53);
+        expect(filterLines.length).toBe(54);
 
         expect(filterLines.includes('||adsnet.com/*/700x350.gif$domain=example.com')).toBeTruthy();
         expect(filterLines.includes('example.com##+js(set-constant, ads, false)')).toBeTruthy();
@@ -94,9 +94,12 @@ describe('Test builder', () => {
         expect(filterLines.includes('||example.com/*.mp4$media,redirect=noop-1s.mp4')).toBeTruthy();
         expect(filterLines.includes('||example.com^$script,redirect-rule=noop.js')).toBeTruthy();
 
+        expect(filterLines.includes('example.com#%#//scriptlet(\'trusted-set-local-storage-item\', \'iName\', \'iValue\')')).toBeFalsy();
+        expect(filterLines.includes('example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")')).toBeFalsy();
+
         filterContent = await readFile(path.join(__dirname, 'resources/platforms/test2', 'filters', '5.txt'));
         filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(53);
+        expect(filterLines.length).toBe(54);
 
         expect(filterLines.includes('test.com#%#//scriptlet(\'abp-abort-on-property-read\', \'adsShown\')')).toBeTruthy();
         expect(filterLines.includes('example.com#@%#//scriptlet(\'abp-abort-on-property-write\', \'adblock.check\')')).toBeTruthy();
@@ -110,9 +113,12 @@ describe('Test builder', () => {
         expect(filterLines.includes('||example.com/*.mp4$media,redirect=noopmp4-1s')).toBeTruthy();
         expect(filterLines.includes('||example.com^$script,redirect-rule=noopjs')).toBeTruthy();
 
+        expect(filterLines.includes('example.com#%#//scriptlet(\'trusted-set-local-storage-item\', \'iName\', \'iValue\')')).toBeFalsy();
+        expect(filterLines.includes('example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")')).toBeFalsy();
+
         filterContent = await readFile(path.join(__dirname, 'resources/platforms/ios', 'filters', '5.txt'));
         filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(41);
+        expect(filterLines.length).toBe(42);
 
         expect(filterLines.includes('||example.com/images/*.mp4')).toBeTruthy();
         expect(filterLines.includes('test.com,mp4upload.com###overlay')).toBeTruthy();
@@ -184,7 +190,7 @@ describe('Test builder', () => {
         expect(filterContent).toBeTruthy();
 
         filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(50);
+        expect(filterLines.length).toBe(51);
 
         expect(filterLines[2]).toBe('! Title: AdGuard Base filter + EasyList');
         expect(filterLines.indexOf('![Adblock Plus 2.0]') >= 0).toBeTruthy();
@@ -216,7 +222,7 @@ describe('Test builder', () => {
         expect(filterContent).toBeTruthy();
 
         filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(36);
+        expect(filterLines.length).toBe(38);
 
         expect(filterLines.indexOf('test-common-rule.com') >= 0).toBeTruthy();
         expect(filterLines.indexOf('test-common-1-rule.com') >= 0).toBeFalsy();
@@ -225,11 +231,15 @@ describe('Test builder', () => {
         expect(filterLines.indexOf('excluded_platform') >= 0).toBeTruthy();
         expect(filterLines.indexOf('test_domain#%#testScript();') >= 0).toBeTruthy();
 
+        // 'trusted-' scriptlets should be included in full trust level filters
+        expect(filterLines.includes('example.com#%#//scriptlet(\'trusted-set-local-storage-item\', \'iName\', \'iValue\')')).toBeTruthy();
+        expect(filterLines.includes('example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")')).toBeTruthy();
+
         filterContent = await readFile(path.join(platformsPath, 'hints', 'filters', '2.txt'));
         expect(filterContent).toBeTruthy();
 
         filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(49);
+        expect(filterLines.length).toBe(52);
 
         expect(filterLines.indexOf('test-common-rule.com') >= 0).toBeTruthy();
         expect(filterLines.indexOf('test-common-1-rule.com') >= 0).toBeTruthy();
@@ -243,7 +253,7 @@ describe('Test builder', () => {
         expect(filterContent).toBeTruthy();
 
         filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(49);
+        expect(filterLines.length).toBe(52);
 
         expect(filterLines.indexOf('test.com#%#var isadblock=1;') >= 0).toBeTruthy();
         expect(filterLines.indexOf('test.com#%#//scriptlet(\'ubo-abort-on-property-read.js\', \'Object.prototype.getBanner\')') >= 0).toBeTruthy();
@@ -352,7 +362,7 @@ describe('Test builder', () => {
         expect(filterContent).toBeTruthy();
 
         filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(52);
+        expect(filterLines.length).toBe(53);
 
         expect(filterLines.indexOf('||example.com^$script,redirect=noopjs') >= 0).toBeTruthy();
         expect(filterLines.indexOf('||example.com/banner$image,redirect=1x1-transparent.gif') >= 0).toBeTruthy();

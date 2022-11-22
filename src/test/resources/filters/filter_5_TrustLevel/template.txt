@@ -59,3 +59,6 @@ example.com##div.grid_1[class$="app"]
 ||test.com^$script,rewrite=abp-resource:blank-js
 ||example.com/*.mp4$media,redirect=noopmp4-1s
 ||example.com^$script,redirect-rule=noopjs
+!
+example.com#%#//scriptlet('trusted-set-local-storage-item', 'iName', 'iValue')
+example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")
