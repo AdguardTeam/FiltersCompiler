@@ -37,6 +37,11 @@ describe('validator', () => {
             'div[class^="sc-"]::before',
             // native Document.querySelectorAll does not throws error on this selector so we consider it as valid
             '.video-holder > .video-options ::after',
+            // should be valid but there is an issue with `nwsapi` which is used in `jsdom`
+            // which is used in ExtendedCss to validate selectors
+            // https://github.com/dperini/nwsapi/issues/34
+            // TODO: check later is it fixed
+            // 'a[href^="/watch?v="][onclick^="return test.onEvent(arguments[0]||window.event,\'"]',
         ];
         test.each(validSelectors)('%s', (selector) => {
             const rules = [`example.com##${selector}`];
@@ -48,6 +53,8 @@ describe('validator', () => {
             '%',
             '.4wNET',
             '.\].slidein.\[.box',
+            'div[class"ads-article"]',
+            'img[height="60"][width"468"]',
         ];
         test.each(invalidSelectors)('%s', (selector) => {
             const rules = [`example.com##${selector}`];

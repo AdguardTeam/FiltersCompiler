@@ -40,3 +40,7 @@ test.com#%#AG_setConstant("ads", "false");
 test.com#@%#Object.defineProperty(window, 'abcde', { get: function() { return []; } });
 ! ||test.com/res/js/*.js$replace=/\"OK\/banners/\"OK\/banners__\// is excluded by "$replace" in exclusions-high.txt
 ||test.com/res/js/*.js$replace=/\"OK\/banners/\"OK\/banners__\//
+! example.com#%#//scriptlet('trusted-set-local-storage-item', 'iName', 'iValue') is excluded by "#%#//scriptlet('trusted-" in exclusions-high.txt
+example.com#%#//scriptlet('trusted-set-local-storage-item', 'iName', 'iValue')
+! example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue") is excluded by "#%#//scriptlet("trusted-" in exclusions-high.txt
+example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")
