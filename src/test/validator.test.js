@@ -42,6 +42,9 @@ describe('validator', () => {
             // https://github.com/dperini/nwsapi/issues/34
             // TODO: check later is it fixed
             // 'a[href^="/watch?v="][onclick^="return test.onEvent(arguments[0]||window.event,\'"]',
+            // escaped colon at start of attribute name
+            'div[\\:data-service-slot][data-ac]',
+            '#main-container > div[\\:class^="$test.ad.RenderedDesktop"]',
         ];
         test.each(validSelectors)('%s', (selector) => {
             const rules = [`example.com##${selector}`];
