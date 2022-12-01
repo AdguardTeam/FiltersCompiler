@@ -1,5 +1,17 @@
 # Filters Compiler Changelog
 
+## v1.1.66
+
+### Updated
+
+* ExtendedCss to v2.0.18
+
+## v1.1.65
+
+### Updated
+
+* ExtendedCss to v2.0.15
+
 ## v1.1.64
 
 ### Updated

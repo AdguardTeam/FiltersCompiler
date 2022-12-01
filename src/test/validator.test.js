@@ -45,6 +45,8 @@ describe('validator', () => {
             // escaped colon at start of attribute name
             'div[\\:data-service-slot][data-ac]',
             '#main-container > div[\\:class^="$test.ad.RenderedDesktop"]',
+            'div[class\\"ads-article\\"]',
+            "[class\\'ads-article\\']",
         ];
         test.each(validSelectors)('%s', (selector) => {
             const rules = [`example.com##${selector}`];
