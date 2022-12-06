@@ -60,6 +60,7 @@ describe('validator', () => {
             '.\].slidein.\[.box',
             'div[class"ads-article"]',
             'img[height="60"][width"468"]',
+            'table[style*=border: 0px"]',
         ];
         test.each(invalidSelectors)('%s', (selector) => {
             const rules = [`example.com##${selector}`];
