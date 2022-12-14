@@ -1,5 +1,12 @@
 # Filters Compiler Changelog
 
+## v1.1.68
+
+### Updated
+
+* Scriptlets to v1.7.13
+* TSUrlFilter to 1.0.63
+
 ## v1.1.67
 
 ### Updated
