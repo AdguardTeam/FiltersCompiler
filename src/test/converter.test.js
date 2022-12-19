@@ -248,6 +248,14 @@ describe('converter', () => {
         expected = 'example.org##+js(abort-on-property-write, adblock.check)';
         expect(actual).toBe(expected);
 
+        actual = scriptlets.convertAdgToUbo("example.org#%#//scriptlet('set-constant', 'dataLayer', 'emptyArr')");
+        expected = 'example.org##+js(set-constant, dataLayer, [])';
+        expect(actual).toBe(expected);
+
+        actual = scriptlets.convertAdgToUbo("example.org#%#//scriptlet('set-constant', 'dataLayer', 'emptyObj')");
+        expected = 'example.org##+js(set-constant, dataLayer, {})';
+        expect(actual).toBe(expected);
+
         actual = scriptlets.convertAbpToAdg('test.com#$#abort-on-property-read adsShown');
         expected = "test.com#%#//scriptlet('abp-abort-on-property-read', 'adsShown')";
         expect(actual[0]).toBe(expected);

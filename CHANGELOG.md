@@ -1,37 +1,50 @@
 # Filters Compiler Changelog
 
+
+## v1.1.69
+
+### Changed
+
+- Updated Scriptlets to v1.7.14
+- Updated TSUrlFilter to 1.0.64
+
+
 ## v1.1.68
 
-### Updated
+### Changed
 
-* Scriptlets to v1.7.13
-* TSUrlFilter to 1.0.63
+- Updated Scriptlets to v1.7.13
+- Updated TSUrlFilter to 1.0.63
+
 
 ## v1.1.67
 
-### Updated
+### Changed
 
-* ExtendedCss to v2.0.24
-* Scriptlets to v1.7.10
-* TSUrlFilter to 1.0.57
+- Updated ExtendedCss to v2.0.24
+- Updated Scriptlets to v1.7.10
+- Updated TSUrlFilter to 1.0.57
+
 
 ## v1.1.66
 
-### Updated
+### Changed
 
-* ExtendedCss to v2.0.18
+- Updated ExtendedCss to v2.0.18
+
 
 ## v1.1.65
 
-### Updated
+### Changed
 
-* ExtendedCss to v2.0.15
+- Updated ExtendedCss to v2.0.15
+
 
 ## v1.1.64
 
-### Updated
+### Changed
 
-* ExtendedCss to v2.0.12
+- Updated ExtendedCss to v2.0.12
 
 
 ## v1.1.63
@@ -40,6 +53,6 @@
 
 * Support of Trusted scriptlets and their exclusion from list which trust-level is not `full`
 
-### Updated
+### Changed
 
-* TSUrlFilter to v1.0.51, Scriptlets to v1.7.3
+- Updated TSUrlFilter to v1.0.51, Scriptlets to v1.7.3
