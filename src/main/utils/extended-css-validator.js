@@ -23,6 +23,49 @@ module.exports = (function () {
      */
 
     /**
+     * Related to the bug — pseudo-class arg with combinators.
+     *
+     * @see {@link https://github.com/dperini/nwsapi/issues/55}
+     *
+     * @example
+     * '*:not(div > span)'
+     */
+    const VALID_PSEUDO_CLASS_COMBINATOR_ARG_REGEXP = /(.+)?:(not|is)\((.+)?(~|>|\+)(.+)?\)(.+)?/;
+
+    /**
+     * Related to the bug — pseudo-class arg with parenthesis in attribute value.
+     *
+     * @see {@link https://github.com/dperini/nwsapi/issues/71}
+     *
+     * @example
+     * 'div:not([right=")"])'
+     * 'body *:not([left="("])'
+     */
+    const VALID_PSEUDO_CLASS_PARENTHESIS_ARG_REGEXP = /(.+)?:(not|is)\((.+)?\[.+=("|')(.+)?(\(|\))(.+)?("|')\]\)/;
+
+    // TODO: remove backupValidate() after the bugs are fixed
+    /**
+     * Validates `selector` by its matching with specific regular expressions due to nwsapi bugs:
+     * @see {@link https://github.com/dperini/nwsapi/issues/55},
+     * @see {@link https://github.com/dperini/nwsapi/issues/71}.
+     *
+     * @param selector Selector to validate.
+     * @param originalError Previous validation error for selectors which are non-related to the bugs.
+     *
+     * @returns {SelectorValidationResult}
+     */
+    const backupValidate = (selector, originalError) => {
+        const isValidArgBugRelated = VALID_PSEUDO_CLASS_COMBINATOR_ARG_REGEXP.test(selector)
+            || VALID_PSEUDO_CLASS_PARENTHESIS_ARG_REGEXP.test(selector);
+        // if selector is not matched by the regexp specific to the bug
+        // original validate error should be returned
+        if (!isValidArgBugRelated) {
+            return { ok: false, error: originalError };
+        }
+        return { ok: true, error: null };
+    };
+
+    /**
      * Validates css selector, uses ExtendedCss.validate() for it.
      *
      * @param selectorText
@@ -55,7 +98,14 @@ module.exports = (function () {
             };
         }
 
-        return ExtendedCss.validate(selectorText);
+        let validation = ExtendedCss.validate(selectorText);
+        // TODO: remove later when the bug is fixed
+        // https://github.com/dperini/nwsapi/issues/55
+        // ExtendedCss.validate() should be enough for selector validation
+        if (!validation.ok) {
+            validation = backupValidate(selectorText, validation.error);
+        }
+        return validation;
     };
 
     return {

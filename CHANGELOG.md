@@ -1,5 +1,11 @@
 # Filters Compiler Changelog
 
+## Unreleased
+
+### Changed
+
+- CSS selectors validation due to related third-party bugs — [nwsapi#55](https://github.com/dperini/nwsapi/issues/55) and [nwsapi#71](https://github.com/dperini/nwsapi/issues/71)
+
 
 ## v1.1.69
 
