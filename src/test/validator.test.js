@@ -59,6 +59,9 @@ describe('validator', () => {
             '.share--content button:not([onclick="window.print();"])',
             '.sns > a[href^="javascript:openSendNews"]:not([href="javascript:openSendNews(\'url\');"])',
             '.social > nav > ul > li > a[href="javascript:;"][onclick^="Share"]:not([onclick="Share(\'P\');"])',
+            // `*:not(<arg>)` with standard selector `arg`
+            'html:not([style]) tbody > tr[align="left"]',
+            '.banner:has(~ .right_bx, ~ div[class^="aside"])',
         ];
         test.each(validSelectors)('%s', (selector) => {
             const rules = [`example.com##${selector}`];
@@ -73,6 +76,10 @@ describe('validator', () => {
             'div[class"ads-article"]',
             'img[height="60"][width"468"]',
             'table[style*=border: 0px"]',
+            // `*:not(<arg>)` with extended selector `arg`
+            // not valid due to top DOM node limitation
+            // https://github.com/AdguardTeam/ExtendedCss/#extended-css-not-limitations
+            'html:not(:has(span))',
         ];
         test.each(invalidSelectors)('%s', (selector) => {
             const rules = [`example.com##${selector}`];

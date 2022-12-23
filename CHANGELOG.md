@@ -1,10 +1,27 @@
 # Filters Compiler Changelog
 
-## Unreleased
+
+## v1.1.71
 
 ### Changed
 
-- CSS selectors validation due to related third-party bugs — [nwsapi#55](https://github.com/dperini/nwsapi/issues/55) and [nwsapi#71](https://github.com/dperini/nwsapi/issues/71)
+- Updated ExtendedCss to v2.0.33:
+    - `:not()` and `:is()` pseudo-classes with no extended selector arg
+        are considered as standard — top DOM node limitation
+        [[1]](https://github.com/AdguardTeam/ExtendedCss/#extended-css-not-limitations)
+        [[2]](https://github.com/AdguardTeam/ExtendedCss/#extended-css-is-limitations)
+    -  validation of CSS selectors due to related third-party bugs [nwsapi#55](https://github.com/dperini/nwsapi/issues/55)
+        and [nwsapi#71](https://github.com/dperini/nwsapi/issues/71)
+- Updated Scriptlets to v1.7.19
+- Updated TSUrlFilter to 1.0.66
+
+### Added
+
+- Conversion for `google-ima3` redirect [#167](https://github.com/AdguardTeam/FiltersCompiler/issues/167)
+
+### Removed
+
+- Support of `$webrtc` modifier
 
 
 ## v1.1.69

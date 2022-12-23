@@ -398,6 +398,11 @@ describe('converter', () => {
             expected = '/blockadblock.$script,redirect=prevent-bab';
             expect(actual[0]).toBe(expected);
 
+            // https://github.com/AdguardTeam/FiltersCompiler/issues/167
+            actual = converter.convertRulesToAdgSyntax(['||imasdk.googleapis.com/js/sdkloader/ima3.js$script,important,redirect=google-ima.js,domain=example.com']);
+            expected = '||imasdk.googleapis.com/js/sdkloader/ima3.js$script,important,redirect=google-ima3,domain=example.com';
+            expect(actual[0]).toBe(expected);
+
             actual = converter.convertAdgRedirectsToUbo(['/blockadblock.$script,redirect=prevent-bab']);
             expected = '/blockadblock.$script,redirect=nobab.js';
             expect(actual[0]).toBe(expected);

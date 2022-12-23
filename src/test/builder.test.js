@@ -190,7 +190,7 @@ describe('Test builder', () => {
         expect(filterContent).toBeTruthy();
 
         filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(51);
+        expect(filterLines.length).toBe(50);
 
         expect(filterLines[2]).toBe('! Title: AdGuard Base filter + EasyList');
         expect(filterLines.indexOf('![Adblock Plus 2.0]') >= 0).toBeTruthy();
@@ -205,12 +205,17 @@ describe('Test builder', () => {
         expect(filterLines.indexOf('test.com#%#var isadblock=1;') === -1).toBeTruthy();
         expect(filterLines.indexOf('example.com#%#AG_onLoad(function() { AG_removeElementBySelector(\'span[class="intexta"]\'); });') === -1).toBeTruthy();
         expect(filterLines.indexOf('test.com##+js(abort-on-property-read, Object.prototype.getBanner)') >= 0).toBeTruthy();
+        // $webrtc is deprecated
+        expect(filterLines.indexOf('||example.com^$webrtc,domain=example.org') >= 0).toBeFalsy();
 
         filterContent = await readFile(path.join(platformsPath, 'test', 'filters', '2_optimized.txt'));
         expect(filterContent).toBeTruthy();
         filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(35);
+        expect(filterLines.length).toBe(34);
         expect(filterLines[2]).toBe('! Title: AdGuard Base filter + EasyList (Optimized)');
+
+        // $webrtc is deprecated
+        expect(filterLines.indexOf('||example.com^$webrtc,domain=example.org') >= 0).toBeFalsy();
 
         filterContent = await readFile(path.join(platformsPath, 'test', 'filters', '2_without_easylist.txt'));
         expect(filterContent).toBeTruthy();
@@ -222,7 +227,7 @@ describe('Test builder', () => {
         expect(filterContent).toBeTruthy();
 
         filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(38);
+        expect(filterLines.length).toBe(37);
 
         expect(filterLines.indexOf('test-common-rule.com') >= 0).toBeTruthy();
         expect(filterLines.indexOf('test-common-1-rule.com') >= 0).toBeFalsy();
@@ -230,6 +235,9 @@ describe('Test builder', () => {
         expect(filterLines.indexOf('~nigma.ru,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]') >= 0).toBeFalsy();
         expect(filterLines.indexOf('excluded_platform') >= 0).toBeTruthy();
         expect(filterLines.indexOf('test_domain#%#testScript();') >= 0).toBeTruthy();
+
+        // $webrtc is deprecated
+        expect(filterLines.indexOf('||example.com^$webrtc,domain=example.org') >= 0).toBeFalsy();
 
         // 'trusted-' scriptlets should be included in full trust level filters
         expect(filterLines.includes('example.com#%#//scriptlet(\'trusted-set-local-storage-item\', \'iName\', \'iValue\')')).toBeTruthy();
@@ -239,7 +247,7 @@ describe('Test builder', () => {
         expect(filterContent).toBeTruthy();
 
         filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(52);
+        expect(filterLines.length).toBe(51);
 
         expect(filterLines.indexOf('test-common-rule.com') >= 0).toBeTruthy();
         expect(filterLines.indexOf('test-common-1-rule.com') >= 0).toBeTruthy();
@@ -247,6 +255,9 @@ describe('Test builder', () => {
         expect(filterLines.indexOf('~nigma.ru,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]') >= 0).toBeTruthy();
         expect(filterLines.indexOf('excluded_platform') >= 0).toBeTruthy();
         expect(filterLines.indexOf('test_domain#%#testScript();') >= 0).toBeTruthy();
+
+        // $webrtc is deprecated
+        expect(filterLines.indexOf('||example.com^$webrtc,domain=example.org') >= 0).toBeFalsy();
 
         // Check iOS platform
         filterContent = await readFile(path.join(platformsPath, 'ios', 'filters', '2.txt'));
