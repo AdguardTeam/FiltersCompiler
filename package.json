@@ -14,7 +14,7 @@
   "dependencies": {
     "@adguard/extended-css": "^2.0.33",
     "@adguard/scriptlets": "^1.7.19",
-    "@adguard/tsurlfilter": "^1.0.66",
+    "@adguard/tsurlfilter": "^1.0.67",
     "ajv": "^8.11.0",
     "child_process": ">=1.0.2",
     "filters-downloader": "git+https://github.com/AdguardTeam/FiltersDownloader.git#v1.1.12",

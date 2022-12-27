@@ -15,10 +15,10 @@
     "@babel/runtime" "^7.7.2"
     js-yaml "^3.13.1"
 
-"@adguard/tsurlfilter@^1.0.66":
-  version "1.0.66"
-  resolved "https://registry.yarnpkg.com/@adguard/tsurlfilter/-/tsurlfilter-1.0.66.tgz#dd8bca87cf88fdf985b7249ffc9a40ec32f671bf"
-  integrity sha512-RklWl/7nuWR4+lzis1nIwq6zw2EgQ7zIFdrhVCLqISW8oi+jfCD54cQVyIRKODLxFI//0OQvTpv4giWzOnJX7A==
+"@adguard/tsurlfilter@^1.0.67":
+  version "1.0.67"
+  resolved "https://registry.yarnpkg.com/@adguard/tsurlfilter/-/tsurlfilter-1.0.67.tgz#967189403924377011c5f12220115ab76d1005e8"
+  integrity sha512-CkZ9PYzhOh1/0lFhrJaroKlx2+h7b0frrbwsiVm50NIa34cLmjRcHjm9Tn7S0guLbg5r8B+VxZir0KaJ3U2+jw==
   dependencies:
     "@adguard/extended-css" "^2.0.33"
     "@adguard/scriptlets" "^1.7.19"

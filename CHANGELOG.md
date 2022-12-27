@@ -1,6 +1,14 @@
 # Filters Compiler Changelog
 
 
+## v1.1.72
+
+### Changed
+
+- Updated TSUrlFilter to v1.0.67:
+    - validation of `$jsonprune` modifier
+
+
 ## v1.1.71
 
 ### Changed

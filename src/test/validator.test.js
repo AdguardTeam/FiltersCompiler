@@ -597,6 +597,17 @@ describe('validator', () => {
         expect(validator.validate(rules)).toHaveLength(0);
     });
 
+    describe('validate jsonprune modifier', () => {
+        const validRules = [
+            '||example.org/*/*/$xmlhttprequest,jsonprune=\\$..[ac\\, ab]',
+            '||example.org/*/*/$jsonprune=\\$..[ac\\, ab],xmlhttprequest',
+            '||example.org/*/*/$xmlhttprequest,jsonprune=\\$.data.*.attributes',
+        ];
+        test.each(validRules)('%s', (rule) => {
+            expect(validator.validate([rule])).toHaveLength(1);
+        });
+    });
+
     it('checkAffinityDirectives test', () => {
         let rules = [
             '||test1.ru',
