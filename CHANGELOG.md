@@ -1,6 +1,6 @@
 # Filters Compiler Changelog
 
-## v1.1.72
+## v1.1.73
 
 ### Changed
 
