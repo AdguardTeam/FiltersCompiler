@@ -608,6 +608,17 @@ describe('validator', () => {
         });
     });
 
+    describe('validate hls modifier', () => {
+        const validRules = [
+            '||example.org^$hls=preroll',
+            '||example.org^$hls=\\/videoplayback^?*&source=dclk_video_ads',
+            '||example.org^$hls=/#UPLYNK-SEGMENT:.*\\,ad/t',
+        ];
+        test.each(validRules)('%s', (rule) => {
+            expect(validator.validate([rule])).toHaveLength(1);
+        });
+    });
+
     it('checkAffinityDirectives test', () => {
         let rules = [
             '||test1.ru',

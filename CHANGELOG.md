@@ -1,5 +1,12 @@
 # Filters Compiler Changelog
 
+## v1.1.72
+
+### Changed
+
+- Updated TSUrlFilter to v1.0.68:
+    - validation of `$hls` modifier
+
 
 ## v1.1.72
 
