@@ -409,7 +409,7 @@ describe('converter', () => {
 
             // https://github.com/AdguardTeam/Scriptlets/issues/127
             actual = converter.convertAdgRedirectsToUbo(['||googletagmanager.com/gtm.js$script,redirect=googletagmanager-gtm,domain=morningstar.nl']);
-            expected = '||googletagmanager.com/gtm.js$script,redirect=google-analytics_ga.js,domain=morningstar.nl';
+            expected = '||googletagmanager.com/gtm.js$script,redirect=googletagmanager_gtm.js,domain=morningstar.nl';
             expect(actual[0]).toBe(expected);
 
             // media type for 'empty' redirect
