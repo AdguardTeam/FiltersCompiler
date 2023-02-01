@@ -1,11 +1,21 @@
 # Filters Compiler Changelog
 
+
+## v1.1.76
+
+### Changed
+
+- Updated ExtendedCss to v2.0.45
+- Updated TSUrlFilter to 1.0.73
+
+
 ## v1.1.75
 
 ### Changed
 
 - Updated Scriptlets to v1.8.2
 - Updated TSUrlFilter to 1.0.72
+
 
 ## v1.1.73
 
