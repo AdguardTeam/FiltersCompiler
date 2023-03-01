@@ -21,8 +21,12 @@ module.exports = (() => {
     const metadataFilterIdsPool = [];
 
     const PLATFORM_FILTERS_DIR = 'filters';
-    const FILTERS_METADATA_FILE = 'filters.json';
-    const FILTERS_I18N_METADATA_FILE = 'filters_i18n.json';
+    const FILTERS_METADATA_FILE_JSON = 'filters.json';
+    const FILTERS_I18N_METADATA_FILE_JSON = 'filters_i18n.json';
+
+    // AG-20175
+    const FILTERS_METADATA_FILE_JS = 'filters.js';
+    const FILTERS_I18N_METADATA_FILE_JS = 'filters_i18n.js';
 
     /**
      * From 1 to 99 we have AdGuard filters
@@ -490,7 +494,8 @@ module.exports = (() => {
             createDir(platformDir);
 
             logger.info(`Writing filters metadata: ${config.path}`);
-            const filtersFile = path.join(platformDir, FILTERS_METADATA_FILE);
+            const filtersFileJson = path.join(platformDir, FILTERS_METADATA_FILE_JSON);
+            const filtersFileJs = path.join(platformDir, FILTERS_METADATA_FILE_JS);
             let metadata = { groups, tags, filters: filtersMetadata };
             metadata = rewriteSubscriptionUrls(metadata, config);
             metadata = removeRedundantFiltersMetadata(metadata, config.platform);
@@ -501,27 +506,34 @@ module.exports = (() => {
                 metadata = removeObsoleteFilters(metadata);
             }
 
-            fs.writeFileSync(filtersFile, JSON.stringify(metadata, null, '\t'), 'utf8');
+            const filtersContent = JSON.stringify(metadata, null, '\t');
+
+            fs.writeFileSync(filtersFileJson, filtersContent, 'utf8');
+            fs.writeFileSync(filtersFileJs, filtersContent, 'utf8');
 
             logger.info(`Writing filters localizations: ${config.path}`);
-            const filtersI18nFile = path.join(platformDir, FILTERS_I18N_METADATA_FILE);
+            const filtersI18nFileJson = path.join(platformDir, FILTERS_I18N_METADATA_FILE_JSON);
+            const filtersI18nFileJs = path.join(platformDir, FILTERS_I18N_METADATA_FILE_JS);
 
-            let localisedFilters = {};
+            let localizedFilters = {};
             if (platform === 'MAC') {
-                localisedFilters = { ...localizations.filters };
+                localizedFilters = { ...localizations.filters };
             } else {
-                localisedFilters = excludeObsoleteFilters(localizations.filters, obsoleteFilters);
+                localizedFilters = excludeObsoleteFilters(localizations.filters, obsoleteFilters);
             }
             const i18nMetadata = {
                 groups: localizations.groups,
                 tags: localizations.tags,
-                filters: localisedFilters,
+                filters: localizedFilters,
             };
             if (platform === 'MAC') {
                 delete i18nMetadata.tags;
             }
 
-            fs.writeFileSync(filtersI18nFile, JSON.stringify(i18nMetadata, null, '\t'), 'utf8');
+            const i18nContent = JSON.stringify(i18nMetadata, null, '\t');
+
+            fs.writeFileSync(filtersI18nFileJson, i18nContent, 'utf8');
+            fs.writeFileSync(filtersI18nFileJs, i18nContent, 'utf8');
         }
 
         logger.info('Writing filters metadata done');

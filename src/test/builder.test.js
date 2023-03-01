@@ -545,4 +545,16 @@ describe('Test builder', () => {
 
         await expect(builder.build(filtersDir, null, null, platformsPath, platformsConfig, [9])).rejects.toThrow(/^ENOENT: no such file or directory, open.*non-existing-file\.txt.*$/);
     });
+
+    it('filters.js and filters_i18n.js as copies of the json files', async () => {
+        const platformsPath = path.join(__dirname, './resources/platforms');
+
+        const filtersJson = await readFile(path.join(platformsPath, 'test', 'filters.json'));
+        const filtersJs = await readFile(path.join(platformsPath, 'test', 'filters.js'));
+        expect(filtersJson).toEqual(filtersJs);
+
+        const filtersI18nJson = await readFile(path.join(platformsPath, 'test', 'filters_i18n.json'));
+        const filtersI18nJs = await readFile(path.join(platformsPath, 'test', 'filters_i18n.js'));
+        expect(filtersI18nJson).toEqual(filtersI18nJs);
+    });
 });
