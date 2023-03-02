@@ -1,6 +1,13 @@
 # Filters Compiler Changelog
 
 
+## v1.1.77
+
+### Added
+
+- Build .js copies of `filters.json` and `filters_i18n.json`
+
+
 ## v1.1.76
 
 ### Changed
