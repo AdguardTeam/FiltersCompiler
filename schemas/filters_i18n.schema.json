@@ -34094,6 +34094,1135 @@
             }
           }
         },
+        "23": {
+            "$id": "#/properties/filters/properties/23",
+            "type": "object",
+            "title": "The 23 Schema",
+            "required": [
+              "ar",
+              "be",
+              "bg",
+              "ca",
+              "da",
+              "de",
+              "en",
+              "es",
+              "es_ES",
+              "fa",
+              "fi",
+              "fr",
+              "he",
+              "hr",
+              "hu",
+              "id",
+              "it",
+              "ja",
+              "ko",
+              "nl",
+              "no",
+              "pl",
+              "pt",
+              "pt_BR",
+              "pt_PT",
+              "ru",
+              "sk",
+              "sl",
+              "sr",
+              "sv",
+              "tr",
+              "uk",
+              "vi",
+              "zh",
+              "zh_TW"
+            ],
+            "properties": {
+              "ar": {
+                "$id": "#/properties/filters/properties/23/properties/ar",
+                "type": "object",
+                "title": "The Ar Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/ar/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "فلترإسباني / برتغاليAdGuard"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/ar/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "قائمة التصفية التي تزيل الإعلانات تحديدًا على مواقع الويب باللغتين الإسبانية والبرتغالية"
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "be": {
+                "$id": "#/properties/filters/properties/23/properties/be",
+                "type": "object",
+                "title": "The Be Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/be/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "Іспана-партугальскі фільтр"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/be/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "Іспана-партугальскі фільтр AdGuard. Фільтр, што дазваляе прыбраць рэкламу з сайтаў на іспанскай і партугальскай мовах."
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "bg": {
+                "$id": "#/properties/filters/properties/23/properties/bg",
+                "type": "object",
+                "title": "The Bg Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/bg/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "Испански/Португалски филтър"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/bg/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "Филтър, който дава възможност за блокиране на реклами на уеб сайтове на испански и португалски език."
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "ca": {
+                "$id": "#/properties/filters/properties/23/properties/ca",
+                "type": "object",
+                "title": "The Ca Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/ca/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "Filtre Espanyol/Portugués"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/ca/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "Filtre que permet bloquejar els anunci de publicitat en  Espanyol i Portugués."
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "da": {
+                "$id": "#/properties/filters/properties/23/properties/da",
+                "type": "object",
+                "title": "The Da Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/da/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "AdGuard Spansk/Portugisisk filter"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/da/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "Filterliste som specifikt fjerner reklamer på spansk/portugisisksprogede hjemmesider."
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "de": {
+                "$id": "#/properties/filters/properties/23/properties/de",
+                "type": "object",
+                "title": "The De Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/de/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "AdGuard Spanischer/Portugiesischer Filter"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/de/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "Filterliste , die spezifisch Anzeigen auf spanischen/portugiesischen Webseiten blockiert."
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "en": {
+                "$id": "#/properties/filters/properties/23/properties/en",
+                "type": "object",
+                "title": "The En Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/en/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "AdGuard Spanish/Portuguese filter"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/en/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "Filter list that specifically removes ads on websites in the Spanish and Portuguese languages."
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "es": {
+                "$id": "#/properties/filters/properties/23/properties/es",
+                "type": "object",
+                "title": "The Es Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/es/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "Filtro para español/portugués"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/es/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "Filtro español/portugués de AdGuard. Este filtro quita anuncios en sitios web españoles o portugueses."
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "es_ES": {
+                "$id": "#/properties/filters/properties/23/properties/es_ES",
+                "type": "object",
+                "title": "The Es_es Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/es_ES/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "Filtro para español/portugués"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/es_ES/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "Filtro español/portugués de AdGuard. Este filtro quita anuncios en sitios web españoles o portugueses."
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "fa": {
+                "$id": "#/properties/filters/properties/23/properties/fa",
+                "type": "object",
+                "title": "The Fa Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/fa/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "فیلتر اسپانیایی و پرتغالی"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/fa/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "فیلتر اَدگارد اسپانیایی/پرتغالی. فیلتر اَدگارد اسپانیایی/پرتغالی. این لیست فیلترها،مخصوص حذف تبلیغات وبسایت های اسپانیایی/پرتغالی زبان است."
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "fi": {
+                "$id": "#/properties/filters/properties/23/properties/fi",
+                "type": "object",
+                "title": "The Fi Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/fi/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "Espanjalainen / Portugalilainen suodatin"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/fi/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "Suodatin joka mahdollistaa mainosten eston portugalin- ja espanjankielisillä verkkosivuilla."
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "fr": {
+                "$id": "#/properties/filters/properties/23/properties/fr",
+                "type": "object",
+                "title": "The Fr Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/fr/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "Filtre AdGuard Espagnol/Portugais"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/fr/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "Liste de filtres faits pour bloquer les publicités sur les sites web en Espagnol et en Portugais."
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "he": {
+                "$id": "#/properties/filters/properties/23/properties/he",
+                "type": "object",
+                "title": "The He Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/he/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "מסנו ספרדי/פורטוגזי"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/he/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      ".המסנן הספרדי/פורטוגזי של אדגארד מסנן רשימה שבאופן ספציפי מסירה פרסומות באתרים בשפה ספרדי ופורטוגזית"
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "hr": {
+                "$id": "#/properties/filters/properties/23/properties/hr",
+                "type": "object",
+                "title": "The Hr Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/hr/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "Filter za španjolski i portugalski"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/hr/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "Filter koji omogućuje blokiranje oglasa na španjolskim i portugalskim stranicama"
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "hu": {
+                "$id": "#/properties/filters/properties/23/properties/hu",
+                "type": "object",
+                "title": "The Hu Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/hu/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "Spanyol/portugál szűrő"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/hu/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "Szűrő ami engedélyezi a reklámok tiltását spanyol és portugál weboldalakon."
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "id": {
+                "$id": "#/properties/filters/properties/23/properties/id",
+                "type": "object",
+                "title": "The Id Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/id/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "Penyaring AdGuard Spanyol/Portugis"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/id/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "Daftar penyaring yang secara khusus menghapus iklan di situs web dalam bahasa Spanyol dan Portugis."
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "it": {
+                "$id": "#/properties/filters/properties/23/properties/it",
+                "type": "object",
+                "title": "The It Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/it/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "Filtro spagnolo/portoghese"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/it/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "Filtro spagnolo/portoghese di Adguard. Filtro che rimuove specificatamente annunci sui siti web in lingua spagnola e portoghese."
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "ja": {
+                "$id": "#/properties/filters/properties/23/properties/ja",
+                "type": "object",
+                "title": "The Ja Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/ja/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "スペイン語/ポルトガル語フィルタ"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/ja/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "AdGuardスペイン語/ポルトガル語フィルタ。スペイン語とポルトガル語のウェブ広告を除去するフィルタリストになります。"
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "ko": {
+                "$id": "#/properties/filters/properties/23/properties/ko",
+                "type": "object",
+                "title": "The Ko Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/ko/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "스페인어/포르투갈어 필터"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/ko/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "스페인어와 포르투갈어로 된 웹사이트의 광고를 차단합니다."
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "nl": {
+                "$id": "#/properties/filters/properties/23/properties/nl",
+                "type": "object",
+                "title": "The Nl Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/nl/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "Spaans/Portugees filter"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/nl/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "AdGuard Spaans/Portugees filter. Filter dat het blokkeren van advertenties op websites in het Spaans en Portugees mogelijk maakt."
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "no": {
+                "$id": "#/properties/filters/properties/23/properties/no",
+                "type": "object",
+                "title": "The No Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/no/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "AdGuards spanske/portugisiske filter"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/no/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "AdGuard spansk/portugisisk filter. Filterliste som spesifikt fjerner annonser på spanske og portugisiske nettsider."
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "pl": {
+                "$id": "#/properties/filters/properties/23/properties/pl",
+                "type": "object",
+                "title": "The Pl Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/pl/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "Hiszpański/Portugalski filtr AdGuard"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/pl/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "Filtr, który umożliwia blokowanie reklam na hiszpańskich i portugalskich stronach internetowych."
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "pt": {
+                "$id": "#/properties/filters/properties/23/properties/pt",
+                "type": "object",
+                "title": "The Pt Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/pt/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "Filtro Espanhol/Português do AdGuard"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/pt/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "Filtro que permite o bloqueio de anúncios em websites de língua espanhola e portuguesa."
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "pt_BR": {
+                "$id": "#/properties/filters/properties/23/properties/pt_BR",
+                "type": "object",
+                "title": "The Pt_br Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/pt_BR/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "Filtro Espanhol/Português do AdGuard"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/pt_BR/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "Filtro que permite o bloqueio de anúncios em sites com o conteúdo Espanhol e Português."
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "pt_PT": {
+                "$id": "#/properties/filters/properties/23/properties/pt_PT",
+                "type": "object",
+                "title": "The Pt_pt Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/pt_PT/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "Filtro Espanhol/Português do AdGuard"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/pt_PT/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "Filtro que permite o bloqueio de anúncios em websites de língua espanhola e portuguesa."
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "ru": {
+                "$id": "#/properties/filters/properties/23/properties/ru",
+                "type": "object",
+                "title": "The Ru Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/ru/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "Испано-португальский фильтр"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/ru/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "Испано-португальский фильтр AdGuard. Фильтр, позволяющий убрать рекламу с сайтов на испанском и португальском языках."
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "sk": {
+                "$id": "#/properties/filters/properties/23/properties/sk",
+                "type": "object",
+                "title": "The Sk Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/sk/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "AdGuard španielsky/portugalský filter"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/sk/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "Filter, ktorý špecificky odstraňuje reklamy na stránkach v španielčine a portugalčine."
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "sl": {
+                "$id": "#/properties/filters/properties/23/properties/sl",
+                "type": "object",
+                "title": "The Sl Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/sl/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "AdGuardov špansko/portugalski filter\n "
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/sl/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "Seznam filtrov, ki izrecno odstranjuje oglase na spletnih mestih v španskem in portugalskem jeziku."
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "sr": {
+                "$id": "#/properties/filters/properties/23/properties/sr",
+                "type": "object",
+                "title": "The Sr Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/sr/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "AdGuards ryskspråksfilter"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/sr/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "Filter som tillämpar reklamblockering på ryskspråkiga webbplatser."
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "sv": {
+                "$id": "#/properties/filters/properties/23/properties/sv",
+                "type": "object",
+                "title": "The Sv Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/sv/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "AdGuards spansk/portugisiska filter"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/sv/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "Filterlista som specifikt avlägsnar reklam på spanskspråkiga och portugisspråkiga webbplatser."
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "tr": {
+                "$id": "#/properties/filters/properties/23/properties/tr",
+                "type": "object",
+                "title": "The Tr Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/tr/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "AdGuard İspanyolca/Portekizce filtresi"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/tr/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "Özellikle İspanyolca ve Portekizce sitelerde reklamları engelleyen filtre."
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "uk": {
+                "$id": "#/properties/filters/properties/23/properties/uk",
+                "type": "object",
+                "title": "The Uk Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/uk/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "Іспано-португальський фільтр"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/uk/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "Іспано-португальський фільтр AdGuard. Фільтр, який дозволяє заблокувати рекламу на сайтах з іспанською та португальською мовами."
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "vi": {
+                "$id": "#/properties/filters/properties/23/properties/vi",
+                "type": "object",
+                "title": "The Vi Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/vi/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "Bộ lọc tiếng Tây Ban Nha/Bồ Đào Nha"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/vi/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "Bộ lọc kích hoạt loại bỏ quảng cáo khỏi các website với nội dung tiếng Tây Ban Nha và Bồ Đào Nha."
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "zh": {
+                "$id": "#/properties/filters/properties/23/properties/zh",
+                "type": "object",
+                "title": "The Zh Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/zh/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "西班牙语/葡萄牙语过滤器"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/zh/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "该过滤器可以拦截西班牙语与葡萄牙语网站上的广告。"
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "zh_TW": {
+                "$id": "#/properties/filters/properties/23/properties/zh_TW",
+                "type": "object",
+                "title": "The Zh_tw Schema",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/filters/properties/23/properties/zh_TW/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                      "AdGuard 西班牙文 / 葡萄牙文過濾器"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "description": {
+                    "$id": "#/properties/filters/properties/23/properties/zh_TW/properties/description",
+                    "type": "string",
+                    "title": "The Description Schema",
+                    "default": "",
+                    "examples": [
+                      "特別地移除於西班牙語 / 葡萄牙語網站上的廣告之過濾清單。"
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              }
+            }
+          },
         "224": {
           "$id": "#/properties/filters/properties/224",
           "type": "object",
