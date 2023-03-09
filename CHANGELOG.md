@@ -1,7 +1,7 @@
 # Filters Compiler Changelog
 
 
-## Unreleased
+## v1.1.79
 
 ### Added
 
