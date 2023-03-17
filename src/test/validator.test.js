@@ -103,6 +103,7 @@ describe('validator', () => {
         const rules = [
             '||example.com##.div',
             'test$domain=yandex.ru,google.com',
+            ',example.com,example.org##[src*="base64"]',
         ];
         expect(validator.validate(rules)).toHaveLength(0);
     });
