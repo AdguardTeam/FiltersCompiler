@@ -12,13 +12,13 @@
     "prepare": "husky install"
   },
   "dependencies": {
-    "@adguard/extended-css": "^2.0.45",
-    "@adguard/scriptlets": "^1.8.2",
-    "@adguard/tsurlfilter": "^1.0.73",
+    "@adguard/extended-css": "^2.0.52",
+    "@adguard/scriptlets": "^1.9.7",
+    "@adguard/tsurlfilter": "^2.0.3",
     "ajv": "^8.11.0",
     "child_process": ">=1.0.2",
     "filters-downloader": "git+https://github.com/AdguardTeam/FiltersDownloader.git#v1.1.12",
-    "jsdom": "^20.0.2",
+    "jsdom": "^21.1.1",
     "md5": "2.3.0",
     "moment": "^2.29.4",
     "utf8": "^3.0.0"

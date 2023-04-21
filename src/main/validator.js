@@ -58,6 +58,10 @@ const validate = function (list, excluded, invalid = [], filterName) { // eslint
             return false;
         }
 
+        if (convertedRules.length === 0) {
+            return false;
+        }
+
         for (let i = 0; i < convertedRules.length; i += 1) {
             const convertedRuleText = convertedRules[i];
 

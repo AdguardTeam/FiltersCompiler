@@ -565,7 +565,7 @@ describe('validator', () => {
     describe('validate removeparam rules', () => {
         describe('valid', () => {
             const validRules = [
-                '$removeparam=gclid|yclid|fbclid',
+                '$removeparam=/source|campaign/',
                 '||test.com^$removeparam=qwerty',
                 '||test.com^$removeparam=/qwerty/i',
                 '@@||example.com$removeparam',
@@ -581,6 +581,8 @@ describe('validator', () => {
         describe('invalid', () => {
             const invalidRules = [
                 '||example.org^$removeparam=p,popup',
+                // error: multiple values are not allowed
+                '$removeparam=source|campaign',
             ];
             test.each(invalidRules)('%s', (rule) => {
                 expect(validator.validate([rule])).toHaveLength(0);

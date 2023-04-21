@@ -4,6 +4,10 @@ module.exports = (function () {
      * ExtendedCss is not supposed to work without window environment,
      * so we pass some wrapper dummy.
      */
+    const { TextEncoder, TextDecoder } = require('util');
+    global.TextEncoder = TextEncoder;
+    global.TextDecoder = TextDecoder;
+
     const jsdom = require('jsdom');
     const { JSDOM } = jsdom;
     const dom = new JSDOM('<!DOCTYPE html><p>Empty</p>');

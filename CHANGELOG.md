@@ -1,21 +1,34 @@
 # Filters Compiler Changelog
 
+All notable changes to this project will be documented in this file.
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v1.1.79
+
+## [v1.1.82] - 2023-04-21
+
+### Changed
+
+- Updated ExtendedCss to v2.0.52
+- Updated Scriptlets to v1.9.7
+- Updated TSUrlFilter to v2.0.3
+
+
+## [v1.1.79] - 2023-03-09
 
 ### Added
 
 - Locales validation `filters_i18n` schema for filter 23
 
 
-## v1.1.77
+## [v1.1.77] - 2023-03-01
 
 ### Added
 
 - Build .js copies of `filters.json` and `filters_i18n.json`
 
 
-## v1.1.76
+## [v1.1.76] - 2023-02-01
 
 ### Changed
 
@@ -23,7 +36,7 @@
 - Updated TSUrlFilter to 1.0.73
 
 
-## v1.1.75
+## [v1.1.75] - 2023-01-19
 
 ### Changed
 
@@ -31,7 +44,7 @@
 - Updated TSUrlFilter to 1.0.72
 
 
-## v1.1.73
+## [v1.1.73] - 2022-12-28
 
 ### Changed
 
@@ -39,7 +52,7 @@
     - validation of `$hls` modifier
 
 
-## v1.1.72
+## [v1.1.72] - 2022-12-27
 
 ### Changed
 
@@ -47,7 +60,7 @@
     - validation of `$jsonprune` modifier
 
 
-## v1.1.71
+## [v1.1.71] - 2022-12-23
 
 ### Changed
 
@@ -70,7 +83,7 @@
 - Support of `$webrtc` modifier
 
 
-## v1.1.69
+## [v1.1.69] - 2022-12-19
 
 ### Changed
 
@@ -78,7 +91,7 @@
 - Updated TSUrlFilter to 1.0.64
 
 
-## v1.1.68
+## [v1.1.68] - 2022-12-14
 
 ### Changed
 
@@ -86,7 +99,7 @@
 - Updated TSUrlFilter to 1.0.63
 
 
-## v1.1.67
+## [v1.1.67] - 2022-12-06
 
 ### Changed
 
@@ -95,28 +108,28 @@
 - Updated TSUrlFilter to 1.0.57
 
 
-## v1.1.66
+## [v1.1.66] - 2022-12-01
 
 ### Changed
 
 - Updated ExtendedCss to v2.0.18
 
 
-## v1.1.65
+## [v1.1.65] - 2022-11-29
 
 ### Changed
 
 - Updated ExtendedCss to v2.0.15
 
 
-## v1.1.64
+## [v1.1.64] - 2022-11-28
 
 ### Changed
 
 - Updated ExtendedCss to v2.0.12
 
 
-## v1.1.63
+## [v1.1.63] - 2022-11-22
 
 ### Added
 
@@ -125,3 +138,21 @@
 ### Changed
 
 - Updated TSUrlFilter to v1.0.51, Scriptlets to v1.7.3
+
+
+[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.82...HEAD
+[v1.1.82]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.79...v1.1.82
+[v1.1.79]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.77...v1.1.79
+[v1.1.77]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.76...v1.1.77
+[v1.1.76]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.75...v1.1.76
+[v1.1.75]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.73...v1.1.75
+[v1.1.73]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.72...v1.1.73
+[v1.1.72]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.71...v1.1.72
+[v1.1.71]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.69...v1.1.71
+[v1.1.69]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.68...v1.1.69
+[v1.1.68]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.67...v1.1.68
+[v1.1.67]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.66...v1.1.67
+[v1.1.66]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.65...v1.1.66
+[v1.1.65]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.64...v1.1.65
+[v1.1.64]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.63...v1.1.64
+[v1.1.63]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.61...v1.1.63
