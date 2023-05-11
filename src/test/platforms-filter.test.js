@@ -123,25 +123,36 @@ describe('platforms filter', () => {
                     '\\[-ext-',
                     ':has\\(',
                     '\\$stealth',
+                    '\\$content',
+                    ',content(,|$)',
                 ],
                 'ignoreRuleHints': false,
             },
         };
 
-        const before = [
+        const notMatchRules = [
             '! Comment',
             'example.com',
-            'example.com$stealth',
+            'example.com,content-examples.com###ad3',
+        ];
+        const matchRules = [
+            '@@||example.com$stealth',
             'javarchive.com##.sidebar_list > .widget_text:has(a[title = "ads"])',
             "aranzulla.it##body > div[id][class][-ext-has=\"a[href^='/locked-no-script.php']\"]",
+            '@@||example.net^$content',
+            '@@||example.com^$content,elemhide,jsinject',
+            '@@||example.com^$elemhide,content,jsinject',
+            '@@||example.com^$elemhide,content',
+        ];
+
+        const before = [
+            ...notMatchRules,
+            ...matchRules,
         ];
 
         const after = filter.cleanupRules(before, config, 0);
 
         expect(after).toBeDefined();
-        expect(after).toHaveLength(2);
-
-        expect(after.indexOf('! Comment')).toBeGreaterThanOrEqual(0);
-        expect(after.indexOf('example.com')).toBeGreaterThanOrEqual(0);
+        expect(after).toEqual(notMatchRules);
     });
 });
