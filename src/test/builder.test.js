@@ -17,544 +17,706 @@ const readFile = (path) => {
     }
 };
 
+const filtersDir = path.join(__dirname, './resources/filters');
+const badFiltersDir = path.join(__dirname, './resources/bad-filters/');
+const logFile = path.join(__dirname, './resources/log.txt');
+const reportFile = path.join(__dirname, './resources/report.txt');
+const platformsDir = path.join(__dirname, './resources/platforms');
+const platformsConfigFile = path.join(__dirname, './resources/platforms.json');
+
+const getPlatformsConfig = async () => {
+    const platformsConfig = await readFile(platformsConfigFile);
+    return JSON.parse(platformsConfig);
+};
+
+optimization.disableOptimization();
+
 describe('Test builder', () => {
-    it('Works', async () => {
-        optimization.disableOptimization();
-
+    beforeAll(async () => {
         expect(builder).toBeTruthy();
-
-        const filtersDir = path.join(__dirname, './resources/filters');
-        const logFile = path.join(__dirname, './resources/log.txt');
-        const reportFile = path.join(__dirname, './resources/report.txt');
-        const platformsPath = path.join(__dirname, './resources/platforms');
-        const platformsConfigFile = path.join(__dirname, './resources/platforms.json');
-        const platformsConfig = JSON.parse(await readFile(platformsConfigFile));
-
-        await builder.build(filtersDir, logFile, reportFile, platformsPath, platformsConfig);
-
-        let revision = await readFile(path.join(filtersDir, 'filter_3_Test', 'revision.json'));
-
-        expect(revision).toBeTruthy();
-
-        revision = JSON.parse(revision);
-        expect(revision.version).toBeTruthy();
-        expect(revision.timeUpdated).toBeTruthy();
-
-        let filterText = (await readFile(path.join(filtersDir, 'filter_3_Test', 'filter.txt'))).trim();
-        expect(filterText).toBeTruthy();
-
-        let filterLines = filterText.split(/\r?\n/);
-        expect(filterLines.length).toBe(23);
-
-        // Common include
-        expect(filterLines.includes('! some common rules could be places here')).toBeTruthy();
-        expect(filterLines.includes('test-common-rule.com')).toBeTruthy();
-        expect(filterLines.includes('test-common-rule.com$xmlhttprequest')).toBeTruthy();
-        expect(filterLines.includes('example.com#$#h1 { background-color: blue !important }')).toBeTruthy();
-
-        // Check replace version comment
-        expect(filterLines.includes('! Version: 11.9090.19.19')).toBeFalsy();
-        expect(filterLines.includes('! OriginalVersion: 11.9090.19.19')).toBeTruthy();
-
-        // Common_1 include
-        expect(filterLines.includes('test-common-1-rule.com')).toBeTruthy();
-
-        // Exclude_1
-        expect(filterLines.includes('test-common-1-rule.com$xmlhttprequest')).toBeFalsy();
-
-        // Strip comments
-        expect(filterLines.includes('! some common rules could be places here, but comment are stripped')).toBeFalsy();
-
-        // Exclude
-        expect(filterLines.includes('||test.com^')).toBeTruthy();
-        expect(filterLines.includes('#%#test.com^$third-party')).toBeFalsy();
-        expect(filterLines.includes('||test.com^$third-party')).toBeFalsy();
-        expect(filterLines.includes('||test.com^$replace=')).toBeFalsy();
-        expect(filterLines.includes('regularexpressionexcluded')).toBeFalsy();
-        expect(filterLines.includes('regularexpression_not_excluded')).toBeTruthy();
-
-        let filterContent = await readFile(path.join(__dirname, 'resources/platforms/test', 'filters', '5.txt'));
-        filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(54);
-
-        expect(filterLines.includes('||adsnet.com/*/700x350.gif$domain=example.com')).toBeTruthy();
-        expect(filterLines.includes('example.com##+js(set-constant, ads, false)')).toBeTruthy();
-        expect(filterLines.includes('test.com##+js(abort-on-property-read, adsShown)')).toBeTruthy();
-        expect(filterLines.includes('example.com##+js(disable-newtab-links)')).toBeTruthy();
-        expect(filterLines.includes('test.com#@#+js(abort-on-property-read, some.prop)')).toBeTruthy();
-        expect(filterLines.includes('||www.ynet.co.il^$important,websocket,~third-party,domain=www.ynet.co.il')).toBeTruthy();
-        expect(filterLines.includes('example.com$$script[tag-content="12313"][max-length="262144"]')).toBeTruthy();
-        expect(filterLines.includes('rybnik.com.pl##^iframe[name]:not([class]):not([id]):not([src])[style="display:none"]')).toBeFalsy();
-        expect(filterLines.includes('test.com#%#AG_setConstant("ads", "false");')).toBeFalsy();
-        expect(filterLines.includes('test.com#@%#Object.defineProperty(window, \'abcde\', { get: function() { return []; } });')).toBeFalsy();
-        expect(filterLines.includes('||example.com/api/v1/ad/*/json$replace=/html/abcd\\,/i')).toBeFalsy();
-        expect(filterLines.includes('||adsnet.com/*/700x350.gif$domain=example.com')).toBeTruthy();
-        expect(filterLines.includes('||example.com/banner$image,redirect=3x2.png')).toBeTruthy();
-        expect(filterLines.includes('||test.com^$script,redirect=noop.js')).toBeTruthy();
-        expect(filterLines.includes('||example.com/*.mp4$media,redirect=noop-1s.mp4')).toBeTruthy();
-        expect(filterLines.includes('||example.com^$script,redirect-rule=noop.js')).toBeTruthy();
-
-        expect(filterLines.includes('example.com#%#//scriptlet(\'trusted-set-local-storage-item\', \'iName\', \'iValue\')')).toBeFalsy();
-        expect(filterLines.includes('example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")')).toBeFalsy();
-
-        filterContent = await readFile(path.join(__dirname, 'resources/platforms/test2', 'filters', '5.txt'));
-        filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(54);
-
-        expect(filterLines.includes('test.com#%#//scriptlet(\'abp-abort-on-property-read\', \'adsShown\')')).toBeTruthy();
-        expect(filterLines.includes('example.com#@%#//scriptlet(\'abp-abort-on-property-write\', \'adblock.check\')')).toBeTruthy();
-        expect(filterLines.includes('test.com#@%#//scriptlet(\'ubo-abort-on-property-read.js\', \'some.prop\')')).toBeTruthy();
-        expect(filterLines.includes('example.com#%#//scriptlet(\'ubo-disable-newtab-links.js\')')).toBeTruthy();
-        expect(filterLines.includes('example.com#%#//scriptlet(\'ubo-set-constant.js\', \'ads\', \'false\')')).toBeTruthy();
-        expect(filterLines.includes('example.com$$script[tag-content="12313"][max-length="262144"]')).toBeTruthy();
-        expect(filterLines.includes('||www.ynet.co.il^$important,websocket,~third-party,domain=www.ynet.co.il')).toBeTruthy();
-        expect(filterLines.includes('||example.com/banner$image,redirect=3x2-transparent.png')).toBeTruthy();
-        expect(filterLines.includes('||test.com^$script,redirect=noopjs')).toBeTruthy();
-        expect(filterLines.includes('||example.com/*.mp4$media,redirect=noopmp4-1s')).toBeTruthy();
-        expect(filterLines.includes('||example.com^$script,redirect-rule=noopjs')).toBeTruthy();
-
-        expect(filterLines.includes('example.com#%#//scriptlet(\'trusted-set-local-storage-item\', \'iName\', \'iValue\')')).toBeFalsy();
-        expect(filterLines.includes('example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")')).toBeFalsy();
-
-        filterContent = await readFile(path.join(__dirname, 'resources/platforms/ios', 'filters', '5.txt'));
-        filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(42);
-
-        expect(filterLines.includes('||example.com/images/*.mp4')).toBeTruthy();
-        expect(filterLines.includes('test.com,mp4upload.com###overlay')).toBeTruthy();
-
-        expect(filterLines.includes('||example.com/test/$media,mp4,domain=test.com')).toBeFalsy();
-        expect(filterLines.includes('||test.com/cams/video_file/*.mp4$media,mp4')).toBeFalsy();
-        expect(filterLines.includes('||example.com/test/$media,redirect=noopmp4-1s,domain=test.com')).toBeFalsy();
-        expect(filterLines.includes('||test.com/cams/video_file/*.mp4$media,redirect=noopmp4-1s')).toBeFalsy();
-        expect(filterLines.includes('||example.com^$script,redirect-rule=noopjs')).toBeFalsy();
-        expect(filterLines.includes('||test.com/res/js/*.js$replace=/\\"OK\\/banners/\\"OK\\/banners__\\//')).toBeFalsy();
-        expect(filterLines.includes('||example.com^$~script,~stylesheet,~xmlhttprequest,replace=/popunder_url/popunder_url_/')).toBeFalsy();
-        expect(filterLines.includes('||test.com/Forums2008/JS/replaceLinks.js')).toBeTruthy();
-        expect(filterLines.includes('@@||test.com^$generichide,app=iexplore.exe')).toBeFalsy();
-        expect(filterLines.includes('example.com##div.grid_1[class$="app"]')).toBeTruthy();
-        expect(filterLines.indexOf('||app-test.com^$third-party')).toBeTruthy();
-
-        // platforms tests
-        filterText = await readFile(path.join(filtersDir, 'filter_3_Test', 'filter.txt'));
-        expect(filterText).toBeTruthy();
-
-        let filtersMetadata = await readFile(path.join(platformsPath, 'test', 'filters.json'));
-        expect(filtersMetadata).toBeTruthy();
-        filtersMetadata = JSON.parse(filtersMetadata);
-        expect(filtersMetadata.filters).toBeTruthy();
-        expect(filtersMetadata.filters[0]).toBeTruthy();
-        expect(filtersMetadata.filters[0].filterId).toBe(2);
-        expect(filtersMetadata.filters[0].name).toBe('AdGuard Base filter');
-        expect(filtersMetadata.filters[0].description).toBe('EasyList + AdGuard English filter. This filter is necessary for quality ad blocking.');
-        expect(filtersMetadata.filters[0].timeAdded).toBeTruthy();
-        expect(filtersMetadata.filters[0].homepage).toBe('https://easylist.adblockplus.org/');
-        expect(filtersMetadata.filters[0].expires).toBe(172800);
-        expect(filtersMetadata.filters[0].displayNumber).toBe(101);
-        expect(filtersMetadata.filters[0].groupId).toBe(2);
-        expect(filtersMetadata.filters[0].subscriptionUrl).toBe('https://filters.adtidy.org/test/filters/2.txt');
-        expect(filtersMetadata.filters[0].version).toBeTruthy();
-        expect(filtersMetadata.filters[0].timeUpdated).toBeTruthy();
-        expect(/\d\d-\d\d-\d\dT\d\d:\d\d:\d\d[+-]\d\d\d\d/.test(filtersMetadata.filters[0].timeUpdated)).toBeTruthy();
-        expect(filtersMetadata.filters[0].languages.length).toBe(2);
-        expect(filtersMetadata.filters[0].languages[0]).toBe('en');
-        expect(filtersMetadata.filters[0].languages[1]).toBe('pl');
-        expect(filtersMetadata.filters[0].tags.length).toBe(4);
-        expect(filtersMetadata.filters[0].tags[0]).toBe(1);
-        expect(filtersMetadata.filters[0].trustLevel).toBe('full');
-
-        // Obsolete Filter test
-        expect(filtersMetadata.filters.some((filter) => filter.filterId === 6)).toBeFalsy();
-        expect(filtersMetadata.filters.some((filter) => filter.name === 'Obsolete Test Filter')).toBeFalsy();
-
-        let filtersI18nMetadata = await readFile(path.join(platformsPath, 'test', 'filters_i18n.json'));
-        expect(filtersI18nMetadata).toBeTruthy();
-        filtersI18nMetadata = JSON.parse(filtersI18nMetadata);
-        const filtersI18nMetadataFilters = Object.keys(filtersI18nMetadata.filters);
-
-        // Obsolete Filter test
-        expect(filtersI18nMetadataFilters.some((filter) => filter === '6')).toBeFalsy();
-
-        let localScriptRules = await readFile(path.join(platformsPath, 'test', 'local_script_rules.txt'));
-        expect(localScriptRules).toBeFalsy();
-        const localScriptRulesLines = localScriptRules.split('\r\n');
-        expect(localScriptRulesLines.indexOf('test_domain#%#testScript();') === -1).toBeTruthy();
-
-        let localScriptRulesJson = await readFile(path.join(platformsPath, 'test', 'local_script_rules.json'));
-        expect(localScriptRulesJson).toBeTruthy();
-        localScriptRulesJson = JSON.parse(localScriptRulesJson);
-        expect(localScriptRulesJson.comment).toBeTruthy();
-        expect(localScriptRulesJson.rules).toBeTruthy();
-
-        filterContent = await readFile(path.join(platformsPath, 'test', 'filters', '2.txt'));
-        expect(filterContent).toBeTruthy();
-
-        filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(50);
-
-        expect(filterLines[2]).toBe('! Title: AdGuard Base filter + EasyList');
-        expect(filterLines.indexOf('![Adblock Plus 2.0]') >= 0).toBeTruthy();
-        expect(filterLines.indexOf('test-common-rule.com') >= 0).toBeTruthy();
-        expect(filterLines.indexOf('test-common-1-rule.com') >= 0).toBeTruthy();
-        expect(filterLines.indexOf('! some common rules could be places here') >= 0).toBeTruthy();
-        expect(filterLines.indexOf('~nigma.ru,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]') >= 0).toBeTruthy();
-        expect(filterLines.indexOf('excluded_platform') >= 0).toBeTruthy();
-        expect(filterLines.indexOf('test_domain#%#testScript();') === -1).toBeTruthy();
-        expect(filterLines.indexOf('!+ NOT_OPTIMIZED') >= 0).toBeTruthy();
-        expect(filterLines.indexOf('test-common-2-rule.com') >= 0).toBeTruthy();
-        expect(filterLines.indexOf('test.com#%#var isadblock=1;') === -1).toBeTruthy();
-        expect(filterLines.indexOf('example.com#%#AG_onLoad(function() { AG_removeElementBySelector(\'span[class="intexta"]\'); });') === -1).toBeTruthy();
-        expect(filterLines.indexOf('test.com##+js(abort-on-property-read, Object.prototype.getBanner)') >= 0).toBeTruthy();
-        // $webrtc is deprecated
-        expect(filterLines.indexOf('||example.com^$webrtc,domain=example.org') >= 0).toBeFalsy();
-
-        filterContent = await readFile(path.join(platformsPath, 'test', 'filters', '2_optimized.txt'));
-        expect(filterContent).toBeTruthy();
-        filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(34);
-        expect(filterLines[2]).toBe('! Title: AdGuard Base filter + EasyList (Optimized)');
-
-        // $webrtc is deprecated
-        expect(filterLines.indexOf('||example.com^$webrtc,domain=example.org') >= 0).toBeFalsy();
-
-        filterContent = await readFile(path.join(platformsPath, 'test', 'filters', '2_without_easylist.txt'));
-        expect(filterContent).toBeTruthy();
-        filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(28);
-        expect(filterLines[2]).toBe('! Title: AdGuard Base filter');
-
-        filterContent = await readFile(path.join(platformsPath, 'config/test', 'filters', '2.txt'));
-        expect(filterContent).toBeTruthy();
-
-        filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(37);
-
-        expect(filterLines.indexOf('test-common-rule.com') >= 0).toBeTruthy();
-        expect(filterLines.indexOf('test-common-1-rule.com') >= 0).toBeFalsy();
-        expect(filterLines.indexOf('! some common rules could be places here') >= 0).toBeFalsy();
-        expect(filterLines.indexOf('~nigma.ru,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]') >= 0).toBeFalsy();
-        expect(filterLines.indexOf('excluded_platform') >= 0).toBeTruthy();
-        expect(filterLines.indexOf('test_domain#%#testScript();') >= 0).toBeTruthy();
-
-        // $webrtc is deprecated
-        expect(filterLines.indexOf('||example.com^$webrtc,domain=example.org') >= 0).toBeFalsy();
-
-        // 'trusted-' scriptlets should be included in full trust level filters
-        expect(filterLines.includes('example.com#%#//scriptlet(\'trusted-set-local-storage-item\', \'iName\', \'iValue\')')).toBeTruthy();
-        expect(filterLines.includes('example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")')).toBeTruthy();
-
-        filterContent = await readFile(path.join(platformsPath, 'hints', 'filters', '2.txt'));
-        expect(filterContent).toBeTruthy();
-
-        filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(51);
-
-        expect(filterLines.indexOf('test-common-rule.com') >= 0).toBeTruthy();
-        expect(filterLines.indexOf('test-common-1-rule.com') >= 0).toBeTruthy();
-        expect(filterLines.indexOf('! some common rules could be places here') >= 0).toBeTruthy();
-        expect(filterLines.indexOf('~nigma.ru,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]') >= 0).toBeTruthy();
-        expect(filterLines.indexOf('excluded_platform') >= 0).toBeTruthy();
-        expect(filterLines.indexOf('test_domain#%#testScript();') >= 0).toBeTruthy();
-
-        // $webrtc is deprecated
-        expect(filterLines.indexOf('||example.com^$webrtc,domain=example.org') >= 0).toBeFalsy();
-
-        // Check iOS platform
-        filterContent = await readFile(path.join(platformsPath, 'ios', 'filters', '2.txt'));
-        expect(filterContent).toBeTruthy();
-
-        filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(52);
-
-        expect(filterLines.indexOf('test.com#%#var isadblock=1;') >= 0).toBeTruthy();
-        expect(filterLines.indexOf('test.com#%#//scriptlet(\'ubo-abort-on-property-read.js\', \'Object.prototype.getBanner\')') >= 0).toBeTruthy();
-        expect(filterLines.indexOf('example.net#$?#.main-content { margin-top: 0!important; }') >= 0).toBeTruthy();
-        expect(filterLines.indexOf('test.com#@$?#.banner { padding: 0!important; }') >= 0).toBeTruthy();
-        expect(filterLines.indexOf('example.net#?#.banner:matches-css(width: 360px)') >= 0).toBeTruthy();
-        expect(filterLines.indexOf('test.com#@?#.banner:matches-css(height: 200px)') >= 0).toBeTruthy();
-
-        expect(filterLines.indexOf('||example.org^$cookie=test') >= 0).toBeFalsy();
-        expect(filterLines.indexOf('@@||example.com^$stealth') >= 0).toBeFalsy();
-        expect(filterLines.indexOf('||example.com^$webrtc,domain=example.org') >= 0).toBeFalsy();
-        expect(filterLines.indexOf('||example.org^$csp=frame-src \'none\'') >= 0).toBeFalsy();
-
-        // Check MAC platform
-        let filtersMetadataMAC = await readFile(path.join(platformsPath, 'mac', 'filters.json'));
-        expect(filtersMetadataMAC).toBeTruthy();
-        filtersMetadataMAC = JSON.parse(filtersMetadataMAC);
-        expect(Object.keys(filtersMetadataMAC).length).toEqual(2);
-
-        expect(filtersMetadataMAC.groups).toBeTruthy();
-        const group = filtersMetadataMAC.groups[0];
-        expect(group).toBeTruthy();
-        expect(Object.keys(group).length).toBe(3);
-        expect(group.groupId).toBe(1);
-        expect(group.groupName).toBe('Adguard Filters');
-        expect(group.displayNumber).toBe(1);
-
-        expect(filtersMetadataMAC.tags).toBe(undefined);
-
-        expect(filtersMetadataMAC.filters).toBeTruthy();
-        const englishFilter = filtersMetadataMAC.filters[0];
-        expect(englishFilter).toBeTruthy();
-        expect(Object.keys(englishFilter).length).toBe(11);
-
-        expect(englishFilter.filterId).toBe(2);
-        expect(englishFilter.name).toBe('AdGuard Base filter');
-        expect(englishFilter.description).toBe('EasyList + AdGuard English filter. This filter is necessary for quality ad blocking.');
-        expect(englishFilter.timeAdded).toBe(undefined);
-        expect(englishFilter.homepage).toBe('https://easylist.adblockplus.org/');
-        expect(englishFilter.expires).toBe(172800);
-        expect(englishFilter.displayNumber).toBe(101);
-        expect(englishFilter.groupId).toBe(2);
-        expect(englishFilter.subscriptionUrl).toBe('https://filters.adtidy.org/mac/filters/2.txt');
-        expect(englishFilter.version).toBeTruthy();
-        expect(englishFilter.timeUpdated).toBeTruthy();
-        expect(englishFilter.languages.length).toBe(2);
-        expect(englishFilter.languages[0]).toBe('en');
-        expect(englishFilter.languages[1]).toBe('pl');
-        expect(englishFilter.tags).toBe(undefined);
-        expect(englishFilter.trustLevel).toBe(undefined);
-
-        let filtersI18nMetadataMAC = await readFile(path.join(platformsPath, 'mac', 'filters_i18n.json'));
-        expect(filtersI18nMetadataMAC).toBeTruthy();
-        filtersI18nMetadataMAC = JSON.parse(filtersI18nMetadataMAC);
-        expect(filtersI18nMetadataMAC).toBeTruthy();
-
-        expect(Object.keys(filtersI18nMetadataMAC).length).toBe(2);
-        expect(filtersMetadataMAC.groups).toBeTruthy();
-        expect(filtersMetadataMAC.tags).toBe(undefined);
-        expect(filtersMetadataMAC.filters).toBeTruthy();
-
-        // Check conditions
-        expect(filterLines.indexOf('!#if adguard') >= 0).toBeFalsy();
-        expect(filterLines.indexOf('!#endif') >= 0).toBeFalsy();
-        expect(filterLines.indexOf('if_not_adguard_rule') >= 0).toBeFalsy();
-        expect(filterLines.indexOf('if_adguard_included_rule') >= 0).toBeTruthy();
-        expect(filterLines.indexOf('if_adguard_rule') >= 0).toBeTruthy();
-
-        // wrong condition
-        expect(filterLines.indexOf('wrong_condition') >= 0).toBeFalsy();
-
-        // Check includes
-        expect(filterLines.indexOf('!#include') >= 0).toBeFalsy();
-
-        // platform specify includes
-        filterContent = await readFile(path.join(platformsPath, 'mac', 'filters', '4_optimized.txt'));
-        expect(filterContent).toBeTruthy();
-
-        filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toEqual(13);
-        expect(filterLines.indexOf('if_mac_included_rule') < 0).toBeTruthy();
-
-        // do not remove directives while stripped comment. `directives_not_stripped` rule should not remain
-        expect(filterLines.indexOf('directives_not_stripped') >= 0).toBeFalsy();
-
-        // Check condition directives for platforms
-        filterContent = await readFile(path.join(platformsPath, 'test', 'filters', '4.txt'));
-        expect(filterContent).toBeTruthy();
-
-        filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(23);
-        expect(filterLines[2].startsWith('! Title:')).toBeTruthy();
-        expect(filterLines[2].endsWith('(Optimized)')).toBeFalsy();
-        expect(filterLines.indexOf('if_not_ublock') < 0).toBeTruthy();
-
-        filterContent = await readFile(path.join(platformsPath, 'test', 'filters', '4_optimized.txt'));
-        expect(filterContent).toBeTruthy();
-
-        filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(13);
-        expect(filterLines[2].startsWith('! Title:')).toBeTruthy();
-        expect(filterLines[2].endsWith('(Optimized)')).toBeTruthy();
-        expect(filterLines.indexOf('if_not_ublock') < 0).toBeTruthy();
-
-        filterContent = await readFile(path.join(platformsPath, 'mac', 'filters', '5.txt'));
-        expect(filterContent).toBeTruthy();
-
-        filterLines = filterContent.split('\r\n');
-        expect(filterLines.length).toBe(53);
-
-        expect(filterLines.indexOf('||example.com^$script,redirect=noopjs') >= 0).toBeTruthy();
-        expect(filterLines.indexOf('||example.com/banner$image,redirect=1x1-transparent.gif') >= 0).toBeTruthy();
-
-        // Testing `platformsIncluded` directive
-        // check if Directives Filter was built for test platform and metadata added to it's filters.json
-        filterContent = existsSync(path.join(platformsPath, 'test', 'filters', '4.txt'));
-        expect(filterContent).toBeTruthy();
-        filterContent = existsSync(path.join(platformsPath, 'test', 'filters', '4_optimized.txt'));
-        expect(filterContent).toBeTruthy();
-        let metadata = await readFile(path.join(platformsPath, 'test', 'filters.json'));
-        metadata = JSON.parse(metadata);
-        expect(metadata).toBeTruthy();
-        expect(metadata.filters.some((f) => f.filterId === 4)).toBeTruthy();
-        // check if Directives Filter was built for mac platform and metadata added to it's filters.json
-        filterContent = existsSync(path.join(platformsPath, 'mac', 'filters', '4.txt'));
-        expect(filterContent).toBeTruthy();
-        filterContent = existsSync(path.join(platformsPath, 'mac', 'filters', '4_optimized.txt'));
-        expect(filterContent).toBeTruthy();
-        metadata = await readFile(path.join(platformsPath, 'mac', 'filters.json'));
-        metadata = JSON.parse(metadata);
-        expect(metadata).toBeTruthy();
-        expect(metadata.filters.some((f) => f.filterId === 4)).toBeTruthy();
-
-        // check if Directives Filter was NOT built for ios platform and metadata was NOT added to it's filters.json
-        filterContent = existsSync(path.join(platformsPath, 'ios', 'filters', '4.txt'));
-        expect(filterContent).toBeTruthy();
-        filterContent = existsSync(path.join(platformsPath, 'ios', 'filters', '4_optimized.txt'));
-        expect(filterContent).toBeTruthy();
-        metadata = await readFile(path.join(platformsPath, 'ios', 'filters.json'));
-        metadata = JSON.parse(metadata);
-        expect(metadata).toBeTruthy();
-        expect(metadata.filters.some((f) => f.filterId === 4)).toBeFalsy();
-        // check if Directives Filter was NOT built for test2 platform and metadata was NOT added to it's filters.json
-        filterContent = existsSync(path.join(platformsPath, 'test2', 'filters', '4.txt'));
-        expect(filterContent).toBeTruthy();
-        filterContent = existsSync(path.join(platformsPath, 'test2', 'filters', '4_optimized.txt'));
-        expect(filterContent).toBeTruthy();
-        metadata = await readFile(path.join(platformsPath, 'test2', 'filters.json'));
-        metadata = JSON.parse(metadata);
-        expect(metadata).toBeTruthy();
-        expect(metadata.filters.some((f) => f.filterId === 4)).toBeFalsy();
-
-        // Testing `platformsExcluded` directive
-        // check if Test Filter was NOT built for mac platform and metadata was NOT added to it's filters.json
-        filterContent = existsSync(path.join(platformsPath, 'mac', 'filters', '3.txt'));
-        expect(filterContent).toBeTruthy();
-        filterContent = existsSync(path.join(platformsPath, 'mac', 'filters', '3_optimized.txt'));
-        expect(filterContent).toBeTruthy();
-        metadata = await readFile(path.join(platformsPath, 'mac', 'filters.json'));
-        metadata = JSON.parse(metadata);
-        expect(metadata).toBeTruthy();
-        expect(metadata.filters.some((f) => f.filterId === 3)).toBeFalsy();
-
-        // check if Test Filter was built for ios platform and metadata added to it's filters.json
-        filterContent = existsSync(path.join(platformsPath, 'ios', 'filters', '3.txt'));
-        expect(filterContent).toBeTruthy();
-        filterContent = existsSync(path.join(platformsPath, 'ios', 'filters', '3_optimized.txt'));
-        expect(filterContent).toBeTruthy();
-        metadata = await readFile(path.join(platformsPath, 'ios', 'filters.json'));
-        metadata = JSON.parse(metadata);
-        expect(metadata).toBeTruthy();
-        expect(metadata.filters.some((f) => f.filterId === 3)).toBeTruthy();
-
-        // Testing `platformsIncluded` and `platformsExcluded` directive:
-        // Test Platforms Filter should be built only for mac and chromium platforms only
-        filterContent = existsSync(path.join(platformsPath, 'mac', 'filters', '7.txt'));
-        expect(filterContent).toBeTruthy();
-        filterContent = existsSync(path.join(platformsPath, 'mac', 'filters', '7_optimized.txt'));
-        expect(filterContent).toBeTruthy();
-        metadata = await readFile(path.join(platformsPath, 'mac', 'filters.json'));
-        metadata = JSON.parse(metadata);
-        expect(metadata).toBeTruthy();
-        expect(metadata.filters.some((f) => f.filterId === 7)).toBeTruthy();
-
-        filterContent = existsSync(path.join(platformsPath, 'test2', 'filters', '7.txt'));
-        expect(filterContent).toBeTruthy();
-        filterContent = existsSync(path.join(platformsPath, 'test2', 'filters', '7_optimized.txt'));
-        expect(filterContent).toBeTruthy();
-        metadata = await readFile(path.join(platformsPath, 'test2', 'filters.json'));
-        metadata = JSON.parse(metadata);
-        expect(metadata).toBeTruthy();
-        expect(metadata.filters.some((f) => f.filterId === 7)).toBeTruthy();
-
-        filterContent = existsSync(path.join(platformsPath, 'ios', 'filters', '7.txt'));
-        expect(filterContent).toBeTruthy();
-        filterContent = existsSync(path.join(platformsPath, 'ios', 'filters', '7_optimized.txt'));
-        expect(filterContent).toBeTruthy();
-        metadata = await readFile(path.join(platformsPath, 'ios', 'filters.json'));
-        metadata = JSON.parse(metadata);
-        expect(metadata).toBeTruthy();
-        expect(metadata.filters.some((f) => f.filterId === 7)).toBeFalsy();
-
-        filterContent = existsSync(path.join(platformsPath, 'test', 'filters', '7.txt'));
-        expect(filterContent).toBeTruthy();
-        filterContent = existsSync(path.join(platformsPath, 'test', 'filters', '7_optimized.txt'));
-        expect(filterContent).toBeTruthy();
-        metadata = await readFile(path.join(platformsPath, 'test', 'filters.json'));
-        metadata = JSON.parse(metadata);
-        expect(metadata).toBeTruthy();
-        expect(metadata.filters.some((f) => f.filterId === 7)).toBeFalsy();
-
-        // test hint PLATFORM inside of !#safari_cb_affinity directive
-        filterContent = await readFile(path.join(platformsPath, 'ios', 'filters', '7.txt'));
-        expect(filterContent).toBeTruthy();
-        filterLines = filterContent.split('\r\n');
-        expect(filterLines.includes('||example1.org')).toBeTruthy();
-        expect(filterLines.includes('||example2.org')).toBeTruthy();
-
-        filterContent = await readFile(path.join(platformsPath, 'mac', 'filters', '7.txt'));
-        expect(filterContent).toBeTruthy();
-        filterLines = filterContent.split('\r\n');
-        expect(filterLines.includes('||example1.org')).toBeTruthy();
-        expect(filterLines.includes('||example2.org')).toBeFalsy();
-
-        // test removing scriptlet rules in local_script_rules.json for chrome browser extension
-        localScriptRulesJson = await readFile(path.join(platformsPath, 'chromium', 'local_script_rules.json'));
-        expect(localScriptRulesJson).toBeTruthy();
-        localScriptRules = JSON.parse(localScriptRulesJson);
-        expect(localScriptRules.rules).toBeTruthy();
-        expect(localScriptRules.rules.some((rule) => rule.script.startsWith('//scriptlet'))).toBeFalsy();
-
-        // test applying replacements
-        filterContent = await readFile(path.join(platformsPath, 'replacements', 'filters', '2.txt'));
-        filterLines = filterContent.split('\r\n');
-        expect(filterLines.includes('||stringtoreplace^')).toBeFalsy();
-        expect(filterLines.includes('||replacementstring^')).toBeTruthy();
+        const platformsConfig = await getPlatformsConfig();
+        await builder.build(filtersDir, logFile, reportFile, platformsDir, platformsConfig);
+    });
+
+    describe('Works', () => {
+        it('revision', async () => {
+            const revisionContent = await readFile(path.join(filtersDir, 'filter_3_Test', 'revision.json'));
+            expect(revisionContent).toBeTruthy();
+
+            const revision = JSON.parse(revisionContent);
+            expect(revision.version).toBeTruthy();
+            expect(revision.timeUpdated).toBeTruthy();
+        });
+
+        it('filter 3 test', async () => {
+            const filterContent = (await readFile(path.join(filtersDir, 'filter_3_Test', 'filter.txt'))).trim();
+            expect(filterContent).toBeTruthy();
+
+            const filterLines = filterContent.split(/\r?\n/);
+            expect(filterLines.length).toEqual(23);
+
+            // Common include
+            expect(filterLines.includes('! some common rules could be places here')).toBeTruthy();
+            expect(filterLines.includes('test-common-rule.com')).toBeTruthy();
+            expect(filterLines.includes('test-common-rule.com$xmlhttprequest')).toBeTruthy();
+            expect(filterLines.includes('example.com#$#h1 { background-color: blue !important }')).toBeTruthy();
+
+            // Check replace version comment
+            expect(filterLines.includes('! Version: 11.9090.19.19')).toBeFalsy();
+            expect(filterLines.includes('! OriginalVersion: 11.9090.19.19')).toBeTruthy();
+
+            // Common_1 include
+            expect(filterLines.includes('test-common-1-rule.com')).toBeTruthy();
+
+            // Exclude_1
+            expect(filterLines.includes('test-common-1-rule.com$xmlhttprequest')).toBeFalsy();
+
+            // Strip comments
+            expect(filterLines.includes('! some common rules could be places here, but comment are stripped')).toBeFalsy();
+
+            // Exclude
+            expect(filterLines.includes('||test.com^')).toBeTruthy();
+            expect(filterLines.includes('#%#test.com^$third-party')).toBeFalsy();
+            expect(filterLines.includes('||test.com^$third-party')).toBeFalsy();
+            expect(filterLines.includes('||test.com^$replace=')).toBeFalsy();
+            expect(filterLines.includes('regularexpressionexcluded')).toBeFalsy();
+            expect(filterLines.includes('regularexpression_not_excluded')).toBeTruthy();
+        });
+
+        it('platforms/test filters 5.txt', async () => {
+            const filterContent = await readFile(path.join(__dirname, 'resources/platforms/test', 'filters', '5.txt'));
+            const filterLines = filterContent.split(/\r?\n/);
+            expect(filterLines.length).toEqual(54);
+
+            const presentRules = [
+                '||adsnet.com/*/700x350.gif$domain=example.com',
+                'example.com##+js(set-constant, ads, false)',
+                'test.com##+js(abort-on-property-read, adsShown)',
+                'example.com##+js(disable-newtab-links)',
+                'test.com#@#+js(abort-on-property-read, some.prop)',
+                '||www.ynet.co.il^$important,websocket,~third-party,domain=www.ynet.co.il',
+                'example.com$$script[tag-content="12313"][max-length="262144"]',
+                '||adsnet.com/*/700x350.gif$domain=example.com',
+                '||example.com/banner$image,redirect=3x2.png',
+                '||test.com^$script,redirect=noop.js',
+                '||example.com/*.mp4$media,redirect=noop-1s.mp4',
+                '||example.com^$script,redirect-rule=noop.js',
+            ];
+            presentRules.forEach((rule) => {
+                expect(filterLines.includes(rule)).toBeTruthy();
+            });
+
+            const absentRules = [
+                'rybnik.com.pl##^iframe[name]:not([class]):not([id]):not([src])[style="display:none"]',
+                'test.com#%#AG_setConstant("ads", "false");',
+                'test.com#@%#Object.defineProperty(window, \'abcde\', { get: function() { return []; } });',
+                '||example.com/api/v1/ad/*/json$replace=/html/abcd\\,/i',
+                'example.com#%#//scriptlet(\'trusted-set-local-storage-item\', \'iName\', \'iValue\')',
+                'example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")',
+            ];
+            absentRules.forEach((rule) => {
+                expect(filterLines.includes(rule)).toBeFalsy();
+            });
+        });
+
+        it('platforms/test2 filters 5.txt', async () => {
+            const filterContent = await readFile(path.join(__dirname, 'resources/platforms/test2', 'filters', '5.txt'));
+            const filterLines = filterContent.split(/\r?\n/);
+            expect(filterLines.length).toEqual(54);
+
+            const presentRules = [
+                'test.com#%#//scriptlet(\'abp-abort-on-property-read\', \'adsShown\')',
+                'example.com#@%#//scriptlet(\'abp-abort-on-property-write\', \'adblock.check\')',
+                'test.com#@%#//scriptlet(\'ubo-abort-on-property-read.js\', \'some.prop\')',
+                'example.com#%#//scriptlet(\'ubo-disable-newtab-links.js\')',
+                'example.com#%#//scriptlet(\'ubo-set-constant.js\', \'ads\', \'false\')',
+                'example.com$$script[tag-content="12313"][max-length="262144"]',
+                '||www.ynet.co.il^$important,websocket,~third-party,domain=www.ynet.co.il',
+                '||example.com/banner$image,redirect=3x2-transparent.png',
+                '||test.com^$script,redirect=noopjs',
+                '||example.com/*.mp4$media,redirect=noopmp4-1s',
+                '||example.com^$script,redirect-rule=noopjs',
+            ];
+            presentRules.forEach((rule) => {
+                expect(filterLines.includes(rule)).toBeTruthy();
+            });
+
+
+            const absentRules = [
+                'example.com#%#//scriptlet(\'trusted-set-local-storage-item\', \'iName\', \'iValue\')',
+                'example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")',
+            ];
+            absentRules.forEach((rule) => {
+                expect(filterLines.includes(rule)).toBeFalsy();
+            });
+        });
+
+        it('platforms/ios filters 5.txt', async () => {
+            const filterContent = await readFile(path.join(__dirname, 'resources/platforms/ios', 'filters', '5.txt'));
+            const filterLines = filterContent.split(/\r?\n/);
+            expect(filterLines.length).toEqual(42);
+
+            const presentRules = [
+                '||example.com/images/*.mp4',
+                'test.com,mp4upload.com###overlay',
+                '||test.com/Forums2008/JS/replaceLinks.js',
+                'example.com##div.grid_1[class$="app"]',
+                '||app-test.com^$third-party',
+            ];
+            presentRules.forEach((rule) => {
+                expect(filterLines.includes(rule)).toBeTruthy();
+            });
+            const absentRules = [
+                '||example.com/test/$media,mp4,domain=test.com',
+                '||test.com/cams/video_file/*.mp4$media,mp4',
+                '||example.com/test/$media,redirect=noopmp4-1s,domain=test.com',
+                '||test.com/cams/video_file/*.mp4$media,redirect=noopmp4-1s',
+                '||example.com^$script,redirect-rule=noopjs',
+                '||test.com/res/js/*.js$replace=/\\"OK\\/banners/\\"OK\\/banners__\\//',
+                '||example.com^$~script,~stylesheet,~xmlhttprequest,replace=/popunder_url/popunder_url_/',
+                '@@||test.com^$generichide,app=iexplore.exe',
+            ];
+            absentRules.forEach((rule) => {
+                expect(filterLines.includes(rule)).toBeFalsy();
+            });
+        });
+
+        it('platforms tests', async () => {
+            const filterText = await readFile(path.join(filtersDir, 'filter_3_Test', 'filter.txt'));
+            expect(filterText).toBeTruthy();
+        });
+
+        it('platform/test filters.json', async () => {
+            const filtersMetadataContent = await readFile(path.join(platformsDir, 'test', 'filters.json'));
+            expect(filtersMetadataContent).toBeTruthy();
+
+            const filtersMetadata = JSON.parse(filtersMetadataContent);
+            expect(filtersMetadata.filters).toBeTruthy();
+            expect(filtersMetadata.filters[0]).toBeTruthy();
+            expect(filtersMetadata.filters[0].filterId).toEqual(2);
+            expect(filtersMetadata.filters[0].name).toEqual('AdGuard Base filter');
+            expect(filtersMetadata.filters[0].description).toEqual('EasyList + AdGuard English filter. This filter is necessary for quality ad blocking.');
+            expect(filtersMetadata.filters[0].timeAdded).toBeTruthy();
+            expect(filtersMetadata.filters[0].homepage).toEqual('https://easylist.adblockplus.org/');
+            expect(filtersMetadata.filters[0].expires).toEqual(172800);
+            expect(filtersMetadata.filters[0].displayNumber).toEqual(101);
+            expect(filtersMetadata.filters[0].groupId).toEqual(2);
+            expect(filtersMetadata.filters[0].subscriptionUrl).toEqual('https://filters.adtidy.org/test/filters/2.txt');
+            expect(filtersMetadata.filters[0].version).toBeTruthy();
+            expect(filtersMetadata.filters[0].timeUpdated).toBeTruthy();
+            expect(/\d\d-\d\d-\d\dT\d\d:\d\d:\d\d[+-]\d\d\d\d/.test(filtersMetadata.filters[0].timeUpdated)).toBeTruthy();
+            expect(filtersMetadata.filters[0].languages.length).toEqual(2);
+            expect(filtersMetadata.filters[0].languages[0]).toEqual('en');
+            expect(filtersMetadata.filters[0].languages[1]).toEqual('pl');
+            expect(filtersMetadata.filters[0].tags.length).toEqual(4);
+            expect(filtersMetadata.filters[0].tags[0]).toEqual(1);
+            expect(filtersMetadata.filters[0].trustLevel).toEqual('full');
+
+            // Obsolete Filter test
+            expect(filtersMetadata.filters.some((filter) => filter.filterId === 6)).toBeFalsy();
+            expect(filtersMetadata.filters.some((filter) => filter.name === 'Obsolete Test Filter')).toBeFalsy();
+        });
+
+        it('platform/test filters_i18n.json', async () => {
+            const filtersI18nMetadataContent = await readFile(path.join(platformsDir, 'test', 'filters_i18n.json'));
+            expect(filtersI18nMetadataContent).toBeTruthy();
+
+            const filtersI18nMetadata = JSON.parse(filtersI18nMetadataContent);
+            const filtersI18nMetadataFilterIds = Object.keys(filtersI18nMetadata.filters);
+
+            // Obsolete Filter test
+            expect(filtersI18nMetadataFilterIds.some((id) => id === '6')).toBeFalsy();
+        });
+
+        it('platform/test local_script_rules.txt', async () => {
+            const localScriptRulesContent = await readFile(path.join(platformsDir, 'test', 'local_script_rules.txt'));
+            expect(localScriptRulesContent).toBeFalsy();
+
+            const localScriptRulesLines = localScriptRulesContent.split('\r\n');
+            expect(localScriptRulesLines.includes('test_domain#%#testScript();')).toBeFalsy();
+        });
+
+        it('platform/test local_script_rules.json', async () => {
+            const localScriptRulesJsonContent = await readFile(path.join(platformsDir, 'test', 'local_script_rules.json'));
+            expect(localScriptRulesJsonContent).toBeTruthy();
+
+            const localScriptRulesJson = JSON.parse(localScriptRulesJsonContent);
+            expect(localScriptRulesJson.comment).toBeTruthy();
+            expect(localScriptRulesJson.rules).toBeTruthy();
+        });
+
+        it('platform/test filters 2.txt', async () => {
+            const filterContent = await readFile(path.join(platformsDir, 'test', 'filters', '2.txt'));
+            expect(filterContent).toBeTruthy();
+
+            const filterLines = filterContent.split(/\r?\n/);
+            expect(filterLines.length).toEqual(50);
+            expect(filterLines[2]).toEqual('! Title: AdGuard Base filter + EasyList');
+
+            const presentLines = [
+                '![Adblock Plus 2.0]',
+                'test-common-rule.com',
+                'test-common-1-rule.com',
+                '! some common rules could be places here',
+                '~nigma.ru,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]',
+                'excluded_platform',
+                '!+ NOT_OPTIMIZED',
+                'test-common-2-rule.com',
+                'test.com##+js(abort-on-property-read, Object.prototype.getBanner)',
+            ];
+            presentLines.forEach((rule) => {
+                expect(filterLines.includes(rule)).toBeTruthy();
+            });
+
+            const absentLines = [
+                'test_domain#%#testScript();',
+                'test.com#%#var isadblock=1;',
+                'example.com#%#AG_onLoad(function() { AG_removeElementBySelector(\'span[class="intexta"]\'); });',
+                // $webrtc is deprecated
+                '||example.com^$webrtc,domain=example.org',
+            ];
+            absentLines.forEach((rule) => {
+                expect(filterLines.includes(rule)).toBeFalsy();
+            });
+        });
+
+        it('platform/test filters 2_optimized.txt', async () => {
+            const filterContent = await readFile(path.join(platformsDir, 'test', 'filters', '2_optimized.txt'));
+            expect(filterContent).toBeTruthy();
+
+            const filterLines = filterContent.split(/\r?\n/);
+            expect(filterLines.length).toEqual(34);
+            expect(filterLines[2]).toEqual('! Title: AdGuard Base filter + EasyList (Optimized)');
+
+            // $webrtc is deprecated
+            expect(filterLines.includes('||example.com^$webrtc,domain=example.org')).toBeFalsy();
+        });
+
+        it('platform/test filters 2_without_easylist.txt', async () => {
+            const filterContent = await readFile(path.join(platformsDir, 'test', 'filters', '2_without_easylist.txt'));
+            expect(filterContent).toBeTruthy();
+
+            const filterLines = filterContent.split(/\r?\n/);
+            expect(filterLines.length).toEqual(28);
+            expect(filterLines[2]).toEqual('! Title: AdGuard Base filter');
+        });
+
+        it('platforms/config/test filters 2.txt', async () => {
+            const filterContent = await readFile(path.join(platformsDir, 'config/test', 'filters', '2.txt'));
+            expect(filterContent).toBeTruthy();
+
+            const filterLines = filterContent.split(/\r?\n/);
+            expect(filterLines.length).toEqual(37);
+
+            const presentLines = [
+                'test-common-rule.com',
+                'excluded_platform',
+                'test_domain#%#testScript();',
+                // 'trusted-' scriptlets should be included in full trust level filters
+                'example.com#%#//scriptlet(\'trusted-set-local-storage-item\', \'iName\', \'iValue\')',
+                'example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")',
+            ];
+            presentLines.forEach((rule) => {
+                expect(filterLines.includes(rule)).toBeTruthy();
+            });
+
+            const absentLines = [
+                'test-common-1-rule.com',
+                '! some common rules could be places here',
+                '~nigma.ru,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]',
+                // $webrtc is deprecated
+                '||example.com^$webrtc,domain=example.org',
+            ];
+            absentLines.forEach((rule) => {
+                expect(filterLines.includes(rule)).toBeFalsy();
+            });
+        });
+
+        it('platforms/hints filters 2.txt', async () => {
+            const filterContent = await readFile(path.join(platformsDir, 'hints', 'filters', '2.txt'));
+            expect(filterContent).toBeTruthy();
+
+            const filterLines = filterContent.split(/\r?\n/);
+            expect(filterLines.length).toEqual(51);
+
+            const presentLines = [
+                'test-common-rule.com',
+                'test-common-1-rule.com',
+                '! some common rules could be places here',
+                '~nigma.ru,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]',
+                'excluded_platform',
+                'test_domain#%#testScript();',
+            ];
+            presentLines.forEach((rule) => {
+                expect(filterLines.includes(rule)).toBeTruthy();
+            });
+
+            const absentLines = [
+                // $webrtc is deprecated
+                '||example.com^$webrtc,domain=example.org',
+            ];
+            absentLines.forEach((rule) => {
+                expect(filterLines.includes(rule)).toBeFalsy();
+            });
+        });
+
+        it('platforms/ios filters 2.txt', async () => {
+            const filterContent = await readFile(path.join(platformsDir, 'ios', 'filters', '2.txt'));
+            expect(filterContent).toBeTruthy();
+
+            const filterLines = filterContent.split(/\r?\n/);
+            expect(filterLines.length).toEqual(52);
+
+            const presentLines = [
+                'test.com#%#var isadblock=1;',
+                'test.com#%#//scriptlet(\'ubo-abort-on-property-read.js\', \'Object.prototype.getBanner\')',
+                'example.net#$?#.main-content { margin-top: 0!important; }',
+                'test.com#@$?#.banner { padding: 0!important; }',
+                'example.net#?#.banner:matches-css(width: 360px)',
+                'test.com#@?#.banner:matches-css(height: 200px)',
+            ];
+            presentLines.forEach((rule) => {
+                expect(filterLines.includes(rule)).toBeTruthy();
+            });
+
+            const absentLines = [
+                '||example.org^$cookie=test',
+                '@@||example.com^$stealth',
+                '||example.com^$webrtc,domain=example.org',
+                '||example.org^$csp=frame-src \'none\'',
+            ];
+            absentLines.forEach((rule) => {
+                expect(filterLines.includes(rule)).toBeFalsy();
+            });
+        });
+
+        describe('check MAC platform', () => {
+            it('platform/mac filters.json', async () => {
+                const macFiltersMetadataContent = await readFile(path.join(platformsDir, 'mac', 'filters.json'));
+                expect(macFiltersMetadataContent).toBeTruthy();
+                const macFiltersMetadata = JSON.parse(macFiltersMetadataContent);
+                expect(Object.keys(macFiltersMetadata).length).toEqual(2);
+
+                expect(macFiltersMetadata.filters).toBeTruthy();
+                expect(macFiltersMetadata.groups).toBeTruthy();
+                expect(macFiltersMetadata.tags).toEqual(undefined);
+
+                const group = macFiltersMetadata.groups[0];
+                expect(group).toBeTruthy();
+                expect(Object.keys(group).length).toEqual(3);
+                expect(group.groupId).toEqual(1);
+                expect(group.groupName).toEqual('Adguard Filters');
+                expect(group.displayNumber).toEqual(1);
+
+                const englishFilter = macFiltersMetadata.filters[0];
+                expect(englishFilter).toBeTruthy();
+                expect(Object.keys(englishFilter).length).toEqual(11);
+                expect(englishFilter.filterId).toEqual(2);
+                expect(englishFilter.name).toEqual('AdGuard Base filter');
+                expect(englishFilter.description).toEqual('EasyList + AdGuard English filter. This filter is necessary for quality ad blocking.');
+                expect(englishFilter.timeAdded).toEqual(undefined);
+                expect(englishFilter.homepage).toEqual('https://easylist.adblockplus.org/');
+                expect(englishFilter.expires).toEqual(172800);
+                expect(englishFilter.displayNumber).toEqual(101);
+                expect(englishFilter.groupId).toEqual(2);
+                expect(englishFilter.subscriptionUrl).toEqual('https://filters.adtidy.org/mac/filters/2.txt');
+                expect(englishFilter.version).toBeTruthy();
+                expect(englishFilter.timeUpdated).toBeTruthy();
+                expect(englishFilter.languages.length).toEqual(2);
+                expect(englishFilter.languages[0]).toEqual('en');
+                expect(englishFilter.languages[1]).toEqual('pl');
+                expect(englishFilter.tags).toEqual(undefined);
+                expect(englishFilter.trustLevel).toEqual(undefined);
+            });
+
+            it('platform/mac filters_i18n.json', async () => {
+                const macFiltersI18nMetadataContent = await readFile(path.join(platformsDir, 'mac', 'filters_i18n.json'));
+                expect(macFiltersI18nMetadataContent).toBeTruthy();
+
+                const macFiltersI18nMetadata = JSON.parse(macFiltersI18nMetadataContent);
+                expect(macFiltersI18nMetadata).toBeTruthy();
+                expect(Object.keys(macFiltersI18nMetadata).length).toEqual(2);
+            });
+
+            it('platform/mac filters 2.txt', async () => {
+                const filterContent = await readFile(path.join(platformsDir, 'mac', 'filters', '2.txt'));
+                expect(filterContent).toBeTruthy();
+
+                const filterLines = filterContent.split(/\r?\n/);
+
+                // Check conditions
+                expect(filterLines.includes('!#if adguard')).toBeFalsy();
+                expect(filterLines.includes('!#endif')).toBeFalsy();
+                expect(filterLines.includes('if_not_adguard_rule')).toBeFalsy();
+                expect(filterLines.includes('if_adguard_included_rule')).toBeTruthy();
+                expect(filterLines.includes('if_adguard_rule')).toBeTruthy();
+
+                // wrong condition
+                expect(filterLines.includes('wrong_condition')).toBeFalsy();
+
+                // Check includes
+                expect(filterLines.includes('!#include')).toBeFalsy();
+            });
+
+            it('platform/mac filters 4_optimized.txt', async () => {
+                // platform specify includes
+                const filterContent = await readFile(path.join(platformsDir, 'mac', 'filters', '4_optimized.txt'));
+                expect(filterContent).toBeTruthy();
+
+                const filterLines = filterContent.split(/\r?\n/);
+                // expect(filterLines.length).toEqual(13);
+                expect(filterLines.includes('if_mac_included_rule')).toBeFalsy();
+
+                // do not remove directives while stripped comment. `directives_not_stripped` rule should not remain
+                expect(filterLines.includes('directives_not_stripped')).toBeFalsy();
+            });
+        });
+
+        describe('condition directives for platforms', () => {
+            it('platform/test filters 4.txt', async () => {
+                const filterContent = await readFile(path.join(platformsDir, 'test', 'filters', '4.txt'));
+                expect(filterContent).toBeTruthy();
+
+                const filterLines = filterContent.split(/\r?\n/);
+                console.log(filterLines);
+                expect(filterLines.length).toEqual(23);
+                expect(filterLines[2].startsWith('! Title:')).toBeTruthy();
+                expect(filterLines[2].endsWith('(Optimized)')).toBeFalsy();
+                expect(filterLines.includes('if_not_ublock')).toBeFalsy();
+            });
+
+            it('platform/test filters 4_optimized.txt', async () => {
+                const filterContent = await readFile(path.join(platformsDir, 'test', 'filters', '4_optimized.txt'));
+                expect(filterContent).toBeTruthy();
+
+                const filterLines = filterContent.split(/\r?\n/);
+                expect(filterLines.length).toEqual(13);
+                expect(filterLines[2].startsWith('! Title:')).toBeTruthy();
+                expect(filterLines[2].endsWith('(Optimized)')).toBeTruthy();
+                expect(filterLines.includes('if_not_ublock')).toBeFalsy();
+            });
+
+            it('platform/mac filters 5.txt', async () => {
+                const filterContent = await readFile(path.join(platformsDir, 'mac', 'filters', '5.txt'));
+                expect(filterContent).toBeTruthy();
+
+                const filterLines = filterContent.split(/\r?\n/);
+                expect(filterLines.length).toEqual(53);
+                expect(filterLines.includes('||example.com^$script,redirect=noopjs')).toBeTruthy();
+                expect(filterLines.includes('||example.com/banner$image,redirect=1x1-transparent.gif')).toBeTruthy();
+            });
+        });
+
+        describe('platformsIncluded directive', () => {
+            it('platform/test', async () => {
+                // check if Directives Filter was built for test platform and metadata added to it's filters.json
+                const fullFilterContent = existsSync(path.join(platformsDir, 'test', 'filters', '4.txt'));
+                expect(fullFilterContent).toBeTruthy();
+                const optimizedFilterContent = existsSync(path.join(platformsDir, 'test', 'filters', '4_optimized.txt'));
+                expect(optimizedFilterContent).toBeTruthy();
+
+                const metadataContent = await readFile(path.join(platformsDir, 'test', 'filters.json'));
+                const metadata = JSON.parse(metadataContent);
+                expect(metadata).toBeTruthy();
+                expect(metadata.filters.some((f) => f.filterId === 4)).toBeTruthy();
+            });
+
+            it('platform/mac', async () => {
+                // check if Directives Filter was built for mac platform and metadata added to it's filters.json
+                const fullFilterContent = existsSync(path.join(platformsDir, 'mac', 'filters', '4.txt'));
+                expect(fullFilterContent).toBeTruthy();
+                const optimizedFilterContent = existsSync(path.join(platformsDir, 'mac', 'filters', '4_optimized.txt'));
+                expect(optimizedFilterContent).toBeTruthy();
+
+                const metadataContent = await readFile(path.join(platformsDir, 'mac', 'filters.json'));
+                const metadata = JSON.parse(metadataContent);
+                expect(metadata).toBeTruthy();
+                expect(metadata.filters.some((f) => f.filterId === 4)).toBeTruthy();
+            });
+
+            it('platform/ios', async () => {
+                // check if Directives Filter was NOT built for ios platform and metadata was NOT added to it's filters.json
+                const fullFilterContent = existsSync(path.join(platformsDir, 'ios', 'filters', '4.txt'));
+                expect(fullFilterContent).toBeTruthy();
+                const optimizedFilterContent = existsSync(path.join(platformsDir, 'ios', 'filters', '4_optimized.txt'));
+                expect(optimizedFilterContent).toBeTruthy();
+
+                const metadataContent = await readFile(path.join(platformsDir, 'ios', 'filters.json'));
+                const metadata = JSON.parse(metadataContent);
+                expect(metadata).toBeTruthy();
+                expect(metadata.filters.some((f) => f.filterId === 4)).toBeFalsy();
+            });
+
+            it('platform/test2', async () => {
+                // check if Directives Filter was NOT built for test2 platform and metadata was NOT added to it's filters.json
+                const fullFilterContent = existsSync(path.join(platformsDir, 'test2', 'filters', '4.txt'));
+                expect(fullFilterContent).toBeTruthy();
+                const optimizedFilterContent = existsSync(path.join(platformsDir, 'test2', 'filters', '4_optimized.txt'));
+                expect(optimizedFilterContent).toBeTruthy();
+
+                const metadataContent = await readFile(path.join(platformsDir, 'test2', 'filters.json'));
+                const metadata = JSON.parse(metadataContent);
+                expect(metadata).toBeTruthy();
+                expect(metadata.filters.some((f) => f.filterId === 4)).toBeFalsy();
+            });
+        });
+
+        describe('platformsExcluded directive', () => {
+            it('platform/mac', async () => {
+                // check if Test Filter was NOT built for mac platform and metadata was NOT added to it's filters.json
+                const fullFilterContent = existsSync(path.join(platformsDir, 'mac', 'filters', '3.txt'));
+                expect(fullFilterContent).toBeTruthy();
+                const optimizedFilterContent = existsSync(path.join(platformsDir, 'mac', 'filters', '3_optimized.txt'));
+                expect(optimizedFilterContent).toBeTruthy();
+
+                const metadataContent = await readFile(path.join(platformsDir, 'mac', 'filters.json'));
+                const metadata = JSON.parse(metadataContent);
+                expect(metadata).toBeTruthy();
+                expect(metadata.filters.some((f) => f.filterId === 3)).toBeFalsy();
+            });
+
+            it('platform/ios', async () => {
+                // check if Test Filter was built for ios platform and metadata added to it's filters.json
+                const fullFilterContent = existsSync(path.join(platformsDir, 'ios', 'filters', '3.txt'));
+                expect(fullFilterContent).toBeTruthy();
+                const optimizedFilterContent = existsSync(path.join(platformsDir, 'ios', 'filters', '3_optimized.txt'));
+                expect(optimizedFilterContent).toBeTruthy();
+
+                const metadataContent = await readFile(path.join(platformsDir, 'ios', 'filters.json'));
+                const metadata = JSON.parse(metadataContent);
+                expect(metadata).toBeTruthy();
+                expect(metadata.filters.some((f) => f.filterId === 3)).toBeTruthy();
+            });
+        });
+
+        describe('both platformsIncluded and platformsExcluded directives', () => {
+            // Test Platforms Filter should be built only for mac and chromium platforms only
+            // check src/test/resources/filters/filter_7_Platforms/metadata.json for details
+            it('platform/mac', async () => {
+                const fullFilterContent = existsSync(path.join(platformsDir, 'mac', 'filters', '7.txt'));
+                expect(fullFilterContent).toBeTruthy();
+                const optimizedFilterContent = existsSync(path.join(platformsDir, 'mac', 'filters', '7_optimized.txt'));
+                expect(optimizedFilterContent).toBeTruthy();
+
+                const metadataContent = await readFile(path.join(platformsDir, 'mac', 'filters.json'));
+                const metadata = JSON.parse(metadataContent);
+                expect(metadata).toBeTruthy();
+                expect(metadata.filters.some((f) => f.filterId === 7)).toBeTruthy();
+            });
+
+            it('platform/test2', async () => {
+                // chromium path is test2, it is specified in src/test/resources/platforms.json
+                const fullFilterContent = existsSync(path.join(platformsDir, 'test2', 'filters', '7.txt'));
+                expect(fullFilterContent).toBeTruthy();
+                const optimizedFilterContent = existsSync(path.join(platformsDir, 'test2', 'filters', '7_optimized.txt'));
+                expect(optimizedFilterContent).toBeTruthy();
+
+                const metadataContent = await readFile(path.join(platformsDir, 'test2', 'filters.json'));
+                const metadata = JSON.parse(metadataContent);
+                expect(metadata).toBeTruthy();
+                expect(metadata.filters.some((f) => f.filterId === 7)).toBeTruthy();
+            });
+
+            it('platform/ios', async () => {
+                // ios is specified in platformsIncluded
+                // but it is also specified in platformsExcluded, so no build for ios
+                const fullFilterContent = existsSync(path.join(platformsDir, 'ios', 'filters', '7.txt'));
+                expect(fullFilterContent).toBeTruthy();
+                const optimizedFilterContent = existsSync(path.join(platformsDir, 'ios', 'filters', '7_optimized.txt'));
+                expect(optimizedFilterContent).toBeTruthy();
+
+                const metadataContent = await readFile(path.join(platformsDir, 'ios', 'filters.json'));
+                const metadata = JSON.parse(metadataContent);
+                expect(metadata).toBeTruthy();
+                expect(metadata.filters.some((f) => f.filterId === 7)).toBeFalsy();
+            });
+
+            it('platform/test', async () => {
+                const fullFilterContent = existsSync(path.join(platformsDir, 'test', 'filters', '7.txt'));
+                expect(fullFilterContent).toBeTruthy();
+                const optimizedFilterContent = existsSync(path.join(platformsDir, 'test', 'filters', '7_optimized.txt'));
+                expect(optimizedFilterContent).toBeTruthy();
+
+                const metadataContent = await readFile(path.join(platformsDir, 'test', 'filters.json'));
+                const metadata = JSON.parse(metadataContent);
+                expect(metadata).toBeTruthy();
+                expect(metadata.filters.some((f) => f.filterId === 7)).toBeFalsy();
+            });
+        });
+
+        describe('hint PLATFORM inside of !#safari_cb_affinity directive', () => {
+            it('platform/ios', async () => {
+                const filterContent = await readFile(path.join(platformsDir, 'ios', 'filters', '7.txt'));
+                expect(filterContent).toBeTruthy();
+
+                const filterLines = filterContent.split(/\r?\n/);
+                expect(filterLines.includes('||example1.org')).toBeTruthy();
+                expect(filterLines.includes('||example2.org')).toBeTruthy();
+            });
+
+            it('platform/mac', async () => {
+                const filterContent = await readFile(path.join(platformsDir, 'mac', 'filters', '7.txt'));
+                expect(filterContent).toBeTruthy();
+
+                const filterLines = filterContent.split(/\r?\n/);
+                expect(filterLines.includes('||example1.org')).toBeTruthy();
+                expect(filterLines.includes('||example2.org')).toBeFalsy();
+            });
+        });
+
+        it('removing scriptlet rules in local_script_rules.json', async () => {
+            // test removing scriptlet rules in local_script_rules.json for chrome browser extension
+            const localScriptRulesJsonContent = await readFile(path.join(platformsDir, 'chromium', 'local_script_rules.json'));
+            expect(localScriptRulesJsonContent).toBeTruthy();
+
+            const localScriptRulesData = JSON.parse(localScriptRulesJsonContent);
+            expect(localScriptRulesData.rules).toBeTruthy();
+            expect(localScriptRulesData.rules.some((rule) => rule.script.startsWith('//scriptlet'))).toBeFalsy();
+        });
+
+        it('applying replacements', async () => {
+            const filterContent = await readFile(path.join(platformsDir, 'replacements', 'filters', '2.txt'));
+            expect(filterContent).toBeTruthy();
+
+            const filterLines = filterContent.split(/\r?\n/);
+            expect(filterLines.includes('||stringtoreplace^')).toBeFalsy();
+            expect(filterLines.includes('||replacementstring^')).toBeTruthy();
+        });
     });
 
     it('Builds lists', async () => {
-        optimization.disableOptimization();
-        expect(builder).toBeTruthy();
-
-        const filtersDir = path.join(__dirname, './resources/filters');
-        const logFile = path.join(__dirname, './resources/log.txt');
-        const reportFile = path.join(__dirname, './resources/report.txt');
-
         await builder.build(filtersDir, logFile, reportFile, null, {}, null, [2, 3]);
-
         let revision = await readFile(path.join(filtersDir, 'filter_2_English', 'revision.json'));
         expect(revision).toBeTruthy();
 
         await builder.build(filtersDir, logFile, reportFile, null, {}, null, null, [3, 4]);
-
         revision = await readFile(path.join(filtersDir, 'filter_2_English', 'revision.json'));
         expect(revision).toBeTruthy();
 
         await builder.build(filtersDir, logFile, reportFile, null, {}, null, [2, 3], [3, 4]);
-
         revision = await readFile(path.join(filtersDir, 'filter_2_English', 'revision.json'));
         expect(revision).toBeTruthy();
     });
 
     it('Validate affinity directives', async () => {
-        const platformsConfig = path.join(__dirname, './resources/platforms.json');
-        const platformsPath = path.join(__dirname, './resources/platforms');
-        optimization.disableOptimization();
-
-        const filtersDir = path.join(__dirname, './resources/bad-filters/');
-        await expect(builder.build(filtersDir, null, null, platformsPath, platformsConfig, [8])).rejects.toThrow('Error validating !#safari_cb_affinity directive in filter 8');
+        await expect(
+            builder.build(badFiltersDir, null, null, platformsDir, platformsConfigFile, [8])
+        ).rejects.toThrow('Error validating !#safari_cb_affinity directive in filter 8');
     });
 
     it('Resolve bad include inside condition', async () => {
-        const platformsConfig = path.join(__dirname, './resources/platforms.json');
-        const platformsPath = path.join(__dirname, './resources/platforms');
-        optimization.disableOptimization();
-
-        const filtersDir = path.join(__dirname, './resources/bad-filters/');
-
-        await expect(builder.build(filtersDir, null, null, platformsPath, platformsConfig, [9])).rejects.toThrow(/^ENOENT: no such file or directory, open.*non-existing-file\.txt.*$/);
+        await expect(
+            builder.build(badFiltersDir, null, null, platformsDir, platformsConfigFile, [9])
+        ).rejects.toThrow(/^ENOENT: no such file or directory, open.*non-existing-file\.txt.*$/);
     });
 
     it('filters.js and filters_i18n.js as copies of the json files', async () => {
-        const platformsPath = path.join(__dirname, './resources/platforms');
-
-        const filtersJson = await readFile(path.join(platformsPath, 'test', 'filters.json'));
-        const filtersJs = await readFile(path.join(platformsPath, 'test', 'filters.js'));
+        const filtersJson = await readFile(path.join(platformsDir, 'test', 'filters.json'));
+        const filtersJs = await readFile(path.join(platformsDir, 'test', 'filters.js'));
         expect(filtersJson).toEqual(filtersJs);
 
-        const filtersI18nJson = await readFile(path.join(platformsPath, 'test', 'filters_i18n.json'));
-        const filtersI18nJs = await readFile(path.join(platformsPath, 'test', 'filters_i18n.js'));
+        const filtersI18nJson = await readFile(path.join(platformsDir, 'test', 'filters_i18n.json'));
+        const filtersI18nJs = await readFile(path.join(platformsDir, 'test', 'filters_i18n.js'));
         expect(filtersI18nJson).toEqual(filtersI18nJs);
     });
 });
