@@ -141,7 +141,6 @@ describe('Test builder', () => {
                 expect(filterLines.includes(rule)).toBeTruthy();
             });
 
-
             const absentRules = [
                 'example.com#%#//scriptlet(\'trusted-set-local-storage-item\', \'iName\', \'iValue\')',
                 'example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")',
@@ -464,7 +463,9 @@ describe('Test builder', () => {
                 expect(filterContent).toBeTruthy();
 
                 const filterLines = filterContent.split(/\r?\n/);
-                // expect(filterLines.length).toEqual(13);
+                expect(filterLines.length).toEqual(12);
+
+                // due to missed defines.adguard_app_mac in src/test/resources/platforms.json
                 expect(filterLines.includes('if_mac_included_rule')).toBeFalsy();
 
                 // do not remove directives while stripped comment. `directives_not_stripped` rule should not remain
@@ -478,10 +479,12 @@ describe('Test builder', () => {
                 expect(filterContent).toBeTruthy();
 
                 const filterLines = filterContent.split(/\r?\n/);
-                console.log(filterLines);
-                expect(filterLines.length).toEqual(23);
+                expect(filterLines.length).toEqual(22);
                 expect(filterLines[2].startsWith('! Title:')).toBeTruthy();
                 expect(filterLines[2].endsWith('(Optimized)')).toBeFalsy();
+
+                // due to `!#if (!ublock)` directive
+                // in src/test/resources/filters/filter_4_Directives/template.txt
                 expect(filterLines.includes('if_not_ublock')).toBeFalsy();
             });
 
@@ -490,7 +493,8 @@ describe('Test builder', () => {
                 expect(filterContent).toBeTruthy();
 
                 const filterLines = filterContent.split(/\r?\n/);
-                expect(filterLines.length).toEqual(13);
+                expect(filterLines.length).toEqual(12);
+
                 expect(filterLines[2].startsWith('! Title:')).toBeTruthy();
                 expect(filterLines[2].endsWith('(Optimized)')).toBeTruthy();
                 expect(filterLines.includes('if_not_ublock')).toBeFalsy();
