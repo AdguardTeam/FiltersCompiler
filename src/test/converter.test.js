@@ -50,6 +50,21 @@ describe('converter', () => {
         expect(c[0]).toEqual('');
     });
 
+    it('converts network rule modifiers', () => {
+        // escaped comma in regexp modifier value should remain escaped after the conversion
+        let c = converter.convertRulesToAdgSyntax([String.raw`||example.org^$hls=/^__s=[A-Za-z0-9]{6\,}/`]);
+        expect(c[0]).toBe(String.raw`||example.org^$hls=/^__s=[A-Za-z0-9]{6\,}/`);
+
+        c = converter.convertRulesToAdgSyntax([String.raw`||example.org/*/*/$jsonprune=\\$..[ac\\, ab]`]);
+        expect(c[0]).toBe(String.raw`||example.org/*/*/$jsonprune=\\$..[ac\\, ab]`);
+
+        c = converter.convertRulesToAdgSyntax([String.raw`||example.org/*/*/$removeparam=/^__s=[A-Za-z0-9]{6\,}/`]);
+        expect(c[0]).toBe(String.raw`||example.org/*/*/$removeparam=/^__s=[A-Za-z0-9]{6\,}/`);
+
+        c = converter.convertRulesToAdgSyntax([String.raw`||example.org/*/*/$replace=/<item type=\"banner\">.{280\,400}.*<\/background><\/item>//`]);
+        expect(c[0]).toBe(String.raw`||example.org/*/*/$replace=/<item type=\"banner\">.{280\,400}.*<\/background><\/item>//`);
+    });
+
     it('keeps cosmetic rule as is', () => {
         const source = 'ferra.ru##div[data-render-state] + div[class^="jsx-"][class$=" undefined"]';
         const expected = source;

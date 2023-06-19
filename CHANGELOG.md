@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Updated TSUrlFilter to v2.1.2
+
+
+## [v1.1.85] - 2023-06-15
+
+### Changed
+
 - Updated Scriptlets to v1.9.37
 - Updated TSUrlFilter to v2.0.7
 
