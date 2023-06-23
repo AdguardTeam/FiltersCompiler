@@ -4,8 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - 2023-06-23
 
-## [v1.1.85] - 2023-06-15
+### Changed
+
+- Updated `platforms.json` and added `adguard_ext_chromium` into `defines` for `EXTENSION_EDGE` and `EXTENSION_OPERA`.
+
+
+## [v1.1.86] - 2023-06-15
 
 ### Changed
 
@@ -155,7 +161,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated TSUrlFilter to v1.0.51, Scriptlets to v1.7.3
 
 
-[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.82...HEAD
+[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.86...HEAD
+[v1.1.86]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.85...v1.1.86
+[v1.1.85]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.82...v1.1.85
 [v1.1.82]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.79...v1.1.82
 [v1.1.79]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.77...v1.1.79
 [v1.1.77]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.76...v1.1.77

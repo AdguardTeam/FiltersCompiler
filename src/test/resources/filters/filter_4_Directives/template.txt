@@ -9,3 +9,6 @@
 !#if (!ublock)
 if_not_ublock
 !#endif
+!#if (adguard_ext_chromium && adguard_ext_edge)
+if_edge_chromium
+!#endif

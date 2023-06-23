@@ -106,6 +106,19 @@
             "adguard_ext_chromium": true
         }
     },
+    "EXTENSION_EDGE": {
+        "platform": "ext_edge",
+        "path": "edge",
+        "configuration": {
+            "removeRulePatterns": false,
+            "ignoreRuleHints": false
+        },
+        "defines": {
+            "adguard": true,
+            "adguard_ext_edge": true,
+            "adguard_ext_chromium": true
+        }
+    },
     "TEST_REPLACEMENTS": {
         "platform": "test",
         "path": "replacements",

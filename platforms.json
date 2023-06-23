@@ -32,7 +32,6 @@
             "adguard_app_mac": true
         }
     },
-
     "ANDROID": {
         "platform": "android",
         "path": "android",
@@ -44,13 +43,126 @@
             "adguard_app_android": true
         }
     },
-
-    "IOS": {
-        "platform": "ios",
-        "path": "ios",
+    "EXTENSION_CHROMIUM": {
+        "platform": "ext_chromium",
+        "path": "extension/chromium",
         "configuration": {
             "removeRulePatterns": [
-                "\\$\\$|\\$\\@\\$",
+                "^((?!#%#).)*\\$\\$|\\$\\@\\$",
+                "\\$(.*,)?replace=",
+                "important,replace=",
+                "\\$(.*,)?app",
+                "\\$network",
+                "\\$protobuf",
+                "important,protobuf",
+                "\\$extension",
+                ",extension",
+                "\\$hls=",
+                ",hls=",
+                "\\$jsonprune=",
+                ",jsonprune=",
+                "\\$content",
+                ",content"
+            ],
+            "ignoreRuleHints": false
+        },
+        "defines": {
+            "adguard": true,
+            "adguard_ext_chromium": true
+        }
+    },
+    "EXTENSION_EDGE": {
+        "platform": "ext_edge",
+        "path": "extension/edge",
+        "configuration": {
+            "removeRulePatterns": [
+                "^((?!#%#).)*\\$\\$|\\$\\@\\$",
+                "\\$(.*,)?replace=",
+                "important,replace=",
+                "\\$(.*,)?app",
+                "\\$network",
+                "\\$protobuf",
+                "important,protobuf",
+                "\\$extension",
+                ",extension",
+                "\\$hls=",
+                ",hls=",
+                "\\$jsonprune=",
+                ",jsonprune=",
+                "\\$content",
+                ",content"
+            ],
+            "ignoreRuleHints": false
+        },
+        "defines": {
+            "adguard": true,
+            "adguard_ext_edge": true,
+            "adguard_ext_chromium": true
+        }
+    },
+    "EXTENSION_OPERA": {
+        "platform": "ext_opera",
+        "path": "extension/opera",
+        "configuration": {
+            "removeRulePatterns": [
+                "^((?!#%#).)*\\$\\$|\\$\\@\\$",
+                "\\$(.*,)?replace=",
+                "important,replace=",
+                "\\$(.*,)?app",
+                "\\$network",
+                "\\$protobuf",
+                "important,protobuf",
+                "\\$extension",
+                ",extension",
+                "\\$hls=",
+                ",hls=",
+                "\\$jsonprune=",
+                ",jsonprune=",
+                "\\$content",
+                ",content"
+            ],
+            "ignoreRuleHints": false
+        },
+        "defines": {
+            "adguard": true,
+            "adguard_ext_opera": true,
+            "adguard_ext_chromium": true
+        }
+    },
+    "EXTENSION_FIREFOX": {
+        "platform": "ext_ff",
+        "path": "extension/firefox",
+        "configuration": {
+            "removeRulePatterns": [
+                "^((?!#%#).)*\\$\\$|\\$\\@\\$",
+                "\\$(.*,)?app",
+                "\\$network",
+                "\\$protobuf",
+                "important,protobuf",
+                "\\$extension",
+                ",extension"
+            ],
+            "ignoreRuleHints": false
+        },
+        "defines": {
+            "adguard": true,
+            "adguard_ext_firefox": true
+        }
+    },
+    "EXTENSION_SAFARI": {
+        "platform": "ext_safari",
+        "path": "extension/safari",
+        "configuration": {
+            "removeRulePatterns": [
+                "\\$domain=\/",
+                ",domain=\/",
+                "^((?!#%#).)*\\$\\$|\\$\\@\\$",
+                "\\$extension",
+                ",extension",
+                "\\$removeparam",
+                ",removeparam",
+                "\\$removeheader",
+                ",removeheader",
                 "\\$(.*,)?mp4",
                 "\\$(.*,)?replace=",
                 "\\$stealth",
@@ -68,88 +180,12 @@
                 "\\$empty",
                 ",empty",
                 "\\$webrtc",
-                "\\$csp=",
-                "\\$network"
-            ],
-            "ignoreRuleHints": false
-        },
-        "defines": {
-            "adguard": true,
-            "adguard_app_ios": true
-        }
-    },
-
-    "EXTENSION_CHROMIUM": {
-        "platform": "ext_chromium",
-        "path": "extension/chromium",
-        "configuration": {
-            "removeRulePatterns": [
-                "\\$\\$|\\$\\@\\$",
-                "\\$(.*,)?replace=",
-                "important,replace=",
-                "\\$(.*,)?app",
-                "\\$network",
-                "\\$protobuf",
-                "important,protobuf",
-                "\\$extension",
-                ",extension"
-            ],
-            "ignoreRuleHints": false
-        },
-        "defines": {
-            "adguard": true,
-            "adguard_ext_chromium": true
-        }
-    },
-    "EXTENSION_FIREFOX": {
-        "platform": "ext_ff",
-        "path": "extension/firefox",
-        "configuration": {
-            "removeRulePatterns": [
-                "\\$(.*,)?app",
-                "\\$network",
-                "\\$protobuf",
-                "important,protobuf",
-                "\\$extension",
-                ",extension",
-                "\\$\\$|\\$\\@\\$",
-                "\\$(.*,)?replace=",
-                "important,replace="
-            ],
-            "ignoreRuleHints": false
-        },
-        "defines": {
-            "adguard": true,
-            "adguard_ext_firefox": true
-        }
-    },
-    "EXTENSION_SAFARI": {
-        "platform": "ext_safari",
-        "path": "extension/safari",
-        "configuration": {
-            "removeRulePatterns": [
-                "\\$\\$|\\$\\@\\$",
-                "\\$(.*,)?mp4",
-                "\\$(.*,)?replace=",
-                "\\$stealth",
-                ",stealth",
-                "\\$cookie",
-                ",cookie",
-                "important,replace=",
-                "\\$(.*,)?app",
-                "\\$network",
-                "\\$protobuf",
-                "important,protobuf",
                 "\\$csp",
-                "\\$extension",
-                ",extension",
-                "\\$redirect=",
-                ",redirect=",
-                "\\$redirect-rule=",
-                ",redirect-rule=",
-                "\\$empty",
-                ",empty",
-                "\\$webrtc"
+                "\\$network",
+                "\\$hls=",
+                ",hls=",
+                "\\$jsonprune=",
+                ",jsonprune="
             ],
             "ignoreRuleHints": false
         },
@@ -158,65 +194,65 @@
             "adguard_ext_safari": true
         }
     },
-    "EXTENSION_EDGE": {
-        "platform": "ext_edge",
-        "path": "extension/edge",
+    "IOS": {
+        "platform": "ios",
+        "path": "ios",
         "configuration": {
             "removeRulePatterns": [
-                "\\$\\$|\\$\\@\\$",
-                "\\$(.*,)?mp4",
-                "\\$(.*,)?replace=",
-                "important,replace=",
-                "\\$(.*,)?app",
-                "\\$network",
-                "\\$protobuf",
-                "important,protobuf",
+                "\\$domain=\/",
+                ",domain=\/",
+                "^((?!#%#).)*\\$\\$|\\$\\@\\$",
                 "\\$extension",
                 ",extension",
+                "\\$removeparam",
+                ",removeparam",
+                "\\$removeheader",
+                ",removeheader",
+                "\\$(.*,)?mp4",
+                "\\$(.*,)?replace=",
+                "\\$stealth",
+                ",stealth",
+                "\\$cookie",
+                ",cookie",
+                "important,replace=",
+                "\\$(.*,)?app",
+                "\\$protobuf",
+                "important,protobuf",
                 "\\$redirect=",
                 ",redirect=",
                 "\\$redirect-rule=",
                 ",redirect-rule=",
-                "\\$empty=",
-                ",empty=",
-                "#%#//scriptlet"
-            ],
-            "ignoreRuleHints": false
-        },
-        "defines": {
-            "adguard": true,
-            "adguard_ext_edge": true
-        }
-    },
-    "EXTENSION_OPERA": {
-        "platform": "ext_opera",
-        "path": "extension/opera",
-        "configuration": {
-            "removeRulePatterns": [
-                "\\$\\$|\\$\\@\\$",
-                "\\$(.*,)?replace=",
-                "important,replace=",
-                "\\$(.*,)?app",
+                "\\$empty",
+                ",empty",
+                "\\$webrtc",
+                "\\$csp",
                 "\\$network",
-                "\\$protobuf",
-                "important,protobuf",
-                "\\$extension",
-                ",extension"
+                "\\$hls=",
+                ",hls=",
+                "\\$jsonprune=",
+                ",jsonprune="
             ],
             "ignoreRuleHints": false
         },
         "defines": {
             "adguard": true,
-            "adguard_ext_opera": true
+            "adguard_app_ios": true
         }
     },
-
     "EXTENSION_ANDROID_CONTENT_BLOCKER": {
         "platform": "ext_android_cb",
         "path": "extension/android-content-blocker",
         "configuration": {
             "removeRulePatterns": [
-                "\\$\\$|\\$\\@\\$",
+                "\\$domain=\/",
+                ",domain=\/",
+                "^((?!#%#).)*\\$\\$|\\$\\@\\$",
+                "\\$extension",
+                ",extension",
+                "\\$removeparam",
+                ",removeparam",
+                "\\$removeheader",
+                ",removeheader",
                 "#%#",
                 "#@%#",
                 "#\\$#",
@@ -238,6 +274,12 @@
                 ":has-text\\(",
                 ":contains\\(",
                 ":matches-css\\(",
+                ":matches-attr\\(",
+                ":matches-property\\(",
+                ":xpath\\(",
+                ":nth-ancestor\\(",
+                ":upward\\(",
+                ":remove\\(",
                 ":matches-css-before\\(",
                 ":matches-css-after\\(",
                 ":-abp-has\\(",
@@ -250,7 +292,10 @@
                 ",redirect=",
                 "\\$redirect-rule=",
                 ",redirect-rule=",
-                "^\\[.+?\\].*#(\\$|\\@|\\?|\\@){0,2}#"
+                "\\$hls=",
+                ",hls=",
+                "\\$jsonprune=",
+                ",jsonprune="
             ],
             "ignoreRuleHints": false
         },
@@ -259,13 +304,12 @@
             "adguard_ext_android_cb": true
         }
     },
-
     "EXTENSION_UBLOCK": {
         "platform": "ext_ublock",
         "path": "extension/ublock",
         "configuration": {
             "removeRulePatterns": [
-                "\\$\\$|\\$\\@\\$",
+                "^((?!#%#).)*\\$\\$|\\$\\@\\$",
                 "\\$(.*,)?mp4",
                 "\\$(.*,)?replace=",
                 "\\$stealth",
@@ -286,7 +330,11 @@
                 "\\$content",
                 ",content(,|$)",
                 "$webrtc",
-                "#\\$#@media "
+                "#\\$#@media ",
+                "\\$hls=",
+                ",hls=",
+                "\\$jsonprune=",
+                ",jsonprune="
             ],
             "ignoreRuleHints": false,
             "adbHeader": "![Adblock Plus 2.0]"

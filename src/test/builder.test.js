@@ -509,6 +509,15 @@ describe('Test builder', () => {
                 expect(filterLines.includes('||example.com^$script,redirect=noopjs')).toBeTruthy();
                 expect(filterLines.includes('||example.com/banner$image,redirect=1x1-transparent.gif')).toBeTruthy();
             });
+
+            it('platform/edge filters4.txt', async () => {
+                const filterContent = await readFile(path.join(platformsDir, 'edge', 'filters', '4.txt'));
+                expect(filterContent).toBeTruthy();
+
+                const filterLines = filterContent.split(/\r?\n/);
+                expect(filterLines.length).toEqual(23);
+                expect(filterLines.includes('if_edge_chromium')).toBeTruthy();
+            });
         });
 
         describe('platformsIncluded directive', () => {

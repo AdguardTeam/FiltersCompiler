@@ -125,6 +125,17 @@ describe('platforms filter', () => {
                     '\\$stealth',
                     '\\$content',
                     ',content(,|$)',
+                    // regexp domain modifier values
+                    '\\$domain=\/',
+                    ',$domain=\/',
+                    '\\$(.*,)?hls=',
+                    '\\$(.*,)?jsonprune=',
+                    // https://github.com/AdguardTeam/FiltersRegistry/issues/731
+                    '^((?!#%#).)*\\$\\$|\\$\\@\\$"',
+                    '\\$removeparam',
+                    ',removeparam',
+                    '\\$removeheader',
+                    ',removeheader',
                 ],
                 'ignoreRuleHints': false,
             },
@@ -134,6 +145,9 @@ describe('platforms filter', () => {
             '! Comment',
             'example.com',
             'example.com,content-examples.com###ad3',
+            '||example.org^$domain=example.com',
+            '@@||example.org^$domain=example.com,elemhide',
+            'apkpure.com#%#//scriptlet("set-constant", "$$.analytics.send", "noopFunc")',
         ];
         const matchRules = [
             '@@||example.com$stealth',
@@ -142,7 +156,12 @@ describe('platforms filter', () => {
             '@@||example.net^$content',
             '@@||example.com^$content,elemhide,jsinject',
             '@@||example.com^$elemhide,content,jsinject',
-            '@@||example.com^$elemhide,content',
+            '||video.twimg.com/ext_tw_video/*/*.m3u8$domain=/^i[a-z]*\.strmrdr[a-z]+\..*/',
+            '@@||video.twimg.com/ext_tw_video/*/*.m3u8$domain=/^i[a-z]*\.strmrdr[a-z]+\..*/',
+            '||dai.google.com/ondemand/hls/content/*.m3u8$hls=/redirector\.googlevideo\.com\/,domain=sbs.com.au',
+            '||pluto.tv/*/session.json$jsonprune=\$..[adBreak\, adBreaks]',
+            '||example.org^$xmlhttprequest,removeparam=param',
+            '||example.org^$xmlhttprequest,removeheader=location',
         ];
 
         const before = [
