@@ -164,7 +164,6 @@
         "configuration": {
             "removeRulePatterns": [
                 "\\$\\$|\\$\\@\\$",
-                "\\$(.*,)?mp4",
                 "\\$(.*,)?replace=",
                 "important,replace=",
                 "\\$(.*,)?app",
@@ -172,20 +171,14 @@
                 "\\$protobuf",
                 "important,protobuf",
                 "\\$extension",
-                ",extension",
-                "\\$redirect=",
-                ",redirect=",
-                "\\$redirect-rule=",
-                ",redirect-rule=",
-                "\\$empty=",
-                ",empty=",
-                "#%#//scriptlet"
+                ",extension"
             ],
             "ignoreRuleHints": false
         },
         "defines": {
             "adguard": true,
-            "adguard_ext_edge": true
+            "adguard_ext_edge": true,
+            "adguard_ext_chromium": true
         }
     },
     "EXTENSION_OPERA": {
@@ -207,7 +200,8 @@
         },
         "defines": {
             "adguard": true,
-            "adguard_ext_opera": true
+            "adguard_ext_opera": true,
+            "adguard_ext_chromium": true
         }
     },
 
