@@ -572,11 +572,10 @@ describe('converter', () => {
 
     it('converts scriplet rule  with modifiers to UBlock syntax', () => {
         const source = String.raw`[$path=/page,domain=example.com|~example.org]#%#//scriptlet('ubo-setTimeout-defuser.js', '[native code]', '8000')`;
-        const expected = String.raw`example.com,~example.org##+js(no-setTimeout-if, [native code], 8000):matches-path(/page)`;
 
         let rulesList = converter.convertAdgPathModifierToUbo([source]);
         rulesList = converter.convertAdgScriptletsToUbo(rulesList);
 
-        expect(rulesList[0]).toEqual(expected);
+        expect(rulesList).toHaveLength(0);
     });
 });

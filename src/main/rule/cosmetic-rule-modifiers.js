@@ -54,8 +54,7 @@ const convertAdgPathModifierToUbo = (rule) => {
     const isScriptlet = content.startsWith('//scriptlet');
 
     if (isScriptlet) {
-        const uboScriptletRule = scriptlets.convertAdgToUbo(`${domainsPattern}${marker}${content}`);
-        return `${uboScriptletRule}:matches-path(${path})`;
+        throw new Error(`Path option "${path}" not supported by uBO scriptlet syntax`);
     }
 
     return `${domainsPattern}${marker}:matches-path(${path})${content}`;
