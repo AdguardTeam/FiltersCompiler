@@ -5,14 +5,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [1.1.90] - 2023-07-11
+## [v1.1.90] - 2023-07-11
 
 ### Changed
 
 - Throw an error during ADG→UBO conversion of scriptlets rule with `$path` modifier
 
 
-## [1.1.88] - 2023-06-26
+## [v1.1.88] - 2023-06-26
 
 ### Changed
 
