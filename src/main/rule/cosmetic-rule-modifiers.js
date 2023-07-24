@@ -1,5 +1,4 @@
 const { CosmeticRuleParser } = require('@adguard/tsurlfilter');
-const scriptlets = require('@adguard/scriptlets');
 
 const isAdgCosmeticRuleWithPathModifier = (rule) => {
     try {

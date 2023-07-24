@@ -36,7 +36,9 @@ Test:
             exec 2>&1
 
             yarn install
+            yarn lint
             yarn test
+
             rm -rf node_modules
   requirements:
     - adg-docker: 'true'
