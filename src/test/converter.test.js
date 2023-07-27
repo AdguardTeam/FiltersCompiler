@@ -191,6 +191,10 @@ describe('converter', () => {
         actual = converter.convertAdgScriptletsToUbo(undefined);
         expected = [];
         expect(actual).toEqual(expected);
+
+        actual = converter.convertAdgScriptletsToUbo([String.raw`example.com#%#//scriptlet('adjust-setInterval', ',dataType:_', '1000', '0.02')`]);
+        expected = [String.raw`example.com##+js(nano-setInterval-booster, \,dataType:_, 1000, 0.02)`];
+        expect(actual).toEqual(expected);
     });
 
     it('converts ##^script:has-text to $$script[tag-contains]', () => {

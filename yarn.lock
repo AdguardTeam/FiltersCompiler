@@ -15,6 +15,14 @@
     "@babel/runtime" "^7.20.13"
     js-yaml "^3.13.1"
 
+"@adguard/scriptlets@^1.9.58":
+  version "1.9.58"
+  resolved "https://registry.yarnpkg.com/@adguard/scriptlets/-/scriptlets-1.9.58.tgz#3458e1e25e53f83ad481bd8f38fffa2f19b92c13"
+  integrity sha512-b1IRloQAOS7TUNHJamtkNbcoQ5lNec8IS6cbEpEXD1mCmaiBI1cw2aXcbhbQ104NTXLlGSv4D9oeEWpw7ML5kA==
+  dependencies:
+    "@babel/runtime" "^7.20.13"
+    js-yaml "^3.13.1"
+
 "@adguard/tsurlfilter@2.1.5":
   version "2.1.5"
   resolved "https://registry.yarnpkg.com/@adguard/tsurlfilter/-/tsurlfilter-2.1.5.tgz#2d0358ebc5b8eb2e6ca731cf298766031200a441"
