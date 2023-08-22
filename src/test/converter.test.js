@@ -477,6 +477,18 @@ describe('converter', () => {
 
             actual = converter.convertAdgRedirectsToUbo(['', undefined]);
             expect(actual).toHaveLength(2);
+
+            // AdGuard does not support UBO's $redirect priority and skips it during the conversion
+            // https://github.com/AdguardTeam/tsurlfilter/issues/59
+            // ADG -> UBO:
+            actual = converter.convertAdgRedirectsToUbo(['||example.com^$script,redirect=noopjs:99']);
+            expected = '||example.com^$script,redirect=noop.js';
+            expect(actual[0]).toBe(expected);
+
+            // UBO -> ADG:
+            actual = converter.convertRulesToAdgSyntax(['||example.com^$redirect=noop.js:99']);
+            expected = '||example.com^$redirect=noopjs';
+            expect(actual[0]).toBe(expected);
         });
 
         it('does not add unnecessary symbols while converting redirects', () => {
