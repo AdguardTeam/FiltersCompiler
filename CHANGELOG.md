@@ -191,6 +191,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated TSUrlFilter to v1.0.51, Scriptlets to v1.7.3
 
 
+[v1.1.94]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.93...v1.1.94
 [v1.1.93]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.92...v1.1.93
 [v1.1.92]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.90...v1.1.92
 [v1.1.90]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.88...v1.1.90
