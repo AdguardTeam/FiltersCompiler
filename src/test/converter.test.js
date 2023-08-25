@@ -195,6 +195,10 @@ describe('converter', () => {
         actual = converter.convertAdgScriptletsToUbo([String.raw`example.com#%#//scriptlet('adjust-setInterval', ',dataType:_', '1000', '0.02')`]);
         expected = [String.raw`example.com##+js(nano-setInterval-booster, \,dataType:_, 1000, 0.02)`];
         expect(actual).toEqual(expected);
+
+        actual = converter.convertAdgScriptletsToUbo(["example.org#%#//scriptlet('set-session-storage-item', 'acceptCookies', 'false')"]);
+        expected = 'example.org##+js(set-session-storage-item, acceptCookies, false)';
+        expect(actual[0]).toBe(expected);
     });
 
     it('converts ##^script:has-text to $$script[tag-contains]', () => {
@@ -336,6 +340,10 @@ describe('converter', () => {
 
         actual = converter.convertRulesToAdgSyntax(['test.com#@#script:inject(abort-on-property-read.js, some.prop)']);
         expected = "test.com#@%#//scriptlet('ubo-abort-on-property-read.js', 'some.prop')";
+        expect(actual[0]).toBe(expected);
+
+        actual = converter.convertRulesToAdgSyntax(['example.org##+js(set-cookie, notice_preferences, 1)']);
+        expected = "example.org#%#//scriptlet('ubo-set-cookie.js', 'notice_preferences', '1')";
         expect(actual[0]).toBe(expected);
     });
 
