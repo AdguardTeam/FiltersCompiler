@@ -38,7 +38,7 @@ Build:
 
             rm -rf node_modules
     - inject-variables:
-        file: build/build.txt
+        file: dist/build.txt
         scope: RESULT
         namespace: inject
     - any-task:
