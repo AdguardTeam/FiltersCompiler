@@ -50,9 +50,6 @@ jobs:
       - name: Run tests
         run: yarn test
 
-      - name: Run build
-        run: yarn build
-
       - name: Release on GitHub
         uses: softprops/action-gh-release@v1
         with:
