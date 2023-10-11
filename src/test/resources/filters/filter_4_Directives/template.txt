@@ -12,3 +12,10 @@ if_not_ublock
 !#if (adguard_ext_chromium && adguard_ext_edge)
 if_edge_chromium
 !#endif
+!#if (adguard_app_ios || adguard_app_mac)
+!#if (adguard_app_ios)
+ios_rule
+!#else
+non_ios_rule
+!#endif
+!#endif

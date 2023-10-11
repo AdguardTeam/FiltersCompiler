@@ -463,13 +463,9 @@ describe('Test builder', () => {
                 expect(filterContent).toBeTruthy();
 
                 const filterLines = filterContent.split(/\r?\n/);
-                expect(filterLines.length).toEqual(12);
+                expect(filterLines.length).toEqual(14);
 
-                // due to missed defines.adguard_app_mac in src/test/resources/platforms.json
-                expect(filterLines.includes('if_mac_included_rule')).toBeFalsy();
-
-                // do not remove directives while stripped comment. `directives_not_stripped` rule should not remain
-                expect(filterLines.includes('directives_not_stripped')).toBeFalsy();
+                expect(filterLines.includes('if_mac_included_rule')).toBeTruthy();
             });
         });
 
@@ -517,6 +513,24 @@ describe('Test builder', () => {
                 const filterLines = filterContent.split(/\r?\n/);
                 expect(filterLines.length).toEqual(23);
                 expect(filterLines.includes('if_edge_chromium')).toBeTruthy();
+            });
+
+            it('filters4.txt - if with else branch', async () => {
+                const ifContent = await readFile(path.join(platformsDir, 'ios', 'filters', '4.txt'));
+                expect(ifContent).toBeTruthy();
+
+                const ifLines = ifContent.split(/\r?\n/);
+                expect(ifLines.length).toEqual(24);
+                expect(ifLines.includes('ios_rule')).toBeTruthy();
+                expect(ifLines.includes('non_ios_rule')).toBeFalsy();
+
+                const elseContent = await readFile(path.join(platformsDir, 'mac', 'filters', '4.txt'));
+                expect(elseContent).toBeTruthy();
+
+                const elseLines = elseContent.split(/\r?\n/);
+                expect(elseLines.length).toEqual(24);
+                expect(elseLines.includes('ios_rule')).toBeFalsy();
+                expect(elseLines.includes('non_ios_rule')).toBeTruthy();
             });
         });
 

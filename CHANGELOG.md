@@ -1,8 +1,16 @@
 # Filters Compiler Changelog
 
 All notable changes to this project will be documented in this file.
+
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+
+## [v1.1.98] - 2023-10-11
+
+### Changed
+
+- Update `@adguard/filters-downloader` to [v1.1.20](https://github.com/AdguardTeam/FiltersDownloader/blob/master/CHANGELOG.md).
 
 
 ## [v1.1.96] - 2023-08-25
@@ -201,6 +209,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated TSUrlFilter to v1.0.51, Scriptlets to v1.7.3
 
 
+[v1.1.98]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.96...v1.1.98
 [v1.1.96]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.94...v1.1.96
 [v1.1.94]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.93...v1.1.94
 [v1.1.93]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.92...v1.1.93

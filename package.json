@@ -13,11 +13,11 @@
   },
   "dependencies": {
     "@adguard/extended-css": "^2.0.52",
+    "@adguard/filters-downloader": "^1.1.20",
     "@adguard/scriptlets": "^1.9.72",
     "@adguard/tsurlfilter": "2.1.11",
     "ajv": "^8.11.0",
     "child_process": ">=1.0.2",
-    "filters-downloader": "git+https://github.com/AdguardTeam/FiltersDownloader.git#v1.1.12",
     "jsdom": "^21.1.1",
     "md5": "2.3.0",
     "moment": "^2.29.4",

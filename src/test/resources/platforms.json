@@ -54,7 +54,8 @@
             "adbHeader": "![Test ios filter]"
         },
         "defines": {
-            "adguard": true
+            "adguard": true,
+            "adguard_app_ios": true
         }
     },
     "TEST_COMMENTS": {
@@ -80,7 +81,8 @@
             "ignoreRuleHints": false
         },
         "defines": {
-            "adguard": true
+            "adguard": true,
+            "adguard_app_mac": true
         }
     },
     "TEST_HINTS": {

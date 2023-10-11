@@ -30,7 +30,7 @@ module.exports = (function () {
     const workaround = require('./utils/workaround');
     const webutils = require('./utils/webutils');
 
-    const FiltersDownloader = require('filters-downloader');
+    const FiltersDownloader = require('@adguard/filters-downloader');
 
     const TEMPLATE_FILE = 'template.txt';
     const FILTER_FILE = 'filter.txt';
