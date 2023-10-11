@@ -19,7 +19,7 @@ Increment:
   other:
     clean-working-dir: true
   docker:
-    image: ${bamboo.dockerContainer}
+    image: ${bamboo.dockerNode}
     volumes:
       ${system.YARN_DIR}: "${bamboo.yarnCache}"
   tasks:
