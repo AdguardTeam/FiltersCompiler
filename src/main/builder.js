@@ -46,6 +46,7 @@ module.exports = (function () {
     const INCLUDE_OPTION_COMMENTS = '/stripComments';
     const INCLUDE_OPTION_NOT_OPTIMIZED = '/notOptimized';
     const INCLUDE_OPTION_EXCLUDE = '/exclude=';
+    const INCLUDE_OPTION_MODIFIERS = '/addModifiers=';
 
     const NOT_OPTIMIZED_HINT = '!+ NOT_OPTIMIZED';
 
@@ -128,6 +129,29 @@ module.exports = (function () {
             result.push(v);
         });
 
+        return result;
+    };
+    /**
+     * Adds modifiers to lines of text.
+     *
+     * @param {string[]} lines - An array of text lines.
+     * @param {string} modifier - The modifier to add.
+     * @returns {string[]} - An array of modified lines.
+     */
+    const addModifiers = (lines, modifier) => {
+        const result = [];
+        lines.forEach((line) => {
+            // Check if the line is empty or null, and skip it.
+            if (!line || line.length === 0) {
+                return result;
+            }
+            // Check if the line doesn't start with '!' character (comment).
+            if (!line.startsWith('! ')) {
+                // Add the specified modifier to the line.
+                result.push(`${line}$${modifier}`);
+            }
+        });
+        // Return the array of modified lines.
         return result;
     };
 
@@ -241,9 +265,16 @@ module.exports = (function () {
         let stripComments = false;
         let notOptimized = false;
         let exclude = null;
+        let includedModifiers = null;
 
         for (let i = 1; i < parts.length; i += 1) {
             const attribute = parts[i].trim();
+            if (attribute.startsWith(INCLUDE_OPTION_MODIFIERS)) {
+                // Extract the value inside quotes, if it exists.
+                const modifierMatch = attribute.match(/=["'](.*?)["']/);
+                // Set the 'includedModifiers' variable to the extracted value or to null if no match is found.
+                includedModifiers = modifierMatch ? modifierMatch[1] : null;
+            }
             if (attribute.startsWith(INCLUDE_OPTION_COMMENTS)) {
                 stripComments = true;
             } else if (attribute.startsWith(INCLUDE_OPTION_NOT_OPTIMIZED)) {
@@ -256,6 +287,7 @@ module.exports = (function () {
 
         return {
             url,
+            includedModifiers,
             stripComments,
             notOptimized,
             exclude,
@@ -322,6 +354,11 @@ module.exports = (function () {
 
             if (options.notOptimized) {
                 result = addNotOptimizedHints(result);
+            }
+            const modifier = options.includedModifiers;
+
+            if (modifier) {
+                result = addModifiers(result, modifier);
             }
 
             result = workaround.fixVersionComments(result);

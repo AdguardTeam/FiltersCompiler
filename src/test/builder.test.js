@@ -83,6 +83,22 @@ describe('Test builder', () => {
             expect(filterLines.includes('regularexpression_not_excluded')).toBeTruthy();
         });
 
+        it('platforms/test filters 8.txt', async () => {
+            // Read the content of the file and split it into lines
+            const filterContent = await readFile(path.join(filtersDir, 'filter_8_Includes', 'filter.txt'));
+            const filterLines = filterContent.split(/\r?\n/);
+            // Check that the number of lines in the file is equal to 15
+            expect(filterLines.length).toEqual(15);
+            // Check that the array of lines is not empty
+            expect(filterLines).toBeTruthy();
+            // Check that each line (excluding comments) ends with '$image,script'
+            filterLines.forEach((line) => {
+                if (!line.startsWith('!')) {
+                    expect(line.trim().endsWith('$image,script')).toBeTruthy();
+                }
+            });
+        });
+
         it('platforms/test filters 5.txt', async () => {
             const filterContent = await readFile(path.join(__dirname, 'resources/platforms/test', 'filters', '5.txt'));
             const filterLines = filterContent.split(/\r?\n/);

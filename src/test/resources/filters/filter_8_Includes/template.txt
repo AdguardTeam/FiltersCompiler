@@ -1,0 +1,4 @@
+! Homepage: http://adguard.com/filters.html#english
+! License: http://creativecommons.org/licenses/by-sa/3.0/
+!
+@include ../cname_trackers.txt /addModifiers="image,script"
