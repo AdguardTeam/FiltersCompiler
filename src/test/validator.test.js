@@ -9,7 +9,7 @@ const { setConfiguration, CompatibilityTypes } = require('@adguard/tsurlfilter')
 const validator = require('../main/validator');
 
 // Sets configuration compatibility
-setConfiguration({ compatibility: CompatibilityTypes.corelibs });
+setConfiguration({ compatibility: CompatibilityTypes.Corelibs });
 
 // Mock log to hide error messages
 jest.mock('../main/utils/log');
@@ -616,6 +616,15 @@ describe('validator', () => {
             '||example.org^$hls=preroll',
             '||example.org^$hls=\\/videoplayback^?*&source=dclk_video_ads',
             '||example.org^$hls=/#UPLYNK-SEGMENT:.*\\,ad/t',
+        ];
+        test.each(validRules)('%s', (rule) => {
+            expect(validator.validate([rule])).toHaveLength(1);
+        });
+    });
+
+    describe('validate referrerpolicy modifier', () => {
+        const validRules = [
+            '||example.com^$referrerpolicy=origin',
         ];
         test.each(validRules)('%s', (rule) => {
             expect(validator.validate([rule])).toHaveLength(1);

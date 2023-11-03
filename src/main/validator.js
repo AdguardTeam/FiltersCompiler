@@ -70,7 +70,9 @@ const validate = function (list, excluded, invalid = [], filterName) { // eslint
             if (!validationResult.valid) {
                 // log source rule text to the excluded log
                 logger.error(`Invalid rule in ${filterName}: ${ruleText}`);
-                excludeRule(excluded, validationResult.error, ruleText);
+                // save warning as comment
+                excludeRule(excluded, `! ${validationResult.error}`, ruleText);
+                // ruleText should be already included into the error text
                 invalid.push(validationResult.error);
                 return false;
             }

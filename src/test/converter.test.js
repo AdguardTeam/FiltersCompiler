@@ -58,6 +58,9 @@ describe('converter', () => {
         c = converter.convertRulesToAdgSyntax([String.raw`||example.org/*/*/$jsonprune=\\$..[ac\\, ab]`]);
         expect(c[0]).toBe(String.raw`||example.org/*/*/$jsonprune=\\$..[ac\\, ab]`);
 
+        c = converter.convertRulesToAdgSyntax([String.raw`||example.com^$referrerpolicy=origin`]);
+        expect(c[0]).toBe(String.raw`||example.com^$referrerpolicy=origin`);
+
         c = converter.convertRulesToAdgSyntax([String.raw`||example.org/*/*/$removeparam=/^__s=[A-Za-z0-9]{6\,}/`]);
         expect(c[0]).toBe(String.raw`||example.org/*/*/$removeparam=/^__s=[A-Za-z0-9]{6\,}/`);
 

@@ -130,6 +130,7 @@ describe('platforms filter', () => {
                     ',$domain=\/',
                     '\\$(.*,)?hls=',
                     '\\$(.*,)?jsonprune=',
+                    '\\$(.*,)?referrerpolicy=',
                     // https://github.com/AdguardTeam/FiltersRegistry/issues/731
                     '^((?!#%#).)*\\$\\$|\\$\\@\\$"',
                     '\\$removeparam',
@@ -160,6 +161,7 @@ describe('platforms filter', () => {
             '@@||video.twimg.com/ext_tw_video/*/*.m3u8$domain=/^i[a-z]*\.strmrdr[a-z]+\..*/',
             '||dai.google.com/ondemand/hls/content/*.m3u8$hls=/redirector\.googlevideo\.com\/,domain=sbs.com.au',
             '||pluto.tv/*/session.json$jsonprune=\$..[adBreak\, adBreaks]',
+            '||example.com^$referrerpolicy=origin',
             '||example.org^$xmlhttprequest,removeparam=param',
             '||example.org^$xmlhttprequest,removeheader=location',
         ];
