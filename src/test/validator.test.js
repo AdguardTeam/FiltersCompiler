@@ -631,6 +631,15 @@ describe('validator', () => {
         });
     });
 
+    describe('validate permissions modifier', () => {
+        const validRules = [
+            '||example.org^$permissions=geolocation=()',
+        ];
+        test.each(validRules)('%s', (rule) => {
+            expect(validator.validate([rule])).toHaveLength(1);
+        });
+    });
+
     it('checkAffinityDirectives test', () => {
         let rules = [
             '||test1.ru',

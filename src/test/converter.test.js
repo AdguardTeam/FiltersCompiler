@@ -66,6 +66,9 @@ describe('converter', () => {
 
         c = converter.convertRulesToAdgSyntax([String.raw`||example.org/*/*/$replace=/<item type=\"banner\">.{280\,400}.*<\/background><\/item>//`]);
         expect(c[0]).toBe(String.raw`||example.org/*/*/$replace=/<item type=\"banner\">.{280\,400}.*<\/background><\/item>//`);
+
+        c = converter.convertRulesToAdgSyntax(['||example.org^$permissions=geolocation=()']);
+        expect(c[0]).toBe('||example.org^$permissions=geolocation=()');
     });
 
     it('keeps cosmetic rule as is', () => {
