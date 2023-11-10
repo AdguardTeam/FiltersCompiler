@@ -48,6 +48,58 @@ describe('Test builder', () => {
             expect(revision.timeUpdated).toBeTruthy();
         });
 
+        describe('Testing addModifiers function', () => {
+            it('Should filter "platforms/mac" with "10.txt"', async () => {
+                // Read the content of the file and split it into lines
+                const filterContent = await readFile(path.join(platformsDir, 'mac', 'filters', '10.txt'));
+                const filterLines = filterContent.split(/\r?\n/);
+                expect(filterLines.length).toEqual(14);
+                // Ensure that the file is not empty
+                expect(filterContent).toBeTruthy();
+                const filterRules = filterLines.filter((line) => line.length > 0 && !line.startsWith('!'));
+                // Check that each line ends with '$image'
+                filterRules.forEach((line) => {
+                    expect(line.endsWith('$image')).toBeTruthy();
+                    expect(line).not.toBe(null);
+                });
+            });
+
+            it('Should filter "platforms/ios" with "10.txt"', async () => {
+                const filterContent = await readFile(path.join(platformsDir, 'ios', 'filters', '10.txt'));
+                const filterLines = filterContent.split(/\r?\n/);
+                expect(filterLines.length).toEqual(26);
+                // Ensure that the file is not empty
+                expect(filterContent).toBeTruthy();
+                // Filter rules without comments
+                const filterRules = filterLines.filter((line) => line.length > 0 && !line.startsWith('!'));
+                // Ensure that each line ends with '$image,script'
+                filterRules.forEach((line) => {
+                    expect(line.endsWith('$image,script')).toBeTruthy();
+                    expect(line).not.toBe(null);
+                });
+                // Check that the number of hints is equal to the number of rules
+                const filterHints = filterLines.filter((line) => line === '!+ NOT_OPTIMIZED');
+                expect(filterRules.length).toEqual(filterHints.length);
+            });
+
+            it('Should filter "platforms/edge" with "10.txt"', async () => {
+                const filterContent = await readFile(path.join(platformsDir, 'edge', 'filters', '10.txt'));
+                const filterLines = filterContent.split(/\r?\n/);
+                expect(filterLines.length).toEqual(19);
+                // Ensure that the file is not empty
+                expect(filterContent).toBeTruthy();
+                const filterRules = filterLines.filter((line) => line.length > 0 && !line.startsWith('!'));
+                // Ensure that each line ends with '$redirect=nooptext,important'
+                filterRules.forEach((line) => {
+                    expect(line.endsWith('$redirect=nooptext,important')).toBeTruthy();
+                    expect(line).not.toBe(null);
+                });
+                // Check that the number of hints is equal to the number of rules
+                const filterHints = filterLines.filter((line) => line === '!+ NOT_OPTIMIZED');
+                expect(filterRules.length).toEqual(filterHints.length);
+            });
+        });
+
         it('filter 3 test', async () => {
             const filterContent = (await readFile(path.join(filtersDir, 'filter_3_Test', 'filter.txt'))).trim();
             expect(filterContent).toBeTruthy();

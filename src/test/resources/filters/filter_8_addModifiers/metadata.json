@@ -1,0 +1,15 @@
+{
+  "filterId": 10,
+  "name": "Modifiers Filter",
+  "description": "Modifiers Filter description",
+  "timeAdded": 1698146271,
+  "homepage": "https://example.com/",
+  "expires": "2 days",
+  "displayNumber": 130,
+  "groupId": 5,
+  "subscriptionUrl": "https://example.com/",
+  "tags": [
+    "purpose:ads", "lang:en"
+  ],
+  "trustLevel": "high"
+}

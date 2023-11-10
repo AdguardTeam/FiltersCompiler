@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.1.105] - 2023-11-10
+
+### Added
+
+- New include directive option `/addModifiers` [#190](https://github.com/AdguardTeam/FiltersCompiler/issues/190)
+
+### Changed
+
+- Implemented the ability to apply modifiers based on their sequential order in the line.
+
 
 ## [v1.1.104] - 2023-11-08
 
@@ -231,6 +241,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated [@adguard/tsurlfilter] to v1.0.51, [@adguard/scriptlets] to v1.7.3
 
 
+[v1.1.105]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.104...v1.1.105
+[v1.1.104]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.102...v1.1.104
+[v1.1.102]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.101...v1.1.102
 [v1.1.101]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.100...v1.1.101
 [v1.1.100]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.96...v1.1.100
 [v1.1.96]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.94...v1.1.96

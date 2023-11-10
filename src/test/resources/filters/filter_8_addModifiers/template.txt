@@ -1,0 +1,12 @@
+! Homepage: http://adguard.com/filters.html#english
+! License: http://creativecommons.org/licenses/by-sa/3.0/
+!
+!#if (adguard_app_mac)
+@include ../cname_trackers.txt /addModifiers="image" /stripComments
+!#endif
+!#if (adguard_app_ios)
+@include ../cname_trackers.txt /addModifiers="image,script" /notOptimized
+!#endif
+!#if (adguard_ext_edge)
+@include ../cname_trackers.txt /addModifiers="redirect=nooptext,important" /notOptimized /stripComments
+!#endif

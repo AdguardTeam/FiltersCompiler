@@ -505,7 +505,7 @@ module.exports = (() => {
             } else {
                 metadata = removeObsoleteFilters(metadata);
             }
-
+            // TODO: https://github.com/AdguardTeam/FiltersCompiler/issues/195
             const filtersContent = JSON.stringify(metadata, null, '\t');
 
             fs.writeFileSync(filtersFileJson, filtersContent, 'utf8');

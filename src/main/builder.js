@@ -42,10 +42,14 @@ module.exports = (function () {
     const TRUST_LEVEL_DIR = './utils/trust-levels';
     const DEFAULT_TRUST_LEVEL = 'low';
 
+    const SPACE = ' ';
+    const SLASH = '/';
+    const EQUAL_SIGN = '=';
     const INCLUDE_DIRECTIVE = '@include ';
-    const INCLUDE_OPTION_COMMENTS = '/stripComments';
-    const INCLUDE_OPTION_NOT_OPTIMIZED = '/notOptimized';
-    const INCLUDE_OPTION_EXCLUDE = '/exclude=';
+    const STRIP_COMMENTS_OPTION = 'stripComments';
+    const NOT_OPTIMIZED_OPTION = 'notOptimized';
+    const EXCLUDE_OPTION = 'exclude';
+    const ADD_MODIFIERS_OPTION = 'addModifiers';
 
     const NOT_OPTIMIZED_HINT = '!+ NOT_OPTIMIZED';
 
@@ -121,13 +125,38 @@ module.exports = (function () {
                 return;
             }
 
-            if (!v.startsWith('! ')) {
+            if (!v.startsWith(RuleMasks.MASK_COMMENT) && !v.startsWith(`${RuleMasks.MASK_HINT}${SPACE}`)) {
                 result.push(NOT_OPTIMIZED_HINT);
             }
 
             result.push(v);
         });
 
+        return result;
+    };
+    /**
+     * Adds modifiers to lines of text.
+     *
+     * @param {string[]} lines - An array of text lines.
+     * @param {string} modifiersStr - Modifiers as a string to add.
+     * @returns {string[]} - An array of modified lines.
+     */
+    const addModifiers = (lines, modifiersStr) => {
+        const result = lines
+            .map((line) => {
+                // Filter out null and empty strings
+                if (!line || line.trim() === '') {
+                    return;
+                }
+                // Check if the line has a comment marker '#'.
+                if (line.startsWith(RuleMasks.MASK_HOST_FILE_COMMENT)) {
+                    // Replace the comment marker '#' with the adblock comment marker '!' and return the modified line.
+                    return line.replace(RuleMasks.MASK_HOST_FILE_COMMENT, RuleMasks.MASK_COMMENT);
+                }
+                // Add the specified modifier to the line that doesn't start with '!' character (comment).
+                return line.startsWith(RuleMasks.MASK_COMMENT) ? line : `${line}$${modifiersStr}`;
+            });
+        // Return the array of modified lines.
         return result;
     };
 
@@ -154,15 +183,15 @@ module.exports = (function () {
         for (let exclusion of exclusions) {
             exclusion = exclusion.trim();
 
-            if (exclusion && !exclusion.startsWith('!')) {
+            if (exclusion && !exclusion.startsWith(RuleMasks.MASK_COMMENT)) {
                 const message = `${line} is excluded by "${exclusion}" in ${reason}`;
 
-                const isExcludedByRegexp = exclusion.endsWith('/') && exclusion.startsWith('/')
+                const isExcludedByRegexp = exclusion.endsWith(SLASH) && exclusion.startsWith(SLASH)
                     && line.match(new RegExp(exclusion.substring(1, exclusion.length - 1)));
 
                 if ((isExcludedByRegexp || line.includes(exclusion)) && !scriptletException(line, exclusion)) {
                     logger.log(message);
-                    excluded.push(`! ${message}`);
+                    excluded.push(`${RuleMasks.MASK_COMMENT}${SPACE}${message}`);
                     excluded.push(line);
                     return exclusion;
                 }
@@ -226,40 +255,59 @@ module.exports = (function () {
     };
 
     /**
-     * Parses include line
+     * Extracts the value of an attribute.
+    *
+    * @param {string} attribute - The input attribute string.
+    * @returns {string} The extracted attribute value without quotes if it is not empty.
+    * @throws {Error} If the attribute value is empty.
+    */
+    const getOptionValue = (attribute) => {
+        const quotedValue = attribute.substring(attribute.indexOf(EQUAL_SIGN) + 1);
+        const value = stripEndQuotes(quotedValue).trim();
+        if (value.length === 0) {
+            throw new Error(`Include directive value cannot be empty: '${attribute}'`);
+        }
+        return value;
+    };
+
+    /**
+     * @typedef {object} IncludeOption
+     * @property {string} name Option name
+     * @property {boolean|string} value Option value
+     */
+
+    /**
+     * @typedef {object} ParsedIncludeData
+     * @property {string} url Parsed url of file to include
+     * @property {IncludeOption[]} options Array of parsed include directive options
+     */
+
+    /**
+     * Parses an include line to extract the URL and options.
      *
-     * @param line
-     * @returns {{url: string, stripComments: boolean, notOptimized: boolean, exclude: *}}
+     * @param {string} line - The input line to parse.
+     * @returns {ParsedIncludeData} Parsed result containing the URL and options.
      */
     const parseIncludeLine = function (line) {
-        const parts = line.split(' ');
-
+        const parts = line.split(SPACE);
         let url = parts[1].trim();
-
         url = stripEndQuotes(url);
-
-        let stripComments = false;
-        let notOptimized = false;
-        let exclude = null;
-
+        // Initialize an options array to store the parsed options.
+        const options = [];
+        // Stack options into the array in the sequence in which they found in the string
         for (let i = 1; i < parts.length; i += 1) {
             const attribute = parts[i].trim();
-            if (attribute.startsWith(INCLUDE_OPTION_COMMENTS)) {
-                stripComments = true;
-            } else if (attribute.startsWith(INCLUDE_OPTION_NOT_OPTIMIZED)) {
-                notOptimized = true;
-            } else if (attribute.startsWith(INCLUDE_OPTION_EXCLUDE)) {
-                exclude = attribute.substring(attribute.indexOf('=') + 1);
-                exclude = stripEndQuotes(exclude);
+            if (attribute.startsWith(`${SLASH}${STRIP_COMMENTS_OPTION}`)) {
+                options.push({ name: STRIP_COMMENTS_OPTION, value: true });
+            } else if (attribute.startsWith(`${SLASH}${NOT_OPTIMIZED_OPTION}`)) {
+                options.push({ name: NOT_OPTIMIZED_OPTION, value: true });
+            } else if (attribute.startsWith(`${SLASH}${EXCLUDE_OPTION}${EQUAL_SIGN}`)) {
+                options.push({ name: EXCLUDE_OPTION, value: getOptionValue(attribute) });
+            } else if (attribute.startsWith(`${SLASH}${ADD_MODIFIERS_OPTION}${EQUAL_SIGN}`)) {
+                options.push({ name: ADD_MODIFIERS_OPTION, value: getOptionValue(attribute) });
             }
         }
-
-        return {
-            url,
-            stripComments,
-            notOptimized,
-            exclude,
-        };
+        return { url, options };
     };
 
     /**
@@ -279,50 +327,58 @@ module.exports = (function () {
 
     /**
      * Creates content from include line
-     *
-     * @param line
-     * @param excluded
-     * @returns {Array}
+     * @param {string} line - The include line containing the URL or file path and optional options.
+     * @param {Array<string>} excluded - An array of strings representing excluded content.
+     * @returns {Promise<Array<string>>} - Included content.
+     * @throws {Error} Throws an error if there is an issue handling the include operation.
      */
     const include = async function (line, excluded) {
         let result = [];
 
-        const options = parseIncludeLine(line);
+        const { url, options } = parseIncludeLine(line);
 
-        if (!options.url) {
+        if (!url) {
             logger.warn('Invalid include url');
             return result;
         }
 
-        logger.log(`Applying inclusion from: ${options.url}`);
+        logger.log(`Applying inclusion from: ${url}`);
 
-        const externalInclude = options.url.includes(':');
+        const externalInclude = url.includes(':');
         // eslint-disable-next-line max-len
-        const included = externalInclude ? webutils.downloadFile(options.url) : readFile(path.join(currentDir, options.url));
+        const included = externalInclude ? webutils.downloadFile(url) : readFile(path.join(currentDir, url));
 
         if (included) {
             result = splitLines(included);
 
-            checkRedirects(result, options.url);
+            checkRedirects(result, url);
 
             // resolved includes
-            const originUrl = externalInclude ? FiltersDownloader.getFilterUrlOrigin(options.url) : currentDir;
+            const originUrl = externalInclude ? FiltersDownloader.getFilterUrlOrigin(url) : currentDir;
             result = await FiltersDownloader.resolveIncludes(result, originUrl);
 
             result = workaround.removeAdblockVersion(result);
 
-            if (options.exclude) {
-                const optionsExcludePath = path.join(currentDir, options.exclude);
-                result = exclude(result, optionsExcludePath, excluded);
-            }
-
-            if (options.stripComments) {
-                result = stripComments(result);
-            }
-
-            if (options.notOptimized) {
-                result = addNotOptimizedHints(result);
-            }
+            options.forEach(({ name, value }) => {
+                let optionsExcludePath;
+                switch (name) {
+                    case EXCLUDE_OPTION:
+                        optionsExcludePath = path.join(currentDir, value);
+                        result = exclude(result, optionsExcludePath, excluded);
+                        break;
+                    case STRIP_COMMENTS_OPTION:
+                        result = stripComments(result);
+                        break;
+                    case NOT_OPTIMIZED_OPTION:
+                        result = addNotOptimizedHints(result);
+                        break;
+                    case ADD_MODIFIERS_OPTION:
+                        result = addModifiers(result, value);
+                        break;
+                    default:
+                        break;
+                }
+            });
 
             result = workaround.fixVersionComments(result);
         } else {

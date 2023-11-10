@@ -1,0 +1,11 @@
+# Title: AdGuard CNAME disguised mail_trackers list
+# Description: The list of unique mail_trackers domains that disguise the real trackers by using CNAME records.
+# TimeUpdated: 2023-10-16T08:00:16+00:00
+# Homepage: https://github.com/AdguardTeam/cname-trackers
+#
+a155e09a56.reuters.tv
+albany.townsquarenewsletters.com
+alerts.dmgt.com
+! comment
+aremedia.e.aremedia.com.au
+auto.scissorsscotch.com
