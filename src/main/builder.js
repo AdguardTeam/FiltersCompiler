@@ -146,7 +146,7 @@ module.exports = (function () {
             .map((line) => {
                 // Filter out null and empty strings
                 if (!line || line.trim() === '') {
-                    return;
+                    return RuleMasks.MASK_COMMENT;
                 }
                 // Check if the line has a comment marker '#'.
                 if (line.startsWith(RuleMasks.MASK_HOST_FILE_COMMENT)) {
