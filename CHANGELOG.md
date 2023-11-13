@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## [Unreleased]
+
+### Changed
+
+- Updated [@adguard/filters-downloader] to v1.1.23
+- Updated [@adguard/tsurlfilter] to v2.2.5
+- Updated [@adguard/scriptlets] to v1.9.91
+
+
 ## [v1.1.105] - 2023-11-10
 
 ### Added
@@ -241,6 +251,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated [@adguard/tsurlfilter] to v1.0.51, [@adguard/scriptlets] to v1.7.3
 
 
+[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.105...HEAD
 [v1.1.105]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.104...v1.1.105
 [v1.1.104]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.102...v1.1.104
 [v1.1.102]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.101...v1.1.102

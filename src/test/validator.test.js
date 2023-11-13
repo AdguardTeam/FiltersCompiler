@@ -445,6 +445,7 @@ describe('validator', () => {
                 'example.com#%#//scriptlet("prevent-adfly")',
                 'example.com#@%#//scriptlet("ubo-nano-setInterval-booster", "some.example", "1000")',
                 "arctic.de#%#//scriptlet('set-cookie-reload', 'cookie-preference', '1')",
+                "example.org#%#//scriptlet('trusted-prune-inbound-object', 'Object.getOwnPropertyNames', 'example')",
             ];
             test.each(validRules)('%s', (rule) => {
                 expect(validator.validate([rule])).toHaveLength(1);

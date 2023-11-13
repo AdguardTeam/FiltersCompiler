@@ -13,9 +13,9 @@
   },
   "dependencies": {
     "@adguard/extended-css": "^2.0.52",
-    "@adguard/filters-downloader": "^1.1.21",
-    "@adguard/scriptlets": "^1.9.83",
-    "@adguard/tsurlfilter": "2.2.4",
+    "@adguard/filters-downloader": "^1.1.23",
+    "@adguard/scriptlets": "^1.9.91",
+    "@adguard/tsurlfilter": "2.2.5",
     "ajv": "^8.11.0",
     "child_process": ">=1.0.2",
     "jsdom": "^21.1.1",

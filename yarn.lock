@@ -7,27 +7,27 @@
   resolved "https://registry.yarnpkg.com/@adguard/extended-css/-/extended-css-2.0.52.tgz#f5e7c3df1796deb96404a1b6441e7a4c729f09ac"
   integrity sha512-T77MnFD/+A3q93MNEq13qPUXPQRBeOUO9LRyqslcaz7jD5qMcikX1nx436u3PXdZXZpa6R0nnwXQ7wwScDmVgw==
 
-"@adguard/filters-downloader@^1.1.21":
-  version "1.1.21"
-  resolved "https://registry.yarnpkg.com/@adguard/filters-downloader/-/filters-downloader-1.1.21.tgz#db5d15af69544faca3d13c01f483efcf46a811fc"
-  integrity sha512-25qPnB+ZHBALwOCwFgX5PP8QD00nNZmpSQPyLov6OS6DSf2h1wFyJu3HZ8AtkacYkkrssrj73QMpGO6HvcMnKQ==
+"@adguard/filters-downloader@^1.1.23":
+  version "1.1.23"
+  resolved "https://registry.yarnpkg.com/@adguard/filters-downloader/-/filters-downloader-1.1.23.tgz#3b701527c67881a87a27fea658a3b24422f8b794"
+  integrity sha512-BPzcwtkjRZWb+m2XK1d/lD1qg0kYFBCuSf07y8Utv6ZMU82RcwRG3B1kLLLe+y2mOcz1VgW3tNN77dDzxgjP9A==
   dependencies:
     axios "^0.21.1"
 
-"@adguard/scriptlets@^1.9.83":
-  version "1.9.83"
-  resolved "https://registry.yarnpkg.com/@adguard/scriptlets/-/scriptlets-1.9.83.tgz#77d1e6a0e0eb74a359618281e62cfcf829e408ec"
-  integrity sha512-Nnv/tW1yEujFovc54mZWBrZNGYe0vqHcymgRmveAWNSSGDEoYh+kG/YtvweNZa01yx859O6Tfq/8kXajtWaTPg==
+"@adguard/scriptlets@^1.9.91":
+  version "1.9.91"
+  resolved "https://registry.yarnpkg.com/@adguard/scriptlets/-/scriptlets-1.9.91.tgz#6f416b749e9528ceb6ecc4d408b82f914f7b4a6e"
+  integrity sha512-oJDDZgdtnFbVTtQm1ag9MUoiqggp4BvykCyufhdlq72hyDjX7NrBEQ9sU1qQPaxDPQ/VD8Uur45rFFxAPf2WNA==
   dependencies:
     "@babel/runtime" "^7.20.13"
     js-yaml "^3.13.1"
 
-"@adguard/tsurlfilter@2.2.4":
-  version "2.2.4"
-  resolved "https://registry.yarnpkg.com/@adguard/tsurlfilter/-/tsurlfilter-2.2.4.tgz#97b775f1091eea8f8135eb0890266e3e4be69359"
-  integrity sha512-Q+XfoU5E0gNI6Kf3WIznGWETsrMpA/t7tTg+hUVbY2ELCLW9X/h1wTSizMS1kDPx2dnRFrJa/zzdmXiF3P7trQ==
+"@adguard/tsurlfilter@2.2.5":
+  version "2.2.5"
+  resolved "https://registry.yarnpkg.com/@adguard/tsurlfilter/-/tsurlfilter-2.2.5.tgz#fda46d4b08361942cb58b1d7a35921cbd34b5442"
+  integrity sha512-r44FxLH7TcB2GF8kiBTXaoQKSkYYC8udfcV7sLY41kgJYjM05g0TxhGO3UhkrUZ8ps2ctNMKFbghpbrwlJIvmA==
   dependencies:
-    "@adguard/scriptlets" "^1.9.83"
+    "@adguard/scriptlets" "^1.9.91"
     cidr-tools "^6.4.1"
     commander "9.4.1"
     is-cidr "4.0.2"
