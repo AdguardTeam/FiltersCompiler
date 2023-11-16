@@ -98,7 +98,7 @@ where:
       In this case, host-file comments are to be replaced `#` by AdBlock-style syntax comments `!`.
 
 > [!IMPORTANT]
-> The content of the included file is formatted in the order in which the modifiers in the line are specified.
+> The content of the included file is formatted by the options due to the order of their mention in the directive.
 
 #### Example:
 
