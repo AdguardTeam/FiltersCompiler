@@ -85,11 +85,11 @@ The `@include` directive provides the ability to include content from the specif
 
 where:
 
-- `<filepath>` — required, a same origin absolute or relative file path to be included;
+- `<filepath>` — required, URL or same origin relative file path to be included;
 - `<options>` — optional, a list of options separated by spaces.
   Available options:
 
-    - `/stripComments` removes AdBlock-style syntax comments from the include file — lines which start with `!`;
+    - `/stripComments` removes AdBlock-style syntax comments from the included file — lines which start with `!`;
     - `/notOptimized` adds a `!+ NOT_OPTIMIZED` hint to the rules;
     - `/exclude="<filepath>"` excludes from the included file rules
       listed in the exceptions file available by `filepath`;
@@ -126,6 +126,10 @@ The order of execution of the options is as follows:
     example.org$script
     ```
 
+    > [!NOTE]
+    > Used to restrict rules with modifiers when blocking the entire domain would result in a breakage.
+    > [issue example](https://github.com/AdguardTeam/FiltersCompiler/issues/190)
+
 1. `/exclude="../exclusions.txt"`: Excludes rules listed in the exception list from the file named `exclusions.txt`, if they match.
 
     Due to the content of `exclusions.txt`:
@@ -142,6 +146,9 @@ The order of execution of the options is as follows:
     example.org$script
     ```
 
+    > [!NOTE]
+    > Used to exclude problematic rules in the filter
+
 1. `/notOptimized`: Adds the `!+ NOT_OPTIMIZED` hint to the rules.
 
     Result of adding the hint:
@@ -151,6 +158,10 @@ The order of execution of the options is as follows:
     !+ NOT_OPTIMIZED
     example.org$script
     ```
+
+    > [!NOTE]
+    > Used in cases where the filter is designed for mobile site layout and some rules may be removed,
+    > due to the lack of ability to collect statistics on mobile platforms.
 
 1. `/stripComments`: Removes comments in AdBlock style from the included file.
 
