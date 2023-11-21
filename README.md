@@ -126,7 +126,6 @@ The order of execution of the options is as follows:
     example.org$script
     ```
 
-    > [!NOTE]
     > Used to restrict rules with modifiers when blocking the entire domain would result in a breakage.
     > [issue example](https://github.com/AdguardTeam/FiltersCompiler/issues/190)
 
@@ -146,7 +145,6 @@ The order of execution of the options is as follows:
     example.org$script
     ```
 
-    > [!NOTE]
     > Used to exclude problematic rules in the filter
 
 1. `/notOptimized`: Adds the `!+ NOT_OPTIMIZED` hint to the rules.
@@ -159,7 +157,6 @@ The order of execution of the options is as follows:
     example.org$script
     ```
 
-    > [!NOTE]
     > Used in cases where the filter is designed for mobile site layout and some rules may be removed,
     > due to the lack of ability to collect statistics on mobile platforms.
 
