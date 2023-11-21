@@ -249,6 +249,7 @@ describe('Test builder', () => {
             expect(filtersMetadata.filters[0].description).toEqual('EasyList + AdGuard English filter. This filter is necessary for quality ad blocking.');
             expect(filtersMetadata.filters[0].timeAdded).toBeTruthy();
             expect(filtersMetadata.filters[0].homepage).toEqual('https://easylist.adblockplus.org/');
+            // expires value parsed from the filter metadata
             expect(filtersMetadata.filters[0].expires).toEqual(172800);
             expect(filtersMetadata.filters[0].displayNumber).toEqual(101);
             expect(filtersMetadata.filters[0].groupId).toEqual(2);
@@ -429,6 +430,10 @@ describe('Test builder', () => {
             const filterLines = filterContent.split(/\r?\n/);
             expect(filterLines.length).toEqual(53);
 
+            // expires value in set from the filters metadata
+            // if there is no 'expires' property in platform.json for the platform
+            expect(filterLines.includes('! Expires: 2 days (update frequency)')).toBeTruthy();
+
             const presentLines = [
                 'test_domain#%#testScript();',
                 'test.com#%#var isadblock=1;',
@@ -480,7 +485,9 @@ describe('Test builder', () => {
                 expect(englishFilter.description).toEqual('EasyList + AdGuard English filter. This filter is necessary for quality ad blocking.');
                 expect(englishFilter.timeAdded).toEqual(undefined);
                 expect(englishFilter.homepage).toEqual('https://easylist.adblockplus.org/');
-                expect(englishFilter.expires).toEqual(172800);
+                // due to the override value set in the platforms.json for mac platform
+                // the value is "12 hours" which is 43200 seconds
+                expect(englishFilter.expires).toEqual(43200);
                 expect(englishFilter.displayNumber).toEqual(101);
                 expect(englishFilter.groupId).toEqual(2);
                 expect(englishFilter.subscriptionUrl).toEqual('https://filters.adtidy.org/mac/filters/2.txt');
@@ -507,6 +514,9 @@ describe('Test builder', () => {
                 expect(filterContent).toBeTruthy();
 
                 const filterLines = filterContent.split(/\r?\n/);
+
+                // expires value can be overridden by platforms.json for specific platforms
+                expect(filterLines.includes('! Expires: 12 hours (update frequency)')).toBeTruthy();
 
                 // Check conditions
                 expect(filterLines.includes('!#if adguard')).toBeFalsy();

@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Ability to override metadata's expires value for specific platforms
+  [#198](https://github.com/AdguardTeam/FiltersCompiler/issues/198)'
+- Default expires value "12 hours" for `mac_v2` and `windows`
+
 ### Changed
 
 - Exclude `#@%#` scripts exceptions from uBO filter lists

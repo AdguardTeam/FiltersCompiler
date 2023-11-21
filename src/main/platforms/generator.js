@@ -46,6 +46,17 @@ module.exports = (() => {
         + '3. We allow only custom rules got from the User filter (which user creates manually)'
         + 'or from this DEFAULT_SCRIPT_RULES object';
 
+    const ONE_HOUR_SEC = 60 * 60;
+    const ONE_DAY_SEC = 24 * ONE_HOUR_SEC;
+
+    /**
+     * Default value of filter expiration time
+     * if impossible to parse a value specified in platforms.json or in filter metadata.
+     *
+     * Defaults to 1 day (or 86400 in seconds).
+     */
+    const DEFAULT_EXPIRES_SEC = 1 * ONE_DAY_SEC;
+
     /**
      * Platforms configurations
      */
@@ -74,9 +85,10 @@ module.exports = (() => {
      *
      * @param metadataFile
      * @param revisionFile
+     * @param platformsJsonExpires
      * @returns {[*,*,*,*,string]}
      */
-    const makeHeader = function (metadataFile, revisionFile) {
+    const makeHeader = function (metadataFile, revisionFile, platformsJsonExpires) {
         const metadataString = readFile(metadataFile);
         if (!metadataString) {
             throw new Error('Error reading metadata');
@@ -91,12 +103,16 @@ module.exports = (() => {
 
         const revision = JSON.parse(revisionString);
 
+        const expires = typeof platformsJsonExpires !== 'undefined'
+            ? platformsJsonExpires
+            : metadata.expires;
+
         return [
             `! Title: ${metadata.name}`,
             `! Description: ${metadata.description}`,
             `! Version: ${revision.version}`,
             `! TimeUpdated: ${moment(revision.timeUpdated).format()}`,
-            `! Expires: ${metadata.expires} (update frequency)`,
+            `! Expires: ${expires} (update frequency)`,
         ];
     };
 
@@ -194,23 +210,26 @@ module.exports = (() => {
     /**
      * Replaces tags keywords with tag ids
      *
-     * @param filters
+     * @param rawFilters
      * @param tags
      */
-    const replaceTagKeywords = function (filters, tags) {
+    const replaceTagKeywords = function (rawFilters, tags) {
         const tagsMap = new Map();
 
-        tags.forEach((f) => {
-            tagsMap.set(f.keyword, f.tagId);
+        tags.forEach((tag) => {
+            tagsMap.set(tag.keyword, tag.tagId);
         });
 
+        // create new variable to avoid mutation of input parameters
+        const filters = [];
         const lostTags = [];
         // eslint-disable-next-line no-restricted-syntax
-        for (const f of filters) {
-            if (f.tags) {
+        for (const filter of rawFilters) {
+            const newFilter = { ...filter };
+            if (newFilter.tags) {
                 const ids = [];
                 // eslint-disable-next-line no-restricted-syntax
-                for (const t of f.tags) {
+                for (const t of newFilter.tags) {
                     const id = tagsMap.get(t);
                     if (id) {
                         ids.push(id);
@@ -220,9 +239,10 @@ module.exports = (() => {
                     }
                 }
 
-                delete f.tags;
-                f.tags = ids;
+                delete newFilter.tags;
+                newFilter.tags = ids;
             }
+            filters.push(newFilter);
         }
 
         if (lostTags.length > 0) {
@@ -233,25 +253,76 @@ module.exports = (() => {
     };
 
     /**
-     * Parses "Expires" field and converts it to seconds
+     * Converts `rawExpires` with `day` marker into **seconds**.
      *
-     * @param filters
+     * @param {any} rawExpires Raw `expires` value from filter metadata or platforms.json.
+     *
+     * @returns {number} Parsed expires value from days to seconds,
+     * or {@link DEFAULT_EXPIRES_SEC} if it cannot be parsed.
      */
-    const replaceExpires = function (filters) {
-        // eslint-disable-next-line no-restricted-syntax
-        for (const f of filters) {
-            if (f.expires) {
-                if (f.expires.indexOf('day') > 0) {
-                    f.expires = parseInt(f.expires, 10) * 24 * 60 * 60;
-                } else if (f.expires.indexOf('hour') > 0) {
-                    f.expires = parseInt(f.expires, 10) * 60 * 60;
-                }
+    const convertExpiresDaysToSeconds = (rawExpires) => {
+        const expiresDays = parseInt(rawExpires, 10);
+        if (Number.isNaN(expiresDays)) {
+            return DEFAULT_EXPIRES_SEC;
+        }
+        return expiresDays * ONE_DAY_SEC;
+    };
 
-                if (Number.isNaN(f.expires)) {
-                    // Default
-                    f.expires = 86400;
-                }
+    /**
+     * Converts `rawExpires` with `hour` marker into **seconds**.
+     *
+     * @param {any} rawExpires Raw `expires` value from filter metadata or platforms.json.
+     *
+     * @returns {number} Parsed expires value from hours to seconds,
+     * or {@link DEFAULT_EXPIRES_SEC} if it cannot be parsed.
+     */
+    const convertExpiresHoursToSeconds = (rawExpires) => {
+        const expiresHours = parseInt(rawExpires, 10);
+        if (Number.isNaN(expiresHours)) {
+            return DEFAULT_EXPIRES_SEC;
+        }
+        return expiresHours * ONE_HOUR_SEC;
+    };
+
+    /**
+     * Overrides filter metadata `expires` property with platforms.json's `expires` property.
+     *
+     * Then parses the value and converts it to **seconds**.
+     * If it cannot be parsed or not set at all, the default value {@link DEFAULT_EXPIRES_SEC} is used.
+     *
+     * @example
+     * `12 hours` → 43200
+     * `1 day`    → 86400
+     * `2 days`   → 172800
+     *
+     * @param rawFilters Input filters' metadata.
+     * @param platformsJsonExpires Platforms.json's `expires` property to override filters' `expires`.
+     *
+     * @returns {Array<object>} Updated filters' metadata with `expires` property in **seconds**.
+     */
+    const replaceExpires = function (rawFilters, platformsJsonExpires) {
+        const filters = [];
+        // eslint-disable-next-line no-restricted-syntax
+        for (const filter of rawFilters) {
+            // do not mutate input parameters
+            const newFilter = { ...filter };
+            // expires value which is set in platforms.json has higher priority
+            // https://github.com/AdguardTeam/FiltersCompiler/issues/198
+            if (typeof platformsJsonExpires !== 'undefined') {
+                newFilter.expires = platformsJsonExpires;
             }
+
+            if (newFilter.expires) {
+                if (newFilter.expires.indexOf('day') > 0) {
+                    newFilter.expires = convertExpiresDaysToSeconds(newFilter.expires);
+                } else if (newFilter.expires.indexOf('hour') > 0) {
+                    newFilter.expires = convertExpiresHoursToSeconds(newFilter.expires);
+                }
+            } else {
+                // use default value if 'expires' is not set either in platforms.json or in filter metadata
+                newFilter.expires = DEFAULT_EXPIRES_SEC;
+            }
+            filters.push(newFilter);
         }
 
         return filters;
@@ -261,16 +332,19 @@ module.exports = (() => {
      * In case of backward compatibility
      * Adds 'languages' metadata field parsed from 'lang:' tags
      *
-     * @param filters
+     * @param rawFilters
      */
-    const parseLangTags = function (filters) {
+    const parseLangTags = function (rawFilters) {
+        // do not mutate input parameters
+        const filters = [];
         // eslint-disable-next-line no-restricted-syntax
-        for (const f of filters) {
-            if (f.tags) {
+        for (const filter of rawFilters) {
+            const newFilter = { ...filter };
+            if (newFilter.tags) {
                 const filterLanguages = [];
                 let hasRecommended = false;
                 // eslint-disable-next-line no-restricted-syntax
-                for (const t of f.tags) {
+                for (const t of newFilter.tags) {
                     if (!hasRecommended && t === 'recommended') {
                         hasRecommended = true;
                     }
@@ -281,8 +355,9 @@ module.exports = (() => {
                 }
 
                 // Languages will be added for recommended filters only
-                f.languages = hasRecommended ? filterLanguages : [];
+                newFilter.languages = hasRecommended ? filterLanguages : [];
             }
+            filters.push(newFilter);
         }
 
         return filters;
@@ -323,8 +398,11 @@ module.exports = (() => {
 
     /**
      * Removes redundant metadata for included or excluded filters for the current platform
+     *
      * @param metadata
      * @param platform
+     *
+     * @returns {object} Metadata with filtered `filters` array due to the `platform`.
      */
     const removeRedundantFiltersMetadata = (metadata, platform) => {
         // leaves only included filters metadata
@@ -481,9 +559,9 @@ module.exports = (() => {
             return;
         }
 
-        filtersMetadata = parseLangTags(filtersMetadata);
-        filtersMetadata = replaceTagKeywords(filtersMetadata, tags);
-        filtersMetadata = replaceExpires(filtersMetadata);
+        // do not mutate input parameters
+        const parsedLangTagsFiltersMetadata = parseLangTags(filtersMetadata);
+        const replacedTagKeywordsFiltersMetadata = replaceTagKeywords(parsedLangTagsFiltersMetadata, tags);
 
         const localizations = loadLocales(path.join(filtersDir, '../locales'));
 
@@ -496,7 +574,15 @@ module.exports = (() => {
             logger.info(`Writing filters metadata: ${config.path}`);
             const filtersFileJson = path.join(platformDir, FILTERS_METADATA_FILE_JSON);
             const filtersFileJs = path.join(platformDir, FILTERS_METADATA_FILE_JS);
-            let metadata = { groups, tags, filters: filtersMetadata };
+
+            const replacedExpiresFiltersMetadata = replaceExpires(replacedTagKeywordsFiltersMetadata, config.expires);
+
+            let metadata = {
+                groups,
+                tags,
+                filters: replacedExpiresFiltersMetadata,
+            };
+
             metadata = rewriteSubscriptionUrls(metadata, config);
             metadata = removeRedundantFiltersMetadata(metadata, config.platform);
 
@@ -763,7 +849,6 @@ module.exports = (() => {
 
         const metadataFilePath = path.join(filterDir, metadataFile);
         const revisionFilePath = path.join(filterDir, revisionFile);
-        const header = makeHeader(metadataFilePath, revisionFilePath);
 
         const metadata = JSON.parse(readFile(metadataFilePath));
         const { filterId } = metadata;
@@ -809,6 +894,8 @@ module.exports = (() => {
             const optimizedRules = filter.cleanupAndOptimizeRules(rules, config, optimizationConfig, filterId);
             // eslint-disable-next-line max-len
             logger.info(`Filter ${filterId}. Rules ${originalRules.length} => ${rules.length} => ${optimizedRules.length}. PlatformPath: '${config.path}'`);
+
+            const header = makeHeader(metadataFilePath, revisionFilePath, config.expires);
 
             const platformDir = path.join(platformsPath, config.path, PLATFORM_FILTERS_DIR);
             writeFilterRules(filterId, platformDir, config, header, rules, false);

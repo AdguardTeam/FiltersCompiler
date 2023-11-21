@@ -5,6 +5,7 @@
         "configuration": {
             "ignoreRuleHints": false
         },
+        "expires": "12 hours",
         "defines": {
             "adguard": true,
             "adguard_app_windows": true
@@ -24,6 +25,7 @@
     "MAC_V2": {
         "platform": "mac",
         "path": "mac_v2",
+        "expires": "12 hours",
         "configuration": {
             "ignoreRuleHints": false
         },
