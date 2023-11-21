@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [Unreleased]
+## [v1.1.115] - 2023-11-21
 
 ### Added
 
@@ -264,14 +264,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* Support of Trusted scriptlets and their exclusion from list which trust-level is not `full`
+- Support of Trusted scriptlets and their exclusion from list which trust-level is not `full`
 
 ### Changed
 
 - Updated [@adguard/tsurlfilter] to v1.0.51, [@adguard/scriptlets] to v1.7.3
 
 
-[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.107...HEAD
+[v1.1.115]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.107...v1.1.115
 [v1.1.107]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.105...v1.1.107
 [v1.1.105]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.104...v1.1.105
 [v1.1.104]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.102...v1.1.104
