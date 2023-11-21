@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Exclude `#@%#` scripts exceptions from uBO filter lists
   [#199](https://github.com/AdguardTeam/FiltersCompiler/issues/199)
+- Exclude unsupported modifiers for `ext_safari`, `ios`, and `ext_android_cb` platforms
+  [#201](https://github.com/AdguardTeam/FiltersCompiler/issues/201)
 
 
 ## [v1.1.107] - 2023-11-13

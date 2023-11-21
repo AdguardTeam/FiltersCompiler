@@ -137,6 +137,7 @@ describe('platforms filter', () => {
                     ',removeparam',
                     '\\$removeheader',
                     ',removeheader',
+                    '\\$all',
                 ],
                 'ignoreRuleHints': false,
             },
@@ -163,7 +164,46 @@ describe('platforms filter', () => {
             '||pluto.tv/*/session.json$jsonprune=\$..[adBreak\, adBreaks]',
             '||example.com^$referrerpolicy=origin',
             '||example.org^$xmlhttprequest,removeparam=param',
+            '@@||example.org^$all',
             '||example.org^$xmlhttprequest,removeheader=location',
+        ];
+
+        const before = [
+            ...notMatchRules,
+            ...matchRules,
+        ];
+
+        const after = filter.cleanupRules(before, config, 0);
+
+        expect(after).toBeDefined();
+        expect(after).toEqual(notMatchRules);
+    });
+
+    it('Test removing of single content modifier', () => {
+        const config = {
+            'platform': 'test',
+            'path': 'hints',
+            'configuration': {
+                'removeRulePatterns': [
+                    '\\$content$',
+                ],
+                'ignoreRuleHints': false,
+            },
+        };
+
+        const notMatchRules = [
+            '! Comment',
+            'example.com',
+            'example.com,content-examples.com###ad3',
+            '@@||example.com^$content,elemhide,jsinject',
+            '@@||example.com^$elemhide,content,jsinject',
+            '@@||example.com^$elemhide,jsinject,content',
+            '@@||content.com$stealth',
+            'example.com##.sidebar_list > .widget_text:has(a[title = "content"])',
+            '||dai.google.com/ondemand/hls/content/*.m3u8$hls=/redirector\.googlevideo\.com\/,domain=sbs.com.au',
+        ];
+        const matchRules = [
+            '@@||example.com^$content',
         ];
 
         const before = [
