@@ -28,6 +28,7 @@ invalid_options$invalid_opt
 test_domain#%#testScript();
 !
 test.com#%#var isadblock=1;
+example.org#@%#navigator.getBattery = undefined;
 example.com#%#AG_onLoad(function() { AG_removeElementBySelector('span[class="intexta"]'); });
 test.com#%#//scriptlet('ubo-abort-on-property-read.js', 'Object.prototype.getBanner')
 example.net#$?#.main-content { margin-top: 0!important; }

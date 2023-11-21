@@ -552,7 +552,7 @@ module.exports = (() => {
             const config = platformPathsConfig[platform];
             const platformDir = path.join(platformsPath, config.path);
 
-            const rules = [];
+            const rulesTxt = [];
             const rulesJson = {
                 comment: LOCAL_SCRIPT_RULES_COMMENT,
                 rules: [],
@@ -569,8 +569,13 @@ module.exports = (() => {
                 for (let rule of lines) {
                     rule = rule.trim();
 
-                    if (rule && rule[0] !== '!' && rule.indexOf(RuleMasks.MASK_SCRIPT) > 0) {
-                        rules.push(rule);
+                    if (!rule
+                        || rule.startsWith(RuleMasks.MASK_COMMENT)) {
+                        continue;
+                    }
+
+                    if (rule.includes(RuleMasks.MASK_SCRIPT)) {
+                        rulesTxt.push(rule);
 
                         const m = rule.split(RuleMasks.MASK_SCRIPT);
                         rulesJson.rules.push({
@@ -587,7 +592,7 @@ module.exports = (() => {
 
             fs.writeFileSync(
                 path.join(platformDir, LOCAL_SCRIPT_RULES_FILE),
-                rules.join(RULES_SEPARATOR),
+                rulesTxt.join(RULES_SEPARATOR),
                 'utf8'
             );
             fs.writeFileSync(
@@ -633,18 +638,17 @@ module.exports = (() => {
     };
 
     /**
-     * Exclude #%# rules from rules list
-     * @param {array} rules
-     * @return {array} result
+     * Exclude `#%#` and `#@%#` rules from rules list.
+     *
+     * @param {Array<any>} rules Input list of rules.
+     * @return {Array<any>} Filtered list of rules.
      */
     const excludeScriptRules = (rules) => {
-        const result = [];
-        rules.forEach((rule) => {
-            if (rule && !rule.includes(RuleMasks.MASK_SCRIPT)) {
-                result.push(rule);
-            }
+        return rules.filter((rule) => {
+            return rule
+                && !rule.includes(RuleMasks.MASK_SCRIPT)
+                && !rule.includes(RuleMasks.MASK_SCRIPT_EXCEPTION);
         });
-        return result;
     };
 
     /**
@@ -682,7 +686,8 @@ module.exports = (() => {
         let rulesList = rules;
 
         // Convert Adguard scriptlets and redirect rules to UBlock syntax.
-        // Exclude script rules.
+        // Exclude script rules
+        // and script rules exceptions https://github.com/AdguardTeam/FiltersCompiler/issues/199
         // Modify title for base filter
         if (config.platform === 'ext_ublock') {
             rulesList = converter.convertAdgPathModifierToUbo(rulesList);

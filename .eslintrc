@@ -68,6 +68,7 @@
     "wrap-iife": "off",
     "func-names": "off",
     "no-shadow": "off",
+    "arrow-body-style": 0,
     "no-multi-spaces": [
       "error",
       {

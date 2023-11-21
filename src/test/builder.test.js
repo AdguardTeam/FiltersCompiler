@@ -161,7 +161,7 @@ describe('Test builder', () => {
             const absentRules = [
                 'rybnik.com.pl##^iframe[name]:not([class]):not([id]):not([src])[style="display:none"]',
                 'test.com#%#AG_setConstant("ads", "false");',
-                'test.com#@%#Object.defineProperty(window, \'abcde\', { get: function() { return []; } });',
+                "test.com#@%#Object.defineProperty(window, 'abcde', { get: function() { return []; } });",
                 '||example.com/api/v1/ad/*/json$replace=/html/abcd\\,/i',
                 'example.com#%#//scriptlet(\'trusted-set-local-storage-item\', \'iName\', \'iValue\')',
                 'example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")',
@@ -297,6 +297,8 @@ describe('Test builder', () => {
         });
 
         it('platform/test filters 2.txt', async () => {
+            // directory 'test' is used for 'ext_ublock' platform;
+            // see src/test/resources/platforms.json
             const filterContent = await readFile(path.join(platformsDir, 'test', 'filters', '2.txt'));
             expect(filterContent).toBeTruthy();
 
@@ -322,6 +324,7 @@ describe('Test builder', () => {
             const absentLines = [
                 'test_domain#%#testScript();',
                 'test.com#%#var isadblock=1;',
+                'example.org#@%#navigator.getBattery = undefined;',
                 'example.com#%#AG_onLoad(function() { AG_removeElementBySelector(\'span[class="intexta"]\'); });',
                 // $webrtc is deprecated
                 '||example.com^$webrtc,domain=example.org',
@@ -332,6 +335,8 @@ describe('Test builder', () => {
         });
 
         it('platform/test filters 2_optimized.txt', async () => {
+            // directory 'test' is used for 'ext_ublock' platform;
+            // see src/test/resources/platforms.json
             const filterContent = await readFile(path.join(platformsDir, 'test', 'filters', '2_optimized.txt'));
             expect(filterContent).toBeTruthy();
 
@@ -341,6 +346,12 @@ describe('Test builder', () => {
 
             // $webrtc is deprecated
             expect(filterLines.includes('||example.com^$webrtc,domain=example.org')).toBeFalsy();
+
+            // script `#%#` rules and script exception `#%@#` rules should be excluded for ext_ublock platform
+            // see excludeScriptRules() in generator.js
+            expect(filterLines.includes('test.com#%#var isadblock=1;')).toBeFalsy();
+            // https://github.com/AdguardTeam/FiltersCompiler/issues/199
+            expect(filterLines.includes('example.org#@%#navigator.getBattery = undefined;')).toBeFalsy();
         });
 
         it('platform/test filters 2_without_easylist.txt', async () => {
@@ -357,7 +368,7 @@ describe('Test builder', () => {
             expect(filterContent).toBeTruthy();
 
             const filterLines = filterContent.split(/\r?\n/);
-            expect(filterLines.length).toEqual(37);
+            expect(filterLines.length).toEqual(38);
 
             const presentLines = [
                 'test-common-rule.com',
@@ -388,7 +399,7 @@ describe('Test builder', () => {
             expect(filterContent).toBeTruthy();
 
             const filterLines = filterContent.split(/\r?\n/);
-            expect(filterLines.length).toEqual(51);
+            expect(filterLines.length).toEqual(52);
 
             const presentLines = [
                 'test-common-rule.com',
@@ -416,10 +427,12 @@ describe('Test builder', () => {
             expect(filterContent).toBeTruthy();
 
             const filterLines = filterContent.split(/\r?\n/);
-            expect(filterLines.length).toEqual(52);
+            expect(filterLines.length).toEqual(53);
 
             const presentLines = [
+                'test_domain#%#testScript();',
                 'test.com#%#var isadblock=1;',
+                'example.org#@%#navigator.getBattery = undefined;',
                 'test.com#%#//scriptlet(\'ubo-abort-on-property-read.js\', \'Object.prototype.getBanner\')',
                 'example.net#$?#.main-content { margin-top: 0!important; }',
                 'test.com#@$?#.banner { padding: 0!important; }',
