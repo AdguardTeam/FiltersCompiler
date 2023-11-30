@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- FiltersCompiler ignore uBO exception rules with $important modifier [#200](https://github.com/AdguardTeam/FiltersCompiler/issues/200)
+
 ### Changed
 - Updated [@adguard/extended-css] to v2.0.56
 
@@ -274,7 +278,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Updated [@adguard/tsurlfilter] to v1.0.51, [@adguard/scriptlets] to v1.7.3
 
-
+[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.115...HEAD
 [v1.1.115]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.107...v1.1.115
 [v1.1.107]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.105...v1.1.107
 [v1.1.105]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.104...v1.1.105

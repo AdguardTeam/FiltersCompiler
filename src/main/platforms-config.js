@@ -434,6 +434,16 @@ const CSS_MEDIA_RULES_PATTERNS = [
 ];
 
 /**
+ * Patterns to match unblocking basic rules with `$important` modifier
+ * which is not supported by uBlock Origin.
+ *
+ * @see {@link https://github.com/AdguardTeam/FiltersCompiler/issues/200}
+ */
+const UNBLOCKING_IMPORTANT_RULES_PATTERNS = [
+    '@@.*?(\\$|,)important',
+];
+
+/**
  * Pattern to detect Extended CSS rules
  *
  * @example
@@ -711,6 +721,7 @@ module.exports = {
                 ...HLS_MODIFIER_PATTERNS,
                 ...REFERRERPOLICY_MODIFIER_PATTERNS,
                 ...JSONPRUNE_MODIFIER_PATTERNS,
+                ...UNBLOCKING_IMPORTANT_RULES_PATTERNS,
             ],
             'ignoreRuleHints': false,
             'adbHeader': '![Adblock Plus 2.0]',

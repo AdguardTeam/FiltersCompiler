@@ -216,4 +216,41 @@ describe('platforms filter', () => {
         expect(after).toBeDefined();
         expect(after).toEqual(notMatchRules);
     });
+
+    it('Allowlist basic rules with important for ubo', () => {
+        const config = {
+            'platform': 'test',
+            'path': 'hints',
+            'configuration': {
+                'removeRulePatterns': [
+                    '@@.*?(\\$|,)important',
+                ],
+                'ignoreRuleHints': false,
+            },
+        };
+
+        const notMatchRules = [
+            '! Comment',
+            'example.com',
+            '@@||important.com^$document',
+            'example.com###.ad,.important',
+            '||example.com^$important',
+        ];
+        const matchRules = [
+            '@@||example.com^$important',
+            '@@example.com^$script,important',
+            '@@||example.com^$important',
+            '@@||example.com^$css,important',
+        ];
+
+        const before = [
+            ...notMatchRules,
+            ...matchRules,
+        ];
+
+        const after = filter.cleanupRules(before, config, 0);
+
+        expect(after).toBeDefined();
+        expect(after).toEqual(notMatchRules);
+    });
 });
