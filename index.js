@@ -1,4 +1,3 @@
-const fs = require('fs');
 const path = require('path');
 const { setLogger, setConfiguration, CompatibilityTypes } = require('@adguard/tsurlfilter');
 
@@ -7,17 +6,16 @@ const schemaValidator = require('./src/main/json-validator');
 const localesValidator = require('./src/main/locales-validator');
 const logger = require('./src/main/utils/log');
 
+// default platforms config
+const platformsConfig = require('./src/main/platforms-config');
+
 // Sets RuleConverter to use logger of current library
 setLogger(logger);
 
 // Sets configuration compatibility
 setConfiguration({ compatibility: CompatibilityTypes.Corelibs });
 
-const platformsConfigPath = path.join(__dirname, './platforms.json');
 const jsonSchemasConfigDir = path.join(__dirname, './schemas/');
-
-// Reading the default platforms config
-const platformsConfig = JSON.parse(fs.readFileSync(platformsConfigPath, { encoding: 'utf-8' }));
 
 process.on('unhandledRejection', (error) => {
     throw error;
