@@ -5,14 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+
+## [v1.1.119] - 2023-12-06
 
 ### Added
 
-- FiltersCompiler ignore uBO exception rules with $important modifier [#200](https://github.com/AdguardTeam/FiltersCompiler/issues/200)
+- FiltersCompiler ignore uBO exception rules with $important modifier
+  [#200](https://github.com/AdguardTeam/FiltersCompiler/issues/200)
 
 ### Changed
+
 - Updated [@adguard/extended-css] to v2.0.56
+- Updated [@adguard/tsurlfilter] to v2.2.7
+- Updated [@adguard/scriptlets] to v1.9.101
+
 
 ## [v1.1.115] - 2023-11-21
 
@@ -278,7 +284,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Updated [@adguard/tsurlfilter] to v1.0.51, [@adguard/scriptlets] to v1.7.3
 
-[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.115...HEAD
+[v1.1.119]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.115...v1.1.119
 [v1.1.115]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.107...v1.1.115
 [v1.1.107]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.105...v1.1.107
 [v1.1.105]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.104...v1.1.105

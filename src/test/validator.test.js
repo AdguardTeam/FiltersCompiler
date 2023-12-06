@@ -476,6 +476,7 @@ describe('validator', () => {
                 '||googletagservices.com/test.js$domain=test.com,redirect=googletagservices-gpt',
                 '||podu.me/ads/audio/*.mp3$redirect=noopmp3-0.1s',
                 '||podu.me/ads/audio/*.mp3$media,redirect=noopmp3-0.1s',
+                '||example.com^$redirect=noopjson',
             ];
             test.each(validRules)('%s', (rule) => {
                 expect(validator.validate([rule])).toHaveLength(1);
@@ -527,6 +528,9 @@ describe('validator', () => {
             expect(redirects.isValidAdgRedirectRule(rule)).toBeTruthy();
 
             rule = '||googletagmanager.com/gtm.js$script,redirect=googletagmanager-gtm,domain=morningstar.nl';
+            expect(redirects.isValidAdgRedirectRule(rule)).toBeTruthy();
+
+            rule = '||example.com^$redirect=noopjson';
             expect(redirects.isValidAdgRedirectRule(rule)).toBeTruthy();
         });
     });

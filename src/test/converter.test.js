@@ -476,6 +476,10 @@ describe('converter', () => {
             actual = converter.convertAdgRedirectsToUbo(['||example.com^$redirect=noopjs']);
             expected = '||example.com^$redirect=noop.js,script';
             expect(actual[0]).toBe(expected);
+            // noopjson
+            actual = converter.convertAdgRedirectsToUbo(['||example.com^$xmlhttprequest,redirect=noopjson']);
+            expected = '||example.com^$xmlhttprequest,redirect=noop.json';
+            expect(actual[0]).toBe(expected);
             // nooptext:
             actual = converter.convertAdgRedirectsToUbo(['||ad.example.com^$redirect=nooptext,important']);
             expected = '||ad.example.com^$redirect=noop.txt,important,image,media,subdocument,stylesheet,script,xmlhttprequest,other';
