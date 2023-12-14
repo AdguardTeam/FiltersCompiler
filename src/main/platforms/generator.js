@@ -538,6 +538,18 @@ module.exports = (() => {
     };
 
     /**
+     * Sorts metadata's filters by `filterId` property.
+     *
+     * @param {object} metadata Metadata to sort filters for.
+     * @returns {object} Metadata with sorted filters.
+     */
+    const sortMetadataFilters = (metadata) => {
+        const result = { ...metadata };
+        result.filters.sort((a, b) => a.filterId - b.filterId);
+        return result;
+    };
+
+    /**
      * Writes metadata files
      * @param {string} platformsPath
      * @param {string} filtersDir
@@ -591,8 +603,8 @@ module.exports = (() => {
             } else {
                 metadata = removeObsoleteFilters(metadata);
             }
-            // TODO: https://github.com/AdguardTeam/FiltersCompiler/issues/195
-            const filtersContent = JSON.stringify(metadata, null, '\t');
+
+            const filtersContent = JSON.stringify(sortMetadataFilters(metadata), null, '\t');
 
             fs.writeFileSync(filtersFileJson, filtersContent, 'utf8');
             fs.writeFileSync(filtersFileJs, filtersContent, 'utf8');
@@ -1027,5 +1039,6 @@ module.exports = (() => {
     return {
         init,
         generate,
+        sortMetadataFilters,
     };
 })();
