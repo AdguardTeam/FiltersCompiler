@@ -6,7 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [Unreleased]
+## [v1.1.121] - 2023-12-15
+
+## Added
+
+- New `@include` directive option `/ignoreTrustLevel`
+  [#202](https://github.com/AdguardTeam/FiltersCompiler/issues/202)
 
 ## Changed
 
@@ -61,7 +66,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- New include directive option `/addModifiers` [#190](https://github.com/AdguardTeam/FiltersCompiler/issues/190)
+- New `@include` directive option `/addModifiers` [#190](https://github.com/AdguardTeam/FiltersCompiler/issues/190)
 
 ### Changed
 
@@ -293,7 +298,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated [@adguard/tsurlfilter] to v1.0.51, [@adguard/scriptlets] to v1.7.3
 
 
-[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.119...HEAD
+[v1.1.121]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.119...v1.1.121
 [v1.1.119]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.115...v1.1.119
 [v1.1.115]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.107...v1.1.115
 [v1.1.107]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.105...v1.1.107

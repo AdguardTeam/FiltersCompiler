@@ -1,0 +1,4 @@
+example.com#$#.additional { color: red; }
+||example.com$replace=/"additional"/"__additional"/
+example.com#%#AG_setConstant('additional1', '1');
+example.com#%#//scriptlet('set-constant', 'additional2', '2')

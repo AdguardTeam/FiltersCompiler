@@ -1,22 +1,7 @@
 /* eslint-disable global-require */
 
 module.exports = (function () {
-    /**
-     * @typedef {Object} fs
-     * @property {function} readFileSync
-     * @property {function} writeFileSync
-     * @property {function} lstatSync
-     * @property {function} readdirSync
-     * @property {function} isDirectory
-     * @property {function} appendFile
-     * @property {function} existsSync
-     * @property {function} mkdirSync
-     */
     const fs = require('fs');
-    /**
-     * @typedef {Object} path
-     * @property {function} join
-     */
     const path = require('path');
     const md5 = require('md5');
 
@@ -50,10 +35,9 @@ module.exports = (function () {
     const NOT_OPTIMIZED_OPTION = 'notOptimized';
     const EXCLUDE_OPTION = 'exclude';
     const ADD_MODIFIERS_OPTION = 'addModifiers';
+    const IGNORE_TRUST_LEVEL_OPTION = 'ignoreTrustLevel';
 
     const NOT_OPTIMIZED_HINT = '!+ NOT_OPTIMIZED';
-
-    let currentDir;
 
     /**
      * Sync reads file content
@@ -283,13 +267,13 @@ module.exports = (function () {
      */
 
     /**
-     * Parses an include line to extract the URL and options.
+     * Parses an include directive line to extract the URL and options.
      *
-     * @param {string} line - The input line to parse.
+     * @param {string} lineWithDirective - The input line with directive to parse.
      * @returns {ParsedIncludeData} Parsed result containing the URL and options.
      */
-    const parseIncludeLine = function (line) {
-        const parts = line.split(SPACE);
+    const parseIncludeDirective = function (lineWithDirective) {
+        const parts = lineWithDirective.trim().split(SPACE);
         let url = parts[1].trim();
         url = stripEndQuotes(url);
         // Initialize an options array to store the parsed options.
@@ -305,6 +289,8 @@ module.exports = (function () {
                 options.push({ name: EXCLUDE_OPTION, value: getOptionValue(attribute) });
             } else if (attribute.startsWith(`${SLASH}${ADD_MODIFIERS_OPTION}${EQUAL_SIGN}`)) {
                 options.push({ name: ADD_MODIFIERS_OPTION, value: getOptionValue(attribute) });
+            } else if (attribute.startsWith(`${SLASH}${IGNORE_TRUST_LEVEL_OPTION}`)) {
+                options.push({ name: IGNORE_TRUST_LEVEL_OPTION, value: true });
             }
         }
         return { url, options };
@@ -326,116 +312,196 @@ module.exports = (function () {
     };
 
     /**
-     * Creates content from include line
-     * @param {string} line - The include line containing the URL or file path and optional options.
-     * @param {Array<string>} excluded - An array of strings representing excluded content.
-     * @returns {Promise<Array<string>>} - Included content.
+     * @typedef {object} ParsedIncludeResult
+     * @property {string[]} includedLines Included rules.
+     * @property {boolean} shouldIgnoreTrustLevel Indicates whether the metadata's trust level should be ignored.
+     */
+
+    /**
+     * Creates content from compiler's `@include` directive, not `!#include` preprocessor directive.
+     *
+     * @param {string} filterDir Filter directory.
+     * @param {string} directiveLine The include line containing the URL or file path and optional options.
+     * @param {Array<string>} excluded An array of strings representing excluded content.
+     *
+     * @returns {Promise<ParsedIncludeResult>} Parsed include data.
      * @throws {Error} Throws an error if there is an issue handling the include operation.
      */
-    const include = async function (line, excluded) {
-        let result = [];
+    const include = async function (filterDir, directiveLine, excluded) {
+        let includedLines = [];
+        let shouldIgnoreTrustLevel = false;
 
-        const { url, options } = parseIncludeLine(line);
+        const { url, options } = parseIncludeDirective(directiveLine);
 
         if (!url) {
             logger.warn('Invalid include url');
-            return result;
+            return includedLines;
         }
 
         logger.log(`Applying inclusion from: ${url}`);
 
         const externalInclude = url.includes(':');
-        // eslint-disable-next-line max-len
-        const included = externalInclude ? webutils.downloadFile(url) : readFile(path.join(currentDir, url));
+
+        const included = externalInclude
+            ? webutils.downloadFile(url)
+            : readFile(path.join(filterDir, url));
 
         if (included) {
-            result = splitLines(included);
+            includedLines = splitLines(included);
 
-            checkRedirects(result, url);
+            checkRedirects(includedLines, url);
 
-            // resolved includes
-            const originUrl = externalInclude ? FiltersDownloader.getFilterUrlOrigin(url) : currentDir;
-            result = await FiltersDownloader.resolveIncludes(result, originUrl);
+            // resolved `@include` directive url
+            const originUrl = externalInclude
+                ? FiltersDownloader.getFilterUrlOrigin(url)
+                : filterDir;
 
-            result = workaround.removeAdblockVersion(result);
+            includedLines = await FiltersDownloader.resolveIncludes(includedLines, originUrl);
+
+            includedLines = workaround.removeAdblockVersion(includedLines);
 
             options.forEach(({ name, value }) => {
                 let optionsExcludePath;
                 switch (name) {
                     case EXCLUDE_OPTION:
-                        optionsExcludePath = path.join(currentDir, value);
-                        result = exclude(result, optionsExcludePath, excluded);
+                        optionsExcludePath = path.join(filterDir, value);
+                        includedLines = exclude(includedLines, optionsExcludePath, excluded);
                         break;
                     case STRIP_COMMENTS_OPTION:
-                        result = stripComments(result);
+                        includedLines = stripComments(includedLines);
                         break;
                     case NOT_OPTIMIZED_OPTION:
-                        result = addNotOptimizedHints(result);
+                        includedLines = addNotOptimizedHints(includedLines);
                         break;
                     case ADD_MODIFIERS_OPTION:
-                        result = addModifiers(result, value);
+                        includedLines = addModifiers(includedLines, value);
+                        break;
+                    case IGNORE_TRUST_LEVEL_OPTION:
+                        if (externalInclude) {
+                            // eslint-disable-next-line max-len
+                            throw new Error(`Trust level ignoring option is not supported for external includes: ${directiveLine}`);
+                        }
+                        shouldIgnoreTrustLevel = true;
                         break;
                     default:
                         break;
                 }
             });
 
-            result = workaround.fixVersionComments(result);
+            includedLines = workaround.fixVersionComments(includedLines);
         } else {
             throw new Error(`Error handling include from: ${options.url}`);
         }
 
-        logger.log(`Inclusion lines: ${result.length}`);
-        return result;
+        logger.log(`Inclusion lines: ${includedLines.length}`);
+        logger.log(`Should be filtered due to trust level: ${shouldIgnoreTrustLevel}`);
+
+        return {
+            includedLines,
+            shouldIgnoreTrustLevel,
+        };
     };
 
     /**
-     * Compiles filter lines
+     * Resolves preprocessor `!#include` directives by FiltersDownloader.
      *
-     * @param template
-     * @param trustLevelSettings
-     * @param filterName
+     * @param {string} filterDir Filter directory.
+     * @param {string} filterName Filter name.
+     * @param {string[]} lines Array of lines.
+     *
+     * @returns {Promise<string[]>} Promise which resolves
+     * to array of rules as a result of resolving preprocessor `!#include` directives.
+     *
+     * @throws {Error} Throws an error if unable to resolve `!#include` directives.
      */
-    const compile = async function (template, trustLevelSettings, filterName) {
+    const getResolvedPreprocessorIncludes = async function (filterDir, filterName, lines) {
+        let rules = lines;
+        // bad includes are ignored here because they'll be handled in generator after resolving conditions
+        // https://github.com/AdguardTeam/FiltersCompiler/issues/84
+        try {
+            rules = await FiltersDownloader.resolveIncludes(lines, filterDir);
+        } catch (e) {
+            logger.warn(`Error resolving includes in ${filterName}: ${e.message}`);
+        }
+        return rules;
+    };
+
+    /**
+     * Resolved preprocessor `!#include` directives and converts rules to Adguard syntax.
+     *
+     * @param {string} filterDir Filter directory.
+     * @param {string} filterName Filter name.
+     * @param {string[]} lines Array of raw rules and possibly preprocessor `!#include` directives.
+     * @param {string} excluded Array of rules to exclude.
+     *
+     * @returns {Promise<string[]>} Promise which resolves to array of AdGuard syntax rules.
+     */
+    const prepareAdgRules = async function (filterDir, filterName, lines, excluded) {
+        const resolvedIncludes = await getResolvedPreprocessorIncludes(filterDir, filterName, lines);
+        return converter.convertRulesToAdgSyntax(resolvedIncludes, excluded);
+    };
+
+    /**
+     * @typedef {object} CompileResult
+     * @property {string[]} lines Compiled rules.
+     * @property {string[]} excluded Excluded rules.
+     * @property {string[]} invalid Invalid rules.
+     */
+
+    /**
+     * Compiles filter lines.
+     *
+     * @param filterDir Filter directory.
+     * @param filterName Filter name.
+     * @param templateContent Content of template.txt file.
+     * @param trustLevelSettings Trust level settings for the filter.
+     *
+     * @returns {Promise<CompileResult>} Promise which resolves to compiled data for the filter.
+     */
+    const compile = async function (filterDir, filterName, templateContent, trustLevelSettings) {
         let result = [];
         const excluded = [];
 
-        // https://github.com/AdguardTeam/FiltersCompiler/issues/87
         // collect invalid rules for report
+        // https://github.com/AdguardTeam/FiltersCompiler/issues/87
         const invalid = [];
 
-        const lines = splitLines(template);
+        const lines = splitLines(templateContent);
         // eslint-disable-next-line no-restricted-syntax
         for (const line of lines) {
             if (line.startsWith(INCLUDE_DIRECTIVE)) {
                 // eslint-disable-next-line no-await-in-loop
-                const inc = await include(line.trim(), excluded);
+                const { includedLines, shouldIgnoreTrustLevel } = await include(filterDir, line, excluded);
 
-                let k = 0;
-                while (k < inc.length) {
-                    result.push(inc[k].trim());
-                    k += 1;
+                let includedRules = [];
+
+                includedLines.forEach((line) => includedRules.push(line.trim()));
+
+                // eslint-disable-next-line no-await-in-loop
+                includedRules = await prepareAdgRules(filterDir, filterName, includedRules, excluded);
+
+                if (shouldIgnoreTrustLevel) {
+                    logger.info(`Ignoring trust level for ${filterName} due to @include directive: ${line}`);
+                } else {
+                    logger.info(`Applying trust-level exclusions to ${filterName} @include directive: ${line}`);
+                    includedRules = exclude(includedRules, trustLevelSettings, excluded);
                 }
+
+                result.push(...includedRules);
             } else {
-                result.push(line.trim());
+                let inlineRules = [line.trim()];
+
+                // eslint-disable-next-line no-await-in-loop
+                inlineRules = await prepareAdgRules(filterDir, filterName, inlineRules, excluded);
+
+                logger.info('Applying trust-level exclusions to inline template.txt rules...');
+                inlineRules = exclude(inlineRules, trustLevelSettings, excluded);
+                result.push(...inlineRules);
             }
         }
 
-        // bad includes are ignored here because they'll be handled in generator after resolving conditions
-        // https://github.com/AdguardTeam/FiltersCompiler/issues/84
-        try {
-            result = await FiltersDownloader.resolveIncludes(result, currentDir);
-        } catch (e) {
-            logger.warn(`Error resolving includes in ${filterName}: ${e.message}`);
-        }
-
-        result = converter.convertRulesToAdgSyntax(result, excluded);
-
-        const excludeFilePath = path.join(currentDir, EXCLUDE_FILE);
+        const excludeFilePath = path.join(filterDir, EXCLUDE_FILE);
         result = exclude(result, excludeFilePath, excluded);
-
-        logger.info('Applying trust-level exclusions..');
-        result = exclude(result, trustLevelSettings, excluded);
 
         result = validator.validate(result, excluded, invalid, filterName);
 
@@ -489,14 +555,12 @@ module.exports = (function () {
      * @param blacklist
      */
     const buildFilter = async function (filterDir, whitelist, blacklist) {
-        currentDir = filterDir;
-
-        const template = readFile(path.join(currentDir, TEMPLATE_FILE));
-        if (!template) {
+        const templateContent = readFile(path.join(filterDir, TEMPLATE_FILE));
+        if (!templateContent) {
             throw new Error('Invalid template');
         }
 
-        const metadata = JSON.parse(readFile(path.join(currentDir, METADATA_FILE)));
+        const metadata = JSON.parse(readFile(path.join(filterDir, METADATA_FILE)));
         if (metadata.disabled) {
             logger.warn('Filter skipped');
             report.skipFilter(metadata);
@@ -518,9 +582,9 @@ module.exports = (function () {
         // eslint-disable-next-line no-undef
         const trustLevelSettings = path.resolve(__dirname, TRUST_LEVEL_DIR, `exclusions-${trustLevel}.txt`);
 
-        const { name } = metadata;
-        logger.info(`Compiling ${name}`);
-        const result = await compile(template, trustLevelSettings, name);
+        const { name: filterName } = metadata;
+        logger.info(`Compiling ${filterName}`);
+        const result = await compile(filterDir, filterName, templateContent, trustLevelSettings);
 
         if (!validator.checkAffinityDirectives(result.lines)) {
             throw new Error(`Error validating !#safari_cb_affinity directive in filter ${filterId}`);
@@ -536,14 +600,14 @@ module.exports = (function () {
         const compiledData = compiled.join('\r\n');
 
         logger.info(`Writing filter file, lines:${compiled.length}`);
-        writeFile(path.join(currentDir, FILTER_FILE), compiledData);
+        writeFile(path.join(filterDir, FILTER_FILE), compiledData);
         logger.info(`Writing excluded file, lines:${excluded.length}`);
-        writeFile(path.join(currentDir, EXCLUDED_LINES_FILE), excluded.join('\r\n'));
+        writeFile(path.join(filterDir, EXCLUDED_LINES_FILE), excluded.join('\r\n'));
         logger.info('Writing revision file..');
 
         // eslint-disable-next-line no-buffer-constructor
         const hash = Buffer.from(md5(compiledData, { asString: true })).toString('base64').trim();
-        const revisionFile = path.join(currentDir, REVISION_FILE);
+        const revisionFile = path.join(filterDir, REVISION_FILE);
         const revision = makeRevision(revisionFile, hash);
         writeFile(revisionFile, JSON.stringify(revision, null, '\t'));
     };
@@ -594,7 +658,7 @@ module.exports = (function () {
         platformsPath,
         platformsConfig,
         whitelist,
-        blacklist
+        blacklist,
     ) {
         logger.initialize(logFile);
         generator.init(FILTER_FILE, METADATA_FILE, REVISION_FILE, platformsConfig, ADGUARD_FILTERS_SERVER_URL);
@@ -609,5 +673,6 @@ module.exports = (function () {
 
     return {
         build,
+        include,
     };
 }());

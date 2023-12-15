@@ -1,0 +1,19 @@
+! Homepage: http://adguard.com/filters.html#english
+! License: http://creativecommons.org/licenses/by-sa/3.0/
+!
+!#if (adguard_app_mac)
+@include ./additional-rules.txt /ignoreTrustLevel
+!#endif
+!#if (adguard_app_ios)
+@include ./additional-rules.txt
+!#endif
+!
+! following rules are fine for "low" trust level:
+example.com##.lowLevelBanner
+||example.com/low/level/*.js^$script,third-party
+!
+! following rules should be skipped due to the metadata's trust level:
+example.com#$#.template { color: red; }
+||example.com$replace=/"template"/"__template"/
+example.com#%#AG_setConstant('template1', '1');
+example.com#%#//scriptlet('set-constant', 'template2', '2')

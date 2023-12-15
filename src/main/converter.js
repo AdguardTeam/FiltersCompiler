@@ -86,7 +86,7 @@ const convertAdgScriptletsToUbo = (rules) => {
         rules,
         'scriptlet',
         scriptlets.isAdgScriptletRule,
-        scriptlets.convertAdgToUbo
+        scriptlets.convertAdgToUbo,
     );
 };
 
@@ -106,7 +106,7 @@ const convertAdgRedirectsToUbo = (rules) => {
         redirects.isValidAdgRedirectRule,
         // and skip ubo-unsupported redirects for ubo filters
         // https://github.com/AdguardTeam/AdguardFilters/issues/68028
-        redirects.convertAdgRedirectToUbo
+        redirects.convertAdgRedirectToUbo,
     );
 };
 
@@ -118,7 +118,7 @@ const convertAdgPathModifierToUbo = (rules) => {
         rules,
         '$path',
         cosmeticRuleModifiers.isAdgCosmeticRuleWithPathModifier,
-        cosmeticRuleModifiers.convertAdgPathModifierToUbo
+        cosmeticRuleModifiers.convertAdgPathModifierToUbo,
     );
 };
 

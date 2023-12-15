@@ -48,7 +48,7 @@ describe('Test builder', () => {
             expect(revision.timeUpdated).toBeTruthy();
         });
 
-        describe('Testing addModifiers function', () => {
+        describe('addModifiers options of include directive', () => {
             it('Should filter "platforms/mac" with "10.txt"', async () => {
                 // Read the content of the file and split it into lines
                 const filterContent = await readFile(path.join(platformsDir, 'mac', 'filters', '10.txt'));
@@ -784,6 +784,78 @@ describe('Test builder', () => {
             expect(filterLines.includes('||stringtoreplace^')).toBeFalsy();
             expect(filterLines.includes('||replacementstring^')).toBeTruthy();
         });
+
+        describe('ignoreTrustLevel options of include directive', () => {
+            it('platforms/mac with filterId 11', async () => {
+                const filterContent = await readFile(path.join(platformsDir, 'mac', 'filters', '11.txt'));
+                expect(filterContent).toBeTruthy();
+
+                const filterLines = filterContent.split(/\r?\n/);
+                expect(filterLines.length).toEqual(19);
+
+                const presentRules = [
+                    // rules from included file:
+                    'example.com#$#.additional { color: red; }',
+                    '||example.com$replace=/"additional"/"__additional"/',
+                    "example.com#%#AG_setConstant('additional1', '1');",
+                    "example.com#%#//scriptlet('set-constant', 'additional2', '2')",
+                    // rules from template.txt
+                    // allowed for low trust level:
+                    'example.com##.lowLevelBanner',
+                    '||example.com/low/level/*.js^$script,third-party',
+                ];
+                presentRules.forEach((rule) => {
+                    expect(filterLines.includes(rule)).toBeTruthy();
+                });
+
+                const absentRules = [
+                    // rules from template.txt
+                    // not allowed for low trust level:
+                    'example.com#$#.template { color: red; }',
+                    '||example.com$replace=/"template"/"__template"/',
+                    "example.com#%#AG_setConstant('template1', '1');",
+                    "example.com#%#//scriptlet('set-constant', 'template2', '2')",
+                ];
+                absentRules.forEach((rule) => {
+                    expect(filterLines.includes(rule)).toBeFalsy();
+                });
+            });
+
+            it('platforms/ios with filterId 11', async () => {
+                const filterContent = await readFile(path.join(platformsDir, 'ios', 'filters', '11.txt'));
+                expect(filterContent).toBeTruthy();
+
+                const filterLines = filterContent.split(/\r?\n/);
+                expect(filterLines.length).toEqual(16);
+
+                const presentRules = [
+                    // rules from template.txt
+                    // allowed for low trust level:
+                    'example.com##.lowLevelBanner',
+                    '||example.com/low/level/*.js^$script,third-party',
+                ];
+                presentRules.forEach((rule) => {
+                    expect(filterLines.includes(rule)).toBeTruthy();
+                });
+
+                const absentRules = [
+                    // rules from included file:
+                    'example.com#$#.additional { color: red; }',
+                    '||example.com$replace=/"additional"/"__additional"/',
+                    "example.com#%#AG_setConstant('additional1', '1');",
+                    "example.com#%#//scriptlet('set-constant', 'additional2', '2')",
+                    // rules from template.txt
+                    // not allowed for low trust level:
+                    'example.com#$#.template { color: red; }',
+                    '||example.com$replace=/"template"/"__template"/',
+                    "example.com#%#AG_setConstant('template1', '1');",
+                    "example.com#%#//scriptlet('set-constant', 'template2', '2')",
+                ];
+                absentRules.forEach((rule) => {
+                    expect(filterLines.includes(rule)).toBeFalsy();
+                });
+            });
+        });
     });
 
     it('Builds lists', async () => {
@@ -802,13 +874,13 @@ describe('Test builder', () => {
 
     it('Validate affinity directives', async () => {
         await expect(
-            builder.build(badFiltersDir, null, null, platformsDir, platformsConfigFile, [8])
+            builder.build(badFiltersDir, null, null, platformsDir, platformsConfigFile, [8]),
         ).rejects.toThrow('Error validating !#safari_cb_affinity directive in filter 8');
     });
 
     it('Resolve bad include inside condition', async () => {
         await expect(
-            builder.build(badFiltersDir, null, null, platformsDir, platformsConfigFile, [9])
+            builder.build(badFiltersDir, null, null, platformsDir, platformsConfigFile, [9]),
         ).rejects.toThrow(/^ENOENT: no such file or directory, open.*non-existing-file\.txt.*$/);
     });
 
@@ -820,5 +892,46 @@ describe('Test builder', () => {
         const filtersI18nJson = await readFile(path.join(platformsDir, 'test', 'filters_i18n.json'));
         const filtersI18nJs = await readFile(path.join(platformsDir, 'test', 'filters_i18n.js'));
         expect(filtersI18nJson).toEqual(filtersI18nJs);
+    });
+});
+
+describe('check include directive function', () => {
+    describe('valid ignoreTrustLevel option -- same origin file', () => {
+        const testCases = [
+            {
+                actual: '@include ./resources/filters/common.txt /ignoreTrustLevel',
+                expectedShouldIgnore: true,
+            },
+            {
+                actual: '@include ./resources/filters/common.txt /stripComments',
+                expectedShouldIgnore: false,
+            },
+            {
+                actual: '@include ./resources/filters/cname_trackers.txt /addModifiers="script,redirect=noopjs" /ignoreTrustLevel',
+                expectedShouldIgnore: true,
+            },
+            {
+                actual: '@include ./resources/filters/cname_trackers.txt /addModifiers="script,redirect=noopjs"',
+                expectedShouldIgnore: false,
+            },
+        ];
+
+        test.each(testCases)('$actual', async ({ actual, expectedShouldIgnore }) => {
+            // const includedData = await builder.include(actual, [], path.dirname(__filename));
+            const includedData = await builder.include(
+                path.dirname(__filename),
+                actual,
+                [],
+            );
+            expect(includedData.shouldIgnoreTrustLevel).toEqual(expectedShouldIgnore);
+        });
+    });
+
+    it('invalid ignoreTrustLevel option -- no same origin file', async () => {
+        const fileUrl = 'https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/ExperimentalFilter/sections/English/common_js.txt';
+        const actual = `@include "${fileUrl}" /ignoreTrustLevel`;
+        await expect(
+            builder.include(path.dirname(__filename), actual, []),
+        ).rejects.toThrow(/Trust level ignoring option is not supported for external includes/);
     });
 });

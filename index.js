@@ -38,7 +38,7 @@ const compile = function (path, logPath, reportFile, platformsPath, whitelist, b
         platformsPath,
         platformsConfig,
         whitelist,
-        blacklist
+        blacklist,
     );
 };
 

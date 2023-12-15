@@ -691,12 +691,12 @@ module.exports = (() => {
             fs.writeFileSync(
                 path.join(platformDir, LOCAL_SCRIPT_RULES_FILE),
                 rulesTxt.join(RULES_SEPARATOR),
-                'utf8'
+                'utf8',
             );
             fs.writeFileSync(
                 path.join(platformDir, LOCAL_SCRIPT_RULES_FILE_JSON),
                 JSON.stringify(rulesJson, null, 4),
-                'utf8'
+                'utf8',
             );
         }
 
@@ -935,7 +935,7 @@ module.exports = (() => {
         metadataFileName,
         revisionFileName,
         platformsConfig,
-        adguardFiltersServer
+        adguardFiltersServer,
     ) {
         filterFile = filterFileName;
         metadataFile = metadataFileName;
@@ -973,7 +973,7 @@ module.exports = (() => {
         platformsPath,
         whitelist,
         blacklist,
-        obsoleteFiltersMetadata
+        obsoleteFiltersMetadata,
     ) => {
         const items = fs.readdirSync(filtersDir);
         // eslint-disable-next-line no-restricted-syntax
@@ -999,7 +999,7 @@ module.exports = (() => {
                         platformsPath,
                         whitelist,
                         blacklist,
-                        obsoleteFiltersMetadata
+                        obsoleteFiltersMetadata,
                     );
                 }
             }

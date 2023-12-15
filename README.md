@@ -95,76 +95,89 @@ where:
       listed in the exceptions file available by `filepath`;
     - `/addModifiers="<modifiers>"` adds the specified `modifiers` (string as is) to the rules in the included file.
       The addModifiers option can also work with the host-rule format files.
-      In this case, host-file comments are to be replaced `#` by AdBlock-style syntax comments `!`.
+      In this case, host-file comments are to be replaced `#` by AdBlock-style syntax comments `!`;
+    - `/ignoreTrustLevel` disables the check of the trust level of the included file.
+      Allowed only for the same origin files.
 
 > [!IMPORTANT]
-> The content of the included file is formatted by the options due to the order of their mention in the directive.
+> The content of the included file is formatted by the options due to the order of their mention in the directive,
+> except `/ignoreTrustLevel`.
 
-#### Example:
+#### Examples
 
-```adblock
-@include ../input.txt /addModifiers="script" /exclude="../exclusions.txt" /notOptimized /stripComments
-```
+- Include a file with domains, add modifiers to the rules, exclude some rules,
+   add a hint to the rules, and remove comments from the prepared rules:
 
-The order of execution of the options is as follows:
-
-1. `@include ../input.txt`: Includes the content of the file named `input.txt` from the parent directory.
-
-    ``` adblock
-    # comment
-    example.com
-    example.org
+    ```adblock
+    @include ../input.txt /addModifiers="script" /exclude="../exclusions.txt" /notOptimized /stripComments
     ```
 
-1. `/addModifiers="script"`: Adds the `$script` modifier to all rules in the included file.
+    The order of execution of the options is as follows:
 
-    Result of adding modifiers:
+    1. `@include ../input.txt`: Includes the content of the file named `input.txt` from the parent directory.
 
-    ``` adblock
-    ! comment
-    example.com$script
-    example.org$script
-    ```
+        ``` adblock
+        # comment
+        example.com
+        example.org
+        ```
 
-    > Used to restrict rules with modifiers when blocking the entire domain would result in a breakage.
-    > [issue example](https://github.com/AdguardTeam/FiltersCompiler/issues/190)
+    1. `/addModifiers="script"`: Adds the `$script` modifier to all rules in the included file.
 
-1. `/exclude="../exclusions.txt"`: Excludes rules listed in the exception list from the file named `exclusions.txt`, if they match.
+        Result of adding modifiers:
 
-    Due to the content of `exclusions.txt`:
+        ``` adblock
+        ! comment
+        example.com$script
+        example.org$script
+        ```
 
-    ``` adblock
-    example.com$script
-    example2.com$script
-    ```
+        > Used to restrict rules with modifiers when blocking the entire domain would result in a breakage.
+        > [issue example](https://github.com/AdguardTeam/FiltersCompiler/issues/190)
 
-    Result of excluding:
+    1. `/exclude="../exclusions.txt"`: Excludes rules listed in the exception list from the file named `exclusions.txt`, if they match.
 
-    ``` adblock
-    ! comment
-    example.org$script
-    ```
+        Due to the content of `exclusions.txt`:
 
-    > Used to exclude problematic rules in the filter
+        ``` adblock
+        example.com$script
+        example2.com$script
+        ```
 
-1. `/notOptimized`: Adds the `!+ NOT_OPTIMIZED` hint to the rules.
+        Result of excluding:
 
-    Result of adding the hint:
+        ``` adblock
+        ! comment
+        example.org$script
+        ```
 
-    ``` adblock
-    ! comment
-    !+ NOT_OPTIMIZED
-    example.org$script
-    ```
+        > Used to exclude problematic rules in the filter
 
-    > Used in cases where the filter is designed for mobile site layout and some rules may be removed,
-    > due to the lack of ability to collect statistics on mobile platforms.
+    1. `/notOptimized`: Adds the `!+ NOT_OPTIMIZED` hint to the rules.
 
-1. `/stripComments`: Removes comments in AdBlock style from the included file.
+        Result of adding the hint:
 
-    ``` adblock
-    !+ NOT_OPTIMIZED
-    example.org$script
+        ``` adblock
+        ! comment
+        !+ NOT_OPTIMIZED
+        example.org$script
+        ```
+
+        > Used in cases where the filter is designed for mobile site layout and some rules may be removed,
+        > due to the lack of ability to collect statistics on mobile platforms.
+
+    1. `/stripComments`: Removes comments in AdBlock style from the included file.
+
+        ``` adblock
+        !+ NOT_OPTIMIZED
+        example.org$script
+        ```
+
+- Ignore the trust level of the filter list (specified in the metadata) during the file including —
+  include the file rules as is:
+
+    ```adblock
+    @include ./input.txt /ignoreTrustLevel
     ```
 
 [FiltersRegistry]: https://github.com/AdguardTeam/FiltersRegistry/

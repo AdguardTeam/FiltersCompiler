@@ -1,3 +1,9 @@
+! test.com#%#AG_setConstant("ads", "false"); is excluded by "#%#" in exclusions-high.txt
+test.com#%#AG_setConstant("ads", "false");
+! ||example.com/api/v1/ad/*/json$replace=/html/abcd\,/i is excluded by "$replace" in exclusions-high.txt
+||example.com/api/v1/ad/*/json$replace=/html/abcd\,/i
+! test.com#@%#Object.defineProperty(window, 'abcde', { get: function() { return []; } }); is excluded by "#@%#" in exclusions-high.txt
+test.com#@%#Object.defineProperty(window, 'abcde', { get: function() { return []; } });
 ! Rule "example.com##^script:has-text(12313)" converted to: "example.com$$script[tag-content="12313"][max-length="262144"]"
 example.com##^script:has-text(12313)
 ! Rule "example.com##^script:contains(banner)" converted to: "example.com$$script[tag-content="banner"][max-length="262144"]"
@@ -28,18 +34,12 @@ test.com#@#script:inject(abort-on-property-read.js, some.prop)
 ||example.com/test/$media,mp4,domain=test.com
 ! Rule "||test.com/cams/video_file/*.mp4$media,mp4" converted to: "||test.com/cams/video_file/*.mp4$media,redirect=noopmp4-1s"
 ||test.com/cams/video_file/*.mp4$media,mp4
+! ||test.com/res/js/*.js$replace=/\"OK\/banners/\"OK\/banners__\// is excluded by "$replace" in exclusions-high.txt
+||test.com/res/js/*.js$replace=/\"OK\/banners/\"OK\/banners__\//
 ! Rule "||example.com/banner$image,redirect=3x2.png" converted to: "||example.com/banner$image,redirect=3x2-transparent.png"
 ||example.com/banner$image,redirect=3x2.png
 ! Rule "||test.com^$script,rewrite=abp-resource:blank-js" converted to: "||test.com^$script,redirect=noopjs"
 ||test.com^$script,rewrite=abp-resource:blank-js
-! test.com#%#AG_setConstant("ads", "false"); is excluded by "#%#" in exclusions-high.txt
-test.com#%#AG_setConstant("ads", "false");
-! ||example.com/api/v1/ad/*/json$replace=/html/abcd\,/i is excluded by "$replace" in exclusions-high.txt
-||example.com/api/v1/ad/*/json$replace=/html/abcd\,/i
-! test.com#@%#Object.defineProperty(window, 'abcde', { get: function() { return []; } }); is excluded by "#@%#" in exclusions-high.txt
-test.com#@%#Object.defineProperty(window, 'abcde', { get: function() { return []; } });
-! ||test.com/res/js/*.js$replace=/\"OK\/banners/\"OK\/banners__\// is excluded by "$replace" in exclusions-high.txt
-||test.com/res/js/*.js$replace=/\"OK\/banners/\"OK\/banners__\//
 ! example.com#%#//scriptlet('trusted-set-local-storage-item', 'iName', 'iValue') is excluded by "#%#//scriptlet('trusted-" in exclusions-high.txt
 example.com#%#//scriptlet('trusted-set-local-storage-item', 'iName', 'iValue')
 ! example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue") is excluded by "#%#//scriptlet("trusted-" in exclusions-high.txt
