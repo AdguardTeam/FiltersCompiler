@@ -310,7 +310,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated [@adguard/tsurlfilter] to v1.0.51, [@adguard/scriptlets] to v1.7.3
 
 
-[v1.1.121]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.121...v1.1.123
+[v1.1.123]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.121...v1.1.123
 [v1.1.121]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.119...v1.1.121
 [v1.1.119]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.115...v1.1.119
 [v1.1.115]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.107...v1.1.115
