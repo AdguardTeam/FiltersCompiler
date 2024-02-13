@@ -310,7 +310,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated [@adguard/tsurlfilter] to v1.0.51, [@adguard/scriptlets] to v1.7.3
 
 
-[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.121...HEAD
+[v1.1.121]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.121...v1.1.123
 [v1.1.121]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.119...v1.1.121
 [v1.1.119]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.115...v1.1.119
 [v1.1.115]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.107...v1.1.115
@@ -344,7 +344,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [v1.1.64]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.63...v1.1.64
 [v1.1.63]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.61...v1.1.63
 
-[@adguard/extended-css]: https://github.com/AdguardTeam/[@adguard/extended-css]/blob/master/CHANGELOG.md
+[@adguard/extended-css]: https://github.com/AdguardTeam/ExtendedCss/blob/master/CHANGELOG.md
 [@adguard/filters-downloader]: https://github.com/AdguardTeam/FiltersDownloader/blob/master/CHANGELOG.md
-[@adguard/scriptlets]: https://github.com/AdguardTeam/[@adguard/scriptlets]/blob/master/CHANGELOG.md
+[@adguard/scriptlets]: https://github.com/AdguardTeam/Scriptlets/blob/master/CHANGELOG.md
 [@adguard/tsurlfilter]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/tsurlfilter/CHANGELOG.md
