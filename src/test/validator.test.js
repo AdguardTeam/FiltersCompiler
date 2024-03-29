@@ -2,6 +2,11 @@
  * @jest-environment jsdom
  */
 
+const { TextEncoder, TextDecoder } = require('util');
+
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;
+
 /* eslint-disable max-len */
 const scriptlets = require('@adguard/scriptlets');
 const { setConfiguration, CompatibilityTypes } = require('@adguard/tsurlfilter');

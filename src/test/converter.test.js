@@ -351,6 +351,11 @@ describe('converter', () => {
         actual = converter.convertRulesToAdgSyntax(['example.org##+js(set-cookie, notice_preferences, 1)']);
         expected = "example.org#%#//scriptlet('ubo-set-cookie.js', 'notice_preferences', '1')";
         expect(actual[0]).toBe(expected);
+
+        // https://github.com/AdguardTeam/FiltersCompiler/issues/205
+        actual = converter.convertRulesToAdgSyntax(['example.org##+js(set-local-storage-item, counter, $remove$)']);
+        expected = "example.org#%#//scriptlet('ubo-set-local-storage-item.js', 'counter', '$remove$')";
+        expect(actual[0]).toBe(expected);
     });
 
     it('converts ABP scriptlets to Adguard scriptlet', () => {
