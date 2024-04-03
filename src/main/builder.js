@@ -487,7 +487,11 @@ module.exports = (function () {
                     includedRules = exclude(includedRules, trustLevelSettings, excluded);
                 }
 
-                result.push(...includedRules);
+                // 'for' loop is used in purpose instead of spread operator
+                // to avoid 'Maximum call stack size exceeded' error on large number of rules
+                for (let i = 0; i < includedRules.length; i += 1) {
+                    result.push(includedRules[i]);
+                }
             } else {
                 let inlineRules = [line.trim()];
 
@@ -496,7 +500,12 @@ module.exports = (function () {
 
                 logger.info('Applying trust-level exclusions to inline template.txt rules...');
                 inlineRules = exclude(inlineRules, trustLevelSettings, excluded);
-                result.push(...inlineRules);
+
+                // 'for' loop is used in purpose instead of spread operator
+                // to avoid 'Maximum call stack size exceeded' error on large number of rules
+                for (let i = 0; i < inlineRules.length; i += 1) {
+                    result.push(inlineRules[i]);
+                }
             }
         }
 
