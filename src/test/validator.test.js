@@ -650,6 +650,15 @@ describe('validator', () => {
         });
     });
 
+    describe('validate header modifier', () => {
+        const validRules = [
+            String.raw`://www.*.com/*.css|$script,third-party,header=link:/ads\.re\/>;rel=preconnect/`,
+        ];
+        test.each(validRules)('%s', (rule) => {
+            expect(validator.validate([rule])).toHaveLength(1);
+        });
+    });
+
     it('checkAffinityDirectives test', () => {
         let rules = [
             '||test1.ru',

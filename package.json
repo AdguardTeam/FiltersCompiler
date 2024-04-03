@@ -15,7 +15,7 @@
     "@adguard/extended-css": "^2.0.56",
     "@adguard/filters-downloader": "^1.1.23",
     "@adguard/scriptlets": "^1.10.25",
-    "@adguard/tsurlfilter": "2.2.17",
+    "@adguard/tsurlfilter": "2.2.19",
     "ajv": "^8.11.0",
     "child_process": ">=1.0.2",
     "jsdom": "^21.1.1",

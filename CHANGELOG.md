@@ -6,13 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [Unreleased]
+## [v1.1.129] - 2024-04-03
+
+### Changed
+
+- Updated [@adguard/tsurlfilter] to v2.2.19:
+    - validation of `$header` modifier
 
 ### Fixed
 
 - Error during large filter list compiling
 
-[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.127...HEAD
+[v1.1.129]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.127...v1.1.129
 
 
 ## [v1.1.127] - 2024-03-29
