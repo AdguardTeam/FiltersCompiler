@@ -14,6 +14,7 @@ module.exports = (function () {
     const RuleMasks = require('./rule/rule-masks');
     const workaround = require('./utils/workaround');
     const webutils = require('./utils/webutils');
+    const { getFilterIdFromDirName } = require('./utils/utils');
 
     const FiltersDownloader = require('@adguard/filters-downloader');
 
@@ -570,20 +571,23 @@ module.exports = (function () {
         }
 
         const metadata = JSON.parse(readFile(path.join(filterDir, METADATA_FILE)));
-        if (metadata.disabled) {
-            logger.warn('Filter skipped');
-            report.skipFilter(metadata);
-            return;
-        }
 
         const { filterId } = metadata;
+
         if (whitelist && whitelist.length > 0 && whitelist.indexOf(filterId) < 0) {
-            logger.info(`Filter ${filterId} skipped with whitelist`);
+            logger.info(`Filter ${filterId} skipped due to '--include' option`);
             return;
         }
 
         if (blacklist && blacklist.length > 0 && blacklist.indexOf(filterId) >= 0) {
-            logger.info(`Filter ${filterId} skipped with blacklist`);
+            logger.info(`Filter ${filterId} skipped due to '--skip' option`);
+            return;
+        }
+
+        // check whether the filter is disabled after other checks to avoid unnecessary logging
+        if (metadata.disabled) {
+            logger.warn(`Filter ${filterId} skipped as disabled`);
+            report.skipFilter(metadata);
             return;
         }
 
@@ -629,7 +633,8 @@ module.exports = (function () {
      * @param blacklist
      */
     const parseDirectory = async function (filtersDir, whitelist, blacklist) {
-        const items = fs.readdirSync(filtersDir);
+        const items = fs.readdirSync(filtersDir)
+            .sort((a, b) => getFilterIdFromDirName(a) - getFilterIdFromDirName(b));
 
         // eslint-disable-next-line no-restricted-syntax
         for (const directory of items) {
@@ -637,10 +642,10 @@ module.exports = (function () {
             if (fs.lstatSync(filterDir).isDirectory()) {
                 const template = path.join(filterDir, TEMPLATE_FILE);
                 if (fs.existsSync(template)) {
-                    logger.info(`Building filter: ${directory}`);
+                    logger.info(`Building filter ${directory}...`);
                     // eslint-disable-next-line no-await-in-loop
                     await buildFilter(filterDir, whitelist, blacklist);
-                    logger.info(`Building filter: ${directory} ok`);
+                    logger.info(`Filter ${directory} ok`);
                 } else {
                     // eslint-disable-next-line no-await-in-loop
                     await parseDirectory(filterDir, whitelist, blacklist);
