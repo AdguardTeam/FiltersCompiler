@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.1.131] - 2024-04-05
+
+### Fixes
+
+- Ensure report file is created before writing to it
+
+[v1.1.130]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.130...v1.1.131
+
 
 ## [v1.1.130] - 2024-04-04
 
