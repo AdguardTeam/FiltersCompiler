@@ -1,5 +1,4 @@
 const fs = require('fs');
-const fsExtra = require('fs-extra');
 
 const { log } = console;
 const reportDate = new Date();
@@ -56,8 +55,6 @@ const skipFilter = (metadata) => {
  */
 const create = (reportPath) => {
     if (reportPath) {
-        // make sure the file exists before writing to it
-        fsExtra.ensureFileSync(reportPath);
         fs.writeFileSync(reportPath, reportData, 'utf8');
         return;
     }
