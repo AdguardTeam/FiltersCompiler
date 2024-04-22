@@ -9,3 +9,8 @@ alerts.dmgt.com
 ! comment
 aremedia.e.aremedia.com.au
 auto.scissorsscotch.com
+! Avoid duplicates in modifiers list
+! Add new entries to the end of the list comma-separated
+track.domain.com$image
+criteo.com$image,script
+go.pardot.com$all

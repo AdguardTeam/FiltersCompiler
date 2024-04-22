@@ -53,29 +53,48 @@ describe('Test builder', () => {
                 // Read the content of the file and split it into lines
                 const filterContent = await readFile(path.join(platformsDir, 'mac', 'filters', '10.txt'));
                 const filterLines = filterContent.split(/\r?\n/);
-                expect(filterLines.length).toEqual(14);
+                expect(filterLines.length).toEqual(17);
                 // Ensure that the file is not empty
                 expect(filterContent).toBeTruthy();
                 const filterRules = filterLines.filter((line) => line.length > 0 && !line.startsWith('!'));
                 // Check that each line ends with '$image'
-                filterRules.forEach((line) => {
-                    expect(line.endsWith('$image')).toBeTruthy();
-                    expect(line).not.toBe(null);
+                const presentRules = [
+                    'a155e09a56.reuters.tv$image',
+                    'albany.townsquarenewsletters.com$image',
+                    'alerts.dmgt.com$image',
+                    'aremedia.e.aremedia.com.au$image',
+                    'auto.scissorsscotch.com$image',
+                    'track.domain.com$image',
+                    'criteo.com$image,script',
+                    'go.pardot.com$all,image',
+                ];
+                // Check that the specified modifier isn't added to lines that already have it.
+                presentRules.forEach((rule) => {
+                    expect(filterRules.includes(rule)).toBeTruthy();
                 });
             });
 
             it('Should filter "platforms/ios" with "10.txt"', async () => {
                 const filterContent = await readFile(path.join(platformsDir, 'ios', 'filters', '10.txt'));
                 const filterLines = filterContent.split(/\r?\n/);
-                expect(filterLines.length).toEqual(26);
+                expect(filterLines.length).toEqual(34);
                 // Ensure that the file is not empty
                 expect(filterContent).toBeTruthy();
                 // Filter rules without comments
                 const filterRules = filterLines.filter((line) => line.length > 0 && !line.startsWith('!'));
                 // Ensure that each line ends with '$image,script'
-                filterRules.forEach((line) => {
-                    expect(line.endsWith('$image,script')).toBeTruthy();
-                    expect(line).not.toBe(null);
+                const presentRules = [
+                    'a155e09a56.reuters.tv$image,script',
+                    'albany.townsquarenewsletters.com$image,script',
+                    'alerts.dmgt.com$image,script',
+                    'aremedia.e.aremedia.com.au$image,script',
+                    'auto.scissorsscotch.com$image,script',
+                    'track.domain.com$image,script',
+                    'criteo.com$image,script',
+                    'go.pardot.com$all,image,script',
+                ];
+                presentRules.forEach((rule) => {
+                    expect(filterRules.includes(rule)).toBeTruthy();
                 });
                 // Check that the number of hints is equal to the number of rules
                 const filterHints = filterLines.filter((line) => line === '!+ NOT_OPTIMIZED');
@@ -85,14 +104,22 @@ describe('Test builder', () => {
             it('Should filter "platforms/edge" with "10.txt"', async () => {
                 const filterContent = await readFile(path.join(platformsDir, 'edge', 'filters', '10.txt'));
                 const filterLines = filterContent.split(/\r?\n/);
-                expect(filterLines.length).toEqual(19);
+                expect(filterLines.length).toEqual(25);
                 // Ensure that the file is not empty
                 expect(filterContent).toBeTruthy();
                 const filterRules = filterLines.filter((line) => line.length > 0 && !line.startsWith('!'));
-                // Ensure that each line ends with '$redirect=nooptext,important'
-                filterRules.forEach((line) => {
-                    expect(line.endsWith('$redirect=nooptext,important')).toBeTruthy();
-                    expect(line).not.toBe(null);
+                const presentRules = [
+                    'a155e09a56.reuters.tv$all',
+                    'albany.townsquarenewsletters.com$all',
+                    'alerts.dmgt.com$all',
+                    'aremedia.e.aremedia.com.au$all',
+                    'auto.scissorsscotch.com$all',
+                    'track.domain.com$image,all',
+                    'criteo.com$image,script,all',
+                    'go.pardot.com$all',
+                ];
+                presentRules.forEach((rule) => {
+                    expect(filterRules.includes(rule)).toBeTruthy();
                 });
                 // Check that the number of hints is equal to the number of rules
                 const filterHints = filterLines.filter((line) => line === '!+ NOT_OPTIMIZED');

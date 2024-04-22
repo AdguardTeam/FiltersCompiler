@@ -30,7 +30,9 @@ module.exports = (function () {
 
     const SPACE = ' ';
     const SLASH = '/';
+    const COMMA = ',';
     const EQUAL_SIGN = '=';
+    const MODIFIERS_SEPARATOR = '$';
     const INCLUDE_DIRECTIVE = '@include ';
     const STRIP_COMMENTS_OPTION = 'stripComments';
     const NOT_OPTIMIZED_OPTION = 'notOptimized';
@@ -129,19 +131,48 @@ module.exports = (function () {
     const addModifiers = (lines, modifiersStr) => {
         const result = lines
             .map((line) => {
-                // Filter out null and empty strings
+                // filter out null and empty strings
                 if (!line || line.trim() === '') {
                     return RuleMasks.MASK_COMMENT;
                 }
-                // Check if the line has a comment marker '#'.
+
+                // check if the line has a comment marker '#'.
                 if (line.startsWith(RuleMasks.MASK_HOST_FILE_COMMENT)) {
                     // Replace the comment marker '#' with the adblock comment marker '!' and return the modified line.
                     return line.replace(RuleMasks.MASK_HOST_FILE_COMMENT, RuleMasks.MASK_COMMENT);
                 }
-                // Add the specified modifier to the line that doesn't start with '!' character (comment).
-                return line.startsWith(RuleMasks.MASK_COMMENT) ? line : `${line}$${modifiersStr}`;
+
+                // do not modify comment lines
+                if (line.startsWith(RuleMasks.MASK_COMMENT)) {
+                    return line;
+                }
+
+                // if the line does not contain a modifier separator, add it and the specified modifierStr
+                if (!line.includes(MODIFIERS_SEPARATOR)) {
+                    return `${line}${MODIFIERS_SEPARATOR}${modifiersStr}`;
+                }
+
+                // if the rule has a modifier that matches the ONE being added, return the line as is
+                if (!modifiersStr.includes(COMMA) && line.includes(modifiersStr)) {
+                    return line;
+                }
+
+                // if the rule has a modifiers that NOT matches the ONE being added,
+                // add new modifier to the comma-separated line
+                if (!modifiersStr.includes(COMMA) && !line.includes(modifiersStr)) {
+                    return `${line}${COMMA}${modifiersStr}`;
+                }
+
+                // check existing modifiers and added new modifiers in the line
+                const extraModifiers = modifiersStr
+                    .split(COMMA)
+                    .filter((modifier) => !line.includes(modifier))
+                    .join(COMMA);
+
+                return `${line}${COMMA}${extraModifiers}`;
             });
-        // Return the array of modified lines.
+
+        // return the array of modified lines
         return result;
     };
 

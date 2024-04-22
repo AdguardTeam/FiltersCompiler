@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `fs-extra` from package dependencies
 
+### Fixed
+
+- Filtering of duplicates modifiers during the `@include` directive's `/addModifiers` option applying
+
 [Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.131...HEAD
 
 
