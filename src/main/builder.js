@@ -15,6 +15,7 @@ module.exports = (function () {
     const workaround = require('./utils/workaround');
     const webutils = require('./utils/webutils');
     const { getFilterIdFromDirName } = require('./utils/utils');
+    const { optimizeDomainBlockingRules } = require('./utils/builder-utils');
 
     const FiltersDownloader = require('@adguard/filters-downloader');
 
@@ -35,12 +36,15 @@ module.exports = (function () {
     const MODIFIERS_SEPARATOR = '$';
     const INCLUDE_DIRECTIVE = '@include ';
     const STRIP_COMMENTS_OPTION = 'stripComments';
+    const OPTIMIZE_DOMAIN_BLOCKING_RULES = 'optimizeDomainBlockingRules';
     const NOT_OPTIMIZED_OPTION = 'notOptimized';
     const EXCLUDE_OPTION = 'exclude';
     const ADD_MODIFIERS_OPTION = 'addModifiers';
     const IGNORE_TRUST_LEVEL_OPTION = 'ignoreTrustLevel';
 
     const NOT_OPTIMIZED_HINT = '!+ NOT_OPTIMIZED';
+
+    // TODO: Move include directive option functions to utils/builder-utils.js
 
     /**
      * Sync reads file content
@@ -315,6 +319,8 @@ module.exports = (function () {
             const attribute = parts[i].trim();
             if (attribute.startsWith(`${SLASH}${STRIP_COMMENTS_OPTION}`)) {
                 options.push({ name: STRIP_COMMENTS_OPTION, value: true });
+            } else if (attribute.startsWith(`${SLASH}${OPTIMIZE_DOMAIN_BLOCKING_RULES}`)) {
+                options.push({ name: OPTIMIZE_DOMAIN_BLOCKING_RULES, value: true });
             } else if (attribute.startsWith(`${SLASH}${NOT_OPTIMIZED_OPTION}`)) {
                 options.push({ name: NOT_OPTIMIZED_OPTION, value: true });
             } else if (attribute.startsWith(`${SLASH}${EXCLUDE_OPTION}${EQUAL_SIGN}`)) {
@@ -401,6 +407,9 @@ module.exports = (function () {
                         break;
                     case STRIP_COMMENTS_OPTION:
                         includedLines = stripComments(includedLines);
+                        break;
+                    case OPTIMIZE_DOMAIN_BLOCKING_RULES:
+                        includedLines = optimizeDomainBlockingRules(includedLines);
                         break;
                     case NOT_OPTIMIZED_OPTION:
                         includedLines = addNotOptimizedHints(includedLines);

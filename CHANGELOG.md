@@ -7,13 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- New `@include` directive option `/optimizeDomainBlockingRules` [#217]
+
 ### Removed
 
 - `fs-extra` from package dependencies
 
 ### Fixed
 
-- Filtering of duplicates modifiers during the `@include` directive's `/addModifiers` option applying
+- Filtering of duplicates modifiers during the `@include` directive's `/addModifiers` option applying [#218]
 
 [Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.131...HEAD
 
@@ -25,6 +29,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ensure report file is created before writing to it
 
 [v1.1.131]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.130...v1.1.131
+[#217]: https://github.com/AdguardTeam/FiltersCompiler/issues/217
+[#218]: https://github.com/AdguardTeam/FiltersCompiler/issues/218
 
 
 ## [v1.1.130] - 2024-04-04

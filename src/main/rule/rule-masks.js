@@ -3,7 +3,9 @@
  */
 module.exports = (() => ({
     MASK_REGEX_RULE: '/',
+    MASK_RULE_SEPARATOR: '^',
     MASK_WHITE_LIST: '@@',
+    MASK_BASE_RULE: '||',
     MASK_ELEMENT_HIDING: '##',
     MASK_ELEMENT_HIDING_EXCEPTION: '#@#',
     MASK_CSS: '#$#',

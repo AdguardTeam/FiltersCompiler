@@ -48,6 +48,91 @@ describe('Test builder', () => {
             expect(revision.timeUpdated).toBeTruthy();
         });
 
+        describe('optimizeDomainBlockingRules options of include directive', () => {
+            it('Should filter "platforms/mac" with "12.txt"', async () => {
+                // Read the content of the file and split it into lines
+                const filterContent = await readFile(path.join(platformsDir, 'mac', 'filters', '12.txt'));
+                const filterLines = filterContent.split(/\r?\n/);
+                expect(filterLines.length).toEqual(21);
+                // Ensure that the file is not empty
+                expect(filterContent).toBeTruthy();
+                const filterRules = filterLines.filter((line) => line.length > 0 && !line.startsWith('!'));
+                const presentRules = [
+                    '||met.vgwort.de^$script',
+                    '||0031.lookinews.com^$script',
+                    '||0021.lookinews.com^$script',
+                    '||1.lookinews.com^$script',
+                    '||0051.lookinews.com^$script',
+                    '||0071.lookinews.com^$script',
+                    '||4189.freshalldaynews.com^$script',
+                    '||9.freshalldaynews.com^$script',
+                    '||4179.freshalldaynews.com^$script',
+                    '||39.freshalldaynews.com^$script',
+                    '||pl02.owen.prolitteris.ch^$script',
+                    '||intense.vgwort.de^$script',
+                ];
+                presentRules.forEach((rule) => {
+                    expect(filterRules.includes(rule)).toBeTruthy();
+                });
+            });
+
+            it('Should filter "platforms/ios" with "12.txt"', async () => {
+                const filterContent = await readFile(path.join(platformsDir, 'ios', 'filters', '12.txt'));
+                const filterLines = filterContent.split(/\r?\n/);
+                expect(filterLines.length).toEqual(22);
+                // Ensure that the file is not empty
+                expect(filterContent).toBeTruthy();
+                // Filter rules without comments
+                const filterRules = filterLines.filter((line) => line.length > 0 && !line.startsWith('!'));
+                const presentRules = [
+                    '||0031.lookinews.com^',
+                    '||0051.lookinews.com^',
+                    '||0021.lookinews.com^',
+                    '||0071.lookinews.com^',
+                    '||1.lookinews.com^',
+                    '||39.freshalldaynews.com^',
+                    '||4179.freshalldaynews.com^',
+                    '||4189.freshalldaynews.com^',
+                    '||9.freshalldaynews.com^',
+                    '||intense.vgwort.de^',
+                    '||met.vgwort.de^',
+                    '||pl02.owen.prolitteris.ch^',
+                ];
+                presentRules.forEach((rule) => {
+                    expect(filterRules.includes(rule)).toBeTruthy();
+                });
+            });
+
+            it('Should filter "platforms/edge" with "12.txt"', async () => {
+                const filterContent = await readFile(path.join(platformsDir, 'edge', 'filters', '12.txt'));
+                const filterLines = filterContent.split(/\r?\n/);
+                expect(filterLines.length).toEqual(33);
+                // Ensure that the file is not empty
+                expect(filterContent).toBeTruthy();
+                const filterRules = filterLines.filter((line) => line.length > 0 && !line.startsWith('!'));
+                const presentRules = [
+                    '||0031.lookinews.com^',
+                    '||0051.lookinews.com^',
+                    '||0021.lookinews.com^',
+                    '||0071.lookinews.com^',
+                    '||1.lookinews.com^',
+                    '||39.freshalldaynews.com^',
+                    '||4179.freshalldaynews.com^',
+                    '||4189.freshalldaynews.com^',
+                    '||9.freshalldaynews.com^',
+                    '||intense.vgwort.de^',
+                    '||met.vgwort.de^',
+                    '||pl02.owen.prolitteris.ch^',
+                ];
+                presentRules.forEach((rule) => {
+                    expect(filterRules.includes(rule)).toBeTruthy();
+                });
+                // Check that the number of hints is equal to the number of rules
+                const filterHints = filterLines.filter((line) => line === '!+ NOT_OPTIMIZED');
+                expect(filterRules.length).toEqual(filterHints.length);
+            });
+        });
+
         describe('addModifiers options of include directive', () => {
             it('Should filter "platforms/mac" with "10.txt"', async () => {
                 // Read the content of the file and split it into lines

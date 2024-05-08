@@ -98,6 +98,9 @@ where:
       In this case, host-file comments are to be replaced `#` by AdBlock-style syntax comments `!`;
     - `/ignoreTrustLevel` disables the check of the trust level of the included file.
       Allowed only for the same origin files.
+    - `/optimizeDomainBlockingRules` remove redundant rules for domain blocking of the included file.
+      Base rules with modifiers and rules of other format will be ignored.
+      Comments are not checked separately and may not be relevant after optimization.
 
 > [!IMPORTANT]
 > The content of the included file is formatted by the options due to the order of their mention in the directive,
@@ -109,7 +112,7 @@ where:
    add a hint to the rules, and remove comments from the prepared rules:
 
     ```adblock
-    @include ../input.txt /addModifiers="script" /exclude="../exclusions.txt" /notOptimized /stripComments
+    @include ../input.txt /addModifiers="script" /exclude="../exclusions.txt" /notOptimized /stripComments /optimizeDomainBlockingRules
     ```
 
     The order of execution of the options is as follows:
@@ -171,6 +174,25 @@ where:
         ``` adblock
         !+ NOT_OPTIMIZED
         example.org$script
+        ```
+
+    1. `/optimizeDomainBlockingRules`: Remove only domain blocking redundant rules from the included file.
+
+        Due to the optimization:
+
+        ``` adblock
+        ||example.com^
+        ||sub.example.com^
+        ||domain.com^
+        ||test.com^$script
+        ```
+
+        Result of optimization:
+
+         ``` adblock
+        ||example.com^
+        ||domain.com^
+        ||test.com^$script
         ```
 
 - Ignore the trust level of the filter list (specified in the metadata) during the file including —

@@ -1,0 +1,16 @@
+{
+    "filterId": 12,
+    "name": "Remove Redundant Rules Filter",
+    "description": "description",
+    "timeAdded": 1702492570252,
+    "homepage": "https://example.com/",
+    "expires": "2 days",
+    "displayNumber": 99,
+    "groupId": 5,
+    "subscriptionUrl": "https://raw.example.com/file.txt",
+    "tags": [
+      "purpose:ads",
+      "lang:en"
+    ],
+    "trustLevel": "low"
+}
