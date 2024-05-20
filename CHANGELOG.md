@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [v1.1.135] - 2024-05-20
 
 ### Added
 
@@ -19,7 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Filtering of duplicates modifiers during the `@include` directive's `/addModifiers` option applying [#218]
 
-[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.131...HEAD
+[v1.1.135]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.131...v1.1.135
+[#217]: https://github.com/AdguardTeam/FiltersCompiler/issues/217
+[#218]: https://github.com/AdguardTeam/FiltersCompiler/issues/218
 
 
 ## [v1.1.131] - 2024-04-05
@@ -29,8 +31,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ensure report file is created before writing to it
 
 [v1.1.131]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.130...v1.1.131
-[#217]: https://github.com/AdguardTeam/FiltersCompiler/issues/217
-[#218]: https://github.com/AdguardTeam/FiltersCompiler/issues/218
 
 
 ## [v1.1.130] - 2024-04-04
