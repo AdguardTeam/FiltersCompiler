@@ -14,7 +14,7 @@ module.exports = (() => {
 
     const RuleMasks = require('../rule/rule-masks');
 
-    const FiltersDownloader = require('@adguard/filters-downloader');
+    const { FiltersDownloader } = require('@adguard/filters-downloader');
 
     const RULES_SEPARATOR = '\r\n';
     const filterIdsPool = [];

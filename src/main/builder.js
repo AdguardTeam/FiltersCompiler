@@ -17,7 +17,7 @@ module.exports = (function () {
     const { getFilterIdFromDirName } = require('./utils/utils');
     const { optimizeDomainBlockingRules } = require('./utils/builder-utils');
 
-    const FiltersDownloader = require('@adguard/filters-downloader');
+    const { FiltersDownloader } = require('@adguard/filters-downloader');
 
     const TEMPLATE_FILE = 'template.txt';
     const FILTER_FILE = 'filter.txt';

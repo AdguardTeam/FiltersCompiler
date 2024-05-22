@@ -993,7 +993,7 @@ describe('Test builder', () => {
     it('Resolve bad include inside condition', async () => {
         await expect(
             builder.build(badFiltersDir, null, null, platformsDir, platformsConfigFile, [9]),
-        ).rejects.toThrow(/^ENOENT: no such file or directory, open.*non-existing-file\.txt.*$/);
+        ).rejects.toThrow(/^Failed to resolve the include directive: '!#include non-existing-file\.txt'$/);
     });
 
     it('filters.js and filters_i18n.js as copies of the json files', async () => {
