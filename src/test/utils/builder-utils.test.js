@@ -45,4 +45,33 @@ describe('optimizeDomainBlockingRules options of include directive', () => {
             expect(result.includes(rule)).toBeTruthy();
         });
     });
+
+    it('Repeats the given order', () => {
+        const lines = [
+            '! comment',
+            '||example.com^',
+            '! comment',
+            '||sub.example.com^',
+            '||sub2.sub.example.com^',
+            '||some.anotherexample.com^',
+            '! comment',
+            '||anotherexample.com^$image',
+            '! comment',
+            'host.com',
+        ];
+        const expectedOutput = [
+            '! comment',
+            '||example.com^',
+            '! comment',
+            '||some.anotherexample.com^',
+            '! comment',
+            '||anotherexample.com^$image',
+            '! comment',
+            'host.com',
+        ];
+        const result = optimizeDomainBlockingRules(lines);
+        expectedOutput.forEach((rule) => {
+            expect(result.includes(rule)).toBeTruthy();
+        });
+    });
 });

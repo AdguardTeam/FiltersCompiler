@@ -15,13 +15,6 @@ const removeRuleMarkers = (rule) => rule
     .replace(RuleMasks.MASK_RULE_SEPARATOR, '');
 
 /**
- * Converts domain to base rule style syntax
- * @param {string} domain - Domain name.
- * @returns {string} - Domain with base rule markers.
- */
-const addRuleMarkers = (domain) => `${RuleMasks.MASK_BASE_RULE}${domain}${RuleMasks.MASK_RULE_SEPARATOR}`;
-
-/**
  * Checks if the line is in base rule style syntax with no modifier, i.e.,
  * starts with `||` and ends with `^`.
  *
@@ -72,11 +65,8 @@ const optimizeDomainBlockingRules = (lines) => {
      */
     const domainsMap = new Map();
 
-    const resultLines = [];
-
     lines.forEach((line) => {
         if (!shouldOptimize(line)) {
-            resultLines.push(line);
             return;
         }
         const [originalDomain, ...otherDomains] = extractDomainNames(line);
@@ -92,7 +82,6 @@ const optimizeDomainBlockingRules = (lines) => {
             if (wideDomain === checkedWideDomain) {
                 return;
             }
-
             // if currently checking other domains contain the wide domain,
             // remove currently checked domain from wider domains set as it is redundant
             if (otherDomains.includes(wideDomain)) {
@@ -100,10 +89,14 @@ const optimizeDomainBlockingRules = (lines) => {
             }
         });
     });
-
-    const optimizedDomainBlockingRules = Array.from(widerDomains).map(addRuleMarkers);
-
-    return resultLines.concat(optimizedDomainBlockingRules);
+    // return lines in the order they were given
+    return lines.filter((line) => {
+        if (!shouldOptimize(line)) {
+            return true;
+        }
+        const domain = removeRuleMarkers(line);
+        return widerDomains.has(domain);
+    });
 };
 
 module.exports = {
