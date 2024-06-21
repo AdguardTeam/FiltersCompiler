@@ -34,7 +34,14 @@ optimization.disableOptimization();
 describe('Test builder', () => {
     beforeAll(async () => {
         expect(builder).toBeTruthy();
+
         const platformsConfig = await getPlatformsConfig();
+
+        // remove platformsDir if it exists
+        if (existsSync(platformsDir)) {
+            await fs.rmdir(platformsDir, { recursive: true });
+        }
+
         await builder.build(filtersDir, logFile, reportFile, platformsDir, platformsConfig);
     });
 
@@ -759,15 +766,15 @@ describe('Test builder', () => {
                 const metadataContent = await readFile(path.join(platformsDir, 'ios', 'filters.json'));
                 const metadata = JSON.parse(metadataContent);
                 expect(metadata).toBeTruthy();
-                expect(metadata.filters.some((f) => f.filterId === 4)).toBeFalsy();
+                expect(metadata.filters.some((f) => f.filterId === 4)).toBeTruthy();
             });
 
             it('platform/test2', async () => {
                 // check if Directives Filter was NOT built for test2 platform and metadata was NOT added to it's filters.json
                 const fullFilterContent = existsSync(path.join(platformsDir, 'test2', 'filters', '4.txt'));
-                expect(fullFilterContent).toBeTruthy();
+                expect(fullFilterContent).toBeFalsy();
                 const optimizedFilterContent = existsSync(path.join(platformsDir, 'test2', 'filters', '4_optimized.txt'));
-                expect(optimizedFilterContent).toBeTruthy();
+                expect(optimizedFilterContent).toBeFalsy();
 
                 const metadataContent = await readFile(path.join(platformsDir, 'test2', 'filters.json'));
                 const metadata = JSON.parse(metadataContent);
@@ -780,9 +787,9 @@ describe('Test builder', () => {
             it('platform/mac', async () => {
                 // check if Test Filter was NOT built for mac platform and metadata was NOT added to it's filters.json
                 const fullFilterContent = existsSync(path.join(platformsDir, 'mac', 'filters', '3.txt'));
-                expect(fullFilterContent).toBeTruthy();
+                expect(fullFilterContent).toBeFalsy();
                 const optimizedFilterContent = existsSync(path.join(platformsDir, 'mac', 'filters', '3_optimized.txt'));
-                expect(optimizedFilterContent).toBeTruthy();
+                expect(optimizedFilterContent).toBeFalsy();
 
                 const metadataContent = await readFile(path.join(platformsDir, 'mac', 'filters.json'));
                 const metadata = JSON.parse(metadataContent);
@@ -801,61 +808,6 @@ describe('Test builder', () => {
                 const metadata = JSON.parse(metadataContent);
                 expect(metadata).toBeTruthy();
                 expect(metadata.filters.some((f) => f.filterId === 3)).toBeTruthy();
-            });
-        });
-
-        describe('both platformsIncluded and platformsExcluded directives', () => {
-            // Test Platforms Filter should be built only for mac and chromium platforms only
-            // check src/test/resources/filters/filter_7_Platforms/metadata.json for details
-            it('platform/mac', async () => {
-                const fullFilterContent = existsSync(path.join(platformsDir, 'mac', 'filters', '7.txt'));
-                expect(fullFilterContent).toBeTruthy();
-                const optimizedFilterContent = existsSync(path.join(platformsDir, 'mac', 'filters', '7_optimized.txt'));
-                expect(optimizedFilterContent).toBeTruthy();
-
-                const metadataContent = await readFile(path.join(platformsDir, 'mac', 'filters.json'));
-                const metadata = JSON.parse(metadataContent);
-                expect(metadata).toBeTruthy();
-                expect(metadata.filters.some((f) => f.filterId === 7)).toBeTruthy();
-            });
-
-            it('platform/test2', async () => {
-                // chromium path is test2, it is specified in src/test/resources/platforms.json
-                const fullFilterContent = existsSync(path.join(platformsDir, 'test2', 'filters', '7.txt'));
-                expect(fullFilterContent).toBeTruthy();
-                const optimizedFilterContent = existsSync(path.join(platformsDir, 'test2', 'filters', '7_optimized.txt'));
-                expect(optimizedFilterContent).toBeTruthy();
-
-                const metadataContent = await readFile(path.join(platformsDir, 'test2', 'filters.json'));
-                const metadata = JSON.parse(metadataContent);
-                expect(metadata).toBeTruthy();
-                expect(metadata.filters.some((f) => f.filterId === 7)).toBeTruthy();
-            });
-
-            it('platform/ios', async () => {
-                // ios is specified in platformsIncluded
-                // but it is also specified in platformsExcluded, so no build for ios
-                const fullFilterContent = existsSync(path.join(platformsDir, 'ios', 'filters', '7.txt'));
-                expect(fullFilterContent).toBeTruthy();
-                const optimizedFilterContent = existsSync(path.join(platformsDir, 'ios', 'filters', '7_optimized.txt'));
-                expect(optimizedFilterContent).toBeTruthy();
-
-                const metadataContent = await readFile(path.join(platformsDir, 'ios', 'filters.json'));
-                const metadata = JSON.parse(metadataContent);
-                expect(metadata).toBeTruthy();
-                expect(metadata.filters.some((f) => f.filterId === 7)).toBeFalsy();
-            });
-
-            it('platform/test', async () => {
-                const fullFilterContent = existsSync(path.join(platformsDir, 'test', 'filters', '7.txt'));
-                expect(fullFilterContent).toBeTruthy();
-                const optimizedFilterContent = existsSync(path.join(platformsDir, 'test', 'filters', '7_optimized.txt'));
-                expect(optimizedFilterContent).toBeTruthy();
-
-                const metadataContent = await readFile(path.join(platformsDir, 'test', 'filters.json'));
-                const metadata = JSON.parse(metadataContent);
-                expect(metadata).toBeTruthy();
-                expect(metadata.filters.some((f) => f.filterId === 7)).toBeFalsy();
             });
         });
 
@@ -1046,5 +998,51 @@ describe('check include directive function', () => {
         await expect(
             builder.include(path.dirname(__filename), actual, []),
         ).rejects.toThrow(/Trust level ignoring option is not supported for external includes/);
+    });
+});
+
+describe('apply platformsExcluded directive during limited filters list build', () => {
+    beforeAll(async () => {
+        expect(builder).toBeTruthy();
+        const platformsConfig = await getPlatformsConfig();
+
+        // remove platformsDir if it exists
+        if (existsSync(platformsDir)) {
+            fs.rmdir(platformsDir, { recursive: true });
+        }
+
+        const filtersToBuild = [2, 3];
+        await builder.build(filtersDir, logFile, reportFile, platformsDir, platformsConfig, filtersToBuild);
+    });
+
+    // check that filter 2 and 4 are built for mac platform
+    // but filter 3 should be excluded
+    it('platform/mac', async () => {
+        const filterContent2 = existsSync(path.join(platformsDir, 'mac', 'filters', '2.txt'));
+        expect(filterContent2).toBeTruthy();
+        const filterContent3 = existsSync(path.join(platformsDir, 'mac', 'filters', '3.txt'));
+        expect(filterContent3).toBeFalsy();
+
+        // check the same for the metadata
+        const metadataContent = await readFile(path.join(platformsDir, 'mac', 'filters.json'));
+        const metadata = JSON.parse(metadataContent);
+        expect(metadata).toBeTruthy();
+        expect(metadata.filters.some((f) => f.filterId === 2)).toBeTruthy();
+        expect(metadata.filters.some((f) => f.filterId === 3)).toBeFalsy();
+    });
+
+    // at the same time all filters should be built a platform which is not excluded
+    it('platform/edge', async () => {
+        const filterContent2 = existsSync(path.join(platformsDir, 'edge', 'filters', '2.txt'));
+        expect(filterContent2).toBeTruthy();
+        const filterContent3 = existsSync(path.join(platformsDir, 'edge', 'filters', '3.txt'));
+        expect(filterContent3).toBeTruthy();
+
+        // check the same for the metadata
+        const metadataContent = await readFile(path.join(platformsDir, 'edge', 'filters.json'));
+        const metadata = JSON.parse(metadataContent);
+        expect(metadata).toBeTruthy();
+        expect(metadata.filters.some((f) => f.filterId === 2)).toBeTruthy();
+        expect(metadata.filters.some((f) => f.filterId === 3)).toBeTruthy();
     });
 });

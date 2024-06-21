@@ -12,6 +12,5 @@
     "purpose:ads", "lang:en", "lang:pl"
   ],
   "trustLevel": "low",
-  "platformsIncluded": ["mac", "ios", "chromium"],
-  "platformsExcluded": ["ios"]
+  "platformsIncluded": ["mac", "ios", "chromium"]
 }

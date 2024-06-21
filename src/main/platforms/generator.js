@@ -17,7 +17,7 @@ module.exports = (() => {
     const { FiltersDownloader } = require('@adguard/filters-downloader');
 
     const RULES_SEPARATOR = '\r\n';
-    const filterIdsPool = [];
+    let filterIdsPool = [];
     const metadataFilterIdsPool = [];
 
     const OPTIMIZED_PLATFORMS_LIST = ['ext_safari', 'android', 'ios'];
@@ -713,7 +713,7 @@ module.exports = (() => {
      * @param filterDir
      * @returns {null}
      */
-    const loadFilterMetadata = function (filterDir) {
+    const loadFilterMetadata = function (filterDir, whitelist, blacklist) {
         const metadataFilePath = path.join(filterDir, metadataFile);
         const metadataString = readFile(metadataFilePath);
         if (!metadataString) {
@@ -734,7 +734,13 @@ module.exports = (() => {
         result.timeAdded = moment(result.timeAdded).format('YYYY-MM-DDTHH:mm:ssZZ');
         delete result.disabled;
 
-        checkFilterId(metadataFilterIdsPool, result.filterId);
+        const { filterId } = result;
+        if (
+            (whitelist && whitelist.includes(filterId))
+            || (blacklist && !blacklist.includes(filterId))
+        ) {
+            checkFilterId(metadataFilterIdsPool, filterId);
+        }
 
         return result;
     };
@@ -853,6 +859,41 @@ module.exports = (() => {
     };
 
     /**
+     * Checks whether the filter should be built for the specified platform.
+     *
+     * @param {object} metadata Filter metadata.
+     * @param {string} platform Platform.
+     *
+     * @returns True if
+     * - both `platformsIncluded` and `platformsExcluded` properties are not defined in the `metadata`,
+     * - `platformsExcluded` does not contain the specified `platform`,
+     * - `platformsIncluded` contains the specified `platform`.
+     *
+     * @throws An error if both `platformsIncluded` and `platformsExcluded` are defined.
+     */
+    const shouldBuildFilterForPlatform = (metadata, platform) => {
+        const { filterId, platformsExcluded, platformsIncluded } = metadata;
+
+        if (platformsExcluded && platformsIncluded) {
+            let errorMessage = 'Both platformsIncluded and platformsExcluded cannot be defined simultaneously';
+            if (filterId) {
+                errorMessage += ` for filter ${filterId}`;
+            }
+            throw new Error(errorMessage);
+        }
+
+        if (platformsExcluded && platformsExcluded.includes(platform)) {
+            return false;
+        }
+
+        if (!platformsIncluded) {
+            return true;
+        }
+
+        return platformsIncluded.includes(platform);
+    };
+
+    /**
      * Builds platforms for filter
      *
      * @param filterDir
@@ -885,6 +926,13 @@ module.exports = (() => {
         // eslint-disable-next-line guard-for-in,no-restricted-syntax
         for (const platform in platformPathsConfig) {
             const config = platformPathsConfig[platform];
+
+            if (!shouldBuildFilterForPlatform(metadata, config.platform)) {
+                // eslint-disable-next-line max-len
+                logger.info(`Filter ${filterId} skipped for platform '${config.platform}' due to platformsExcluded or platformsIncluded`);
+                continue;
+            }
+
             let rules = FiltersDownloader.resolveConditions(originalRules, config.defines);
 
             // handle includes after resolving conditions:
@@ -990,7 +1038,7 @@ module.exports = (() => {
                     // eslint-disable-next-line no-await-in-loop
                     await buildFilter(filterDir, platformsPath, whitelist, blacklist);
                     logger.info(`Building filter platforms: ${directory} done`);
-                    const filterMetadata = loadFilterMetadata(filterDir);
+                    const filterMetadata = loadFilterMetadata(filterDir, whitelist, blacklist);
                     filtersMetadata.push(filterMetadata);
                     if (isObsoleteFilter(filterMetadata)) {
                         obsoleteFiltersMetadata.push(filterMetadata);
@@ -1038,11 +1086,16 @@ module.exports = (() => {
 
         writeFiltersMetadata(platformsPath, filtersDir, filtersMetadata, obsoleteFiltersMetadata);
         writeLocalScriptRules(platformsPath);
+
+        // reset af the end
+        // TODO: find out better way to reset
+        filterIdsPool = [];
     };
 
     return {
         init,
         generate,
         sortMetadataFilters,
+        shouldBuildFilterForPlatform,
     };
 })();
