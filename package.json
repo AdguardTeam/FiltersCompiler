@@ -1,6 +1,6 @@
 {
   "name": "adguard-filters-compiler",
-  "version": "1.1.137",
+  "version": "1.1.138",
   "description": "AdGuard filters compiler",
   "homepage": "http://adguard.com",
   "main": "index.js",
