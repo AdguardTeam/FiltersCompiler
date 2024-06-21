@@ -146,6 +146,7 @@ module.exports = (() => {
             delete copy.tags;
             delete copy.timeAdded;
             delete copy.trustLevel;
+            delete copy.downloadUrl;
             result.filters.push(copy);
         }
 

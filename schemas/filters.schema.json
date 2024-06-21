@@ -108,6 +108,7 @@
           "displayNumber",
           "groupId",
           "subscriptionUrl",
+          "downloadUrl",
           "version",
           "timeUpdated",
           "languages",
@@ -197,6 +198,16 @@
             "default": "",
             "examples": [
               "https://easylist.to/easylist/easylist.txt"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "downloadUrl": {
+            "$id": "#/properties/filters/items/properties/downloadUrl",
+            "type": "string",
+            "title": "The download URL Schema",
+            "default": "",
+            "examples": [
+              "https://filters.adtidy.org/extension/safari/filters/1.txt"
             ],
             "pattern": "^(.*)$"
           },

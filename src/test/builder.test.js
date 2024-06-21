@@ -361,6 +361,7 @@ describe('Test builder', () => {
             expect(filtersMetadata.filters[0].description).toEqual('EasyList + AdGuard English filter. This filter is necessary for quality ad blocking.');
             expect(filtersMetadata.filters[0].timeAdded).toBeTruthy();
             expect(filtersMetadata.filters[0].homepage).toEqual('https://easylist.adblockplus.org/');
+            expect(filtersMetadata.filters[0].downloadUrl).toEqual('https://filters.adtidy.org/test/filters/2.txt');
             // expires value parsed from the filter metadata
             expect(filtersMetadata.filters[0].expires).toEqual(172800);
             expect(filtersMetadata.filters[0].displayNumber).toEqual(101);

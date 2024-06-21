@@ -20,6 +20,8 @@ module.exports = (() => {
     const filterIdsPool = [];
     const metadataFilterIdsPool = [];
 
+    const OPTIMIZED_PLATFORMS_LIST = ['ext_safari', 'android', 'ios'];
+
     const PLATFORM_FILTERS_DIR = 'filters';
     const FILTERS_METADATA_FILE_JSON = 'filters.json';
     const FILTERS_I18N_METADATA_FILE_JSON = 'filters_i18n.json';
@@ -364,15 +366,15 @@ module.exports = (() => {
     };
 
     /**
-     * Rewrites subscription urls for specified platform config
+     * Does several things with filters URLs:
+     * 1. Rewrites subscription urls for specified platform config
+     * 2. Adds downloadUrl field to the filter
      *
      * @param metadata
      * @param config
      */
-    const rewriteSubscriptionUrls = (metadata, config) => {
-        const OPTIMIZED_PLATFORMS = ['ext_safari', 'android', 'ios'];
-
-        const useOptimized = OPTIMIZED_PLATFORMS.indexOf(config.platform) >= 0;
+    const postProcessUrls = (metadata, config) => {
+        const useOptimized = OPTIMIZED_PLATFORMS_LIST.indexOf(config.platform) >= 0;
 
         const result = {};
 
@@ -380,14 +382,16 @@ module.exports = (() => {
         result.tags = metadata.tags.slice(0);
         result.filters = [];
 
+        const platformPath = config.path;
         // eslint-disable-next-line no-restricted-syntax
         for (const f of metadata.filters) {
-            const copy = { ...f };
+            const fileName = `${f.filterId}${useOptimized ? '_optimized' : ''}.txt`;
+            const downloadUrl = `${adguardFiltersServerUrl}${platformPath}/filters/${fileName}`;
+
+            const copy = { ...f, downloadUrl };
 
             if (copy.subscriptionUrl && copy.subscriptionUrl.startsWith(adguardFiltersServerUrl)) {
-                const fileName = `${copy.filterId}${useOptimized ? '_optimized' : ''}.txt`;
-                const platformPath = config.path;
-                copy.subscriptionUrl = `${adguardFiltersServerUrl}${platformPath}/filters/${fileName}`;
+                copy.subscriptionUrl = downloadUrl;
             }
 
             result.filters.push(copy);
@@ -595,7 +599,7 @@ module.exports = (() => {
                 filters: replacedExpiresFiltersMetadata,
             };
 
-            metadata = rewriteSubscriptionUrls(metadata, config);
+            metadata = postProcessUrls(metadata, config);
             metadata = removeRedundantFiltersMetadata(metadata, config.platform);
 
             if (platform === 'MAC') {
