@@ -767,6 +767,12 @@ describe('Test builder', () => {
                 const metadata = JSON.parse(metadataContent);
                 expect(metadata).toBeTruthy();
                 expect(metadata.filters.some((f) => f.filterId === 4)).toBeTruthy();
+
+                const i18nMetadataContent = await readFile(path.join(platformsDir, 'ios', 'filters_i18n.json'));
+                const i18nMetadata = JSON.parse(i18nMetadataContent);
+                expect(i18nMetadata).toBeTruthy();
+                const localizedFilterIds = Object.keys(i18nMetadata.filters);
+                expect(localizedFilterIds.includes('4')).toBeTruthy();
             });
 
             it('platform/test2', async () => {
@@ -780,6 +786,12 @@ describe('Test builder', () => {
                 const metadata = JSON.parse(metadataContent);
                 expect(metadata).toBeTruthy();
                 expect(metadata.filters.some((f) => f.filterId === 4)).toBeFalsy();
+
+                const i18nMetadataContent = await readFile(path.join(platformsDir, 'test2', 'filters_i18n.json'));
+                const i18nMetadata = JSON.parse(i18nMetadataContent);
+                expect(i18nMetadata).toBeTruthy();
+                const localizedFilterIds = Object.keys(i18nMetadata.filters);
+                expect(localizedFilterIds.includes('4')).toBeFalsy();
             });
         });
 
@@ -794,7 +806,16 @@ describe('Test builder', () => {
                 const metadataContent = await readFile(path.join(platformsDir, 'mac', 'filters.json'));
                 const metadata = JSON.parse(metadataContent);
                 expect(metadata).toBeTruthy();
+                expect(metadata.filters.some((f) => f.filterId === 2)).toBeTruthy();
                 expect(metadata.filters.some((f) => f.filterId === 3)).toBeFalsy();
+
+                // check the same for translations metadata
+                const i18nMetadataContent = await readFile(path.join(platformsDir, 'mac', 'filters_i18n.json'));
+                const i18nMetadata = JSON.parse(i18nMetadataContent);
+                expect(i18nMetadata).toBeTruthy();
+                const localizedFilterIds = Object.keys(i18nMetadata.filters);
+                expect(localizedFilterIds.includes('2')).toBeTruthy();
+                expect(localizedFilterIds.includes('3')).toBeFalsy();
             });
 
             it('platform/ios', async () => {
@@ -1008,7 +1029,7 @@ describe('apply platformsExcluded directive during limited filters list build', 
 
         // remove platformsDir if it exists
         if (existsSync(platformsDir)) {
-            fs.rmdir(platformsDir, { recursive: true });
+            await fs.rmdir(platformsDir, { recursive: true });
         }
 
         const filtersToBuild = [2, 3];
@@ -1018,31 +1039,53 @@ describe('apply platformsExcluded directive during limited filters list build', 
     // check that filter 2 and 4 are built for mac platform
     // but filter 3 should be excluded
     it('platform/mac', async () => {
-        const filterContent2 = existsSync(path.join(platformsDir, 'mac', 'filters', '2.txt'));
+        const platform = 'mac';
+        const platformDirPath = path.join(platformsDir, platform);
+
+        const filterContent2 = existsSync(path.join(platformDirPath, 'filters', '2.txt'));
         expect(filterContent2).toBeTruthy();
-        const filterContent3 = existsSync(path.join(platformsDir, 'mac', 'filters', '3.txt'));
+        const filterContent3 = existsSync(path.join(platformDirPath, 'filters', '3.txt'));
         expect(filterContent3).toBeFalsy();
 
         // check the same for the metadata
-        const metadataContent = await readFile(path.join(platformsDir, 'mac', 'filters.json'));
+        const metadataContent = await readFile(path.join(platformDirPath, 'filters.json'));
         const metadata = JSON.parse(metadataContent);
         expect(metadata).toBeTruthy();
         expect(metadata.filters.some((f) => f.filterId === 2)).toBeTruthy();
         expect(metadata.filters.some((f) => f.filterId === 3)).toBeFalsy();
+
+        // check the same for translations metadata
+        const i18nMetadataContent = await readFile(path.join(platformDirPath, 'filters_i18n.json'));
+        const i18nMetadata = JSON.parse(i18nMetadataContent);
+        expect(i18nMetadata).toBeTruthy();
+        const localizedFilterIds = Object.keys(i18nMetadata.filters);
+        expect(localizedFilterIds.includes('2')).toBeTruthy();
+        expect(localizedFilterIds.includes('3')).toBeFalsy();
     });
 
     // at the same time all filters should be built a platform which is not excluded
     it('platform/edge', async () => {
-        const filterContent2 = existsSync(path.join(platformsDir, 'edge', 'filters', '2.txt'));
+        const platform = 'edge';
+        const platformDirPath = path.join(platformsDir, platform);
+
+        const filterContent2 = existsSync(path.join(platformDirPath, 'filters', '2.txt'));
         expect(filterContent2).toBeTruthy();
-        const filterContent3 = existsSync(path.join(platformsDir, 'edge', 'filters', '3.txt'));
+        const filterContent3 = existsSync(path.join(platformDirPath, 'filters', '3.txt'));
         expect(filterContent3).toBeTruthy();
 
         // check the same for the metadata
-        const metadataContent = await readFile(path.join(platformsDir, 'edge', 'filters.json'));
+        const metadataContent = await readFile(path.join(platformDirPath, 'filters.json'));
         const metadata = JSON.parse(metadataContent);
         expect(metadata).toBeTruthy();
         expect(metadata.filters.some((f) => f.filterId === 2)).toBeTruthy();
         expect(metadata.filters.some((f) => f.filterId === 3)).toBeTruthy();
+
+        // check the same for translations metadata
+        const i18nMetadataContent = await readFile(path.join(platformDirPath, 'filters_i18n.json'));
+        const i18nMetadata = JSON.parse(i18nMetadataContent);
+        expect(i18nMetadata).toBeTruthy();
+        const localizedFilterIds = Object.keys(i18nMetadata.filters);
+        expect(localizedFilterIds.includes('2')).toBeTruthy();
+        expect(localizedFilterIds.includes('3')).toBeTruthy();
     });
 });

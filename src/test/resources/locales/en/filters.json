@@ -4,8 +4,20 @@
 		"filter.1.description": "Adguard Russian filter. Filter that enables blocking of ads on websites in Russian."
 	},
 	{
-		"filter.2.name": "English filter",
-		"filter.2.description": "EasyList + Adguard English filter. Filter list that specifically removes adverts on English language websites."
+		"filter.2.name": "AdGuard Base filter",
+		"filter.2.description": "EasyList + AdGuard English filter. This filter is necessary for quality ad blocking."
+	},
+	{
+		"filter.3.name": "Test Filter",
+		"filter.3.description": "Test Filter description"
+	},
+	{
+		"filter.4.name": "Directives Filter",
+		"filter.4.description": "Directives Filter description."
+	},
+	{
+		"filter.5.name": "Trust Level Test Filter",
+		"filter.5.description": "Trust Level Test Filter description."
 	},
 	{
 		"filter.6.name": "Obsolete Test filter",

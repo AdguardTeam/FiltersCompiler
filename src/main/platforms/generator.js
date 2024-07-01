@@ -31,6 +31,13 @@ module.exports = (() => {
     const FILTERS_I18N_METADATA_FILE_JS = 'filters_i18n.js';
 
     /**
+     * Tag id for obsolete filters.
+     *
+     * @see {@link https://github.com/AdguardTeam/FiltersRegistry/blob/85f2e9f6f5f7c04797017e713dc5986b22a78840/tags/metadata.json#L184}
+     */
+    const OBSOLETE_TAG_ID = 46;
+
+    /**
      * From 1 to 99 we have AdGuard filters
      *
      * @type {number}
@@ -535,7 +542,6 @@ module.exports = (() => {
      * @return {object} result
      */
     const removeObsoleteFilters = (metadata) => {
-        const OBSOLETE_TAG_ID = 46;
         const result = { ...metadata };
         result.filters = metadata.filters.filter((filter) => !filter.tags.includes(OBSOLETE_TAG_ID));
         return result;
@@ -554,10 +560,45 @@ module.exports = (() => {
     };
 
     /**
+     * Checks whether the filter should be built for the specified platform.
+     *
+     * @param {object} metadata Filter metadata.
+     * @param {string} platform Platform.
+     *
+     * @returns True if
+     * - both `platformsIncluded` and `platformsExcluded` properties are not defined in the `metadata`,
+     * - `platformsExcluded` does not contain the specified `platform`,
+     * - `platformsIncluded` contains the specified `platform`.
+     *
+     * @throws An error if both `platformsIncluded` and `platformsExcluded` are defined.
+     */
+    const shouldBuildFilterForPlatform = (metadata, platform) => {
+        const { filterId, platformsExcluded, platformsIncluded } = metadata;
+
+        if (platformsExcluded && platformsIncluded) {
+            let errorMessage = 'Both platformsIncluded and platformsExcluded cannot be defined simultaneously';
+            if (filterId) {
+                errorMessage += ` for filter ${filterId}`;
+            }
+            throw new Error(errorMessage);
+        }
+
+        if (platformsExcluded && platformsExcluded.includes(platform)) {
+            return false;
+        }
+
+        if (!platformsIncluded) {
+            return true;
+        }
+
+        return platformsIncluded.includes(platform);
+    };
+
+    /**
      * Writes metadata files
      * @param {string} platformsPath
      * @param {string} filtersDir
-     * @param {array} filtersMetadata
+     * @param {object[]} filtersMetadata Array of filter metadata objects
      * @param {array} obsoleteFilters
      */
     const writeFiltersMetadata = function (platformsPath, filtersDir, filtersMetadata, obsoleteFilters) {
@@ -617,12 +658,23 @@ module.exports = (() => {
             const filtersI18nFileJson = path.join(platformDir, FILTERS_I18N_METADATA_FILE_JSON);
             const filtersI18nFileJs = path.join(platformDir, FILTERS_I18N_METADATA_FILE_JS);
 
-            let localizedFilters = {};
-            if (platform === 'MAC') {
-                localizedFilters = { ...localizations.filters };
-            } else {
-                localizedFilters = excludeObsoleteFilters(localizations.filters, obsoleteFilters);
+            let localizedFilters = { ...localizations.filters };
+
+            filtersMetadata.forEach((metadata) => {
+                if (!shouldBuildFilterForPlatform(metadata, config.platform)) {
+                    const { filterId } = metadata;
+                    // eslint-disable-next-line max-len
+                    logger.info(`Adding localization for filter ${filterId} skipped for platform '${config.platform}' due to platformsExcluded or platformsIncluded`);
+                    delete localizedFilters[filterId];
+                }
+            });
+
+            // old MAC platform may not support absence some filters i18n metadata,
+            // for all other platforms we can exclude obsolete filters
+            if (platform !== 'MAC') {
+                localizedFilters = excludeObsoleteFilters(localizedFilters, obsoleteFilters);
             }
+
             const i18nMetadata = {
                 groups: localizations.groups,
                 tags: localizations.tags,
@@ -660,6 +712,9 @@ module.exports = (() => {
                 rules: [],
             };
 
+            // TODO: find a better way to iterate over ag filters
+            // because AdGuard Chinese filter has id 224
+            // https://github.com/AdguardTeam/FiltersRegistry/blob/master/filters/filter_224_Chinese/metadata.json
             for (let i = 1; i <= LAST_ADGUARD_FILTER_ID; i += 1) {
                 const filterRules = readFile(path.join(platformDir, PLATFORM_FILTERS_DIR, `${i}.txt`));
                 if (!filterRules) {
@@ -859,41 +914,6 @@ module.exports = (() => {
     };
 
     /**
-     * Checks whether the filter should be built for the specified platform.
-     *
-     * @param {object} metadata Filter metadata.
-     * @param {string} platform Platform.
-     *
-     * @returns True if
-     * - both `platformsIncluded` and `platformsExcluded` properties are not defined in the `metadata`,
-     * - `platformsExcluded` does not contain the specified `platform`,
-     * - `platformsIncluded` contains the specified `platform`.
-     *
-     * @throws An error if both `platformsIncluded` and `platformsExcluded` are defined.
-     */
-    const shouldBuildFilterForPlatform = (metadata, platform) => {
-        const { filterId, platformsExcluded, platformsIncluded } = metadata;
-
-        if (platformsExcluded && platformsIncluded) {
-            let errorMessage = 'Both platformsIncluded and platformsExcluded cannot be defined simultaneously';
-            if (filterId) {
-                errorMessage += ` for filter ${filterId}`;
-            }
-            throw new Error(errorMessage);
-        }
-
-        if (platformsExcluded && platformsExcluded.includes(platform)) {
-            return false;
-        }
-
-        if (!platformsIncluded) {
-            return true;
-        }
-
-        return platformsIncluded.includes(platform);
-    };
-
-    /**
      * Builds platforms for filter
      *
      * @param filterDir
@@ -929,7 +949,7 @@ module.exports = (() => {
 
             if (!shouldBuildFilterForPlatform(metadata, config.platform)) {
                 // eslint-disable-next-line max-len
-                logger.info(`Filter ${filterId} skipped for platform '${config.platform}' due to platformsExcluded or platformsIncluded`);
+                logger.info(`Build of filter ${filterId} skipped for platform '${config.platform}' due to platformsExcluded or platformsIncluded`);
                 continue;
             }
 

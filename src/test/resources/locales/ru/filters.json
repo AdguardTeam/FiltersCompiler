@@ -6,5 +6,17 @@
 	{
 		"filter.2.name": "Localized English filter",
 		"filter.2.description": "Localized EasyList + Adguard English filter. Filter list that specifically removes adverts on English language websites."
+	},
+	{
+		"filter.3.name": "Test Filter",
+		"filter.3.description": "Test Filter description"
+	},
+	{
+		"filter.4.name": "Directives Filter",
+		"filter.4.description": "Directives Filter description."
+	},
+	{
+		"filter.5.name": "Trust Level Test Filter",
+		"filter.5.description": "Trust Level Test Filter description."
 	}
 ]

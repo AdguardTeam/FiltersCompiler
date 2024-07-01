@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [v1.1.140] - 2024-07-01
+
+### Fixed
+
+- Adding filters i18n metadata due to `platformsIncluded` and `platformsExcluded`
+
+[v1.1.140]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.139...v1.1.140
+
+
 ## [v1.1.139] - 2024-06-21
 
 ### Added
