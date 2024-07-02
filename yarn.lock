@@ -25,20 +25,20 @@
     axios "1.6.2"
     crypto-js "^4.2.0"
 
-"@adguard/scriptlets@^1.10.25":
-  version "1.10.25"
-  resolved "https://registry.npmjs.org/@adguard/scriptlets/-/scriptlets-1.10.25.tgz"
-  integrity sha512-q5s7PZ0oIizmcYQa/UI++MxQ7Cb3pdy1K9VY7yj+wtJ/xevEo/nxSLhnU/ijhSMvlAdFlGEkY898munZNfCUYA==
+"@adguard/scriptlets@^1.11.1":
+  version "1.11.1"
+  resolved "https://registry.yarnpkg.com/@adguard/scriptlets/-/scriptlets-1.11.1.tgz#580d90546068df278f22d3e6af0887c608e1b6d2"
+  integrity sha512-HRDgDeHmYXEvplVec9ABOwV6Hwh9nN5E6rMSdb8yioPrHsj5orI5BQ2ABz+s2JgC9fjshauvk818jWTtDxX9aw==
   dependencies:
     "@babel/runtime" "^7.20.13"
     js-yaml "^3.13.1"
 
-"@adguard/tsurlfilter@2.2.19":
-  version "2.2.19"
-  resolved "https://registry.npmjs.org/@adguard/tsurlfilter/-/tsurlfilter-2.2.19.tgz"
-  integrity sha512-kt6hLQQ/RY5rf4cAnCEzKbePa9BeNjQoIc/S5Tjw/dsfOEgKixszLEbfN2Gfn/CbjBsYRWR9M5aCHGB1bt5Czg==
+"@adguard/tsurlfilter@2.2.20":
+  version "2.2.20"
+  resolved "https://registry.yarnpkg.com/@adguard/tsurlfilter/-/tsurlfilter-2.2.20.tgz#cc2a5a15fc2ee739148ff39c9019b961ad1c5f75"
+  integrity sha512-t4xyLkXGmMZgqiwe7aN9ZRuD1tN8f4luYBk5VCsdveSNFIzXNcoIDokglWw8c/HpUVrV48NeW8d0upgB1SE36Q==
   dependencies:
-    "@adguard/scriptlets" "^1.10.25"
+    "@adguard/scriptlets" "^1.11.1"
     cidr-tools "^6.4.1"
     commander "9.4.1"
     is-cidr "4.0.2"
