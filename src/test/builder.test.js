@@ -727,6 +727,16 @@ describe('Test builder', () => {
                 expect(elseLines.includes('ios_rule')).toBeFalsy();
                 expect(elseLines.includes('non_ios_rule')).toBeTruthy();
             });
+
+            it('filters4.txt - adguard_ext_chromium_mv3 constant for the if directive', async () => {
+                const ifContent = await readFile(path.join(platformsDir, 'chromium-mv3', 'filters', '4.txt'));
+                expect(ifContent).toBeTruthy();
+
+                const ifLines = ifContent.split(/\r?\n/);
+                expect(ifLines.length).toEqual(23);
+                expect(ifLines.includes('chrome_mv3_specific_rule')).toBeTruthy();
+                expect(ifLines.includes('ios_rule')).toBeFalsy();
+            });
         });
 
         describe('platformsIncluded directive', () => {

@@ -10,5 +10,11 @@
   "subscriptionUrl": "https://example.com/",
   "tags": [],
   "trustLevel": "full",
-  "platformsIncluded": ["mac", "ios", "ext_ublock", "ext_edge"]
+  "platformsIncluded": [
+    "mac",
+    "ios",
+    "ext_ublock",
+    "ext_edge",
+    "ext_chromium_mv3"
+  ]
 }

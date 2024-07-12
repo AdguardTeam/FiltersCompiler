@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [v1.1.142] - 2024-07-12
+
+### Changed
+
+- Used `adguard_ext_chromium_mv3` for `ext_chromium_mv3` platform in the platforms configuration
+  instead of `adguard_ext_chromium`
+- Updated [@adguard/filters-downloader] to v2.2.2
+- Updated [@adguard/scriptlets] to v1.11.6
+- Updated [@adguard/tsurlfilter] to v2.2.21
+
+[v1.1.142]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.141...v1.1.142
+
+
 ## [v1.1.141] - 2024-07-02
 
 ### Changed

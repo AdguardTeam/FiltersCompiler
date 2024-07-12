@@ -109,6 +109,18 @@
             "adguard_ext_chromium": true
         }
     },
+    "EXTENSION_CHROMIUM_MV3": {
+        "platform": "ext_chromium_mv3",
+        "path": "chromium-mv3",
+        "configuration": {
+            "removeRulePatterns": false,
+            "ignoreRuleHints": false
+        },
+        "defines": {
+            "adguard": true,
+            "adguard_ext_chromium_mv3": true
+        }
+    },
     "EXTENSION_EDGE": {
         "platform": "ext_edge",
         "path": "edge",
