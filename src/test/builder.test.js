@@ -952,6 +952,19 @@ describe('Test builder', () => {
                 });
             });
         });
+
+        it('remove Diff-Path header tag', async () => {
+            const filterContent = await readFile(path.join(platformsDir, 'test', 'filters', '13.txt'));
+            expect(filterContent).toBeTruthy();
+
+            const filterLines = filterContent.split(/\r?\n/);
+            expect(filterLines.length).toEqual(18);
+            // make sure that the needed filter has been built
+            expect(filterLines.includes('! Title: Remove Diff-Path Original list')).toBeTruthy();
+            expect(filterLines.includes('example.com##.original_filter_with_diff_path')).toBeTruthy();
+            // and there is no Diff-Path header tag
+            expect(filterLines.includes('! Diff-Path: patches/20240814180433418.patch#test')).toBeFalsy();
+        });
     });
 
     it('Builds lists', async () => {

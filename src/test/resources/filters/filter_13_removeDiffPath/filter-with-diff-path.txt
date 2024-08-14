@@ -1,0 +1,13 @@
+[Adblock Plus 2.0]
+! Version: 20240814180433418
+! id: test-123-456
+! Title: Remove Diff-Path Original list
+! Last modified: 14 Aug 2024 18:04:33 UTC+3
+! Diff-Path: patches/20240814180433418.patch#test
+! Diff-Expires: 60 minutes
+! Expires: 1 days (update frequency)
+!
+! Copyright: test
+! License: GPLv3 (https://github.com/abpvn/abpvn/blob/master/LICENSE)
+!
+example.com##.original_filter_with_diff_path

@@ -44,6 +44,11 @@ module.exports = (function () {
 
     const NOT_OPTIMIZED_HINT = '!+ NOT_OPTIMIZED';
 
+    /**
+     * Filter header tag for diff path which is needed for patch updates.
+     */
+    const DIFF_PATH_TAG = 'Diff-Path:';
+
     // TODO: Move include directive option functions to utils/builder-utils.js
 
     /**
@@ -483,6 +488,32 @@ module.exports = (function () {
     };
 
     /**
+     * Checks whether the line contain `Diff-Path` header tag.
+     *
+     * `Diff-Path` header tag should be removed from the rules
+     * because some third-party filters may contain it
+     * but @adguard/diff-builder does not support third-party patches.
+     * Anyway the `Diff-Path` header tag should be added by the diff-builder during patch building
+     * and should not be present in the filter file.
+     *
+     * @param {string} line Line to check.
+     *
+     * @returns {boolean} `true` if the line contains `Diff-Path` header tag, `false` otherwise.
+     */
+    const isDiffPathHeaderTag = (line) => {
+        // non-comment lines should be kept
+        if (
+            !line.startsWith(RuleMasks.MASK_COMMENT)
+            // ubo supports `#` for comments
+            && !line.startsWith(RuleMasks.MASK_HOST_FILE_COMMENT)
+        ) {
+            return false;
+        }
+
+        return line.includes(DIFF_PATH_TAG);
+    };
+
+    /**
      * @typedef {object} CompileResult
      * @property {string[]} lines Compiled rules.
      * @property {string[]} excluded Excluded rules.
@@ -549,6 +580,8 @@ module.exports = (function () {
                 }
             }
         }
+
+        result = result.filter((line) => !isDiffPathHeaderTag(line));
 
         const excludeFilePath = path.join(filterDir, EXCLUDE_FILE);
         result = exclude(result, excludeFilePath, excluded);
