@@ -11,6 +11,6 @@
   "tags": [
     "purpose:ads", "lang:en", "lang:pl"
   ],
-  "trustLevel": "low",
+  "trustLevel": "high",
   "platformsIncluded": ["mac", "ios", "chromium"]
 }

@@ -1,10 +1,12 @@
-||test1.ru
-||test2.ru
-||test3.ru
+||test1.com
+||test2.com
 !#safari_cb_affinity(security)
-||test4.ru
-||test5.ru
+||test3.com
 !#safari_cb_affinity
-||test6.ru
-||test7.ru
-
+||test4.com
+||test5.com
+!#safari_cb_affinity(advanced)
+||test6.com/ads.js$domain=example.com
+example.com#%#//scriptlet('set-constant', 'test123', '123')
+!#safari_cb_affinity
+||test7.com

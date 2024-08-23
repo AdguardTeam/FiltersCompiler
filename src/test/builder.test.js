@@ -432,7 +432,7 @@ describe('Test builder', () => {
                 'test-common-rule.com',
                 'test-common-1-rule.com',
                 '! some common rules could be places here',
-                '~nigma.ru,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]',
+                '~example.com,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]',
                 'excluded_platform',
                 '!+ NOT_OPTIMIZED',
                 'test-common-2-rule.com',
@@ -506,7 +506,7 @@ describe('Test builder', () => {
             const absentLines = [
                 'test-common-1-rule.com',
                 '! some common rules could be places here',
-                '~nigma.ru,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]',
+                '~example.com,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]',
                 // $webrtc is deprecated
                 '||example.com^$webrtc,domain=example.org',
             ];
@@ -526,7 +526,7 @@ describe('Test builder', () => {
                 'test-common-rule.com',
                 'test-common-1-rule.com',
                 '! some common rules could be places here',
-                '~nigma.ru,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]',
+                '~example.com,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]',
                 'excluded_platform',
                 'test_domain#%#testScript();',
             ];
@@ -839,6 +839,30 @@ describe('Test builder', () => {
                 const metadata = JSON.parse(metadataContent);
                 expect(metadata).toBeTruthy();
                 expect(metadata.filters.some((f) => f.filterId === 3)).toBeTruthy();
+            });
+        });
+
+        describe('!#safari_cb_affinity directive — check order of builder rules', () => {
+            it('platform/ios', async () => {
+                const filterContent = await readFile(path.join(platformsDir, 'ios', 'filters', '7.txt'));
+                expect(filterContent).toBeTruthy();
+
+                const filterLines = filterContent.split(/\r?\n/);
+
+                const expectedSafariAffinityRules1 = [
+                    '!#safari_cb_affinity(security)',
+                    '||test3.com',
+                    '!#safari_cb_affinity',
+                ];
+                expect(filterLines).toEqual(expect.arrayContaining(expectedSafariAffinityRules1));
+
+                const expectedSafariAffinityRules2 = [
+                    '!#safari_cb_affinity(advanced)',
+                    '||test6.com/ads.js$domain=example.com',
+                    "example.com#%#//scriptlet('set-constant', 'test123', '123')",
+                    '!#safari_cb_affinity',
+                ];
+                expect(filterLines).toEqual(expect.arrayContaining(expectedSafariAffinityRules2));
             });
         });
 

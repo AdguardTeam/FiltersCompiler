@@ -4,7 +4,7 @@
 ||adserver.com^$third-party
 ||test.com/player/*.htm?autoplay=true&mute=true
 example.com#%#//scriptlet("set-constant", "ads", "false")
-test.ru##.twitter-follow-button
+test.com##.twitter-follow-button
 example.net#$?#.main-content { margin-top: 0!important; }
 test.com#%#AG_setConstant("ads", "false");
 example.com#$#h3 { color: green; }

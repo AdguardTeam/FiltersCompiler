@@ -2,28 +2,28 @@
 ! License: http://creativecommons.org/licenses/by-sa/3.0/
 !
 ! THIS FILTER HAS WRONG USAGE OF AFFINITY DIRECTIVE
-||test1.ru
+||test1.com
 !#safari_cb_affinity(security)
-||test2.ru
-||test3.ru
+||test2.com
+||test3.com
 !#safari_cb_affinity
-||test4.ru
-||test5.ru
+||test4.com
+||test5.com
 !#safari_cb_affinity(privacy)
-||test6.ru
-||test7.ru
-||test8.ru
-||test9.ru
-||test10.ru
-||test11.ru
-||test12.ru
+||test6.com
+||test7.com
+||test8.com
+||test9.com
+||test10.com
+||test11.com
+||test12.com
 !#safari_cb_affinity(social)
-||test13.ru
-||test14.ru
-||test15.ru
+||test13.com
+||test14.com
+||test15.com
 !#safari_cb_affinity
-||test16.ru
-||test17.ru
+||test16.com
+||test17.com
 ! Some test rules
 ||test.com^
 ||example.com^$third-party

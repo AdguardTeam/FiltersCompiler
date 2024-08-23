@@ -94,7 +94,7 @@ describe('platforms filter', () => {
             '!+ NOT_OPTIMIZED',
             'not_optimized',
             '!#safari_cb_affinity(general)',
-            'some.affinity.ru#@#.ad-zone',
+            'some.affinity.com#@#.ad-zone',
             '!',
             '!#safari_cb_affinity',
         ];
@@ -110,7 +110,7 @@ describe('platforms filter', () => {
         expect(after.indexOf('###optimized')).toBeLessThan(0);
         expect(after.indexOf('not_optimized')).toBeGreaterThanOrEqual(0);
         expect(after.indexOf('!#safari_cb_affinity(general)')).toBeGreaterThanOrEqual(0);
-        expect(after.indexOf('some.affinity.ru#@#.ad-zone')).toBeGreaterThanOrEqual(0);
+        expect(after.indexOf('some.affinity.com#@#.ad-zone')).toBeGreaterThanOrEqual(0);
         expect(after.indexOf('!#safari_cb_affinity')).toBeGreaterThanOrEqual(0);
     });
 

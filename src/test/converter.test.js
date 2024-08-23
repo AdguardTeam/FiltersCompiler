@@ -75,7 +75,7 @@ describe('converter', () => {
     });
 
     it('keeps cosmetic rule as is', () => {
-        const source = 'ferra.ru##div[data-render-state] + div[class^="jsx-"][class$=" undefined"]';
+        const source = 'example.com##div[data-render-state] + div[class^="jsx-"][class$=" undefined"]';
         const expected = source;
 
         const c = converter.convertRulesToAdgSyntax([source]);
@@ -262,8 +262,8 @@ describe('converter', () => {
         expected = 'spiele-umsonst.de##.left > div.right[style$="~third-partyx;"]';
         expect(actual[0]).not.toBe(expected);
 
-        actual = converter.convertRulesToAdgSyntax(['realadmin.ru#$#.adsbygoogle { height: 1px!important; }']);
-        expected = 'realadmin.ru#$#.adsbygoogle { height: third-partyx!important; }';
+        actual = converter.convertRulesToAdgSyntax(['example.com#$#.adsbygoogle { height: 1px!important; }']);
+        expected = 'example.com#$#.adsbygoogle { height: third-partyx!important; }';
         expect(actual[0]).not.toBe(expected);
     });
 
@@ -396,8 +396,8 @@ describe('converter', () => {
         expected = '||test.com^$elemhide';
         expect(actual[0]).toBe(expected);
 
-        actual = converter.convertRulesToAdgSyntax(['@@||ghide.ehide.ru^$ehide']);
-        expected = '@@||ghide.ehide.ru^$elemhide';
+        actual = converter.convertRulesToAdgSyntax(['@@||ghide.ehide.com^$ehide']);
+        expected = '@@||ghide.ehide.com^$elemhide';
         expect(actual[0]).toBe(expected);
 
         actual = converter.convertRulesToAdgSyntax(['||ghide.com/ghide^$elemhide']);
@@ -584,16 +584,16 @@ describe('converter', () => {
     it('converts cosmetic rule modifiers to UBlock syntax', () => {
         const rules = [
             {
-                source: '[$path=/page]ya.ru##p',
-                expected: 'ya.ru##:matches-path(/page)p',
+                source: '[$path=/page]example.com##p',
+                expected: 'example.com##:matches-path(/page)p',
             },
             {
-                source: '[$path=/page]ya.ru#@#p',
-                expected: 'ya.ru#@#:matches-path(/page)p',
+                source: '[$path=/page]example.com#@#p',
+                expected: 'example.com#@#:matches-path(/page)p',
             },
             {
-                source: String.raw`[$path=/\\/(sub1|sub2)\\/page\\.html/]ya.ru##p`,
-                expected: String.raw`ya.ru##:matches-path(/\/(sub1|sub2)\/page\.html/)p`,
+                source: String.raw`[$path=/\\/(sub1|sub2)\\/page\\.html/]example.com##p`,
+                expected: String.raw`example.com##:matches-path(/\/(sub1|sub2)\/page\.html/)p`,
             },
             {
                 source: '[$path=/sexykpopidol]blog.livedoor.jp###containerWrap > #container > .blog-title-outer + #content.hfeed',

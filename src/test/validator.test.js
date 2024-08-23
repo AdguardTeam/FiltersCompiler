@@ -107,7 +107,7 @@ describe('validator', () => {
     it('validate incorrect rules', () => {
         const rules = [
             '||example.com##.div',
-            'test$domain=yandex.ru,google.com',
+            'test$domain=yandex.com,google.com',
             ',example.com,example.org##[src*="base64"]',
         ];
         expect(validator.validate(rules)).toHaveLength(0);
@@ -231,9 +231,9 @@ describe('validator', () => {
 
     describe('validate html filtering rules', () => {
         const validRules = [
-            '~nigma.ru,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]',
-            '~nigma.ru,google.com$$div[id=\"ad_text\"][tag-content=\"teas\"\"ernet\"][max-length=\"500\"][min-length=\"50\"][wildcard=\"*.adriver.*\"][parent-search-level=\"15\"][parent-elements=\"td,table\"]',
-            '~nigma.ru,google.com$$div[id=\"ad_text\"][max-length=\"500000\"][min-length=\"50\"]',
+            '~example.com,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]',
+            '~example.com,google.com$$div[id=\"ad_text\"][tag-content=\"teas\"\"ernet\"][max-length=\"500\"][min-length=\"50\"][wildcard=\"*.adriver.*\"][parent-search-level=\"15\"][parent-elements=\"td,table\"]',
+            '~example.com,google.com$$div[id=\"ad_text\"][max-length=\"500000\"][min-length=\"50\"]',
         ];
         test.each(validRules)('%s', (rule) => {
             expect(validator.validate([rule])).toHaveLength(1);
@@ -527,10 +527,10 @@ describe('validator', () => {
             rule = '||vast.kinogo.by/code/video-steam/?id=$redirect=noopvast-2.0';
             expect(redirects.isValidAdgRedirectRule(rule)).toBeTruthy();
 
-            rule = '||strm.yandex.ru/get/$script,redirect=noopvast-2.0,domain=kinopoisk.ru';
+            rule = '||strm.yandex.com/get/$script,redirect=noopvast-2.0,domain=kinopoisk.com';
             expect(redirects.isValidAdgRedirectRule(rule)).toBeTruthy();
 
-            rule = '||strm.yandex.ru/get/$script,redirect=noopvast-2.0,domain=kinopoisk.ru';
+            rule = '||strm.yandex.com/get/$script,redirect=noopvast-2.0,domain=kinopoisk.com';
             expect(redirects.isValidAdgRedirectRule(rule)).toBeTruthy();
 
             rule = '||googletagmanager.com/gtm.js$script,redirect=googletagmanager-gtm,domain=morningstar.nl';
@@ -660,101 +660,115 @@ describe('validator', () => {
         });
     });
 
-    it('checkAffinityDirectives test', () => {
+    it('safari_cb_affinity directive test', () => {
         let rules = [
-            '||test1.ru',
+            '||test1.com',
             '!#safari_cb_affinity(security)',
-            '||test2.ru',
-            '||test3.ru',
+            '||test2.com',
+            '||test3.com',
             '!#safari_cb_affinity',
-            '||test4.ru',
-            '||test5.ru',
+            '||test4.com',
+            '||test5.com',
             '!#safari_cb_affinity(privacy)',
-            '||test6.ru',
-            '||test7.ru',
-            '||test8.ru',
+            '||test6.com',
+            '||test7.com',
+            '||test8.com',
             '!#safari_cb_affinity',
-            '||test9.ru',
-            '||test10.ru',
-            '||test11.ru',
-            '||test12.ru',
+            '||test9.com',
+            '||test10.com',
+            '||test11.com',
+            '||test12.com',
             '!#safari_cb_affinity(social)',
-            '||test13.ru',
-            '||test14.ru',
-            '||test15.ru',
+            '||test13.com',
+            '||test14.com',
+            '||test15.com',
             '!#safari_cb_affinity',
-            '||test16.ru',
-            '||test17.ru',
+            '||test16.com',
+            '||test17.com',
         ];
         expect(validator.checkAffinityDirectives(rules)).toBeTruthy();
 
         rules = [
-            '||test1.ru',
+            '||test1.com',
             '!#safari_cb_affinity(security)',
-            '||test2.ru',
-            '||test3.ru',
+            '||test2.com',
+            '||test3.com',
             '!#safari_cb_affinity(privacy)',
-            '||test4.ru',
-            '||test5.ru',
+            '||test4.com',
+            '||test5.com',
             '!#safari_cb_affinity',
-            '||test6.ru',
-            '||test7.ru',
-            '||test8.ru',
+            '||test6.com',
+            '||test7.com',
+            '||test8.com',
             '!#safari_cb_affinity',
         ];
         expect(validator.checkAffinityDirectives(rules)).toBeTruthy();
 
+        // 'advanced' value for the directive
         rules = [
-            '||test1.ru',
-            '||test2.ru',
+            '!#safari_cb_affinity(advanced)',
+            '||test1.com',
+            '||test2.com',
             '!#safari_cb_affinity',
-            '||test3.ru',
-            '||test4.ru',
-            '||test5.ru',
+            '||test3.com',
+            '!#safari_cb_affinity(general,advanced)',
+            '||test4.com',
+            '||test5.com',
+            '!#safari_cb_affinity',
+            '||test6.com',
+        ];
+
+        rules = [
+            '||test1.com',
+            '||test2.com',
+            '!#safari_cb_affinity',
+            '||test3.com',
+            '||test4.com',
+            '||test5.com',
             '!#safari_cb_affinity(privacy)',
         ];
         expect(validator.checkAffinityDirectives(rules)).toBeFalsy();
 
         rules = [
-            '||test1.ru',
+            '||test1.com',
             '!#safari_cb_affinity(security)',
-            '||test2.ru',
-            '||test3.ru',
+            '||test2.com',
+            '||test3.com',
             '!#safari_cb_affinity',
-            '||test4.ru',
-            '||test5.ru',
+            '||test4.com',
+            '||test5.com',
             '!#safari_cb_affinity(privacy)',
-            '||test6.ru',
-            '||test7.ru',
+            '||test6.com',
+            '||test7.com',
         ];
         expect(validator.checkAffinityDirectives(rules)).toBeFalsy();
 
         rules = [
-            '||test1.ru',
-            '||test2.ru',
+            '||test1.com',
+            '||test2.com',
             '!#safari_cb_affinity',
-            '||test3.ru',
+            '||test3.com',
             '!#safari_cb_affinity',
-            '||test4.ru',
-            '||test5.ru',
+            '||test4.com',
+            '||test5.com',
             '!#safari_cb_affinity(privacy)',
-            '||test6.ru',
+            '||test6.com',
         ];
         expect(validator.checkAffinityDirectives(rules)).toBeFalsy();
 
         rules = [
-            '||test1.ru',
-            '||test2.ru',
+            '||test1.com',
+            '||test2.com',
             '!#safari_cb_affinity',
-            '||test3.ru',
+            '||test3.com',
         ];
         expect(validator.checkAffinityDirectives(rules)).toBeFalsy();
 
         rules = [
             '!#safari_cb_affinity(social)',
-            '||test1.ru',
-            '||test2.ru',
-            '||test3.ru',
+            '||test1.com',
+            '||test2.com',
+            '||test3.com',
         ];
         expect(validator.checkAffinityDirectives(rules)).toBeFalsy();
     });
