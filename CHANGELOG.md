@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.1.146] - 2024-08-29
+
+### Added
+
+- `deprecated` property to the built filters metadata
+
+[v1.1.146]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.144...v1.1.146
+
 ## [v1.1.144] - 2024-08-14
 
 ### Fixed

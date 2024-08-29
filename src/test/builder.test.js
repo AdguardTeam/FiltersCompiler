@@ -384,6 +384,11 @@ describe('Test builder', () => {
             expect(filtersMetadata.filters[0].tags[0]).toEqual(1);
             expect(filtersMetadata.filters[0].trustLevel).toEqual('full');
 
+            // Deprecated
+            filtersMetadata.filters.forEach((filter) => {
+                expect(filter.deprecated).toBe(filter.filterId === 2);
+            });
+
             // Obsolete Filter test
             expect(filtersMetadata.filters.some((filter) => filter.filterId === 6)).toBeFalsy();
             expect(filtersMetadata.filters.some((filter) => filter.name === 'Obsolete Test Filter')).toBeFalsy();

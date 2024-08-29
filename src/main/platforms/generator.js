@@ -338,17 +338,24 @@ module.exports = (() => {
     };
 
     /**
-     * In case of backward compatibility
-     * Adds 'languages' metadata field parsed from 'lang:' tags
+     * First step of processing filters metadata
      *
-     * @param rawFilters
+     * @param filtersMetadata
      */
-    const parseLangTags = function (rawFilters) {
+    const processFiltersFromMetadata = function (filtersMetadata) {
         // do not mutate input parameters
         const filters = [];
         // eslint-disable-next-line no-restricted-syntax
-        for (const filter of rawFilters) {
-            const newFilter = { ...filter };
+        for (const filter of filtersMetadata) {
+            const newFilter = {
+                ...filter,
+                deprecated: Boolean(filter.deprecated),
+            };
+
+            /**
+             * In case of backward compatibility
+             * Adds 'languages' metadata field parsed from 'lang:' tags
+             */
             if (newFilter.tags) {
                 const filterLanguages = [];
                 let hasRecommended = false;
@@ -366,6 +373,7 @@ module.exports = (() => {
                 // Languages will be added for recommended filters only
                 newFilter.languages = hasRecommended ? filterLanguages : [];
             }
+
             filters.push(newFilter);
         }
 
@@ -617,7 +625,7 @@ module.exports = (() => {
         }
 
         // do not mutate input parameters
-        const parsedLangTagsFiltersMetadata = parseLangTags(filtersMetadata);
+        const parsedLangTagsFiltersMetadata = processFiltersFromMetadata(filtersMetadata);
         const replacedTagKeywordsFiltersMetadata = replaceTagKeywords(parsedLangTagsFiltersMetadata, tags);
 
         const localizations = loadLocales(path.join(filtersDir, '../locales'));

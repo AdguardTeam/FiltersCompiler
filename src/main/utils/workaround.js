@@ -147,6 +147,8 @@ module.exports = (() => {
             delete copy.timeAdded;
             delete copy.trustLevel;
             delete copy.downloadUrl;
+            delete copy.deprecated;
+
             result.filters.push(copy);
         }
 
