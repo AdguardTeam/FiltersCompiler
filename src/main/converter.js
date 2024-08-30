@@ -1,4 +1,4 @@
-const { RuleConverter } = require('@adguard/tsurlfilter');
+const { RuleConverter, RuleParser } = require('@adguard/agtree');
 const scriptlets = require('@adguard/scriptlets');
 
 const logger = require('./utils/log');
@@ -31,14 +31,18 @@ const convertRulesToAdgSyntax = function (rulesList, excluded) {
     for (let i = 0; i < rulesList.length; i += 1) {
         const rule = rulesList[i];
         try {
-            const converted = RuleConverter.convertRule(rule, { ignoreAllModifier: true });
-            result.push(...converted);
-            if (converted && converted[0] !== rule) {
-                const message = `Rule "${rule}" converted to: "${[...converted]}"`;
+            const ruleNode = RuleParser.parse(rule);
+            const convertedNode = RuleConverter.convertToAdg(ruleNode);
+            const convertedRules = convertedNode.result.map((r) => RuleParser.generate(r));
+
+            result.push(...convertedRules);
+
+            if (convertedNode.isConverted && convertedRules[0] !== rule) {
+                const message = `Rule "${rule}" converted to: "${[...convertedRules]}"`;
                 excludeRule(rule, excluded, message);
             }
         } catch (e) {
-            const message = `Unable to convert rule to AdGuard syntax: ${rule}`;
+            const message = `Unable to convert rule to AdGuard syntax: "${rule}" due to error: ${e.message}`;
             logger.log(message);
             excludeRule(rule, excluded, message);
         }

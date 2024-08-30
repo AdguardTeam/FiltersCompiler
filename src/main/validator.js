@@ -1,9 +1,9 @@
+const { RuleConverter, RuleParser, CommentRuleParser } = require('@adguard/agtree');
 const {
     RuleValidator,
     RuleFactory,
     CosmeticRuleType,
     CosmeticRule,
-    RuleConverter,
 } = require('@adguard/tsurlfilter');
 
 const logger = require('./utils/log');
@@ -41,7 +41,7 @@ const validate = function (list, excluded, invalid = [], filterName) { // eslint
     }
 
     return list.filter((ruleText) => {
-        if (RuleFactory.isComment(ruleText)) {
+        if (CommentRuleParser.isCommentRule(ruleText)) {
             return true;
         }
 
@@ -50,7 +50,9 @@ const validate = function (list, excluded, invalid = [], filterName) { // eslint
         // unsupported UBO HTML rules throws error while conversion
         // https://github.com/AdguardTeam/tsurlfilter/issues/55
         try {
-            convertedRules = RuleConverter.convertRule(ruleText);
+            const ruleNode = RuleParser.parse(rule);
+            const convertedNode = RuleConverter.convertToAdg(ruleNode);
+            convertedRules = convertedNode.result.map((r) => RuleParser.generate(r));
         } catch (e) {
             logger.error(`Invalid rule in ${filterName}: ${ruleText}`);
             excludeRule(excluded, e.message, ruleText);
@@ -77,6 +79,8 @@ const validate = function (list, excluded, invalid = [], filterName) { // eslint
                 return false;
             }
 
+            // TODO: improve validation since agtree parsing is used
+            // so RuleConverter.convertToAdg() returns `result` array with non-string rule nodes
             const rule = RuleFactory.createRule(convertedRuleText);
 
             // It is impossible to bundle jsdom into tsurlfilter, so we check if rules are valid in the compiler

@@ -189,7 +189,7 @@ where:
 
         Result of optimization:
 
-         ``` adblock
+        ``` adblock
         ||example.com^
         ||domain.com^
         ||test.com^$script
