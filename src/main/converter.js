@@ -37,7 +37,7 @@ const convertRulesToAdgSyntax = function (rulesList, excluded) {
 
             result.push(...convertedRules);
 
-            if (convertedNode.isConverted && convertedRules[0] !== rule) {
+            if (convertedNode.isConverted) {
                 const message = `Rule "${rule}" converted to: "${[...convertedRules]}"`;
                 excludeRule(rule, excluded, message);
             }
