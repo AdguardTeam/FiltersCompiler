@@ -12,7 +12,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
-    "@adguard/agtree": "^2.0.0",
+    "@adguard/agtree": "^2.1.1",
     "@adguard/extended-css": "^2.0.56",
     "@adguard/filters-downloader": "^2.2.2",
     "@adguard/scriptlets": "^1.11.27",
