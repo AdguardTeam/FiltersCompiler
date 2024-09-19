@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@adguard/agtree@^2.1.1":
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/@adguard/agtree/-/agtree-2.1.1.tgz#dde2994237ed66fbfc2f814fb520364e2abfefcb"
-  integrity sha512-s5DeAJc52TJ/uz2lYWLbjuuX1XrxUVQ0y7TKEZB/V+rXy/LxfdHTzV20z7yCHLLN26R4M6beVB14gCND1Hr++w==
+"@adguard/agtree@^2.1.2":
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/@adguard/agtree/-/agtree-2.1.2.tgz#b9017566fb1b6a46882f6d5c68b899a1824a299f"
+  integrity sha512-4X7LsKMfQUo90TXVoZedHVjUS0zEDxAvMx0+JtYp2RwarmxVZYOIGygZPOoa6ihwUxUd3fmrsX0c6SQMldA+8Q==
   dependencies:
     "@adguard/css-tokenizer" "^1.1.1"
     clone-deep "^4.0.1"
@@ -53,12 +53,12 @@
     "@babel/runtime" "^7.20.13"
     js-yaml "^3.13.1"
 
-"@adguard/tsurlfilter@3.0.3":
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/@adguard/tsurlfilter/-/tsurlfilter-3.0.3.tgz#af7385a5c45a5614cc47be086208b15b4a21161b"
-  integrity sha512-HXqDhWDY93hESIWWNGXYjzPufKmOZOgeHBHsgTmputbUfIYq/957NNMXb5NVBYbVqVfNDJSEVnwwCwWMrOY68A==
+"@adguard/tsurlfilter@3.0.4":
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/@adguard/tsurlfilter/-/tsurlfilter-3.0.4.tgz#e67e5af6e26add4188b4b4934dc5cfed4ac7e5db"
+  integrity sha512-gQJ307W+/SlheJxTkb9Lv3B6HOcqt/grv8gsylbAcyHwrPAQ3+PQ8irgTXhwR4XnZKDc9tVuOopMlzXYgx8FNA==
   dependencies:
-    "@adguard/agtree" "^2.1.1"
+    "@adguard/agtree" "^2.1.2"
     "@adguard/css-tokenizer" "^1.1.1"
     "@adguard/scriptlets" "^1.11.27"
     cidr-tools "^6.4.1"

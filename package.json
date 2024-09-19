@@ -12,11 +12,11 @@
     "prepare": "husky install"
   },
   "dependencies": {
-    "@adguard/agtree": "^2.1.1",
+    "@adguard/agtree": "^2.1.2",
     "@adguard/extended-css": "^2.0.56",
     "@adguard/filters-downloader": "^2.2.2",
     "@adguard/scriptlets": "^1.11.27",
-    "@adguard/tsurlfilter": "3.0.3",
+    "@adguard/tsurlfilter": "3.0.4",
     "ajv": "^8.11.0",
     "child_process": ">=1.0.2",
     "jsdom": "^21.1.1",

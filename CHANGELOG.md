@@ -9,12 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Added
 
-- [@adguard/agtree] v2.1.1 for rules conversion and validation
+- [@adguard/agtree] v2.1.2 for rules conversion and validation
 
 ### Changed
 
 - Updated [@adguard/scriptlets] to v1.11.27
-- Updated [@adguard/tsurlfilter] to v3.0.3
+- Updated [@adguard/tsurlfilter] to v3.0.4
 
 [Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.146...HEAD
 
