@@ -51,8 +51,8 @@ const validate = function (list, excluded, invalid = [], filterName) { // eslint
         // https://github.com/AdguardTeam/tsurlfilter/issues/55
         try {
             const ruleNode = RuleParser.parse(rule);
-            const convertedNode = RuleConverter.convertToAdg(ruleNode);
-            convertedRules = convertedNode.result.map((r) => RuleParser.generate(r));
+            const conversionResult = RuleConverter.convertToAdg(ruleNode);
+            convertedRules = conversionResult.result.map((r) => RuleParser.generate(r));
         } catch (e) {
             logger.error(`Invalid rule in ${filterName}: ${ruleText}`);
             excludeRule(excluded, e.message, ruleText);

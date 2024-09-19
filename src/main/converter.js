@@ -32,12 +32,12 @@ const convertRulesToAdgSyntax = function (rulesList, excluded) {
         const rule = rulesList[i];
         try {
             const ruleNode = RuleParser.parse(rule);
-            const convertedNode = RuleConverter.convertToAdg(ruleNode);
-            const convertedRules = convertedNode.result.map((r) => RuleParser.generate(r));
+            const conversionResult = RuleConverter.convertToAdg(ruleNode);
+            const convertedRules = conversionResult.result.map((r) => RuleParser.generate(r));
 
             result.push(...convertedRules);
 
-            if (convertedNode.isConverted) {
+            if (conversionResult.isConverted) {
                 const message = `Rule "${rule}" converted to: "${[...convertedRules]}"`;
                 excludeRule(rule, excluded, message);
             }
