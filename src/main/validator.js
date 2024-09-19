@@ -60,7 +60,9 @@ const validate = function (list, excluded, invalid = [], filterName) { // eslint
             return false;
         }
 
-        if (convertedRules.length === 0) {
+        // optional chaining is needed for the length property because convertedRules can be undefined
+        // if RuleParser.parse() or RuleConverter.convertToAdg() throws an error
+        if (convertedRules?.length === 0) {
             return false;
         }
 
