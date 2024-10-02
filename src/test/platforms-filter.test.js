@@ -179,6 +179,46 @@ describe('platforms filter', () => {
         expect(after).toEqual(notMatchRules);
     });
 
+    it('Test removing `redirect-rule=` modifier', () => {
+        const config = {
+            'platform': 'test',
+            'path': 'hints',
+            'configuration': {
+                'removeRulePatterns': [
+                    '\\$redirect-rule=',
+                    ',redirect-rule=',
+                ],
+                'ignoreRuleHints': false,
+            },
+        };
+
+        const notMatchRules = [
+            '! Comment',
+            'example.com',
+            'example.com,content-examples.com###ad3',
+            '@@||example.com^$elemhide,content,jsinject',
+            '@@||example.com^$elemhide,jsinject,content',
+            '@@||content.com$stealth',
+            'example.com##.sidebar_list > .widget_text:has(a[title = "content"])',
+            '||dai.google.com/ondemand/hls/content/*.m3u8$hls=/redirector\.googlevideo\.com\/,domain=sbs.com.au',
+        ];
+        const matchRules = [
+            '||example.com/script.json$xmlhttprequest,redirect-rule=noopjson',
+            '||example.com/script.js$script,redirect-rule=noopjs',
+            '*$redirect-rule=noopjs,xmlhttprequest,domain=example.com',
+        ];
+
+        const before = [
+            ...notMatchRules,
+            ...matchRules,
+        ];
+
+        const after = filter.cleanupRules(before, config, 0);
+
+        expect(after).toBeDefined();
+        expect(after).toEqual(notMatchRules);
+    });
+
     it('Test removing of single content modifier', () => {
         const config = {
             'platform': 'test',

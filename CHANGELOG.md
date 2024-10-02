@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.1.148] - 2024-10-02
+
+### Changed
+
+- Exclude `$redirect-rule` from filters for MV3 extension [#231]
+
+[v1.1.148]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.146...v1.1.148
+[#231]: https://github.com/AdguardTeam/FiltersCompiler/issues/231
+
+
 ## [v1.1.146] - 2024-08-29
 
 ### Added
