@@ -113,7 +113,10 @@
         "platform": "ext_chromium_mv3",
         "path": "chromium-mv3",
         "configuration": {
-            "removeRulePatterns": false,
+            "removeRulePatterns": [
+                "\\$redirect-rule=",
+                ",redirect-rule="
+            ],
             "ignoreRuleHints": false
         },
         "defines": {

@@ -44,4 +44,5 @@ example.com##div.grid_1[class$="app"]
 ||test.com^$script,redirect=noopjs
 ||example.com/*.mp4$media,redirect=noopmp4-1s
 ||example.com^$script,redirect-rule=noopjs
+*$redirect-rule=noopjs,xmlhttprequest,domain=example.com
 !

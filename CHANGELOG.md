@@ -5,18 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+<!-- FIXME: add release date -->
+## [v1.2.1]
 
 ## Added
 
-- [@adguard/agtree] v2.1.2 for rules conversion and validation
+<!-- FIXME: mention the latest version of agtree if needed -->
+- [@adguard/agtree] v2.1.2 for rules conversion and validation.
 
 ### Changed
 
-- Updated [@adguard/scriptlets] to v1.11.27
-- Updated [@adguard/tsurlfilter] to v3.0.4
+<!-- FIXME: use the latest versions of scriptlets and tsurlfilter -->
+- Updated [@adguard/scriptlets] to v1.11.27.
+- Updated [@adguard/tsurlfilter] to v3.0.4.
 
-[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.146...HEAD
+[v1.2.1]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.148...v1.2.1
+
+
+## [v1.1.148] - 2024-10-02
+
+### Changed
+
+- Exclude `$redirect-rule` from filters for MV3 extension [#231]
+
+[v1.1.148]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.146...v1.1.148
+[#231]: https://github.com/AdguardTeam/FiltersCompiler/issues/231
 
 
 ## [v1.1.146] - 2024-08-29

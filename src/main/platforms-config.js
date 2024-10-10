@@ -606,7 +606,10 @@ module.exports = {
         'path': 'extension/chromium-mv3',
         'expires': '10 days',
         'configuration': {
-            'removeRulePatterns': CHROMIUM_BASED_EXTENSION_PATTERNS,
+            'removeRulePatterns': [
+                ...CHROMIUM_BASED_EXTENSION_PATTERNS,
+                ...REDIRECT_MODIFIER_PATTERNS,
+            ],
             'replacements': null,
             'ignoreRuleHints': false,
         },

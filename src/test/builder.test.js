@@ -257,7 +257,7 @@ describe('Test builder', () => {
         it('platforms/test filters 5.txt', async () => {
             const filterContent = await readFile(path.join(__dirname, 'resources/platforms/test', 'filters', '5.txt'));
             const filterLines = filterContent.split(/\r?\n/);
-            expect(filterLines.length).toEqual(54);
+            expect(filterLines.length).toEqual(55);
 
             const presentRules = [
                 '||adsnet.com/*/700x350.gif$domain=example.com',
@@ -293,7 +293,7 @@ describe('Test builder', () => {
         it('platforms/test2 filters 5.txt', async () => {
             const filterContent = await readFile(path.join(__dirname, 'resources/platforms/test2', 'filters', '5.txt'));
             const filterLines = filterContent.split(/\r?\n/);
-            expect(filterLines.length).toEqual(54);
+            expect(filterLines.length).toEqual(55);
 
             const presentRules = [
                 'test.com#%#//scriptlet(\'abp-abort-on-property-read\', \'adsShown\')',
@@ -584,6 +584,41 @@ describe('Test builder', () => {
             });
         });
 
+        it('platforms/chromium-mv3 filters 2.txt', async () => {
+            const filterContent = await readFile(path.join(platformsDir, 'chromium-mv3', 'filters', '2.txt'));
+            expect(filterContent).toBeTruthy();
+
+            const filterLines = filterContent.split(/\r?\n/);
+            expect(filterLines.length).toEqual(56);
+
+            // expires value in set from the filters metadata
+            // if there is no 'expires' property in platform.json for the platform
+            expect(filterLines.includes('! Expires: 2 days (update frequency)')).toBeTruthy();
+
+            const presentLines = [
+                'test_domain#%#testScript();',
+                'test.com#%#var isadblock=1;',
+                'example.org#@%#navigator.getBattery = undefined;',
+                'test.com#%#//scriptlet(\'ubo-abort-on-property-read.js\', \'Object.prototype.getBanner\')',
+                'example.net#$?#.main-content { margin-top: 0!important; }',
+                'test.com#@$?#.banner { padding: 0!important; }',
+                'example.net#?#.banner:matches-css(width: 360px)',
+                'test.com#@?#.banner:matches-css(height: 200px)',
+            ];
+            presentLines.forEach((rule) => {
+                expect(filterLines.includes(rule)).toBeTruthy();
+            });
+
+            const absentLines = [
+                '||example.com^$script,redirect-rule=noopjs',
+                '*$redirect-rule=noopjs,xmlhttprequest,domain=example.com',
+            ];
+
+            absentLines.forEach((rule) => {
+                expect(filterLines.includes(rule)).toBeFalsy();
+            });
+        });
+
         describe('check MAC platform', () => {
             it('platform/mac filters.json', async () => {
                 const macFiltersMetadataContent = await readFile(path.join(platformsDir, 'mac', 'filters.json'));
@@ -701,7 +736,7 @@ describe('Test builder', () => {
                 expect(filterContent).toBeTruthy();
 
                 const filterLines = filterContent.split(/\r?\n/);
-                expect(filterLines.length).toEqual(53);
+                expect(filterLines.length).toEqual(54);
                 expect(filterLines.includes('||example.com^$script,redirect=noopjs')).toBeTruthy();
                 expect(filterLines.includes('||example.com/banner$image,redirect=1x1-transparent.gif')).toBeTruthy();
             });
