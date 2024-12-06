@@ -177,7 +177,7 @@ describe('converter', () => {
 
         // scriptlet without arguments and few domains
         actual = converter.convertAdgScriptletsToUbo(["example1.org,example2.com,some-domain.dom#%#//scriptlet('prevent-adfly')"]);
-        expected = 'example1.org,example2.com,some-domain.dom##+js(adfly-defuser)';
+        expected = 'example1.org,example2.com,some-domain.dom##+js(prevent-adfly)';
         expect(actual[0]).toBe(expected);
 
         // scriptlet argument includes quotes
@@ -204,7 +204,7 @@ describe('converter', () => {
         expect(actual).toEqual(expected);
 
         actual = converter.convertAdgScriptletsToUbo([String.raw`example.com#%#//scriptlet('adjust-setInterval', ',dataType:_', '1000', '0.02')`]);
-        expected = [String.raw`example.com##+js(nano-setInterval-booster, \,dataType:_, 1000, 0.02)`];
+        expected = [String.raw`example.com##+js(adjust-setInterval, \,dataType:_, 1000, 0.02)`];
         expect(actual).toEqual(expected);
 
         actual = converter.convertAdgScriptletsToUbo(["example.org#%#//scriptlet('set-session-storage-item', 'acceptCookies', 'false')"]);
@@ -303,21 +303,21 @@ describe('converter', () => {
         expect(actual[0]).toBe(expected);
 
         actual = scriptlets.convertScriptletToAdg('test.com##+js(abort-current-inline-script, $, popup)');
-        expected = "test.com#%#//scriptlet('ubo-abort-current-inline-script.js', '$', 'popup')";
+        expected = "test.com#%#//scriptlet('ubo-abort-current-inline-script', '$', 'popup')";
         expect(actual[0]).toBe(expected);
 
         // multiple selectors for remove-attr/class
-        actual = scriptlets.convertScriptletToAdg('ubisoft.com##+js(ra, href, area[href*="discordapp.com/"]\\, area[href*="facebook.com/"]\\, area[href*="instagram.com/"])');
-        expected = "ubisoft.com#%#//scriptlet('ubo-ra.js', 'href', 'area[href*=\"discordapp.com/\"], area[href*=\"facebook.com/\"], area[href*=\"instagram.com/\"]')";
+        actual = scriptlets.convertScriptletToAdg('example.com##+js(ra, href, area[href*="example1.org/"]\\, area[href*="example2.org/"]\\, area[href*="example3.org/"])');
+        expected = "example.com#%#//scriptlet('ubo-ra', 'href', 'area[href*=\"example1.org/\"], area[href*=\"example2.org/\"], area[href*=\"example3.org/\"]')";
         expect(actual[0]).toBe(expected);
 
         // https://github.com/AdguardTeam/Scriptlets/issues/194
         actual = scriptlets.convertScriptletToAdg('example.org##+js(rc, cookie--not-set, , stay)');
-        expected = "example.org#%#//scriptlet('ubo-rc.js', 'cookie--not-set', '', 'stay')";
+        expected = "example.org#%#//scriptlet('ubo-rc', 'cookie--not-set', '', 'stay')";
         expect(actual[0]).toBe(expected);
 
-        actual = scriptlets.convertScriptletToAdg('memo-book.pl##+js(rc, .locked, body\\, html, stay)');
-        expected = "memo-book.pl#%#//scriptlet('ubo-rc.js', '.locked', 'body, html', 'stay')";
+        actual = scriptlets.convertScriptletToAdg('example.org##+js(rc, .locked, body\\, html, stay)');
+        expected = "example.org#%#//scriptlet('ubo-rc', '.locked', 'body, html', 'stay')";
         expect(actual[0]).toBe(expected);
 
         actual = scriptlets.convertScriptletToAdg('example.org#$#hide-if-has-and-matches-style \'d[id^="_"]\' \'div > s\' \'display: none\'; hide-if-contains /.*/ .p \'a[href^="/ad__c?"]\'');
@@ -453,8 +453,8 @@ describe('converter', () => {
             expect(actual[0]).toBe(expected);
 
             // https://github.com/AdguardTeam/Scriptlets/issues/127
-            actual = converter.convertAdgRedirectsToUbo(['||googletagmanager.com/gtm.js$script,redirect=googletagmanager-gtm,domain=morningstar.nl']);
-            expected = '||googletagmanager.com/gtm.js$script,redirect=googletagmanager_gtm.js,domain=morningstar.nl';
+            actual = converter.convertAdgRedirectsToUbo(['||googletagmanager.com/gtm.js$script,redirect=googletagmanager-gtm,domain=example.com']);
+            expected = '||googletagmanager.com/gtm.js$script,redirect=google-analytics_analytics.js,domain=example.com';
             expect(actual[0]).toBe(expected);
 
             // media type for 'empty' redirect
@@ -490,15 +490,15 @@ describe('converter', () => {
             expect(actual[0]).toBe(expected);
             // noopjson
             actual = converter.convertAdgRedirectsToUbo(['||example.com^$xmlhttprequest,redirect=noopjson']);
-            expected = '||example.com^$xmlhttprequest,redirect=noop.json';
+            expected = '||example.com^$xhr,redirect=noop.json';
             expect(actual[0]).toBe(expected);
             // nooptext:
             actual = converter.convertAdgRedirectsToUbo(['||ad.example.com^$redirect=nooptext,important']);
-            expected = '||ad.example.com^$redirect=noop.txt,important,image,media,subdocument,stylesheet,script,xmlhttprequest,other';
+            expected = '||ad.example.com^$redirect=noop.txt,important,image,media,subdocument,stylesheet,script,xhr,other';
             expect(actual[0]).toBe(expected);
 
             actual = converter.convertAdgRedirectsToUbo(['||example.com/ad/vmap/*$xmlhttprequest,redirect=noopvast-2.0']);
-            expected = '||example.com/ad/vmap/*$xmlhttprequest,redirect=noop-vast2.xml';
+            expected = '||example.com/ad/vmap/*$xhr,redirect=noopvast-2.0';
             expect(actual[0]).toBe(expected);
 
             actual = converter.convertAdgRedirectsToUbo(['']);
