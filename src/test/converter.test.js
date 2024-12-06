@@ -344,15 +344,13 @@ describe('converter', () => {
         expected = "example.com#@%#//scriptlet('ubo-nano-setInterval-booster.js', 'some.example', '1000')";
         expect(actual[0]).toBe(expected);
 
-        // FIXME: check
-        // actual = converter.convertRulesToAdgSyntax(['test.com##script:inject(json-prune.js)']);
-        // expected = "test.com#%#//scriptlet('ubo-json-prune.js')";
-        // expect(actual[0]).toBe(expected);
+        actual = converter.convertRulesToAdgSyntax(['test.com##script:inject(json-prune.js)']);
+        expected = "test.com#%#//scriptlet('ubo-json-prune.js')";
+        expect(actual[0]).toBe(expected);
 
-        // FIXME: check
-        // actual = converter.convertRulesToAdgSyntax(['test.com#@#script:inject(abort-on-property-read.js, some.prop)']);
-        // expected = "test.com#@%#//scriptlet('ubo-abort-on-property-read.js', 'some.prop')";
-        // expect(actual[0]).toBe(expected);
+        actual = converter.convertRulesToAdgSyntax(['test.com#@#script:inject(abort-on-property-read.js, some.prop)']);
+        expected = "test.com#@%#//scriptlet('ubo-abort-on-property-read.js', 'some.prop')";
+        expect(actual[0]).toBe(expected);
 
         actual = converter.convertRulesToAdgSyntax(['example.org##+js(set-cookie, notice_preferences, 1)']);
         expected = "example.org#%#//scriptlet('ubo-set-cookie', 'notice_preferences', '1')";
@@ -514,11 +512,10 @@ describe('converter', () => {
             expected = '||example.com^$script,redirect=noop.js';
             expect(actual[0]).toBe(expected);
 
-            // FIXME: check
-            // // UBO -> ADG:
-            // actual = converter.convertRulesToAdgSyntax(['||example.com^$redirect=noop.js:99']);
-            // expected = '||example.com^$redirect=noopjs';
-            // expect(actual[0]).toBe(expected);
+            // UBO -> ADG:
+            actual = converter.convertRulesToAdgSyntax(['||example.com^$redirect=noop.js:99']);
+            expected = '||example.com^$redirect=noopjs';
+            expect(actual[0]).toBe(expected);
         });
 
         it('does not add unnecessary symbols while converting redirects', () => {
