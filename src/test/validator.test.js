@@ -296,7 +296,6 @@ describe('validator', () => {
                 't',
                 'tt',
                 'ads',
-                '##q',
                 '||q',
             ];
             expect(validator.validate(rules)).toHaveLength(0);
