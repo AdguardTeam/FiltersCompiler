@@ -2,6 +2,21 @@
 # yarn lockfile v1
 
 
+"@adguard/agtree@2.1.4":
+  version "2.1.4"
+  resolved "https://registry.yarnpkg.com/@adguard/agtree/-/agtree-2.1.4.tgz#fe4e885a8b1a5a54607f208120e06d685c8a71c1"
+  integrity sha512-LuyGnv5zakrUhei3/bjHbs06DkKZhAE9mE6IDb7Ny+dn5dNCngrE3IgI2il+xKt/nPWRSbxroR67jc/ZK6WVEA==
+  dependencies:
+    "@adguard/css-tokenizer" "^1.1.1"
+    clone-deep "^4.0.1"
+    is-ip "3.1.0"
+    json5 "^2.2.3"
+    semver "^7.5.3"
+    sprintf-js "^1.1.3"
+    tldts "^5.7.112"
+    xregexp "^5.1.1"
+    zod "3.21.4"
+
 "@adguard/agtree@^2.1.2":
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/@adguard/agtree/-/agtree-2.1.2.tgz#b9017566fb1b6a46882f6d5c68b899a1824a299f"
@@ -15,6 +30,20 @@
     sprintf-js "^1.1.3"
     tldts "^5.7.112"
     xregexp "^5.1.1"
+    zod "3.21.4"
+
+"@adguard/agtree@^2.1.4":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@adguard/agtree/-/agtree-2.2.0.tgz#be35aaf46b4bc2dac1d73064d45be0502883bf86"
+  integrity sha512-Mct4dTfaetp26e+DlgnTf7N8RUvN5SrVigjrmgOEEWiB3l4nEX3u7vQntSlfWszeAyRjw7GjfuNASezFt4zfHA==
+  dependencies:
+    "@adguard/css-tokenizer" "^1.1.1"
+    clone-deep "^4.0.1"
+    is-ip "3.1.0"
+    json5 "^2.2.3"
+    semver "^7.5.3"
+    sprintf-js "^1.1.3"
+    tldts "^5.7.112"
     zod "3.21.4"
 
 "@adguard/css-tokenizer@^1.1.1":
@@ -31,36 +60,37 @@
     crypto-js "^4.2.0"
     diff "git+https://github.com/105th/jsdiff.git#2be2e7df90e8eebd99f0385c7b1dc16c2f4dcc1a"
 
-"@adguard/extended-css@^2.0.56":
-  version "2.0.56"
-  resolved "https://registry.npmjs.org/@adguard/extended-css/-/extended-css-2.0.56.tgz"
-  integrity sha512-RMPRGZ80kM6KiKRR0K2DUOD0+2CiadBk+G6zYBrRmzk4lD71Cipv2b9/rRy9Fdh41ipoApZsQdbJZozXFsM8RA==
+"@adguard/extended-css@^2.0.59":
+  version "2.0.59"
+  resolved "https://registry.yarnpkg.com/@adguard/extended-css/-/extended-css-2.0.59.tgz#ccc025420c8983c63e73790b280bd913f6f65a80"
+  integrity sha512-rh+rITfPS82JyzSd43fBUdKlLm77YFJkO9uT1PgJAA6BdW0Ufkn2Ab83VrTNWdk+X+ULikdMQVX+SPDWa0eNWA==
 
-"@adguard/filters-downloader@^2.2.2":
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/@adguard/filters-downloader/-/filters-downloader-2.2.2.tgz#ec4c9a5a2cbbaf5c3cd974c3f4b94b11b86c57a5"
-  integrity sha512-7seM81E2QvvgfgC0uiK1ayYLBuRHiRedqQO4xAwpC7x+d1UOyu+pDZxOy3eYW7TMTv+Nd8KrpINPI5RrCZbZ0w==
+"@adguard/filters-downloader@^2.2.4":
+  version "2.2.4"
+  resolved "https://registry.yarnpkg.com/@adguard/filters-downloader/-/filters-downloader-2.2.4.tgz#b69b5340c243eb366f4156c5b3f0fec8fe0bb7ba"
+  integrity sha512-3I7Bi4CvRcZCV0wQvtixhHKZeT4SzyWyPedCHLxXvc1MSsSUmAqkonchn2Aje7wT3zI8f+wHQX7oZTE6jT1lKg==
   dependencies:
     "@adguard/diff-builder" "1.0.17"
     axios "1.6.2"
     crypto-js "^4.2.0"
 
-"@adguard/scriptlets@^1.11.27":
-  version "1.11.27"
-  resolved "https://registry.yarnpkg.com/@adguard/scriptlets/-/scriptlets-1.11.27.tgz#0c023be933e69b7f64fa77934c08d2162e81b11a"
-  integrity sha512-Renm7Okgb2y8ihitKnU/RXV4Hk1eKcbA5Vmxq4kyQ0Eiah3vd+IHR4UZp3yxkhSC9DkiziWKui1l7UASF8wvQQ==
+"@adguard/scriptlets@1.12.1", "@adguard/scriptlets@^1.12.1":
+  version "1.12.1"
+  resolved "https://registry.yarnpkg.com/@adguard/scriptlets/-/scriptlets-1.12.1.tgz#fe458040eba27d71a7825f0a909d61c7bda746cd"
+  integrity sha512-luAGl8hHEjKZfTFqWG8PBsif2wAPWNi0uuT+xzyBTk+IllHDYOLPSwyMKh2ru7nKCQJEOgMVwNoIrPB4zuuX1w==
   dependencies:
+    "@adguard/agtree" "^2.1.2"
     "@babel/runtime" "^7.20.13"
     js-yaml "^3.13.1"
 
-"@adguard/tsurlfilter@3.0.4":
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/@adguard/tsurlfilter/-/tsurlfilter-3.0.4.tgz#e67e5af6e26add4188b4b4934dc5cfed4ac7e5db"
-  integrity sha512-gQJ307W+/SlheJxTkb9Lv3B6HOcqt/grv8gsylbAcyHwrPAQ3+PQ8irgTXhwR4XnZKDc9tVuOopMlzXYgx8FNA==
+"@adguard/tsurlfilter@3.0.8":
+  version "3.0.8"
+  resolved "https://registry.yarnpkg.com/@adguard/tsurlfilter/-/tsurlfilter-3.0.8.tgz#5cd6a9bd46e8a312642942bbdf712ed707fd0331"
+  integrity sha512-NanTKaL38/QoMAZrPsOLJ1HkQcV3DNPwQSC/0PUxD555vpatKlzSguttcB8VwM1JrbiU1nlDpVpGC2v0CNNJ5A==
   dependencies:
-    "@adguard/agtree" "^2.1.2"
+    "@adguard/agtree" "^2.1.4"
     "@adguard/css-tokenizer" "^1.1.1"
-    "@adguard/scriptlets" "^1.11.27"
+    "@adguard/scriptlets" "^1.12.1"
     cidr-tools "^6.4.1"
     commander "9.4.1"
     is-cidr "4.0.2"
