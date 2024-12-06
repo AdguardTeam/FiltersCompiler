@@ -17,6 +17,7 @@ module.exports = {
     },
     'rules': {
         'import/no-extraneous-dependencies': 0,
+        'no-new': 'off',
         'indent': [
             'error',
             4,

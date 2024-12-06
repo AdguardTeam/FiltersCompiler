@@ -6,7 +6,6 @@ const {
     RuleCategory,
     RegExpUtils,
     defaultParserOptions,
-    AnyRule,
 } = require('@adguard/agtree');
 const {
     RuleFactory,
@@ -16,6 +15,10 @@ const {
 
 const logger = require('./utils/log');
 const extendedCssValidator = require('./utils/extended-css-validator');
+
+/**
+ * @typedef {import('@adguard/agtree').AnyRule} AnyRule
+ */
 
 const AFFINITY_DIRECTIVE = '!#safari_cb_affinity'; // used as closing directive
 const AFFINITY_DIRECTIVE_OPEN = `${AFFINITY_DIRECTIVE}(`;
@@ -165,7 +168,7 @@ const validate = function (list, excluded, invalid = [], filterName) { // eslint
 
         // optional chaining is needed for the length property because convertedRules can be undefined
         // if RuleParser.parse() or RuleConverter.convertToAdg() throws an error
-        if (convertedRuleNodes?.length === 0) {
+        if (!convertedRuleNodes || convertedRuleNodes.length === 0) {
             return false;
         }
 
