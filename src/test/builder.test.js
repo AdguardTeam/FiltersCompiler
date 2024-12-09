@@ -1052,9 +1052,21 @@ describe('Test builder', () => {
     });
 
     it('Resolve bad include inside condition', async () => {
+        const filterURL = path.join(badFiltersDir, 'filter_9_Includes');
+        const fileURL = path.join(filterURL, 'non-existing-file.txt');
+        const errorMessages = [
+            "Failed to resolve the include directive '!#include non-existing-file.txt'",
+            `URL: '${filterURL}'`,
+            'Context:',
+            '\t! License: http://creativecommons.org/licenses/by-sa/3.0/',
+            '\t!',
+            '\t!#if adguard',
+            '\t!#include non-existing-file.txt',
+            `\tError: ENOENT: no such file or directory, open '${fileURL}'`,
+        ];
         await expect(
             builder.build(badFiltersDir, null, null, platformsDir, platformsConfigFile, [9]),
-        ).rejects.toThrow(/^Failed to resolve the include directive: '!#include non-existing-file\.txt'$/);
+        ).rejects.toThrow(`${errorMessages.join('\n')}\n`);
     });
 
     it('filters.js and filters_i18n.js as copies of the json files', async () => {

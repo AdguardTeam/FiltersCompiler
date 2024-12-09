@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.1.149] - 2024-12-09
+
+### Changed
+
+- Print more details when build failed because of invalid directives [#213]
+- Updated [@adguard/filters-downloader] to v2.2.4
+
+[v1.1.149]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.148...v1.1.149
+[#213]: https://github.com/AdguardTeam/FiltersCompiler/issues/213
+
 ## [v1.1.148] - 2024-10-02
 
 ### Changed
