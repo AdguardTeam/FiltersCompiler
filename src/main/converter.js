@@ -1,10 +1,9 @@
-const { RuleConverter, RuleParser } = require('@adguard/agtree');
-const scriptlets = require('@adguard/scriptlets');
+import { RuleConverter, RuleParser } from '@adguard/agtree';
+import { isValidAdgRedirectRule, isAdgScriptletRule } from '@adguard/scriptlets/validators';
+import { convertAdgRedirectToUbo, convertAdgToUbo } from '@adguard/redirects/converters';
 
-const logger = require('./utils/log');
-const cosmeticRuleModifiers = require('./rule/cosmetic-rule-modifiers');
-
-const { redirects } = scriptlets;
+import logger from './utils/log';
+import cosmeticRuleModifiers from './rule/cosmetic-rule-modifiers';
 
 /**
  * Excludes rule
@@ -89,8 +88,8 @@ const convertAdgScriptletsToUbo = (rules) => {
     return convertToUbo(
         rules,
         'scriptlet',
-        scriptlets.isAdgScriptletRule,
-        scriptlets.convertAdgToUbo,
+        isAdgScriptletRule,
+        convertAdgToUbo,
     );
 };
 
@@ -107,10 +106,10 @@ const convertAdgRedirectsToUbo = (rules) => {
         rules,
         'redirect',
         // validate AdGuard redirect rules
-        redirects.isValidAdgRedirectRule,
+        isValidAdgRedirectRule,
         // and skip ubo-unsupported redirects for ubo filters
         // https://github.com/AdguardTeam/AdguardFilters/issues/68028
-        redirects.convertAdgRedirectToUbo,
+        convertAdgRedirectToUbo,
     );
 };
 
