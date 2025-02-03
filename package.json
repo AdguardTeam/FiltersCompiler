@@ -3,6 +3,7 @@
   "version": "1.2.0",
   "description": "AdGuard filters compiler",
   "homepage": "http://adguard.com",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "test": "jest",
