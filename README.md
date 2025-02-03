@@ -7,9 +7,9 @@ It is used in [FiltersRegistry].
 - [Tests](#tests)
 - [Development](#development)
 - [Filters metadata](#filters-metadata)
-- [`@include` directive](#include-directive)
+- [`@include` directive and its options](#include-directive)
 
-### Usage
+## Usage
 
 This package is suggested to be used with filters repository with directory structure presented in tests here.
 
@@ -56,28 +56,28 @@ const customPlatformsConfig = {
 compiler.compile(filtersDir, logPath, reportPath, platformsPath, whitelist, blacklist, customPlatformsConfig);
 ```
 
-### Tests
+## Tests
 
 ```bash
 yarn test
 ```
 
-### Development
+## Development
 
 In order to add support for new scriptlets and redirects,
 you should update `@adguard/tsurlfilter` with updated scriptlets.
 
 For fixing scriptlets converting or validation you should update `scriptlets`.
 
-### Filters metadata
+## Filters metadata
 
 Description of the filters metadata is available in the [FiltersRegistry][filters-metadata] repository.
 
-### <a name="include-directive"></a> `@include` directive and its options
+## <a name="include-directive"></a> `@include` directive and its options
 
 The `@include` directive provides the ability to include content from the specified address.
 
-#### Syntax:
+### Syntax
 
 ```text
 @include <filepath> [<options>]
@@ -106,7 +106,7 @@ where:
 > The content of the included file is formatted by the options due to the order of their mention in the directive,
 > except `/ignoreTrustLevel`.
 
-#### Examples
+### Examples
 
 - Include a file with domains, add modifiers to the rules, exclude some rules,
    add a hint to the rules, and remove comments from the prepared rules:
