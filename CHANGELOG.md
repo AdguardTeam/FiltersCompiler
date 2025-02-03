@@ -11,16 +11,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Added
 
 <!-- FIXME: mention the latest version of agtree if needed -->
-- [@adguard/agtree] v2.1.4 for rules conversion and validation.
+- [@adguard/agtree] v3.0.0-alpha.3 for rules conversion and validation.
 
 ### Changed
 
 <!-- FIXME: use the latest versions of scriptlets and tsurlfilter -->
-- Updated [@adguard/extended-css] to v2.0.59.
-- Updated [@adguard/scriptlets] to v2.0.1.
-- Updated [@adguard/tsurlfilter] to v3.0.8.
+- Updated [@adguard/extended-css] to v2.1.1.
+- Updated [@adguard/filters-downloader] to v2.2.6.
+- Updated [@adguard/scriptlets] to v2.1.4.
+- Updated [@adguard/tsurlfilter] to v3.1.0-alpha.8.
 
-[v1.2.1]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.148...v1.2.1
+[v1.2.1]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.149...v1.2.1
 
 ## [v1.1.149] - 2024-12-10
 
