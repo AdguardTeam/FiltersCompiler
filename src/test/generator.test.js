@@ -1,4 +1,7 @@
-const generator = require('../main/platforms/generator');
+import {
+    describe, it, expect, test,
+} from 'vitest';
+import generator from '../main/platforms/generator';
 
 describe('generator', () => {
     it('sortMetadataFilters', () => {

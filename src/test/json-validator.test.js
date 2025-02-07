@@ -1,12 +1,18 @@
-const fs = require('fs');
-const path = require('path');
+/**
+ * @vitest-environment jsdom
+ */
+import {
+    describe, it, expect, vi,
+} from 'vitest';
+import fs from 'fs';
+import path from 'path';
 
-const schemaValidator = require('../main/json-validator');
-const builder = require('../main/builder');
-const optimization = require('../main/optimization');
+import schemaValidator from '../main/json-validator';
+import { build } from '../main/builder';
+import optimization from '../main/optimization';
 
 // Mock log to hide error messages
-jest.mock('../main/utils/log');
+vi.mock('../main/utils/log');
 
 describe('json validator', () => {
     it('Test json validator', async () => {
@@ -18,7 +24,7 @@ describe('json validator', () => {
         const platformsPath = path.join(__dirname, './resources/platforms');
         const platformsConfigFile = path.join(__dirname, './resources/platforms.json');
         const platformsConfig = JSON.parse(fs.readFileSync(platformsConfigFile, { encoding: 'utf-8' }));
-        await builder.build(filtersDir, logFile, reportFile, platformsPath, platformsConfig);
+        await build(filtersDir, logFile, reportFile, platformsPath, platformsConfig);
 
         // Test validation
         const jsonSchemasConfigDir = path.join(__dirname, './resources/schemas');

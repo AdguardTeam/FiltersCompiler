@@ -1,23 +1,34 @@
 /**
- * @jest-environment jsdom
+ * @vitest-environment jsdom
  */
+import {
+    describe, it, expect, vi, test,
+} from 'vitest';
+import { TextEncoder, TextDecoder } from 'util';
 
-const { TextEncoder, TextDecoder } = require('util');
+/* eslint-disable max-len */
+import { scriptlets } from '@adguard/scriptlets';
+import {
+    isValidAdgRedirectRule,
+    isValidScriptletName,
+    isValidScriptletRule,
+    isUboScriptletRule,
+    isAdgScriptletRule,
+    isAbpSnippetRule,
+} from '@adguard/scriptlets/validators';
+
+import { setConfiguration, CompatibilityTypes } from '@adguard/tsurlfilter';
+
+import { validateAndFilterRules, checkAffinityDirectives } from '../main/validator';
 
 global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder;
-
-/* eslint-disable max-len */
-const scriptlets = require('@adguard/scriptlets');
-const { setConfiguration, CompatibilityTypes } = require('@adguard/tsurlfilter');
-
-const validator = require('../main/validator');
 
 // Sets configuration compatibility
 setConfiguration({ compatibility: CompatibilityTypes.Corelibs });
 
 // Mock log to hide error messages
-jest.mock('../main/utils/log');
+vi.mock('../main/utils/log');
 
 describe('validator', () => {
     describe('validate standard css selectors', () => {
@@ -70,7 +81,7 @@ describe('validator', () => {
         ];
         test.each(validSelectors)('%s', (selector) => {
             const rules = [`example.com##${selector}`];
-            expect(validator.validate(rules)).toHaveLength(1);
+            expect(validateAndFilterRules(rules)).toHaveLength(1);
         });
 
         const invalidSelectors = [
@@ -88,7 +99,7 @@ describe('validator', () => {
         ];
         test.each(invalidSelectors)('%s', (selector) => {
             const rules = [`example.com##${selector}`];
-            expect(validator.validate(rules)).toHaveLength(0);
+            expect(validateAndFilterRules(rules)).toHaveLength(0);
         });
 
         // valid rules - element hiding selectors without quotes
@@ -100,7 +111,7 @@ describe('validator', () => {
         ];
         test.each(validNoQuotesSelectors)('%s', (selector) => {
             const rules = [`example.com##${selector}`];
-            expect(validator.validate(rules)).toHaveLength(1);
+            expect(validateAndFilterRules(rules)).toHaveLength(1);
         });
     });
 
@@ -110,7 +121,7 @@ describe('validator', () => {
             'test$domain=yandex.com,google.com',
             ',example.com,example.org##[src*="base64"]',
         ];
-        expect(validator.validate(rules)).toHaveLength(0);
+        expect(validateAndFilterRules(rules)).toHaveLength(0);
     });
 
     describe('validate extended-css', () => {
@@ -133,7 +144,7 @@ describe('validator', () => {
         ];
         test.each(validExtCssSelectors)('%s', (selector) => {
             const rules = [`example.com##${selector}`];
-            expect(validator.validate(rules)).toHaveLength(1);
+            expect(validateAndFilterRules(rules)).toHaveLength(1);
         });
 
         const invalidExtCssSelectors = [
@@ -143,12 +154,12 @@ describe('validator', () => {
         ];
         test.each(invalidExtCssSelectors)('%s', (selector) => {
             const rules = [`example.com##${selector}`];
-            expect(validator.validate(rules)).toHaveLength(0);
+            expect(validateAndFilterRules(rules)).toHaveLength(0);
         });
 
         it('validate abp-contains pseudo class', () => {
             const rules = ['kostrzyn.pl#?#.aktperbox:-abp-contains(Rozmaitości) > div:-abp-has(div)'];
-            expect(validator.validate(rules)).toHaveLength(1);
+            expect(validateAndFilterRules(rules)).toHaveLength(1);
         });
 
         it('xpath selectors', () => {
@@ -163,7 +174,7 @@ describe('validator', () => {
                 'www.wp.pl##:xpath(//div[@data-st-area=\'Zakupy\'][count(*)=2][not(header)])',
                 'www.dobreprogramy.pl##:xpath(//div[contains(text(), \'REKLAMA\')])',
             ];
-            expect(validator.validate(rules)).toHaveLength(rules.length);
+            expect(validateAndFilterRules(rules)).toHaveLength(rules.length);
         });
     });
 
@@ -184,7 +195,7 @@ describe('validator', () => {
             ];
             test.each(validSelectors)('%s', (selector) => {
                 const rules = [`example.com##${selector}`];
-                expect(validator.validate(rules)).toHaveLength(1);
+                expect(validateAndFilterRules(rules)).toHaveLength(1);
             });
 
             it('multiple rules - valid', () => {
@@ -196,7 +207,7 @@ describe('validator', () => {
                     'example.com#$##atomic .Mt\(headerHeight\) { margin-top: 22px !important; }',
                     'example.com#$##\#novella-header { position: relative !important; top: 0 !important; }',
                 ];
-                expect(validator.validate(rules)).toHaveLength(rules.length);
+                expect(validateAndFilterRules(rules)).toHaveLength(rules.length);
             });
         });
 
@@ -208,7 +219,7 @@ describe('validator', () => {
             ];
             test.each(invalidPseudoClassArgSelectors)('%s', (selector) => {
                 const rules = [`example.com##${selector}`];
-                expect(validator.validate(rules)).toHaveLength(0);
+                expect(validateAndFilterRules(rules)).toHaveLength(0);
             });
 
             const unknownPseudoClassSelectors = [
@@ -217,7 +228,7 @@ describe('validator', () => {
             ];
             test.each(unknownPseudoClassSelectors)('%s', (selector) => {
                 const rules = [`example.com##${selector}`];
-                expect(validator.validate(rules)).toHaveLength(0);
+                expect(validateAndFilterRules(rules)).toHaveLength(0);
             });
 
             // FIXME: uncomment and fix validation since rule were added as they should be considered as invalid
@@ -226,7 +237,7 @@ describe('validator', () => {
             //         "example.com#$##atomic .Mt\(headerHeight\) { margin-top: \\'22px\\' !important; }",
             //         "example.com#$##header-floating\ navbar { font-family: \\'Blogger\\'; }",
             //     ];
-            //     expect(validator.validate(rules)).toHaveLength(0);
+            //     expect(validateAndFilterRules(rules)).toHaveLength(0);
             // });
         });
     });
@@ -238,7 +249,7 @@ describe('validator', () => {
             '~example.com,google.com$$div[id=\"ad_text\"][max-length=\"500000\"][min-length=\"50\"]',
         ];
         test.each(validRules)('%s', (rule) => {
-            expect(validator.validate([rule])).toHaveLength(1);
+            expect(validateAndFilterRules([rule])).toHaveLength(1);
         });
     });
 
@@ -246,10 +257,10 @@ describe('validator', () => {
         let rules;
 
         rules = ['||example.com/code/bshow.php$stealth'];
-        expect(validator.validate(rules)).toHaveLength(0);
+        expect(validateAndFilterRules(rules)).toHaveLength(0);
 
         rules = ['@@||example.com/code/bshow.php$stealth'];
-        expect(validator.validate(rules)).toHaveLength(1);
+        expect(validateAndFilterRules(rules)).toHaveLength(1);
     });
 
     describe('Test validation - various rules', () => {
@@ -263,7 +274,7 @@ describe('validator', () => {
                 '||delivery.tf1.fr/pub$media,rewrite=abp-resource:blank-mp3,domain=tf1.fr',
             ];
             test.each(validRules)('%s', (rule) => {
-                expect(validator.validate([rule])).toHaveLength(1);
+                expect(validateAndFilterRules([rule])).toHaveLength(1);
             });
         });
 
@@ -275,7 +286,7 @@ describe('validator', () => {
                 '##[href*="35.200.169.1" i] > img',
                 'aszdziennik.pl##a[href*="/aszdziennik" i] > img[src^="/static/media/"]',
             ];
-            expect(validator.validate(rules)).toHaveLength(rules.length);
+            expect(validateAndFilterRules(rules)).toHaveLength(rules.length);
         });
 
         it('multiple valid rules', () => {
@@ -285,13 +296,13 @@ describe('validator', () => {
                 'example.com##div[class name="textLink" i]',
                 'example.com##div[class^="textLink" "textColor" i]',
             ];
-            expect(validator.validate(rules)).toHaveLength(0);
+            expect(validateAndFilterRules(rules)).toHaveLength(0);
 
             rules = [
                 '||delivery.tf1.fr/pub$media,rewrite=resource:blank-mp3,domain=tf1.fr',
                 '||delivery.tf1.fr/pub$media,rewrite,domain=tf1.fr',
             ];
-            expect(validator.validate(rules)).toHaveLength(0);
+            expect(validateAndFilterRules(rules)).toHaveLength(0);
 
             rules = [
                 't',
@@ -299,16 +310,16 @@ describe('validator', () => {
                 'ads',
                 '||q',
             ];
-            expect(validator.validate(rules)).toHaveLength(0);
+            expect(validateAndFilterRules(rules)).toHaveLength(0);
         });
     });
 
     it('extreme cases', () => {
         // for array with one empty string the same array is returned
-        expect(validator.validate([''])).toStrictEqual(['']);
+        expect(validateAndFilterRules([''])).toStrictEqual(['']);
 
         // empty array is returned if `undefined` is validated
-        expect(validator.validate(undefined)).toStrictEqual([]);
+        expect(validateAndFilterRules(undefined)).toStrictEqual([]);
     });
 
     it('validate redirect option', () => {
@@ -337,14 +348,14 @@ describe('validator', () => {
             ...invalidRules,
         ];
 
-        const validateRules = validator.validate(rules);
+        const validateRules = validateAndFilterRules(rules);
         expect(validateRules).toContain(validRedirect1);
         expect(validateRules).toContain(validRedirect2);
         expect(validateRules).toContain(validImportant3);
         expect(validateRules).not.toContain(invalidRedirect4);
         expect(validateRules).not.toContain(invalidRedirect5);
         expect(validateRules).toContain(validRedirect6);
-        expect(validator.validate(rules)).toHaveLength(validRules.length);
+        expect(validateAndFilterRules(rules)).toHaveLength(validRules.length);
     });
 
     describe('Test validation - incorrect domain option', () => {
@@ -354,7 +365,7 @@ describe('validator', () => {
             '|http*$script,domain=|example.org',
         ];
         test.each(invalidRules)('%s', (rule) => {
-            expect(validator.validate([rule])).toHaveLength(0);
+            expect(validateAndFilterRules([rule])).toHaveLength(0);
         });
     });
 
@@ -365,7 +376,7 @@ describe('validator', () => {
                 'example.com#$#body[style*="background-image: url()"] { margin-top: 45px !important; }',
             ];
             test.each(validRules)('%s', (rule) => {
-                expect(validator.validate([rule])).toHaveLength(1);
+                expect(validateAndFilterRules([rule])).toHaveLength(1);
             });
         });
 
@@ -375,7 +386,7 @@ describe('validator', () => {
                 'example.com##body.reset-scroll::before',
                 'example.com##body.reset-scroll::after',
             ];
-            expect(validator.validate(rules)).toHaveLength(rules.length);
+            expect(validateAndFilterRules(rules)).toHaveLength(rules.length);
         });
 
         describe('single rules - invalid', () => {
@@ -385,7 +396,7 @@ describe('validator', () => {
                 'example.com#$#body[style*="background-image: url(\'https://some.jpg\')"] { background: url() !important; }',
             ];
             test.each(validRules)('%s', (rule) => {
-                expect(validator.validate([rule])).toHaveLength(0);
+                expect(validateAndFilterRules([rule])).toHaveLength(0);
             });
         });
     });
@@ -394,49 +405,49 @@ describe('validator', () => {
         let rules;
 
         rules = ['example.com##^script:contains(/.+banner/)'];
-        expect(validator.validate(rules)).toHaveLength(0);
+        expect(validateAndFilterRules(rules)).toHaveLength(0);
 
         rules = ['example.com##^script:has-text(/\.advert/)'];
-        expect(validator.validate(rules)).toHaveLength(0);
+        expect(validateAndFilterRules(rules)).toHaveLength(0);
     });
 
     it('Test scriptlets lib validator', () => {
         let result;
 
-        result = scriptlets.isValidScriptletName('abort-on-property-read');
+        result = isValidScriptletName('abort-on-property-read');
         expect(result).toBeTruthy();
 
-        result = scriptlets.isValidScriptletName('abort-on--property-read');
+        result = isValidScriptletName('abort-on--property-read');
         expect(result).toBeFalsy();
 
-        result = scriptlets.isValidScriptletRule('test.com#%#//scriptlet("ubo-abort-current-inline-script.js", "Math.random", "adbDetect")');
+        result = isValidScriptletRule('test.com#%#//scriptlet("ubo-abort-current-inline-script.js", "Math.random", "adbDetect")');
         expect(result).toBeTruthy();
 
-        result = scriptlets.isUboScriptletRule('example.com#@#+js(nano-setInterval-booster.js, some.example, 1000)');
+        result = isUboScriptletRule('example.com#@#+js(nano-setInterval-booster.js, some.example, 1000)');
         expect(result).toBeTruthy();
 
-        result = scriptlets.isUboScriptletRule('test.com##script:inject(json-prune.js)');
+        result = isUboScriptletRule('test.com##script:inject(json-prune.js)');
         expect(result).toBeTruthy();
 
-        result = scriptlets.isUboScriptletRule('test.com#%#//scriptlet(\'ubo-json-prune.js\')');
+        result = isUboScriptletRule('test.com#%#//scriptlet(\'ubo-json-prune.js\')');
         expect(result).toBeFalsy();
 
-        result = scriptlets.isAdgScriptletRule('test.com#%#//scriptlet(\'ubo-json-prune.js\')');
+        result = isAdgScriptletRule('test.com#%#//scriptlet(\'ubo-json-prune.js\')');
         expect(result).toBeTruthy();
 
-        result = scriptlets.isAdgScriptletRule('test.com#%#//scriptlet("abort-on-property-read", "some.prop")');
+        result = isAdgScriptletRule('test.com#%#//scriptlet("abort-on-property-read", "some.prop")');
         expect(result).toBeTruthy();
 
-        result = scriptlets.isAdgScriptletRule('arctic.de#%#//scriptlet(\'set-cookie-reload\', \'cookie-preference\', \'1\')');
+        result = isAdgScriptletRule('arctic.de#%#//scriptlet(\'set-cookie-reload\', \'cookie-preference\', \'1\')');
         expect(result).toBeTruthy();
 
-        result = scriptlets.isAdgScriptletRule('test.com#@#script:inject(abort-on-property-read.js, some.prop)');
+        result = isAdgScriptletRule('test.com#@#script:inject(abort-on-property-read.js, some.prop)');
         expect(result).toBeFalsy();
 
-        result = scriptlets.isAbpSnippetRule('example.com#@$#abort-on-property-write adblock.check');
+        result = isAbpSnippetRule('example.com#@$#abort-on-property-write adblock.check');
         expect(result).toBeTruthy();
 
-        result = scriptlets.isAbpSnippetRule('test.com#@#script:inject(abort-on-property-read.js, some.prop)');
+        result = isAbpSnippetRule('test.com#@#script:inject(abort-on-property-read.js, some.prop)');
         expect(result).toBeFalsy();
     });
 
@@ -455,7 +466,7 @@ describe('validator', () => {
                 "example.org#%#//scriptlet('trusted-dispatch-event', 'click')",
             ];
             test.each(validRules)('%s', (rule) => {
-                expect(validator.validate([rule])).toHaveLength(1);
+                expect(validateAndFilterRules([rule])).toHaveLength(1);
             });
         });
 
@@ -469,7 +480,7 @@ describe('validator', () => {
                 'example.com#%#//scriptlet("abp-abort-current-inline-script", console.log", "Hello")',
             ];
             test.each(invalidRules)('%s', (rule) => {
-                expect(validator.validate([rule])).toHaveLength(0);
+                expect(validateAndFilterRules([rule])).toHaveLength(0);
             });
         });
     });
@@ -486,7 +497,7 @@ describe('validator', () => {
                 '||example.com^$redirect=noopjson',
             ];
             test.each(validRules)('%s', (rule) => {
-                expect(validator.validate([rule])).toHaveLength(1);
+                expect(validateAndFilterRules([rule])).toHaveLength(1);
             });
         });
 
@@ -497,48 +508,48 @@ describe('validator', () => {
                 '||example.com/*.mp4$media,redirect=noopmp4_1s',
             ];
             test.each(invalidRules)('%s', (rule) => {
-                expect(validator.validate([rule])).toHaveLength(0);
+                expect(validateAndFilterRules([rule])).toHaveLength(0);
             });
         });
 
         it('Test redirects by the lib methods', () => {
-            const { redirects } = scriptlets;
-
             let rule = '||example.com^$script,redirect=noopjs.js';
-            expect(redirects.isValidAdgRedirectRule(rule)).toBeFalsy();
+            expect(isValidAdgRedirectRule(rule)).toBeFalsy();
 
             rule = '||example.com^$script,redirect=noopjs';
-            expect(redirects.isValidAdgRedirectRule(rule)).toBeTruthy();
+            expect(isValidAdgRedirectRule(rule)).toBeTruthy();
 
             rule = '||example.com^$script,redirects=noopjs';
-            expect(redirects.isValidAdgRedirectRule(rule)).toBeFalsy();
+            expect(isValidAdgRedirectRule(rule)).toBeFalsy();
 
             rule = '||example.com&redirects=noopjs^$script';
-            expect(redirects.isValidAdgRedirectRule(rule)).toBeFalsy();
+            expect(isValidAdgRedirectRule(rule)).toBeFalsy();
+
+            // FIXME: seemes that isAdgRedirectRule was removed
+            // ## [v2.0.1] - 2024-11-13 - scriptlets
+            // rule = '||example.com/banner$image,redirect=32x32transparent.png';
+            // expect(redirects.isAdgRedirectRule(rule)).toBeTruthy();
 
             rule = '||example.com/banner$image,redirect=32x32transparent.png';
-            expect(redirects.isAdgRedirectRule(rule)).toBeTruthy();
-
-            rule = '||example.com/banner$image,redirect=32x32transparent.png';
-            expect(redirects.isValidAdgRedirectRule(rule)).toBeFalsy();
+            expect(isValidAdgRedirectRule(rule)).toBeFalsy();
 
             rule = '||tvn.adocean.pl/*ad.xml$xmlhttprequest,redirect=noopvast-2.0,domain=tvn24.pl';
-            expect(redirects.isValidAdgRedirectRule(rule)).toBeTruthy();
+            expect(isValidAdgRedirectRule(rule)).toBeTruthy();
 
             rule = '||vast.kinogo.by/code/video-steam/?id=$redirect=noopvast-2.0';
-            expect(redirects.isValidAdgRedirectRule(rule)).toBeTruthy();
+            expect(isValidAdgRedirectRule(rule)).toBeTruthy();
 
             rule = '||strm.yandex.com/get/$script,redirect=noopvast-2.0,domain=kinopoisk.com';
-            expect(redirects.isValidAdgRedirectRule(rule)).toBeTruthy();
+            expect(isValidAdgRedirectRule(rule)).toBeTruthy();
 
             rule = '||strm.yandex.com/get/$script,redirect=noopvast-2.0,domain=kinopoisk.com';
-            expect(redirects.isValidAdgRedirectRule(rule)).toBeTruthy();
+            expect(isValidAdgRedirectRule(rule)).toBeTruthy();
 
             rule = '||googletagmanager.com/gtm.js$script,redirect=googletagmanager-gtm,domain=morningstar.nl';
-            expect(redirects.isValidAdgRedirectRule(rule)).toBeTruthy();
+            expect(isValidAdgRedirectRule(rule)).toBeTruthy();
 
             rule = '||example.com^$redirect=noopjson';
-            expect(redirects.isValidAdgRedirectRule(rule)).toBeTruthy();
+            expect(isValidAdgRedirectRule(rule)).toBeTruthy();
         });
     });
 
@@ -550,7 +561,7 @@ describe('validator', () => {
                 '/^https?:\/\/.*(powvideo|powvldeo|povvideo).*\.*[?&$=&!]/$script,subdocument',
             ];
             test.each(validRules)('%s', (rule) => {
-                expect(validator.validate([rule])).toHaveLength(1);
+                expect(validateAndFilterRules([rule])).toHaveLength(1);
             });
         });
 
@@ -561,17 +572,17 @@ describe('validator', () => {
                 '/\.sharesix\.com/.*[a-zA-Z0-9]({4}/$script',
             ];
             test.each(invalidRules)('%s', (rule) => {
-                expect(validator.validate([rule])).toHaveLength(0);
+                expect(validateAndFilterRules([rule])).toHaveLength(0);
             });
         });
     });
 
     it('validate modifiers - known and unknown', () => {
         const validRule = '@@||test.com^$generichide,app=iexplore.exe';
-        expect(validator.validate([validRule])).toHaveLength(1);
+        expect(validateAndFilterRules([validRule])).toHaveLength(1);
 
         const invalidRule = '@@||test.com^$generichide,invalid_modifier';
-        expect(validator.validate([invalidRule])).toHaveLength(0);
+        expect(validateAndFilterRules([invalidRule])).toHaveLength(0);
     });
 
     describe('validate removeparam rules', () => {
@@ -586,7 +597,7 @@ describe('validator', () => {
                 '||example.org^$removeparam=p,object',
             ];
             test.each(validRules)('%s', (rule) => {
-                expect(validator.validate([rule])).toHaveLength(1);
+                expect(validateAndFilterRules([rule])).toHaveLength(1);
             });
         });
 
@@ -597,7 +608,7 @@ describe('validator', () => {
                 '$removeparam=source|campaign',
             ];
             test.each(invalidRules)('%s', (rule) => {
-                expect(validator.validate([rule])).toHaveLength(0);
+                expect(validateAndFilterRules([rule])).toHaveLength(0);
             });
         });
     });
@@ -606,10 +617,10 @@ describe('validator', () => {
         let rules;
 
         rules = ['/adsbygoogle.$redirect-rule=noopmp4-1s,script,domain=nekopoi.web.id'];
-        expect(validator.validate(rules)).toHaveLength(1);
+        expect(validateAndFilterRules(rules)).toHaveLength(1);
 
         rules = ['example.org/ads.js$script,redirect-rule'];
-        expect(validator.validate(rules)).toHaveLength(0);
+        expect(validateAndFilterRules(rules)).toHaveLength(0);
     });
 
     describe('validate jsonprune modifier', () => {
@@ -619,7 +630,7 @@ describe('validator', () => {
             '||example.org/*/*/$xmlhttprequest,jsonprune=\\$.data.*.attributes',
         ];
         test.each(validRules)('%s', (rule) => {
-            expect(validator.validate([rule])).toHaveLength(1);
+            expect(validateAndFilterRules([rule])).toHaveLength(1);
         });
     });
 
@@ -630,7 +641,7 @@ describe('validator', () => {
             '||example.org^$hls=/#UPLYNK-SEGMENT:.*\\,ad/t',
         ];
         test.each(validRules)('%s', (rule) => {
-            expect(validator.validate([rule])).toHaveLength(1);
+            expect(validateAndFilterRules([rule])).toHaveLength(1);
         });
     });
 
@@ -639,7 +650,7 @@ describe('validator', () => {
             '||example.com^$referrerpolicy=origin',
         ];
         test.each(validRules)('%s', (rule) => {
-            expect(validator.validate([rule])).toHaveLength(1);
+            expect(validateAndFilterRules([rule])).toHaveLength(1);
         });
     });
 
@@ -648,7 +659,7 @@ describe('validator', () => {
             '||example.org^$permissions=geolocation=()',
         ];
         test.each(validRules)('%s', (rule) => {
-            expect(validator.validate([rule])).toHaveLength(1);
+            expect(validateAndFilterRules([rule])).toHaveLength(1);
         });
     });
 
@@ -657,7 +668,7 @@ describe('validator', () => {
             String.raw`://www.*.com/*.css|$script,third-party,header=link:/ads\.re\/>;rel=preconnect/`,
         ];
         test.each(validRules)('%s', (rule) => {
-            expect(validator.validate([rule])).toHaveLength(1);
+            expect(validateAndFilterRules([rule])).toHaveLength(1);
         });
     });
 
@@ -687,7 +698,7 @@ describe('validator', () => {
             '||test16.com',
             '||test17.com',
         ];
-        expect(validator.checkAffinityDirectives(rules)).toBeTruthy();
+        expect(checkAffinityDirectives(rules)).toBeTruthy();
 
         rules = [
             '||test1.com',
@@ -703,7 +714,7 @@ describe('validator', () => {
             '||test8.com',
             '!#safari_cb_affinity',
         ];
-        expect(validator.checkAffinityDirectives(rules)).toBeTruthy();
+        expect(checkAffinityDirectives(rules)).toBeTruthy();
 
         // 'advanced' value for the directive
         rules = [
@@ -728,7 +739,7 @@ describe('validator', () => {
             '||test5.com',
             '!#safari_cb_affinity(privacy)',
         ];
-        expect(validator.checkAffinityDirectives(rules)).toBeFalsy();
+        expect(checkAffinityDirectives(rules)).toBeFalsy();
 
         rules = [
             '||test1.com',
@@ -742,7 +753,7 @@ describe('validator', () => {
             '||test6.com',
             '||test7.com',
         ];
-        expect(validator.checkAffinityDirectives(rules)).toBeFalsy();
+        expect(checkAffinityDirectives(rules)).toBeFalsy();
 
         rules = [
             '||test1.com',
@@ -755,7 +766,7 @@ describe('validator', () => {
             '!#safari_cb_affinity(privacy)',
             '||test6.com',
         ];
-        expect(validator.checkAffinityDirectives(rules)).toBeFalsy();
+        expect(checkAffinityDirectives(rules)).toBeFalsy();
 
         rules = [
             '||test1.com',
@@ -763,7 +774,7 @@ describe('validator', () => {
             '!#safari_cb_affinity',
             '||test3.com',
         ];
-        expect(validator.checkAffinityDirectives(rules)).toBeFalsy();
+        expect(checkAffinityDirectives(rules)).toBeFalsy();
 
         rules = [
             '!#safari_cb_affinity(social)',
@@ -771,6 +782,6 @@ describe('validator', () => {
             '||test2.com',
             '||test3.com',
         ];
-        expect(validator.checkAffinityDirectives(rules)).toBeFalsy();
+        expect(checkAffinityDirectives(rules)).toBeFalsy();
     });
 });

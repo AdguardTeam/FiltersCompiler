@@ -1,9 +1,12 @@
-const path = require('path');
+import {
+    describe, it, expect, vi,
+} from 'vitest';
+import path from 'path';
 
-const localesValidator = require('../main/locales-validator');
+import localesValidator from '../main/locales-validator';
 
 // Mock log to hide error messages
-jest.mock('../main/utils/log');
+vi.mock('../main/utils/log');
 
 describe('locales validator', () => {
     it('Test locales validator', async () => {

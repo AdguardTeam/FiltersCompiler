@@ -1,13 +1,17 @@
-/* eslint-disable max-len */
-const path = require('path');
-const fs = require('fs').promises;
-const { existsSync } = require('fs');
+/**
+ * @vitest-environment jsdom
+ */
+import {
+    describe, it, expect, beforeAll, test, vi,
+} from 'vitest';
+import path from 'path';
+import { promises as fs, existsSync } from 'fs';
 
-const optimization = require('../main/optimization');
-const builder = require('../main/builder');
+import optimization from '../main/optimization';
+import { build, include } from '../main/builder';
 
 // Mock log to hide error messages
-jest.mock('../main/utils/log');
+vi.mock('../main/utils/log');
 
 const readFile = (path) => {
     try {
@@ -33,8 +37,6 @@ optimization.disableOptimization();
 
 describe('Test builder', () => {
     beforeAll(async () => {
-        expect(builder).toBeTruthy();
-
         const platformsConfig = await getPlatformsConfig();
 
         // remove platformsDir if it exists
@@ -42,7 +44,7 @@ describe('Test builder', () => {
             await fs.rmdir(platformsDir, { recursive: true });
         }
 
-        await builder.build(filtersDir, logFile, reportFile, platformsDir, platformsConfig);
+        await build(filtersDir, logFile, reportFile, platformsDir, platformsConfig);
     });
 
     describe('Works', () => {
@@ -1035,22 +1037,22 @@ describe('Test builder', () => {
     });
 
     it('Builds lists', async () => {
-        await builder.build(filtersDir, logFile, reportFile, null, {}, null, [2, 3]);
+        await build(filtersDir, logFile, reportFile, null, {}, null, [2, 3]);
         let revision = await readFile(path.join(filtersDir, 'filter_2_English', 'revision.json'));
         expect(revision).toBeTruthy();
 
-        await builder.build(filtersDir, logFile, reportFile, null, {}, null, null, [3, 4]);
+        await build(filtersDir, logFile, reportFile, null, {}, null, null, [3, 4]);
         revision = await readFile(path.join(filtersDir, 'filter_2_English', 'revision.json'));
         expect(revision).toBeTruthy();
 
-        await builder.build(filtersDir, logFile, reportFile, null, {}, null, [2, 3], [3, 4]);
+        await build(filtersDir, logFile, reportFile, null, {}, null, [2, 3], [3, 4]);
         revision = await readFile(path.join(filtersDir, 'filter_2_English', 'revision.json'));
         expect(revision).toBeTruthy();
     });
 
     it('Validate affinity directives', async () => {
         await expect(
-            builder.build(badFiltersDir, null, null, platformsDir, platformsConfigFile, [8]),
+            build(badFiltersDir, null, null, platformsDir, platformsConfigFile, [8]),
         ).rejects.toThrow('Error validating !#safari_cb_affinity directive in filter 8');
     });
 
@@ -1065,10 +1067,10 @@ describe('Test builder', () => {
             '\t!',
             '\t!#if adguard',
             '\t!#include non-existing-file.txt',
-            `\tError: ENOENT: no such file or directory, open '${fileURL}'`,
+            `\tENOENT: no such file or directory, open '${fileURL}'`,
         ];
         await expect(
-            builder.build(badFiltersDir, null, null, platformsDir, platformsConfigFile, [9]),
+            build(badFiltersDir, null, null, platformsDir, platformsConfigFile, [9]),
         ).rejects.toThrow(`${errorMessages.join('\n')}\n`);
     });
 
@@ -1105,8 +1107,8 @@ describe('check include directive function', () => {
         ];
 
         test.each(testCases)('$actual', async ({ actual, expectedShouldIgnore }) => {
-            // const includedData = await builder.include(actual, [], path.dirname(__filename));
-            const includedData = await builder.include(
+            // const includedData = await include(actual, [], path.dirname(__filename));
+            const includedData = await include(
                 path.dirname(__filename),
                 actual,
                 [],
@@ -1119,14 +1121,13 @@ describe('check include directive function', () => {
         const fileUrl = 'https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/ExperimentalFilter/sections/English/common_js.txt';
         const actual = `@include "${fileUrl}" /ignoreTrustLevel`;
         await expect(
-            builder.include(path.dirname(__filename), actual, []),
+            include(path.dirname(__filename), actual, []),
         ).rejects.toThrow(/Trust level ignoring option is not supported for external includes/);
     });
 });
 
 describe('apply platformsExcluded directive during limited filters list build', () => {
     beforeAll(async () => {
-        expect(builder).toBeTruthy();
         const platformsConfig = await getPlatformsConfig();
 
         // remove platformsDir if it exists
@@ -1135,7 +1136,7 @@ describe('apply platformsExcluded directive during limited filters list build', 
         }
 
         const filtersToBuild = [2, 3];
-        await builder.build(filtersDir, logFile, reportFile, platformsDir, platformsConfig, filtersToBuild);
+        await build(filtersDir, logFile, reportFile, platformsDir, platformsConfig, filtersToBuild);
     });
 
     // check that filter 2 and 4 are built for mac platform

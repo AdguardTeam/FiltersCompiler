@@ -1,7 +1,7 @@
 /**
  * Rule masks constants
  */
-module.exports = (() => ({
+export const RuleMasks = {
     MASK_REGEX_RULE: '/',
     MASK_RULE_SEPARATOR: '^',
     MASK_WHITE_LIST: '@@',
@@ -24,5 +24,4 @@ module.exports = (() => ({
     MASK_DIRECTIVES: '!#',
     MASK_SCRIPTLET: '#%#//scriptlet',
     MASK_SCRIPTLET_EXCEPTION: '#@%#//scriptlet',
-})
-)();
+};

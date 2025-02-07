@@ -1,9 +1,9 @@
-import { RuleConverter, RuleParser } from '@adguard/agtree';
+import { RuleConverter, RuleParser, RuleGenerator } from '@adguard/agtree';
 import { isValidAdgRedirectRule, isAdgScriptletRule } from '@adguard/scriptlets/validators';
-import { convertAdgRedirectToUbo, convertAdgToUbo } from '@adguard/redirects/converters';
+import { convertAdgRedirectToUbo, convertAdgToUbo } from '@adguard/scriptlets/converters';
 
-import logger from './utils/log';
-import cosmeticRuleModifiers from './rule/cosmetic-rule-modifiers';
+import { logger } from './utils/log';
+import { isAdgCosmeticRuleWithPathModifier, isAdgCosmeticRuleWithPathModifier } from './rule/cosmetic-rule-modifiers';
 
 /**
  * Excludes rule
@@ -11,7 +11,7 @@ import cosmeticRuleModifiers from './rule/cosmetic-rule-modifiers';
  * @param {array} excluded
  * @param {string} message
  */
-const excludeRule = (rule, excluded, message) => {
+export const excludeRule = (rule, excluded, message) => {
     if (excluded) {
         excluded.push(`! ${message}`);
         excluded.push(rule);
@@ -24,7 +24,7 @@ const excludeRule = (rule, excluded, message) => {
  * @param {array} [excluded]
  * @return {array} result
  */
-const convertRulesToAdgSyntax = function (rulesList, excluded) {
+export const convertRulesToAdgSyntax = (rulesList, excluded) => {
     const result = [];
 
     for (let i = 0; i < rulesList.length; i += 1) {
@@ -32,8 +32,8 @@ const convertRulesToAdgSyntax = function (rulesList, excluded) {
         try {
             const ruleNode = RuleParser.parse(rule);
             const conversionResult = RuleConverter.convertToAdg(ruleNode);
-            const convertedRules = conversionResult.result.map((r) => RuleParser.generate(r));
-
+            // FIXME: RuleParser.generate - undefined
+            const convertedRules = conversionResult.result.map((r) => RuleGenerator.generate(r));
             result.push(...convertedRules);
 
             if (conversionResult.isConverted) {
@@ -58,7 +58,7 @@ const convertRulesToAdgSyntax = function (rulesList, excluded) {
  * @param {function} convertMethod
  * @return {array} modified rules
  */
-const convertToUbo = (rules, ruleType, validateMethod, convertMethod) => {
+export const convertToUbo = (rules, ruleType, validateMethod, convertMethod) => {
     const modified = [];
     rules.forEach((rule) => {
         if (rule && validateMethod(rule)) {
@@ -81,7 +81,7 @@ const convertToUbo = (rules, ruleType, validateMethod, convertMethod) => {
  * @param {array} rules
  * @return {array} modified rules
  */
-const convertAdgScriptletsToUbo = (rules) => {
+export const convertAdgScriptletsToUbo = (rules) => {
     if (!rules) {
         return [];
     }
@@ -98,7 +98,7 @@ const convertAdgScriptletsToUbo = (rules) => {
  * @param {array} rules
  * @return {array} modified rules
  */
-const convertAdgRedirectsToUbo = (rules) => {
+export const convertAdgRedirectsToUbo = (rules) => {
     if (!rules) {
         return [];
     }
@@ -113,21 +113,16 @@ const convertAdgRedirectsToUbo = (rules) => {
     );
 };
 
-const convertAdgPathModifierToUbo = (rules) => {
+export const convertAdgPathModifierToUbo = (rules) => {
     if (!rules) {
         return [];
     }
     return convertToUbo(
         rules,
         '$path',
-        cosmeticRuleModifiers.isAdgCosmeticRuleWithPathModifier,
-        cosmeticRuleModifiers.convertAdgPathModifierToUbo,
+        isAdgCosmeticRuleWithPathModifier,
+        convertAdgPathModifierToUbo,
     );
 };
 
-module.exports = {
-    convertRulesToAdgSyntax,
-    convertAdgScriptletsToUbo,
-    convertAdgRedirectsToUbo,
-    convertAdgPathModifierToUbo,
-};
+export default { convertRulesToAdgSyntax, convertAdgPathModifierToUbo, convertAdgRedirectsToUbo, convertAdgScriptletsToUbo };

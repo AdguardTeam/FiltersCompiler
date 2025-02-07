@@ -1,7 +1,10 @@
-const optimization = require('../main/optimization');
+import {
+    describe, it, expect, vi,
+} from 'vitest';
+import optimization from '../main/optimization';
 
 // Mock log to hide error messages
-jest.mock('../main/utils/log');
+vi.mock('../main/utils/log');
 
 describe('optimization', () => {
     it('Test optimization', () => {

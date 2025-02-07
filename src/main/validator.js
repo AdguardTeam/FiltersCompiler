@@ -1,20 +1,23 @@
-const {
-    CommentRuleParser,
+import {
+    CommentParser,
     CosmeticRuleType,
     RuleConverter,
     RuleParser,
+    RuleGenerator,
     RuleCategory,
     RegExpUtils,
     defaultParserOptions,
-} = require('@adguard/agtree');
-const {
+} from '@adguard/agtree';
+
+import {
     RuleFactory,
     CosmeticRule,
     NetworkRule,
-} = require('@adguard/tsurlfilter');
+} from '@adguard/tsurlfilter';
 
-const logger = require('./utils/log');
-const extendedCssValidator = require('./utils/extended-css-validator');
+import { logger } from './utils/log';
+
+import { validateCssSelector } from './utils/extended-css-validator';
 
 /**
  * @typedef {import('@adguard/agtree').AnyRule} AnyRule
@@ -99,7 +102,7 @@ class RuleValidator {
             return RuleValidator.createValidationResult(true);
         }
 
-        const ruleText = RuleParser.generate(ruleNode);
+        const ruleText = RuleGenerator.generate(ruleNode);
 
         try {
             // Validate cosmetic rules
@@ -135,13 +138,14 @@ class RuleValidator {
  *
  * @returns {string[]} List of valid rules.
  */
-const validate = function (list, excluded, invalid = [], filterName) { // eslint-disable-line default-param-last
+export const validateAndFilterRules = (list, excluded, invalid = [], filterName) => {
+    // eslint-disable-line default-param-last
     if (!list) {
         return [];
     }
 
     return list.filter((ruleText) => {
-        if (CommentRuleParser.isCommentRule(ruleText)) {
+        if (CommentParser.isCommentRule(ruleText)) {
             return true;
         }
 
@@ -202,7 +206,7 @@ const validate = function (list, excluded, invalid = [], filterName) { // eslint
 
             // It is impossible to bundle jsdom into tsurlfilter, so we check if rules are valid in the compiler
             if (rule instanceof CosmeticRule && rule.getType() === CosmeticRuleType.ElementHidingRule) {
-                const validationResult = extendedCssValidator.validateCssSelector(rule.getContent());
+                const validationResult = validateCssSelector(rule.getContent());
                 if (!validationResult.ok) {
                     // TODO: rule selector can be validated by agtree
                     logger.error(`Invalid rule selector in ${filterName}: ${ruleText}`);
@@ -223,7 +227,7 @@ const validate = function (list, excluded, invalid = [], filterName) { // eslint
  *
  * @param lines
  */
-const checkAffinityDirectives = (lines) => {
+export const checkAffinityDirectives = (lines) => {
     if (!(lines && lines.length)) {
         // skip empty filter
         return true;
@@ -245,9 +249,4 @@ const checkAffinityDirectives = (lines) => {
     }
 
     return !stack.length;
-};
-
-module.exports = {
-    validate,
-    checkAffinityDirectives,
 };

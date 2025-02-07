@@ -1,7 +1,10 @@
-const version = require('../main/utils/version');
+import {
+    describe, it, expect, vi,
+} from 'vitest';
+import version from '../main/utils/version';
 
 // Mock log to hide error messages
-jest.mock('../main/utils/log');
+vi.mock('../main/utils/log');
 
 describe('version', () => {
     it('Test versions', () => {

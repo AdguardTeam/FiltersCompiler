@@ -1,7 +1,9 @@
-const filter = require('../main/platforms/filter');
+import { describe, it, expect, vi } from 'vitest';
+
+import { cleanupAndOptimizeRules, cleanupRules } from '../main/platforms/filter';
 
 // Mock log to hide error messages
-jest.mock('../main/utils/log');
+vi.mock('../main/utils/log');
 
 describe('platforms filter', () => {
     it('Test hints', () => {
@@ -29,7 +31,7 @@ describe('platforms filter', () => {
             'invalid_hint',
         ];
 
-        const after = filter.cleanupRules(before, config, 0);
+        const after = cleanupRules(before, config, 0);
 
         expect(after).toBeDefined();
         expect(after).toHaveLength(10);
@@ -99,7 +101,7 @@ describe('platforms filter', () => {
             '!#safari_cb_affinity',
         ];
 
-        const after = filter.cleanupAndOptimizeRules(before, config, optimizationConfig, 0);
+        const after = cleanupAndOptimizeRules(before, config, optimizationConfig, 0);
 
         expect(after).toBeDefined();
         expect(after).toHaveLength(6);
@@ -173,7 +175,7 @@ describe('platforms filter', () => {
             ...matchRules,
         ];
 
-        const after = filter.cleanupRules(before, config, 0);
+        const after = cleanupRules(before, config, 0);
 
         expect(after).toBeDefined();
         expect(after).toEqual(notMatchRules);
@@ -213,7 +215,7 @@ describe('platforms filter', () => {
             ...matchRules,
         ];
 
-        const after = filter.cleanupRules(before, config, 0);
+        const after = cleanupRules(before, config, 0);
 
         expect(after).toBeDefined();
         expect(after).toEqual(notMatchRules);
@@ -251,7 +253,7 @@ describe('platforms filter', () => {
             ...matchRules,
         ];
 
-        const after = filter.cleanupRules(before, config, 0);
+        const after = cleanupRules(before, config, 0);
 
         expect(after).toBeDefined();
         expect(after).toEqual(notMatchRules);
@@ -288,7 +290,7 @@ describe('platforms filter', () => {
             ...matchRules,
         ];
 
-        const after = filter.cleanupRules(before, config, 0);
+        const after = cleanupRules(before, config, 0);
 
         expect(after).toBeDefined();
         expect(after).toEqual(notMatchRules);

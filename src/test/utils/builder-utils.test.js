@@ -1,6 +1,12 @@
-const { optimizeDomainBlockingRules } = require('../../main/utils/builder-utils');
+import {
+    describe,
+    it,
+    expect,
+    vi,
+} from 'vitest';
+import { optimizeDomainBlockingRules } from '../../main/utils/builder-utils';
 
-jest.mock('../../main/utils/log');
+vi.mock('../../main/utils/log');
 
 describe('optimizeDomainBlockingRules options of include directive', () => {
     it('Properly removes redundant rules', () => {

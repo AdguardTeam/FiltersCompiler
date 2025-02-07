@@ -1,6 +1,6 @@
-const { parse } = require('tldts');
+import { parse } from 'tldts';
 
-const RuleMasks = require('../rule/rule-masks');
+import { RuleMasks } from '../rule/rule-masks';
 
 const DOT = '.';
 
@@ -57,7 +57,7 @@ const extractDomainNames = (line) => {
  * @param {string[]} lines - An array of text lines.
  * @returns {string[]} - An array of of text lines with redundant rules removed.
  */
-const optimizeDomainBlockingRules = (lines) => {
+export const optimizeDomainBlockingRules = (lines) => {
     /**
      * Stores a map of original domain and all possible domains from the line.
      *
@@ -97,8 +97,4 @@ const optimizeDomainBlockingRules = (lines) => {
         const domain = removeRuleMarkers(line);
         return widerDomains.has(domain);
     });
-};
-
-module.exports = {
-    optimizeDomainBlockingRules,
 };

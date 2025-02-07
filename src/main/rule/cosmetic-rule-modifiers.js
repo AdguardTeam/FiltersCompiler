@@ -1,6 +1,6 @@
-const { CosmeticRuleParser } = require('@adguard/tsurlfilter');
+import { CosmeticRuleParser } from '@adguard/agtree';
 
-const isAdgCosmeticRuleWithPathModifier = (rule) => {
+export const isAdgCosmeticRuleWithPathModifier = (rule) => {
     try {
         const { pattern } = CosmeticRuleParser.parseRuleTextByMarker(rule);
         if (!pattern) {
@@ -25,7 +25,7 @@ const isAdgCosmeticRuleWithPathModifier = (rule) => {
     }
 };
 
-const convertAdgPathModifierToUbo = (rule) => {
+export const convertAdgPathModifierToUbo = (rule) => {
     const {
         pattern,
         marker,
@@ -57,9 +57,4 @@ const convertAdgPathModifierToUbo = (rule) => {
     }
 
     return `${domainsPattern}${marker}:matches-path(${path})${content}`;
-};
-
-module.exports = {
-    isAdgCosmeticRuleWithPathModifier,
-    convertAdgPathModifierToUbo,
 };
