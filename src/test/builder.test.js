@@ -419,7 +419,7 @@ describe('Test builder', () => {
 
         it('platform/test local_script_rules.json', async () => {
             const localScriptRulesJsonContent = await readFile(
-                path.join(platformsDir, 'test', 'local_script_rules.json')
+                path.join(platformsDir, 'test', 'local_script_rules.json'),
             );
             expect(localScriptRulesJsonContent).toBeTruthy();
 

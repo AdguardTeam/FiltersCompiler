@@ -1,4 +1,6 @@
+/* eslint-disable import/no-unresolved */
 /* eslint-disable max-len */
+// FIXME: adguard/scriptlets/converters not found by eslint
 import {
     describe, it, expect, vi,
 } from 'vitest';
