@@ -76,7 +76,7 @@ const backupValidate = (selector, originalError) => {
  *
  * @returns {SelectorValidationResult}
  */
-export const validateCssSelector = (selectorText) => {
+const validateCssSelector = (selectorText) => {
     // jsdom is crashing when selector is a script
     if (selectorText.indexOf('##script:contains') !== -1
         || selectorText.indexOf('##script:inject') !== -1) {
@@ -111,3 +111,5 @@ export const validateCssSelector = (selectorText) => {
     }
     return validation;
 };
+
+export default validateCssSelector;

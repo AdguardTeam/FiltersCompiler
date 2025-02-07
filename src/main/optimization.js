@@ -1,5 +1,5 @@
 /* eslint-disable global-require */
-import { downloadFile } from './utils/webutils';
+import downloadFile from './utils/webutils';
 
 // Here we can access optimizable filters and its optimization percentages
 // eslint-disable-next-line max-len

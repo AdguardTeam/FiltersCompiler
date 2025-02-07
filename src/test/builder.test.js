@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /**
  * @vitest-environment jsdom
  */

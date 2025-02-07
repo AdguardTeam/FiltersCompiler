@@ -35,7 +35,7 @@ const tryDownloadFile = function (url, retryNum = 0) {
  * @param url
  * @returns {*}
  */
-export const downloadFile = (url) => {
+const downloadFile = (url) => {
     logger.log(`Downloading: ${url}`);
 
     // 5 times to retry after first fail attempt:
@@ -52,3 +52,5 @@ export const downloadFile = (url) => {
         return tryDownloadFile(url, RETRY_NUM);
     }
 };
+
+export default downloadFile;

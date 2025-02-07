@@ -1129,4 +1129,3 @@ export const generate = async (filtersDir, platformsPath, whitelist, blacklist) 
     // TODO: find out better way to reset
     filterIdsPool = [];
 };
-

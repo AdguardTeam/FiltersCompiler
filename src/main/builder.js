@@ -13,7 +13,7 @@ import logger from './utils/log';
 import { skipFilter, addFilter, create } from './utils/report';
 import RuleMasks from './rule/rule-masks';
 import { fixVersionComments, removeAdblockVersion } from './utils/workaround';
-import { downloadFile } from './utils/webutils';
+import downloadFile from './utils/webutils';
 import { getFilterIdFromDirName } from './utils/utils';
 import optimizeDomainBlockingRules from './utils/builder-utils';
 
