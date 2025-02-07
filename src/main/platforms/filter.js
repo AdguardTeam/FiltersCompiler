@@ -9,7 +9,7 @@
  * and strict mode is on then filter compilation should fail, otherwise original rules must be used
  */
 
-import { logger } from '../utils/log';
+import logger from '../utils/log';
 import { overrideRule } from '../utils/workaround';
 import { RuleMasks } from '../rule/rule-masks';
 import { skipRuleWithOptimization } from '../optimization';

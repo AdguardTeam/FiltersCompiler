@@ -1,7 +1,7 @@
 import {
     describe, it, expect, test,
 } from 'vitest';
-import generator from '../main/platforms/generator';
+import { sortMetadataFilters, shouldBuildFilterForPlatform } from '../main/platforms/generator';
 
 describe('generator', () => {
     it('sortMetadataFilters', () => {
@@ -85,7 +85,7 @@ describe('generator', () => {
                 },
             ],
         };
-        expect(generator.sortMetadataFilters(actual)).toEqual(expected);
+        expect(sortMetadataFilters(actual)).toEqual(expected);
     });
 
     describe('shouldBuildFilterForPlatform', () => {
@@ -112,7 +112,7 @@ describe('generator', () => {
                     platformsExcluded: ['mac', 'ios'],
                 },
             ])(`should build filter for platform '${platform}' - %s`, async (metadata) => {
-                expect(generator.shouldBuildFilterForPlatform(metadata, platform)).toBeTruthy();
+                expect(shouldBuildFilterForPlatform(metadata, platform)).toBeTruthy();
             });
         });
 
@@ -133,7 +133,7 @@ describe('generator', () => {
                     platformsExcluded: ['mac', 'ios', 'chromium'],
                 },
             ])(`should NOT build filter for platform '${platform}' - %s`, async (metadata) => {
-                expect(generator.shouldBuildFilterForPlatform(metadata, platform)).toBeFalsy();
+                expect(shouldBuildFilterForPlatform(metadata, platform)).toBeFalsy();
             });
         });
 
@@ -144,7 +144,7 @@ describe('generator', () => {
                 platformsExcluded: ['mac'],
             };
             expect(() => {
-                generator.shouldBuildFilterForPlatform(metadata, platform);
+                shouldBuildFilterForPlatform(metadata, platform);
             }).toThrow(
                 'Both platformsIncluded and platformsExcluded cannot be defined simultaneously for filter 1',
             );

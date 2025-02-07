@@ -15,7 +15,7 @@ import {
     NetworkRule,
 } from '@adguard/tsurlfilter';
 
-import { logger } from './utils/log';
+import logger from './utils/log';
 
 import { validateCssSelector } from './utils/extended-css-validator';
 

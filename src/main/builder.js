@@ -9,7 +9,7 @@ import version from './utils/version';
 import { convertRulesToAdgSyntax } from './converter';
 import { validateAndFilterRules, checkAffinityDirectives } from './validator';
 import { init, generate } from './platforms/generator';
-import { logger } from './utils/log';
+import logger from './utils/log';
 import { skipFilter, addFilter, create } from './utils/report';
 import { RuleMasks } from './rule/rule-masks';
 import { fixVersionComments, removeAdblockVersion } from './utils/workaround';

@@ -24,7 +24,7 @@ const isLevelIncluded = function (level) {
     return Levels[logLevel] <= level;
 };
 
-export const logger = {
+const logger = {
     /**
      * Writes log message
      *
@@ -90,3 +90,5 @@ export const logger = {
         }
     },
 };
+
+export default logger;

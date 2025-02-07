@@ -1,5 +1,5 @@
 /* eslint-disable global-require */
-import { logger } from './log';
+import logger from './log';
 
 /**
  * Some sources require proper user-agents and forbid downloading without.

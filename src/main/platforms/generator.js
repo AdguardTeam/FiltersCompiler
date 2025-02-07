@@ -6,7 +6,7 @@ import crypto from 'crypto';
 import moment from 'moment';
 
 import { FiltersDownloader } from '@adguard/filters-downloader';
-import { logger } from '../utils/log';
+import logger from '../utils/log';
 import { cleanupAndOptimizeRules, cleanupRules } from './filter';
 import {
     rewriteRules,
@@ -1124,9 +1124,3 @@ export const generate = async (filtersDir, platformsPath, whitelist, blacklist) 
     filterIdsPool = [];
 };
 
-export default {
-    init,
-    generate,
-    shouldBuildFilterForPlatform,
-    sortMetadataFilters,
-};

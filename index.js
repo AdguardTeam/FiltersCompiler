@@ -4,7 +4,7 @@ import { setLogger, setConfiguration, CompatibilityTypes } from '@adguard/tsurlf
 import { build } from './src/main/builder';
 import schemaValidator from './src/main/json-validator';
 import localesValidator from './src/main/locales-validator';
-import { logger } from './src/main/utils/log';
+import logger from './src/main/utils/log';
 
 // default platforms config
 import platformsConfig from './src/main/platforms-config';
