@@ -7,7 +7,7 @@ import {
 import path from 'path';
 import { promises as fs, existsSync } from 'fs';
 
-import optimization from '../main/optimization';
+import { disableOptimization } from '../main/optimization';
 import { build, include } from '../main/builder';
 
 // Mock log to hide error messages
@@ -33,7 +33,7 @@ const getPlatformsConfig = async () => {
     return JSON.parse(platformsConfig);
 };
 
-optimization.disableOptimization();
+disableOptimization();
 
 describe('Test builder', () => {
     beforeAll(async () => {
@@ -417,7 +417,9 @@ describe('Test builder', () => {
         });
 
         it('platform/test local_script_rules.json', async () => {
-            const localScriptRulesJsonContent = await readFile(path.join(platformsDir, 'test', 'local_script_rules.json'));
+            const localScriptRulesJsonContent = await readFile(
+                path.join(platformsDir, 'test', 'local_script_rules.json')
+            );
             expect(localScriptRulesJsonContent).toBeTruthy();
 
             const localScriptRulesJson = JSON.parse(localScriptRulesJsonContent);

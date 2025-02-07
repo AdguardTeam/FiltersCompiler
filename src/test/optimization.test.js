@@ -1,18 +1,21 @@
 import {
     describe, it, expect, vi,
 } from 'vitest';
-import optimization from '../main/optimization';
+import {
+    getFiltersOptimizationPercent,
+    skipRuleWithOptimization,
+} from '../main/optimization';
 
 // Mock log to hide error messages
 vi.mock('../main/utils/log');
 
 describe('optimization', () => {
     it('Test optimization', () => {
-        const filtersOptimizationPercent = optimization.getFiltersOptimizationPercent();
+        const filtersOptimizationPercent = getFiltersOptimizationPercent();
 
         expect(filtersOptimizationPercent.config.length).toBeGreaterThan(0);
 
-        expect(optimization.getFilterOptimizationConfig(1)).toBeDefined();
+        expect(getFiltersOptimizationPercent(1)).toBeDefined();
     });
 
     it('Test optimization skip rule', () => {
@@ -35,10 +38,10 @@ describe('optimization', () => {
             ],
         };
 
-        expect(optimization.skipRuleWithOptimization('low_hits1', config)).toBeTruthy();
-        expect(optimization.skipRuleWithOptimization('low_hits1', config)).toBeTruthy();
-        expect(optimization.skipRuleWithOptimization('enough_hits1', config)).toBeFalsy();
-        expect(optimization.skipRuleWithOptimization('enough_hits2', config)).toBeFalsy();
-        expect(optimization.skipRuleWithOptimization('unknown_rule', config)).toBeFalsy();
+        expect(skipRuleWithOptimization('low_hits1', config)).toBeTruthy();
+        expect(skipRuleWithOptimization('low_hits1', config)).toBeTruthy();
+        expect(skipRuleWithOptimization('enough_hits1', config)).toBeFalsy();
+        expect(skipRuleWithOptimization('enough_hits2', config)).toBeFalsy();
+        expect(skipRuleWithOptimization('unknown_rule', config)).toBeFalsy();
     });
 });

@@ -9,7 +9,7 @@ import path from 'path';
 
 import schemaValidator from '../main/json-validator';
 import { build } from '../main/builder';
-import optimization from '../main/optimization';
+import { disableOptimization } from '../main/optimization';
 
 // Mock log to hide error messages
 vi.mock('../main/utils/log');
@@ -17,7 +17,7 @@ vi.mock('../main/utils/log');
 describe('json validator', () => {
     it('Test json validator', async () => {
         // Builds directory, otherwise validation would fail
-        optimization.disableOptimization();
+        disableOptimization();
         const filtersDir = path.join(__dirname, './resources/filters');
         const logFile = path.join(__dirname, './resources/log.txt');
         const reportFile = path.join(__dirname, './resources/report.txt');

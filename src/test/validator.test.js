@@ -7,7 +7,6 @@ import {
 import { TextEncoder, TextDecoder } from 'util';
 
 /* eslint-disable max-len */
-import { scriptlets } from '@adguard/scriptlets';
 import {
     isValidAdgRedirectRule,
     isValidScriptletName,
