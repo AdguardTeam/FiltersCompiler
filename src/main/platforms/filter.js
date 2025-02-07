@@ -11,7 +11,7 @@
 
 import logger from '../utils/log';
 import { overrideRule } from '../utils/workaround';
-import { RuleMasks } from '../rule/rule-masks';
+import RuleMasks from '../rule/rule-masks';
 import { skipRuleWithOptimization } from '../optimization';
 
 const HINT_MASK = `${RuleMasks.MASK_HINT} `;

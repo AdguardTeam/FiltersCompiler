@@ -3,7 +3,7 @@ import { isValidAdgRedirectRule, isAdgScriptletRule } from '@adguard/scriptlets/
 import { convertAdgRedirectToUbo, convertAdgToUbo } from '@adguard/scriptlets/converters';
 
 import logger from './utils/log';
-import { isAdgCosmeticRuleWithPathModifier } from './rule/cosmetic-rule-modifiers';
+import { isAdgCosmeticRuleWithPathModifier, convertAdgPathModifierToUbo } from './rule/cosmetic-rule-modifiers';
 
 /**
  * Excludes rule
@@ -113,7 +113,7 @@ export const convertAdgRedirectsToUbo = (rules) => {
     );
 };
 
-export const convertAdgPathModifierToUbo = (rules) => {
+export const convertAdgPathModifiersToUbo = (rules) => {
     if (!rules) {
         return [];
     }
@@ -127,7 +127,7 @@ export const convertAdgPathModifierToUbo = (rules) => {
 
 export default {
     convertRulesToAdgSyntax,
-    convertAdgPathModifierToUbo,
+    convertAdgPathModifiersToUbo,
     convertAdgRedirectsToUbo,
     convertAdgScriptletsToUbo,
 };

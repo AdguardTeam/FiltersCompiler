@@ -15,10 +15,16 @@ import {
     rewriteMetadataForOldMac,
     modifyBaseFilterHeader,
 } from '../utils/workaround';
-import converter from '../converter';
+
+import {
+    convertAdgPathModifiersToUbo,
+    convertAdgRedirectsToUbo,
+    convertAdgScriptletsToUbo,
+} from '../converter';
+
 import { getFilterOptimizationConfig } from '../optimization';
 
-import { RuleMasks } from '../rule/rule-masks';
+import RuleMasks from '../rule/rule-masks';
 
 const RULES_SEPARATOR = '\r\n';
 let filterIdsPool = [];
@@ -865,9 +871,9 @@ const writeFilterRules = function (filterId, dir, config, rulesHeader, rules, op
     // and script rules exceptions https://github.com/AdguardTeam/FiltersCompiler/issues/199
     // Modify title for base filter
     if (config.platform === 'ext_ublock') {
-        rulesList = converter.convertAdgPathModifierToUbo(rulesList);
-        rulesList = converter.convertAdgScriptletsToUbo(rulesList);
-        rulesList = converter.convertAdgRedirectsToUbo(rulesList);
+        rulesList = convertAdgPathModifiersToUbo(rulesList);
+        rulesList = convertAdgScriptletsToUbo(rulesList);
+        rulesList = convertAdgRedirectsToUbo(rulesList);
         rulesList = excludeScriptRules(rulesList);
         if (filterId === 2) {
             modifyBaseFilterHeader(rulesHeader, optimized);

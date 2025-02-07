@@ -1,7 +1,7 @@
 /**
  * Rule masks constants
  */
-export const RuleMasks = {
+const RuleMasks = {
     MASK_REGEX_RULE: '/',
     MASK_RULE_SEPARATOR: '^',
     MASK_WHITE_LIST: '@@',
@@ -25,3 +25,5 @@ export const RuleMasks = {
     MASK_SCRIPTLET: '#%#//scriptlet',
     MASK_SCRIPTLET_EXCEPTION: '#@%#//scriptlet',
 };
+
+export default RuleMasks;

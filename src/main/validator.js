@@ -138,8 +138,8 @@ class RuleValidator {
  *
  * @returns {string[]} List of valid rules.
  */
+// eslint-disable-next-line default-param-last
 export const validateAndFilterRules = (list, excluded, invalid = [], filterName) => {
-    // eslint-disable-line default-param-last
     if (!list) {
         return [];
     }
