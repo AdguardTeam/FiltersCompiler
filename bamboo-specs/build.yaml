@@ -5,7 +5,7 @@ plan:
   key: FILTRCOMPBUILD
   name: filters-compiler - build release
 variables:
-  dockerNode: adguard/node-ssh:18.13--1
+  dockerNode: adguard/node-ssh:22.11--0
 
 stages:
   - Build:
@@ -61,7 +61,7 @@ Build:
             rm -rf node_modules
             echo "Size after cleanup:" && du -h | tail -n 1
   requirements:
-    - adg-docker: true
+    - adg-docker: 'true'
 
 triggers: []
 
