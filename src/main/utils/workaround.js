@@ -115,6 +115,7 @@ export const fixVersionComments = (rules) => {
     });
 };
 
+// TODO: use agtree to remove adblock agent strings
 /**
  * Removes adblock agent strings, for example:
  *  - [AdBlock],
