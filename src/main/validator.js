@@ -15,9 +15,9 @@ import {
     NetworkRule,
 } from '@adguard/tsurlfilter';
 
-import logger from './utils/log';
+import { logger } from './utils/log';
 
-import validateCssSelector from './utils/extended-css-validator';
+import { validateCssSelector } from './utils/extended-css-validator';
 
 /**
  * @typedef {import('@adguard/agtree').AnyRule} AnyRule

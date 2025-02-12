@@ -58,6 +58,7 @@ module.exports = {
                 'ignoreComments': false,
             },
         ],
+        'import/prefer-default-export': 'off',
         'no-useless-escape': 'off',
         'no-param-reassign': 'off',
         'wrap-iife': 'off',

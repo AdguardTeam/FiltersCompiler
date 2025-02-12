@@ -3,7 +3,7 @@
 import fs from 'fs';
 import path from 'path';
 import Ajv from 'ajv';
-import logger from './utils/log';
+import { logger } from './utils/log';
 
 const OLD_MAC_SCHEMAS_SUBDIR = 'mac';
 const SCHEMA_EXTENSION = '.schema.json';
@@ -118,4 +118,4 @@ const validate = (platformsPath, jsonSchemasConfigDir, filtersRequiredAmount) =>
     return result;
 };
 
-export default { validate };
+export const schemaValidator = { validate };

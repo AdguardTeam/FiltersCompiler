@@ -3,7 +3,7 @@ import {
 } from 'vitest';
 import path from 'path';
 
-import localesValidator from '../main/locales-validator';
+import { localesValidator } from '../main/locales-validator';
 
 // Mock log to hide error messages
 vi.mock('../main/utils/log');

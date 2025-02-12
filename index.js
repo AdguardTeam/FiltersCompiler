@@ -2,12 +2,12 @@ import path from 'path';
 import { setLogger, setConfiguration, CompatibilityTypes } from '@adguard/tsurlfilter';
 
 import { build } from './src/main/builder';
-import schemaValidator from './src/main/json-validator';
-import localesValidator from './src/main/locales-validator';
-import logger from './src/main/utils/log';
+import { schemaValidator } from './src/main/json-validator';
+import { localesValidator } from './src/main/locales-validator';
+import { logger } from './src/main/utils/log';
 
 // default platforms config
-import platformsConfig from './src/main/platforms-config';
+import { platformsConfig } from './src/main/platforms-config';
 
 // Sets RuleConverter to use logger of current library
 setLogger(logger);

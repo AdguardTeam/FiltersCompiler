@@ -1,7 +1,7 @@
 /* eslint-disable global-require */
 import fs from 'fs';
 import path from 'path';
-import logger from './utils/log';
+import { logger } from './utils/log';
 
 const FULL_REQUIRED_ENDINGS = ['name', 'description'];
 const ONLY_NAME_REQUIRED_ENDINGS = ['name'];
@@ -302,6 +302,4 @@ const validate = (dirPath, requiredLocales) => {
     return { ok: isOK, data: results, log: resultsLog };
 };
 
-export default {
-    validate,
-};
+export const localesValidator = { validate };

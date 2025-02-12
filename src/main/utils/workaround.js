@@ -1,4 +1,4 @@
-import RuleMasks from '../rule/rule-masks';
+import { RuleMasks } from '../rule/rule-masks';
 
 export const SCRIPTLET_MASK = '//scriptlet';
 

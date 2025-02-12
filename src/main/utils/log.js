@@ -24,7 +24,9 @@ const isLevelIncluded = function (level) {
     return Levels[logLevel] <= level;
 };
 
-const logger = {
+// TODO: consider using @adguard/logger
+
+export const logger = {
     /**
      * Writes log message
      *
@@ -90,5 +92,3 @@ const logger = {
         }
     },
 };
-
-export default logger;

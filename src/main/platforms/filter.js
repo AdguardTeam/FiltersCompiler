@@ -9,9 +9,9 @@
  * and strict mode is on then filter compilation should fail, otherwise original rules must be used
  */
 
-import logger from '../utils/log';
+import { logger } from '../utils/log';
 import { overrideRule } from '../utils/workaround';
-import RuleMasks from '../rule/rule-masks';
+import { RuleMasks } from '../rule/rule-masks';
 import { skipRuleWithOptimization } from '../optimization';
 
 const HINT_MASK = `${RuleMasks.MASK_HINT} `;
@@ -287,5 +287,3 @@ export const cleanupAndOptimizeRules = function (rules, config, optimizationConf
     config.configuration.removeRulePatterns.pop();
     return result;
 };
-
-export default { cleanupRules, cleanupAndOptimizeRules };

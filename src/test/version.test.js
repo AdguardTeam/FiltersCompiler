@@ -1,7 +1,7 @@
 import {
     describe, it, expect, vi,
 } from 'vitest';
-import version from '../main/utils/version';
+import { version } from '../main/utils/version';
 
 // Mock log to hide error messages
 vi.mock('../main/utils/log');

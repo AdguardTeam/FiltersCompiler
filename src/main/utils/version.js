@@ -1,7 +1,7 @@
 /**
  * Version utility functions
  */
-const version = {
+export const version = {
     /**
      * Parses version from string
      *
@@ -50,5 +50,3 @@ const version = {
         return version.join('.');
     },
 };
-
-export default version;

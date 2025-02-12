@@ -4,7 +4,7 @@ import {
     expect,
     vi,
 } from 'vitest';
-import optimizeDomainBlockingRules from '../../main/utils/builder-utils';
+import { optimizeDomainBlockingRules } from '../../main/utils/builder-utils';
 
 vi.mock('../../main/utils/log');
 

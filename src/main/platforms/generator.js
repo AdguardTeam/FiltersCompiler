@@ -6,7 +6,7 @@ import crypto from 'crypto';
 import moment from 'moment';
 
 import { FiltersDownloader } from '@adguard/filters-downloader';
-import logger from '../utils/log';
+import { logger } from '../utils/log';
 import { cleanupAndOptimizeRules, cleanupRules } from './filter';
 import {
     rewriteRules,
@@ -24,7 +24,7 @@ import {
 
 import { getFilterOptimizationConfig } from '../optimization';
 
-import RuleMasks from '../rule/rule-masks';
+import { RuleMasks } from '../rule/rule-masks';
 
 const RULES_SEPARATOR = '\r\n';
 let filterIdsPool = [];

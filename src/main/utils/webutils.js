@@ -1,5 +1,5 @@
 /* eslint-disable global-require */
-import logger from './log';
+import { logger } from './log';
 
 /**
  * Some sources require proper user-agents and forbid downloading without.
@@ -35,7 +35,7 @@ const tryDownloadFile = function (url, retryNum = 0) {
  * @param url
  * @returns {*}
  */
-const downloadFile = (url) => {
+export const downloadFile = (url) => {
     logger.log(`Downloading: ${url}`);
 
     // 5 times to retry after first fail attempt:
@@ -52,5 +52,3 @@ const downloadFile = (url) => {
         return tryDownloadFile(url, RETRY_NUM);
     }
 };
-
-export default downloadFile;

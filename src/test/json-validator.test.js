@@ -7,7 +7,7 @@ import {
 import fs from 'fs';
 import path from 'path';
 
-import schemaValidator from '../main/json-validator';
+import { schemaValidator } from '../main/json-validator';
 import { build } from '../main/builder';
 import { disableOptimization } from '../main/optimization';
 

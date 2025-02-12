@@ -4,7 +4,7 @@ import { RuleConverter, RuleParser, RuleGenerator } from '@adguard/agtree';
 import { isValidAdgRedirectRule, isAdgScriptletRule } from '@adguard/scriptlets/validators';
 import { convertAdgRedirectToUbo, convertAdgToUbo } from '@adguard/scriptlets/converters';
 
-import logger from './utils/log';
+import { logger } from './utils/log';
 import { isAdgCosmeticRuleWithPathModifier, convertAdgPathModifierToUbo } from './rule/cosmetic-rule-modifiers';
 
 /**
@@ -125,11 +125,4 @@ export const convertAdgPathModifiersToUbo = (rules) => {
         isAdgCosmeticRuleWithPathModifier,
         convertAdgPathModifierToUbo,
     );
-};
-
-export default {
-    convertRulesToAdgSyntax,
-    convertAdgPathModifiersToUbo,
-    convertAdgRedirectsToUbo,
-    convertAdgScriptletsToUbo,
 };

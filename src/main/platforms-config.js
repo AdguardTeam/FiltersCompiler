@@ -535,7 +535,7 @@ const SAFARI_BASED_EXTENSION_PATTERNS = [
     ...JSONPRUNE_MODIFIER_PATTERNS,
 ];
 
-const platformsConfig = {
+export const platformsConfig = {
     'WINDOWS': {
         'platform': 'windows',
         'path': 'windows',
@@ -769,5 +769,3 @@ const platformsConfig = {
         },
     },
 };
-
-export default platformsConfig;
