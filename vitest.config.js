@@ -5,6 +5,6 @@ export default defineConfig({
     test: {
         environment: 'node',
         include: ['src/test/*.test.js'],
-        watch: true,
+        watch: false,
     },
 });
