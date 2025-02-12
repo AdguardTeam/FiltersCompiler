@@ -2,6 +2,9 @@ import { ADG_SCRIPTLET_MASK } from '@adguard/agtree';
 
 import { RuleMasks } from '../rule/rule-masks';
 
+// TODO: consider refactoring this file
+// because agtree provides modern approach to solve such problems
+
 // Based on: https://github.com/github/linguist/pull/5968/commits/f7c5c39139945576a5f9ff0b41c990e6b6019232
 // eslint-disable-next-line max-len
 export const ADBLOCK_AGENT_PATTERN = /^(?:!|#)?\s*\[(?<AdblockInfo>\s*(?:[Aa]d[Bb]lock(?:\s+[Pp]lus)?|u[Bb]lock(?:\s+[Oo]rigin)?|[Aa]d[Gg]uard)(?:\s+(?:\d\.?)+)?\s*)(?:;\g<AdblockInfo>)*\]\s*$/;
