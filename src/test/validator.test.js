@@ -7,7 +7,6 @@ import {
 import { TextEncoder, TextDecoder } from 'util';
 
 /* eslint-disable max-len */
-// FIXME: adguard/scriptlets/validators are not found by eslint
 import {
     isValidAdgRedirectRule,
     isValidScriptletName,
@@ -15,7 +14,6 @@ import {
     isUboScriptletRule,
     isAdgScriptletRule,
     isAbpSnippetRule,
-// eslint-disable-next-line import/no-unresolved
 } from '@adguard/scriptlets/validators';
 
 import { setConfiguration, CompatibilityTypes } from '@adguard/tsurlfilter';

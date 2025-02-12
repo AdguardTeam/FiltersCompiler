@@ -3,19 +3,29 @@
  * eslint config for the compiler
  */
 module.exports = {
-    'env': {
+    env: {
         'browser': true,
         'node': true,
         'jest': true,
     },
-    'extends': 'airbnb-base',
-    'globals': {
+    settings: {
+        'import/resolver': {
+            exports: {},
+        },
+    },
+    plugins: [
+        'import',
+    ],
+    extends: [
+        'airbnb-base',
+    ],
+    globals: {
         'adguard': true,
         'chrome': true,
         'QUnit': true,
         'browser': true,
     },
-    'rules': {
+    rules: {
         'import/no-extraneous-dependencies': 0,
         'no-new': 'off',
         'indent': [

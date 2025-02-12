@@ -1,5 +1,3 @@
-/* eslint-disable import/no-unresolved */
-// FIXME: adguard/scriptlets/validators and adguard/scriptlets/converters are not found by eslint
 import { RuleConverter, RuleParser, RuleGenerator } from '@adguard/agtree';
 import { isValidAdgRedirectRule, isAdgScriptletRule } from '@adguard/scriptlets/validators';
 import { convertAdgRedirectToUbo, convertAdgToUbo } from '@adguard/scriptlets/converters';
