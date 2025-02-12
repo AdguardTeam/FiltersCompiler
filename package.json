@@ -12,6 +12,9 @@
     "build-txt": "node tasks/build-txt.js",
     "prepare": "husky install"
   },
+  "resolutions": {
+    "@adguard/agtree": "3.0.0-alpha.5"
+  },
   "dependencies": {
     "@adguard/agtree": "3.0.0-alpha.5",
     "@adguard/extended-css": "^2.1.1",

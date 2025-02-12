@@ -2,23 +2,7 @@
 # yarn lockfile v1
 
 
-"@adguard/agtree@3.0.0-alpha.2":
-  version "3.0.0-alpha.2"
-  resolved "https://registry.yarnpkg.com/@adguard/agtree/-/agtree-3.0.0-alpha.2.tgz#8fd6b3330846b9134a6864a3c8e56e68f4d1ca71"
-  integrity sha512-rpGxV8hysZ2+ldFjLG3266XAmJMrvnr+Sa2Igj7g5jBhSR27BXnqbrgUH1rBijZ8negAIzOA1Hmk6FuAGNeDjg==
-  dependencies:
-    "@adguard/css-tokenizer" "^1.1.1"
-    camelcase-keys "^7.0.2"
-    clone-deep "^4.0.1"
-    is-ip "3.1.0"
-    json5 "^2.2.3"
-    semver "^7.5.3"
-    sprintf-js "^1.1.3"
-    tldts "^5.7.112"
-    xregexp "^5.1.1"
-    zod "3.21.4"
-
-"@adguard/agtree@3.0.0-alpha.5":
+"@adguard/agtree@3.0.0-alpha.2", "@adguard/agtree@3.0.0-alpha.5", "@adguard/agtree@^3.0.0-alpha.5":
   version "3.0.0-alpha.5"
   resolved "https://registry.yarnpkg.com/@adguard/agtree/-/agtree-3.0.0-alpha.5.tgz#6045f3d6374d8bd0a57e9066e59cc17d0acb1047"
   integrity sha512-z4XK+bKgO0m9P665I2E0y1i9rIVQZq+xk8hhch+e0S9QCjCW1SoAl12FnzygmFCrri9iNJzF88eUEl38RyZKoQ==
@@ -32,27 +16,6 @@
     tldts "^5.7.112"
     xregexp "^5.1.1"
     zod "3.21.4"
-
-"@adguard/agtree@^3.0.0-alpha.5":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@adguard/agtree/-/agtree-3.0.0.tgz#d12cfbe3e5c96a89c0d4bdeb42e4ff09aca7ccb5"
-  integrity sha512-dRHsZ49gjl5Rsnt2WLT8KS9oa7KH5wdiKZiTvqhI5B+h3KahFd8fH5QHhfUKRidXc2ysDw/OUiximAbqce+fFA==
-  dependencies:
-    "@adguard/css-tokenizer" "^1.1.1"
-    camelcase-keys "^7.0.2"
-    clone-deep "^4.0.1"
-    is-ip "3.1.0"
-    json5 "^2.2.3"
-    semver "^7.5.3"
-    sprintf-js "^1.1.3"
-    tldts "^5.7.112"
-    xregexp "^5.1.1"
-    zod "3.21.4"
-
-"@adguard/css-tokenizer@^1.1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@adguard/css-tokenizer/-/css-tokenizer-1.1.1.tgz#9f5cc45c5a2bd16de9a8924524621270d8caedfd"
-  integrity sha512-oDNlMegMJIRZ9v6JuAXFOQzTmkKz3ERILV9rTvbWYLDApOZ8jqwil1fEeJbjGFR37OHN6MVU55ef9NcxZCZrig==
 
 "@adguard/css-tokenizer@^1.2.0":
   version "1.2.0"
@@ -2165,11 +2128,6 @@ semver@^6.3.0:
   version "6.3.0"
   resolved "https://registry.npmjs.org/semver/-/semver-6.3.0.tgz"
   integrity sha512-b39TBaTSfV6yBrapU89p5fKekE2m/NwnDocOVruQFS1/veMgdzuPcnOM34M6CwxW8jH/lxEa5rBoDeUwu5HHTw==
-
-semver@^7.5.3:
-  version "7.6.3"
-  resolved "https://registry.yarnpkg.com/semver/-/semver-7.6.3.tgz#980f7b5550bc175fb4dc09403085627f9eb33143"
-  integrity sha512-oVekP1cKtI+CTDvHWYFUcMtsK/00wmAEfyqKfNdARm8u1wNVhSgaX7A8d4UuIlUI5e84iEwOhs7ZPYRmzU9U6A==
 
 shallow-clone@^3.0.0:
   version "3.0.1"
