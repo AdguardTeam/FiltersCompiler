@@ -169,33 +169,32 @@ describe('Test builder', () => {
                 });
             });
 
-            // FIXME: uncomment and fix the test
-            // it('Should filter "platforms/ios" with "10.txt"', async () => {
-            //     const filterContent = await readFile(path.join(platformsDir, 'ios', 'filters', '10.txt'));
-            //     const filterLines = filterContent.split(/\r?\n/);
-            //     expect(filterLines.length).toEqual(34);
-            //     // Ensure that the file is not empty
-            //     expect(filterContent).toBeTruthy();
-            //     // Filter rules without comments
-            //     const filterRules = filterLines.filter((line) => line.length > 0 && !line.startsWith('!'));
-            //     // Ensure that each line ends with '$image,script'
-            //     const presentRules = [
-            //         'a155e09a56.reuters.tv$image,script',
-            //         'albany.townsquarenewsletters.com$image,script',
-            //         'alerts.dmgt.com$image,script',
-            //         'aremedia.e.aremedia.com.au$image,script',
-            //         'auto.scissorsscotch.com$image,script',
-            //         'track.domain.com$image,script',
-            //         'criteo.com$image,script',
-            //         'go.pardot.com$all,image,script',
-            //     ];
-            //     presentRules.forEach((rule) => {
-            //         expect(filterRules.includes(rule)).toBeTruthy();
-            //     });
-            //     // Check that the number of hints is equal to the number of rules
-            //     const filterHints = filterLines.filter((line) => line === '!+ NOT_OPTIMIZED');
-            //     expect(filterRules.length).toEqual(filterHints.length);
-            // });
+            it.only('Should filter "platforms/ios" with "10.txt"', async () => {
+                const filterContent = await readFile(path.join(platformsDir, 'ios', 'filters', '10.txt'));
+                const filterLines = filterContent.split(/\r?\n/);
+                expect(filterLines.length).toEqual(34);
+                // Ensure that the file is not empty
+                expect(filterContent).toBeTruthy();
+                // Filter rules without comments
+                const filterRules = filterLines.filter((line) => line.length > 0 && !line.startsWith('!'));
+                // Ensure that each line ends with '$image,script'
+                const presentRules = [
+                    'a155e09a56.reuters.tv$image,script',
+                    'albany.townsquarenewsletters.com$image,script',
+                    'alerts.dmgt.com$image,script',
+                    'aremedia.e.aremedia.com.au$image,script',
+                    'auto.scissorsscotch.com$image,script',
+                    'track.domain.com$image,script',
+                    'criteo.com$image,script',
+                    'go.pardot.com$all,image,script',
+                ];
+                presentRules.forEach((rule) => {
+                    expect(filterRules.includes(rule)).toBeTruthy();
+                });
+                // Check that the number of hints is equal to the number of rules
+                const filterHints = filterLines.filter((line) => line === '!+ NOT_OPTIMIZED');
+                expect(filterRules.length).toEqual(filterHints.length);
+            });
 
             it('Should filter "platforms/edge" with "10.txt"', async () => {
                 const filterContent = await readFile(path.join(platformsDir, 'edge', 'filters', '10.txt'));
@@ -428,65 +427,63 @@ describe('Test builder', () => {
             expect(localScriptRulesJson.rules).toBeTruthy();
         });
 
-        // FIXME: uncomment and fix the test
-        // it('platform/test filters 2.txt', async () => {
-        //     // directory 'test' is used for 'ext_ublock' platform;
-        //     // see src/test/resources/platforms.json
-        //     const filterContent = await readFile(path.join(platformsDir, 'test', 'filters', '2.txt'));
-        //     expect(filterContent).toBeTruthy();
+        it('platform/test filters 2.txt', async () => {
+            // directory 'test' is used for 'ext_ublock' platform;
+            // see src/test/resources/platforms.json
+            const filterContent = await readFile(path.join(platformsDir, 'test', 'filters', '2.txt'));
+            expect(filterContent).toBeTruthy();
 
-        //     const filterLines = filterContent.split(/\r?\n/);
-        //     expect(filterLines.length).toEqual(50);
-        //     expect(filterLines[2]).toEqual('! Title: AdGuard Base filter + EasyList');
+            const filterLines = filterContent.split(/\r?\n/);
+            expect(filterLines.length).toEqual(50);
+            expect(filterLines[2]).toEqual('! Title: AdGuard Base filter + EasyList');
 
-        //     const presentLines = [
-        //         '![Adblock Plus 2.0]',
-        //         'test-common-rule.com',
-        //         'test-common-1-rule.com',
-        //         '! some common rules could be places here',
-        //         '~example.com,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]',
-        //         'excluded_platform',
-        //         '!+ NOT_OPTIMIZED',
-        //         'test-common-2-rule.com',
-        //         'test.com##+js(abort-on-property-read, Object.prototype.getBanner)',
-        //     ];
-        //     presentLines.forEach((rule) => {
-        //         expect(filterLines.includes(rule)).toBeTruthy();
-        //     });
+            const presentLines = [
+                '![Adblock Plus 2.0]',
+                'test-common-rule.com',
+                'test-common-1-rule.com',
+                '! some common rules could be places here',
+                '~example.com,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]',
+                'excluded_platform',
+                '!+ NOT_OPTIMIZED',
+                'test-common-2-rule.com',
+                'test.com##+js(abort-on-property-read, Object.prototype.getBanner)',
+            ];
+            presentLines.forEach((rule) => {
+                expect(filterLines.includes(rule)).toBeTruthy();
+            });
 
-        //     const absentLines = [
-        //         'test_domain#%#testScript();',
-        //         'test.com#%#var isadblock=1;',
-        //         'example.org#@%#navigator.getBattery = undefined;',
-        //         'example.com#%#AG_onLoad(function() { AG_removeElementBySelector(\'span[class="intexta"]\'); });',
-        //         // $webrtc is deprecated
-        //         '||example.com^$webrtc,domain=example.org',
-        //     ];
-        //     absentLines.forEach((rule) => {
-        //         expect(filterLines.includes(rule)).toBeFalsy();
-        //     });
-        // });
+            const absentLines = [
+                'test_domain#%#testScript();',
+                'test.com#%#var isadblock=1;',
+                'example.org#@%#navigator.getBattery = undefined;',
+                'example.com#%#AG_onLoad(function() { AG_removeElementBySelector(\'span[class="intexta"]\'); });',
+                // $webrtc is deprecated
+                '||example.com^$webrtc,domain=example.org',
+            ];
+            absentLines.forEach((rule) => {
+                expect(filterLines.includes(rule)).toBeFalsy();
+            });
+        });
 
-        // FIXME: uncomment and fix the test
-        // it('platform/test filters 2_optimized.txt', async () => {
-        //     // directory 'test' is used for 'ext_ublock' platform;
-        //     // see src/test/resources/platforms.json
-        //     const filterContent = await readFile(path.join(platformsDir, 'test', 'filters', '2_optimized.txt'));
-        //     expect(filterContent).toBeTruthy();
+        it('platform/test filters 2_optimized.txt', async () => {
+            // directory 'test' is used for 'ext_ublock' platform;
+            // see src/test/resources/platforms.json
+            const filterContent = await readFile(path.join(platformsDir, 'test', 'filters', '2_optimized.txt'));
+            expect(filterContent).toBeTruthy();
 
-        //     const filterLines = filterContent.split(/\r?\n/);
-        //     expect(filterLines.length).toEqual(34);
-        //     expect(filterLines[2]).toEqual('! Title: AdGuard Base filter + EasyList (Optimized)');
+            const filterLines = filterContent.split(/\r?\n/);
+            expect(filterLines.length).toEqual(34);
+            expect(filterLines[2]).toEqual('! Title: AdGuard Base filter + EasyList (Optimized)');
 
-        //     // $webrtc is deprecated
-        //     expect(filterLines.includes('||example.com^$webrtc,domain=example.org')).toBeFalsy();
+            // $webrtc is deprecated
+            expect(filterLines.includes('||example.com^$webrtc,domain=example.org')).toBeFalsy();
 
-        //     // script `#%#` rules and script exception `#%@#` rules should be excluded for ext_ublock platform
-        //     // see excludeScriptRules() in generator.js
-        //     expect(filterLines.includes('test.com#%#var isadblock=1;')).toBeFalsy();
-        //     // https://github.com/AdguardTeam/FiltersCompiler/issues/199
-        //     expect(filterLines.includes('example.org#@%#navigator.getBattery = undefined;')).toBeFalsy();
-        // });
+            // script `#%#` rules and script exception `#%@#` rules should be excluded for ext_ublock platform
+            // see excludeScriptRules() in generator.js
+            expect(filterLines.includes('test.com#%#var isadblock=1;')).toBeFalsy();
+            // https://github.com/AdguardTeam/FiltersCompiler/issues/199
+            expect(filterLines.includes('example.org#@%#navigator.getBattery = undefined;')).toBeFalsy();
+        });
 
         it('platform/test filters 2_without_easylist.txt', async () => {
             const filterContent = await readFile(path.join(platformsDir, 'test', 'filters', '2_without_easylist.txt'));

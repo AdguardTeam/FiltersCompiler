@@ -129,58 +129,39 @@ const addNotOptimizedHints = function (lines) {
     return result;
 };
 /**
- * Adds modifiers to lines of text.
+ * Adds or updates modifiers in each line of the given array of lines.
  *
  * @param {string[]} lines - An array of text lines.
  * @param {string} modifiersStr - Modifiers as a string to add.
  * @returns {string[]} - An array of modified lines.
  */
 const addModifiers = (lines, modifiersStr) => {
-    const result = lines
-        .map((line) => {
-            // filter out null and empty strings
-            if (!line || line.trim() === '') {
-                return RuleMasks.MASK_COMMENT;
-            }
+    return lines.map((line) => {
+        // If the line is empty or contains only whitespace, it returns a comment mask
+        if (!line || line.trim() === '') {
+            return RuleMasks.MASK_COMMENT;
+        }
+        // If the line starts with a host file comment mask, it replaces it with a comment mask
+        if (line.startsWith(RuleMasks.MASK_HOST_FILE_COMMENT)) {
+            return line.replace(RuleMasks.MASK_HOST_FILE_COMMENT, RuleMasks.MASK_COMMENT);
+        }
+        // If the line starts with a comment mask, it returns the line as is.
+        if (line.startsWith(RuleMasks.MASK_COMMENT)) {
+            return line;
+        }
+        // If the line does not contain a modifiers separator, it appends the given modifiers string
+        if (!line.includes(MODIFIERS_SEPARATOR)) {
+            return `${line}${MODIFIERS_SEPARATOR}${modifiersStr}`;
+        }
+        // If the line already contains modifiers, combine the existing modifiers with the new ones,
+        // ensuring no duplicates, and return the line with the updated modifiers.
+        const [rule, existingModifiersStr] = line.split(MODIFIERS_SEPARATOR);
+        const existingModifiers = existingModifiersStr.split(COMMA);
+        const newModifiers = modifiersStr.split(COMMA);
+        const combinedModifiers = [...new Set([...existingModifiers, ...newModifiers])].join(COMMA);
 
-            // check if the line has a comment marker '#'.
-            if (line.startsWith(RuleMasks.MASK_HOST_FILE_COMMENT)) {
-                // Replace the comment marker '#' with the adblock comment marker '!' and return the modified line.
-                return line.replace(RuleMasks.MASK_HOST_FILE_COMMENT, RuleMasks.MASK_COMMENT);
-            }
-
-            // do not modify comment lines
-            if (line.startsWith(RuleMasks.MASK_COMMENT)) {
-                return line;
-            }
-
-            // if the line does not contain a modifier separator, add it and the specified modifierStr
-            if (!line.includes(MODIFIERS_SEPARATOR)) {
-                return `${line}${MODIFIERS_SEPARATOR}${modifiersStr}`;
-            }
-
-            // if the rule has a modifier that matches the ONE being added, return the line as is
-            if (!modifiersStr.includes(COMMA) && line.includes(modifiersStr)) {
-                return line;
-            }
-
-            // if the rule has a modifiers that NOT matches the ONE being added,
-            // add new modifier to the comma-separated line
-            if (!modifiersStr.includes(COMMA) && !line.includes(modifiersStr)) {
-                return `${line}${COMMA}${modifiersStr}`;
-            }
-
-            // check existing modifiers and added new modifiers in the line
-            const extraModifiers = modifiersStr
-                .split(COMMA)
-                .filter((modifier) => !line.includes(modifier))
-                .join(COMMA);
-
-            return `${line}${COMMA}${extraModifiers}`;
-        });
-
-    // return the array of modified lines
-    return result;
+        return `${rule}${MODIFIERS_SEPARATOR}${combinedModifiers}`;
+    });
 };
 
 /**

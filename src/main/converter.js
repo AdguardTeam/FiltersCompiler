@@ -32,7 +32,6 @@ export const convertRulesToAdgSyntax = (rulesList, excluded) => {
         try {
             const ruleNode = RuleParser.parse(rule);
             const conversionResult = RuleConverter.convertToAdg(ruleNode);
-            // FIXME: RuleParser.generate - undefined
             const convertedRules = conversionResult.result.map((r) => RuleGenerator.generate(r));
             result.push(...convertedRules);
 
