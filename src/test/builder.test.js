@@ -3,7 +3,12 @@
  * @vitest-environment jsdom
  */
 import {
-    describe, it, expect, beforeAll, test, vi,
+    describe,
+    it,
+    expect,
+    beforeAll,
+    test,
+    vi,
 } from 'vitest';
 import path from 'path';
 import { promises as fs, existsSync } from 'fs';

@@ -1,10 +1,15 @@
 /* eslint-disable max-len */
 import {
-    describe, it, expect, vi,
+    describe,
+    it,
+    expect,
+    vi,
 } from 'vitest';
 
 import {
-    convertAdgToUbo, convertAbpToAdg, convertScriptletToAdg,
+    convertAdgToUbo,
+    convertAbpToAdg,
+    convertScriptletToAdg,
 } from '@adguard/scriptlets/converters';
 
 import {
@@ -40,12 +45,11 @@ describe('converter', () => {
         expect(c[0]).toBe('benchmark.pl#$##bannerDBB { height: 10px !important; }');
 
         // https://github.com/AdguardTeam/FiltersCompiler/issues/24
-        // FIXME: uncomment and fix 2 following tests due to the issue mentioned above
-        // c = convertRulesToAdgSyntax(['720hd.club#?##all:style(margin-top: 0 !important)']);
-        // expect(c[0]).toBe('720hd.club#?$##all { margin-top: 0 !important }');
-        //
-        // c = convertRulesToAdgSyntax(['720hd.club#@?##all:style(margin-top: 0 !important)']);
-        // expect(c[0]).toBe('720hd.club#@$?##all { margin-top: 0 !important }');
+        c = convertRulesToAdgSyntax(['720hd.club#?##all:style(margin-top: 0 !important)']);
+        expect(c[0]).toBe('720hd.club#$##all { margin-top: 0 !important }');
+
+        c = convertRulesToAdgSyntax(['720hd.club#@?##all:style(margin-top: 0 !important)']);
+        expect(c[0]).toBe('720hd.club#@$##all { margin-top: 0 !important }');
 
         // https://github.com/AdguardTeam/FiltersCompiler/issues/54
         c = convertRulesToAdgSyntax(['#####']);
@@ -279,13 +283,12 @@ describe('converter', () => {
     });
 
     it('scriptlets converter is working', () => {
-        // FIXME
-        // let actual = convertAdgToUbo('example.com#@#+js(nano-setInterval-booster.js, some.example, 1000)');
-        // let expected = "example.com#@%#//scriptlet('ubo-nano-setInterval-booster.js', 'some.example', '1000')";
-        // expect(actual[0]).toBe(expected);
+        let actual = convertScriptletToAdg('example.com#@#+js(nano-setInterval-booster.js, some.example, 1000)');
+        let expected = "example.com#@%#//scriptlet('ubo-nano-setInterval-booster.js', 'some.example', '1000')";
+        expect(actual[0]).toBe(expected);
 
-        let actual = convertAdgToUbo('example.org#%#//scriptlet("ubo-abort-on-property-read.js", "alert")');
-        let expected = 'example.org##+js(abort-on-property-read, alert)';
+        actual = convertAdgToUbo('example.org#%#//scriptlet("ubo-abort-on-property-read.js", "alert")');
+        expected = 'example.org##+js(abort-on-property-read, alert)';
         expect(actual).toBe(expected);
 
         actual = convertAdgToUbo('example.org#%#//scriptlet("abort-on-property-write", "adblock.check")');

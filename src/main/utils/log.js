@@ -69,7 +69,7 @@ export const logger = {
      */
     error(message) {
         if (isLevelIncluded(Levels.ERROR)) {
-            console.logger.log(message);
+            console.log(message);
             appendFile(message, 'ERROR');
         }
     },
