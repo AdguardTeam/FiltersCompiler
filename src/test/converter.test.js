@@ -645,12 +645,14 @@ describe('converter', () => {
         });
     });
 
-    // FIXME: check if UBO supports `$path` for scriptlets
+    // FIXME: handle ADG cosmetic modifiers in AGTree's convertToUbo
     // it('converts scriptlet rule with modifiers to UBlock syntax', () => {
     //     const source = String.raw`[$path=/page,domain=example.com|~example.org]#%#//scriptlet('ubo-setTimeout-defuser.js', '[native code]', '8000')`;
 
     //     let rulesList = convertAdgPathModifiersToUbo([source]);
     //     rulesList = convertAdgScriptletsToUbo(rulesList);
+
+    //     console.log(rulesList);
 
     //     expect(rulesList).toHaveLength(0);
     // });
