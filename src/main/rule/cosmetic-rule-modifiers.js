@@ -1,60 +1,28 @@
-import { CosmeticRuleParser } from '@adguard/agtree';
+// TODO: Replace this file with AGTree converter once it gets full toUBO support
+import { CosmeticRuleParser, AdblockSyntax, RuleGenerator } from '@adguard/agtree';
 
 export const isAdgCosmeticRuleWithPathModifier = (rule) => {
-    try {
-        const { pattern } = CosmeticRuleParser.parseRuleTextByMarker(rule);
-        if (!pattern) {
-            return false;
-        }
-
-        const { modifiersText } = CosmeticRuleParser.parseRulePatternText(pattern);
-
-        if (!modifiersText) {
-            return false;
-        }
-
-        const { path } = CosmeticRuleParser.parseRuleModifiers(modifiersText);
-
-        if (!path) {
-            return false;
-        }
-
-        return true;
-    } catch (e) {
-        return false;
-    }
+    return rule && rule.startsWith('[') && rule.indexOf('path=') !== -1;
 };
 
 export const convertAdgPathModifierToUbo = (rule) => {
-    const {
-        pattern,
-        marker,
-        content,
-    } = CosmeticRuleParser.parseRuleTextByMarker(rule);
+    const ruleNode = CosmeticRuleParser.parse(rule);
 
-    const {
-        path,
-        restrictedDomains,
-        permittedDomains,
-    } = CosmeticRuleParser.parseRulePattern(pattern);
-
-    const domains = [];
-
-    if (permittedDomains) {
-        domains.push(...permittedDomains);
+    if (!ruleNode) {
+        throw new Error(`Unable to parse rule as cosmetic: ${rule}`);
     }
 
-    if (restrictedDomains) {
-        domains.push(...restrictedDomains.map((domain) => `~${domain}`));
+    ruleNode.syntax = AdblockSyntax.Ubo;
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const modifier of ruleNode.modifiers.children) {
+        if (modifier.name.value === 'path') {
+            modifier.name.value = 'matches-path';
+
+            // unescape `[`, `]`, `,`, `\` characters
+            modifier.value.value = modifier.value.value.replace(/\\([,\[\]\\])/g, '$1');
+        }
     }
 
-    const domainsPattern = domains.join(',');
-
-    const isScriptlet = content.startsWith('//scriptlet');
-
-    if (isScriptlet) {
-        throw new Error(`Path option "${path}" not supported by uBO scriptlet syntax`);
-    }
-
-    return `${domainsPattern}${marker}:matches-path(${path})${content}`;
+    return RuleGenerator.generate(ruleNode);
 };

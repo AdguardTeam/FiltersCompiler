@@ -16,6 +16,7 @@ import {
     convertRulesToAdgSyntax,
     convertAdgRedirectsToUbo,
     convertAdgScriptletsToUbo,
+    convertAdgPathModifiersToUbo,
 } from '../main/converter';
 
 // Mock log to hide error messages
@@ -613,37 +614,36 @@ describe('converter', () => {
         });
     });
 
-    // FIXME: fix tests
-    // describe('converts cosmetic rule modifiers to UBlock syntax', () => {
-    //     const rules = [
-    //         {
-    //             source: '[$path=/page]example.com##p',
-    //             expected: 'example.com##:matches-path(/page)p',
-    //         },
-    //         {
-    //             source: '[$path=/page]example.com#@#p',
-    //             expected: 'example.com#@#:matches-path(/page)p',
-    //         },
-    //         {
-    //             source: String.raw`[$path=/\\/(sub1|sub2)\\/page\\.html/]example.com##p`,
-    //             expected: String.raw`example.com##:matches-path(/\/(sub1|sub2)\/page\.html/)p`,
-    //         },
-    //         {
-    //             source: '[$path=/sexykpopidol]blog.livedoor.jp###containerWrap > #container > .blog-title-outer + #content.hfeed',
-    //             expected: 'blog.livedoor.jp##:matches-path(/sexykpopidol)#containerWrap > #container > .blog-title-outer + #content.hfeed',
-    //         },
-    //         {
-    //             source: String.raw`[$path=/\\/\[a|b|\,\]\\/page\\.html/]example.com## #test`,
-    //             expected: String.raw`example.com##:matches-path(/\/[a|b|,]\/page\.html/)#test`,
-    //         },
-    //     ];
+    describe('converts cosmetic rule modifiers to UBlock syntax', () => {
+        const rules = [
+            {
+                source: '[$path=/page]example.com##p',
+                expected: 'example.com##:matches-path(/page) p',
+            },
+            {
+                source: '[$path=/page]example.com#@#p',
+                expected: 'example.com#@#:matches-path(/page) p',
+            },
+            {
+                source: String.raw`[$path=/\\/(sub1|sub2)\\/page\\.html/]example.com##p`,
+                expected: String.raw`example.com##:matches-path(/\/(sub1|sub2)\/page\.html/) p`,
+            },
+            {
+                source: '[$path=/sexykpopidol]blog.livedoor.jp###containerWrap > #container > .blog-title-outer + #content.hfeed',
+                expected: 'blog.livedoor.jp##:matches-path(/sexykpopidol) #containerWrap > #container > .blog-title-outer + #content.hfeed',
+            },
+            {
+                source: String.raw`[$path=/\\/\[a|b|\,\]\\/page\\.html/]example.com## #test`,
+                expected: String.raw`example.com##:matches-path(/\/[a|b|,]\/page\.html/) #test`,
+            },
+        ];
 
-    //     test.each(rules)('converts path modifier to UBlock syntax', (rule) => {
-    //         const res = convertAdgPathModifiersToUbo([rule.source]);
+        it.each(rules)('converts path modifier to UBlock syntax', (rule) => {
+            const res = convertAdgPathModifiersToUbo([rule.source]);
 
-    //         expect(res[0]).toBe(rule.expected);
-    //     });
-    // });
+            expect(res[0]).toBe(rule.expected);
+        });
+    });
 
     // FIXME: check if UBO supports `$path` for scriptlets
     // it('converts scriptlet rule with modifiers to UBlock syntax', () => {
