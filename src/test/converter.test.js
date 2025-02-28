@@ -583,21 +583,34 @@ describe('converter', () => {
             expect(result[0]).toBe('militaria.pl#$##layout-wrapper::after { height:0!important }');
         });
 
-        // FIXME: check
-        // it('does not convert mess pseudos with scriptlets', () => {
-        //     let rule;
-        //     let result;
+        it('does not convert mess pseudos with scriptlets', () => {
+            let rule;
+            let result;
+            const excluded = [];
 
-        //     rule = 'example.org#$#selector:style()';
-        //     result = convertRulesToAdgSyntax([rule]);
-        //     expect(result).toHaveLength(1);
-        //     expect(result).toContain(rule);
+            rule = 'example.org#$#selector:style()';
+            result = convertRulesToAdgSyntax([rule], excluded);
+            expect(result).toHaveLength(0);
+            expect(excluded).toHaveLength(2);
+            expect(excluded).toEqual(
+                [
+                    '! Unable to convert rule to AdGuard syntax: "example.org#$#selector:style()" due to error: \'AdblockPlus\' syntax cannot be mixed with \'UblockOrigin\' syntax',
+                    'example.org#$#selector:style()',
+                ],
+            );
 
-        //     rule = 'yamareco.com#$#body.header_bg_ad.modal-open:style(padding-right: auto !important;overflow: auto!important)';
-        //     result = convertRulesToAdgSyntax([rule]);
-        //     expect(result).toHaveLength(1);
-        //     expect(result).toContain(rule);
-        // });
+            rule = 'yamareco.com#$#body.header_bg_ad.modal-open:style(padding-right: auto !important;overflow: auto!important)';
+            excluded.length = 0;
+            result = convertRulesToAdgSyntax([rule], excluded);
+            expect(result).toHaveLength(0);
+            expect(excluded).toHaveLength(2);
+            expect(excluded).toEqual(
+                [
+                    '! Unable to convert rule to AdGuard syntax: "yamareco.com#$#body.header_bg_ad.modal-open:style(padding-right: auto !important;overflow: auto!important)" due to error: \'AdblockPlus\' syntax cannot be mixed with \'UblockOrigin\' syntax',
+                    'yamareco.com#$#body.header_bg_ad.modal-open:style(padding-right: auto !important;overflow: auto!important)',
+                ],
+            );
+        });
     });
 
     // FIXME: fix tests
