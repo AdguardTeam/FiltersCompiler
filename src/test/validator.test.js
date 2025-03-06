@@ -129,8 +129,7 @@ describe('validator', () => {
             "#body div[attr='test']:first-child  div",
             '.todaystripe:matches-css(display: block)',
             'body > *:not(div):not(script):matches-css(width:336px)',
-            // FIXME: check this selector as RuleConverter.convertToAdg() throws an error now
-            // 'div[class*=" "]:matches-css(background-image: /^url\(data:image/png;base64,iVBOR/)',
+            'div[class*=" "]:matches-css(background-image: /^url\\(data:image/png;base64,iVBOR/)',
             'div[class*=" "]:matches-css(background-image: /^url\\(https:\\/\\/sport\\.wp\\.pl\\//)',
             '#welcomeMainBanner_welcomeMain div[id*="_containerWrap_"]:has(img[src$="Banner/ad.jpg"]):remove()',
             '.todaystripe:matches-css-before(display: block)',
@@ -141,6 +140,7 @@ describe('validator', () => {
             '.l-main.js-main div.c-block:has(> div.c-header)',
             "[-ext-has='script:contains(var banner)']",
         ];
+
         test.each(validExtCssSelectors)('%s', (selector) => {
             const rules = [`example.com##${selector}`];
             expect(validateAndFilterRules(rules)).toHaveLength(1);
