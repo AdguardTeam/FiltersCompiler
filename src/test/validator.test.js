@@ -534,11 +534,6 @@ describe('validator', () => {
             rule = '||example.com&redirects=noopjs^$script';
             expect(isValidAdgRedirectRule(rule)).toBeFalsy();
 
-            // FIXME: seemes that isAdgRedirectRule was removed
-            // ## [v2.0.1] - 2024-11-13 - scriptlets
-            // rule = '||example.com/banner$image,redirect=32x32transparent.png';
-            // expect(redirects.isAdgRedirectRule(rule)).toBeTruthy();
-
             rule = '||example.com/banner$image,redirect=32x32transparent.png';
             expect(isValidAdgRedirectRule(rule)).toBeFalsy();
 
