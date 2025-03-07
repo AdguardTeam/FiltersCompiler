@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@adguard/agtree": "3.0.0-alpha.5",
+    "@adguard/ecss-tree": "^1.1.0",
     "@adguard/extended-css": "^2.1.1",
     "@adguard/filters-downloader": "^2.2.6",
     "@adguard/scriptlets": "^2.1.4",

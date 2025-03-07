@@ -9,6 +9,8 @@ import {
     defaultParserOptions,
 } from '@adguard/agtree';
 
+import { parse } from '@adguard/ecss-tree';
+
 import {
     RuleFactory,
     CosmeticRule,
@@ -128,6 +130,22 @@ class RuleValidator {
 }
 
 /**
+ * Universal function for validating CSS context.
+ *
+ * @param {string} input - string to be validated.
+ * @param {string} contextName - context (e.g., 'selectorList', 'declarationList', 'mediaQueryList').
+ * @throws {Error} Throws an error if parsing fails.
+ */
+const validateCssContext = (input, contextName) => {
+    parse(input, {
+        context: contextName,
+        onParseError(error) {
+            throw error;
+        },
+    });
+};
+
+/**
  * Removes invalid rules from the list of rules
  * and logs process in the excluded list.
  *
@@ -163,6 +181,31 @@ export const validateAndFilterRules = (list, excluded, invalid = [], filterName)
             });
             const conversionResult = RuleConverter.convertToAdg(ruleNode);
             convertedRuleNodes = conversionResult.result;
+            // eslint-disable-next-line no-restricted-syntax
+            for (const convertedRuleNode of convertedRuleNodes) {
+                if (convertedRuleNode.category !== RuleCategory.Cosmetic) {
+                    continue;
+                }
+                switch (convertedRuleNode.type) {
+                    case CosmeticRuleType.ElementHidingRule: {
+                        validateCssContext(convertedRuleNode.body.selectorList.value, 'selectorList');
+                        break;
+                    }
+                    case CosmeticRuleType.CssInjectionRule: {
+                        validateCssContext(convertedRuleNode.body.selectorList.value, 'selectorList');
+                        if (convertedRuleNode.body.remove === true) {
+                            break;
+                        }
+                        validateCssContext(convertedRuleNode.body.declarationList.value, 'declarationList');
+                        if (convertedRuleNode.body.mediaQueryList && convertedRuleNode.body.mediaQueryList.value) {
+                            validateCssContext(convertedRuleNode.body.mediaQueryList.value, 'mediaQueryList');
+                        }
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
         } catch (e) {
             logger.error(`Invalid rule in ${filterName}: ${ruleText}`);
             excludeRule(excluded, e.message, ruleText);

@@ -109,7 +109,11 @@ describe('validator', () => {
             '##div[id*=smartbanner i]',
         ];
         test.each(validNoQuotesSelectors)('%s', (selector) => {
-            const rules = [`example.com##${selector}`];
+            const rules = [`example.com${selector}`];
+            const invalid = [];
+            const result = validateAndFilterRules(rules, [], invalid);
+            expect(invalid).toEqual([]);
+            expect(result).toHaveLength(1);
             expect(validateAndFilterRules(rules)).toHaveLength(1);
         });
     });
@@ -194,19 +198,24 @@ describe('validator', () => {
             ];
             test.each(validSelectors)('%s', (selector) => {
                 const rules = [`example.com##${selector}`];
-                expect(validateAndFilterRules(rules)).toHaveLength(1);
+                const invalid = [];
+                const result = validateAndFilterRules(rules, [], invalid);
+                expect(invalid).toEqual([]);
+                expect(result).toHaveLength(1);
             });
 
-            it('multiple rules - valid', () => {
-                const rules = [
-                    'example.com#$##header-floating\ navbar { position: absolute !important; }',
-                    'example.com#$##site-header\ 1 > .site-header-main { height: 167.3px !important; }',
-                    'example.com#$#.pmc-u-background-white.\/\/.header__bar { position: relative !important; transform: translateY(0) !important; }',
-                    'example.com#$#.o-sticky_header\@tp- { position: relative !important; }',
-                    'example.com#$##atomic .Mt\(headerHeight\) { margin-top: 22px !important; }',
-                    'example.com#$##\#novella-header { position: relative !important; top: 0 !important; }',
-                ];
-                expect(validateAndFilterRules(rules)).toHaveLength(rules.length);
+            it.each([
+                'example.com#$##header-floating\\ navbar { position: absolute !important; }',
+                'example.com#$##site-header\\ 1 > .site-header-main { height: 167.3px !important; }',
+                'example.com#$#.pmc-u-background-white.\\/\\/.header__bar { position: relative !important; transform: translateY(0) !important; }',
+                'example.com#$#.o-sticky_header\\@tp- { position: relative !important; }',
+                'example.com#$##atomic .Mt\\(headerHeight\\) { margin-top: 22px !important; }',
+                'example.com#$##\\#novella-header { position: relative !important; top: 0 !important; }',
+            ])('%s', (rule) => {
+                const invalid = [];
+                const result = validateAndFilterRules([rule], [], invalid);
+                expect(invalid).toEqual([]);
+                expect(result).toHaveLength(1);
             });
         });
 
@@ -230,14 +239,15 @@ describe('validator', () => {
                 expect(validateAndFilterRules(rules)).toHaveLength(0);
             });
 
-            // FIXME: uncomment and fix validation since rule were added as they should be considered as invalid
-            // it('multiple rules - invalid', () => {
-            //     const rules = [
-            //         "example.com#$##atomic .Mt\(headerHeight\) { margin-top: \\'22px\\' !important; }",
-            //         "example.com#$##header-floating\ navbar { font-family: \\'Blogger\\'; }",
-            //     ];
-            //     expect(validateAndFilterRules(rules)).toHaveLength(0);
-            // });
+            test.each([
+                "example.com#$##atomic .Mt\\(headerHeight\\) { margin-top: \\'22px\\' !important; }",
+                "example.com#$##header-floating\ navbar { font-family: \\'Blogger\\'; }",
+            ])('%s', (rule) => {
+                const invalid = [];
+                const result = validateAndFilterRules([rule], [], invalid);
+                expect(invalid).toEqual([]);
+                expect(result).toHaveLength(1);
+            });
         });
     });
 
