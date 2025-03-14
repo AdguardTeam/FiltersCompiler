@@ -27,29 +27,49 @@ const shouldOptimize = (rule) => {
 };
 
 /**
- * Extracts all possible domains from the line.
+ * Returns the top level domain of the given domain.
  *
- * @param {string} line Line to be optimized.
- * @returns {string[]} Array of possible domains, e.g.,
- * for `sub.example.com` -> `['sub.example.com', 'example.com']`.
+ * @param {string} domain Domain to get the top level domain from.
+ *
+ * @returns {string} Top level domain.
  */
-const extractDomainNames = (line) => {
-    const rawDomain = removeRuleMarkers(line);
+const getTopLevelDomain = (domain) => {
+    const parsedDomain = parse(domain).domain;
+    return typeof parsedDomain === 'string' ? parsedDomain : domain;
+};
 
-    const mainDomain = parse(rawDomain).domain;
-    const parts = rawDomain.split(DOT);
-    const domains = [];
+/**
+ * Finds the widest domains in the given list.
+ *
+ * @param {Set<string>} domains Set of domains to find the widest domains from.
+ *
+ * @returns {Set<string>} Set of widest domains.
+ *
+ * @example
+ * - example.com, sub1.example.com, abc.sub2.example.com -> example.com
+ * - example.org, example.com -> example.org, example.com
+ */
+const findWidestDomains = (domains) => {
+    const sortedDomains = [...domains].sort((a, b) => {
+        return a.split(DOT).length - b.split(DOT).length;
+    });
 
-    for (let i = 0; i < parts.length; i += 1) {
-        const domain = parts.slice(i).join(DOT);
-        domains.push(domain);
+    const result = new Set();
 
-        if (domain === mainDomain) {
-            break;
+    sortedDomains.forEach((domain) => {
+        let isSubdomain = false;
+        result.forEach((parent) => {
+            if (domain.endsWith(`${DOT}${parent}`)) {
+                isSubdomain = true;
+            }
+        });
+
+        if (!isSubdomain) {
+            result.add(domain);
         }
-    }
+    });
 
-    return domains;
+    return result;
 };
 
 /**
@@ -57,44 +77,66 @@ const extractDomainNames = (line) => {
  * @param {string[]} lines - An array of text lines.
  * @returns {string[]} - An array of of text lines with redundant rules removed.
  */
-const optimizeDomainBlockingRules = (lines) => {
-    /**
-     * Stores a map of original domain and all possible domains from the line.
-     *
-     * @type {Map<string, string[]>}
-     */
-    const domainsMap = new Map();
+const optimizeDomainBlockingRules = async (lines) => {
+    const linesToSkipOptimization = new Set();
+    const rawDomainsToOptimize = new Set();
 
     lines.forEach((line) => {
         if (!shouldOptimize(line)) {
+            linesToSkipOptimization.add(line);
             return;
         }
-        const [originalDomain, ...otherDomains] = extractDomainNames(line);
-        domainsMap.set(originalDomain, otherDomains);
+
+        const rawDomain = removeRuleMarkers(line);
+        rawDomainsToOptimize.add(rawDomain);
     });
 
-    // consider all original domains as wider domains at first
-    const widerDomains = new Set(domainsMap.keys());
+    /**
+     * Map of tld for all raw domains
+     * @type {Map<string, Set<string>>}
+     *
+     * It is needed to group rawDomains by top level domain
+     * so groups of related rawDomains can be optimized in parallel.
+     */
+    const topDomainsMap = new Map();
 
-    widerDomains.forEach((wideDomain) => {
-        domainsMap.forEach((otherDomains, checkedWideDomain) => {
-            // skip comparing a domain to itself
-            if (wideDomain === checkedWideDomain) {
-                return;
-            }
-            // if currently checking other domains contain the wide domain,
-            // remove currently checked domain from wider domains set as it is redundant
-            if (otherDomains.includes(wideDomain)) {
-                widerDomains.delete(checkedWideDomain);
-            }
+    rawDomainsToOptimize.forEach((rawDomain) => {
+        const topLevelDomain = getTopLevelDomain(rawDomain);
+
+        if (!topDomainsMap.has(topLevelDomain)) {
+            topDomainsMap.set(topLevelDomain, new Set([rawDomain]));
+        } else {
+            topDomainsMap.get(topLevelDomain).add(rawDomain);
+        }
+    });
+
+    const widerDomains = new Set();
+
+    /**
+     * Runs optimization for a group of related domains -
+     * finds the widest domains in the group and adds them to the result list of wider domains.
+     *
+     * @param {Set<string>} rawDomains Set of related raw domains to optimize.
+     */
+    const optimizeDomains = (rawDomains) => {
+        const widestDomains = findWidestDomains(rawDomains);
+        widestDomains.forEach((domain) => {
+            widerDomains.add(domain);
         });
+    };
+
+    topDomainsMap.forEach((rawDomains) => {
+        optimizeDomains(rawDomains);
     });
+
     // return lines in the order they were given
     return lines.filter((line) => {
-        if (!shouldOptimize(line)) {
+        if (linesToSkipOptimization.has(line)) {
             return true;
         }
+
         const domain = removeRuleMarkers(line);
+
         return widerDomains.has(domain);
     });
 };

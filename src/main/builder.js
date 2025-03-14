@@ -403,7 +403,8 @@ module.exports = (function () {
 
             includedLines = workaround.removeAdblockVersion(includedLines);
 
-            options.forEach(({ name, value }) => {
+            // eslint-disable-next-line no-restricted-syntax
+            for (const { name, value } of options) {
                 let optionsExcludePath;
                 switch (name) {
                     case EXCLUDE_OPTION:
@@ -414,7 +415,8 @@ module.exports = (function () {
                         includedLines = stripComments(includedLines);
                         break;
                     case OPTIMIZE_DOMAIN_BLOCKING_RULES:
-                        includedLines = optimizeDomainBlockingRules(includedLines);
+                        // eslint-disable-next-line no-await-in-loop
+                        includedLines = await optimizeDomainBlockingRules(includedLines);
                         break;
                     case NOT_OPTIMIZED_OPTION:
                         includedLines = addNotOptimizedHints(includedLines);
@@ -432,7 +434,7 @@ module.exports = (function () {
                     default:
                         break;
                 }
-            });
+            }
 
             includedLines = workaround.fixVersionComments(includedLines);
         } else {

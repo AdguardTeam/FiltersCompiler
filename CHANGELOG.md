@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.1.153] - 2025-03-14
+
+### Changed
+
+- Improved performance of the `@include` directive's `/optimizeDomainBlockingRules` option [#243].
+
+[v1.1.153]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.149...v1.1.153
+[#243]: https://github.com/AdguardTeam/FiltersCompiler/issues/243
+
 ## [v1.1.149] - 2024-12-10
 
 ### Changed
