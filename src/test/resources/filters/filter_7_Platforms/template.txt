@@ -5,7 +5,15 @@
 ! Some test rules
 ||test.com^
 ||example.com^$third-party
+!+ NOT_VALIDATE
+||test.org^$newmodifier
+!+ NOT_VALIDATE_TYPO
+||test.org^$unsupported
+!+ PLATFORM(mac, windows) NOT_VALIDATE
+||foo.bar^$newmodifier
 somesite.com##.main-banner
+!+ NOT_VALIDATE PLATFORM(mac, windows)
+||example.org^$newmodifier
 !#safari_cb_affinity(security)
 ||example1.org
 !+ PLATFORM(ios)

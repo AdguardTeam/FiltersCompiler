@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.1.154] - 2025-03-24
+
+### Added
+
+- Support for `!+ NOT_VALIDATE` hint [#245]
+
+[v1.1.154]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.153...v1.1.154
+[#245]: https://github.com/AdguardTeam/FiltersCompiler/issues/245
+
 ## [v1.1.153] - 2025-03-14
 
 ### Changed

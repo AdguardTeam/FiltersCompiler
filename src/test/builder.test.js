@@ -926,6 +926,29 @@ describe('Test builder', () => {
             });
         });
 
+        describe('hint NOT_VALIDATE', () => {
+            it('platform/ios', async () => {
+                const filterContent = await readFile(path.join(platformsDir, 'ios', 'filters', '7.txt'));
+                expect(filterContent).toBeTruthy();
+
+                const filterLines = filterContent.split(/\r?\n/);
+                expect(filterLines.includes('||test.org^$newmodifier')).toBeTruthy();
+                expect(filterLines.includes('||example.org^$newmodifier')).toBeFalsy();
+                expect(filterLines.includes('||test.org^$unsupported')).toBeFalsy();
+            });
+
+            it('platform/mac', async () => {
+                const filterContent = await readFile(path.join(platformsDir, 'mac', 'filters', '7.txt'));
+                expect(filterContent).toBeTruthy();
+
+                const filterLines = filterContent.split(/\r?\n/);
+                expect(filterLines.includes('||test.org^$newmodifier')).toBeTruthy();
+                expect(filterLines.includes('||example.org^$newmodifier')).toBeTruthy();
+                expect(filterLines.includes('||foo.bar^$newmodifier')).toBeTruthy();
+                expect(filterLines.includes('||test.org^$unsupported')).toBeFalsy();
+            });
+        });
+
         it('removing scriptlet rules in local_script_rules.json', async () => {
             // test removing scriptlet rules in local_script_rules.json for chrome browser extension
             const localScriptRulesJsonContent = await readFile(path.join(platformsDir, 'chromium', 'local_script_rules.json'));
