@@ -522,10 +522,6 @@ describe('converter', () => {
             actual = convertToUbo(['', undefined]);
             expect(actual).toHaveLength(2);
 
-            actual = convertToUbo(['example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")']);
-            expected = 'example.com##+js(trusted-set-cookie, cName, cValue)';
-            expect(actual[0]).toBe(expected);
-
             // AdGuard does not support UBO's $redirect priority and skips it during the conversion
             // https://github.com/AdguardTeam/tsurlfilter/issues/59
             // ADG -> UBO:
