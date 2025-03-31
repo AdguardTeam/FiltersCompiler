@@ -78,9 +78,14 @@ describe('validator', () => {
             'html:not([style]) tbody > tr[align="left"]',
             '.banner:has(~ .right_bx, ~ div[class^="aside"])',
         ];
+
         test.each(validSelectors)('%s', (selector) => {
             const rules = [`example.com##${selector}`];
-            expect(validateAndFilterRules(rules)).toHaveLength(1);
+            const invalid = [];
+            const result = validateAndFilterRules(rules, [], invalid);
+
+            expect(invalid).toEqual([]);
+            expect(result).toHaveLength(1);
         });
 
         const invalidSelectors = [
@@ -281,9 +286,18 @@ describe('validator', () => {
                 'samdan.com.tr,esquire.com.tr##div[data-mbzone="Textlink" i] > div#id_d_textlink',
                 "example.com##div[class^='textLink' i]",
                 '||delivery.tf1.fr/pub$media,rewrite=abp-resource:blank-mp3,domain=tf1.fr',
+                // https://github.com/AdguardTeam/FiltersCompiler/issues/241
+                String.raw`[$domain=/^i[a-z]*\.strmrdr[a-z0-9]+\..*/]#%#//scriptlet('set-constant', 'adscfg.enabled', 'false')`,
+                // https://github.com/AdguardTeam/FiltersCompiler/issues/237
+                String.raw`[$url=/^https?:\/\/\d{1\,3}\.\d{1\,3}\.\d{1\,3}\.\d{1\,3}\/.*(\?|&)__cpo=aHR0c/]#%#//scriptlet('set-constant', '__Cpn.prototype.showAds', 'false')`,
+                String.raw`[$url=/^https?:\/\/\d{1\,3}\.\d{1\,3}\.\d{1\,3}\.\d{1\,3}\/.*(\?|&)__cpo=aHR0c/]#%#//scriptlet('abort-on-stack-trace', 'addEventListener', '/attachEvent[\s\S]*?Popup[\s\S]*?register/')`,
             ];
             test.each(validRules)('%s', (rule) => {
-                expect(validateAndFilterRules([rule])).toHaveLength(1);
+                const invalid = [];
+                const result = validateAndFilterRules([rule], [], invalid);
+                expect(invalid).toEqual([]);
+                expect(result).toHaveLength(1);
+                expect(result).toContain(rule);
             });
         });
 

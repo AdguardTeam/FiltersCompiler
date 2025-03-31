@@ -14,9 +14,7 @@ import {
 
 import {
     convertRulesToAdgSyntax,
-    convertAdgRedirectsToUbo,
-    convertAdgScriptletsToUbo,
-    convertAdgPathModifiersToUbo,
+    convertToUbo,
 } from '../main/converter';
 
 // Mock log to hide error messages
@@ -61,6 +59,10 @@ describe('converter', () => {
 
         c = convertRulesToAdgSyntax(['##selector']);
         expect(c[0]).toBe('##selector');
+
+        // https://github.com/AdguardTeam/FiltersCompiler/issues/242
+        c = convertRulesToAdgSyntax([String.raw`new.lewd.ninja##div[class^="box ~!@$%^&*()_+-=,./';:?><[]"]`]);
+        expect(c[0]).toBe(String.raw`new.lewd.ninja##div[class^="box ~!@$%^&*()_+-=,./';:?><[]"]`);
 
         c = convertRulesToAdgSyntax(['']);
         expect(c[0]).toEqual('');
@@ -175,53 +177,53 @@ describe('converter', () => {
 
     it('converts scriptlets to UBlock syntax', () => {
         // scriptlet with one argument
-        let actual = convertAdgScriptletsToUbo(['example.org#%#//scriptlet("abort-on-property-read", "alert")']);
+        let actual = convertToUbo(['example.org#%#//scriptlet("abort-on-property-read", "alert")']);
         let expected = 'example.org##+js(abort-on-property-read, alert)';
         expect(actual[0]).toBe(expected);
 
         // scriptlet with ubo-compatible name
-        actual = convertAdgScriptletsToUbo(['example.org#%#//scriptlet("ubo-abort-on-property-read.js", "alert")']);
+        actual = convertToUbo(['example.org#%#//scriptlet("ubo-abort-on-property-read.js", "alert")']);
         expected = 'example.org##+js(abort-on-property-read, alert)';
         expect(actual[0]).toBe(expected);
 
         // scriptlet with two arguments
-        actual = convertAdgScriptletsToUbo(["example.org#%#//scriptlet('set-constant', 'firstConst', 'false')"]);
+        actual = convertToUbo(["example.org#%#//scriptlet('set-constant', 'firstConst', 'false')"]);
         expected = 'example.org##+js(set-constant, firstConst, false)';
         expect(actual[0]).toBe(expected);
 
         // scriptlet without arguments and few domains
-        actual = convertAdgScriptletsToUbo(["example1.org,example2.com,some-domain.dom#%#//scriptlet('prevent-adfly')"]);
+        actual = convertToUbo(["example1.org,example2.com,some-domain.dom#%#//scriptlet('prevent-adfly')"]);
         expected = 'example1.org,example2.com,some-domain.dom##+js(prevent-adfly)';
         expect(actual[0]).toBe(expected);
 
         // scriptlet argument includes quotes
-        actual = convertAdgScriptletsToUbo(["example.org#%#//scriptlet('set-constant', 'constName', 'value\"12345\"')"]);
+        actual = convertToUbo(["example.org#%#//scriptlet('set-constant', 'constName', 'value\"12345\"')"]);
         expected = 'example.org##+js(set-constant, constName, value"12345")';
         expect(actual[0]).toBe(expected);
 
         // set-constant with empty string arg
-        actual = convertAdgScriptletsToUbo(["example.org#%#//scriptlet('set-constant', 'arg.name', '')"]);
+        actual = convertToUbo(["example.org#%#//scriptlet('set-constant', 'arg.name', '')"]);
         expected = 'example.org##+js(set-constant, arg.name, \'\')';
         expect(actual[0]).toBe(expected);
 
         // multiple selectors for remove-attr/class
-        actual = convertAdgScriptletsToUbo(['example.org#%#//scriptlet(\'remove-class\', \'promo\', \'a.class, div#id, div > #ad > .test\')']);
+        actual = convertToUbo(['example.org#%#//scriptlet(\'remove-class\', \'promo\', \'a.class, div#id, div > #ad > .test\')']);
         expected = 'example.org##+js(remove-class, promo, a.class\\, div#id\\, div > #ad > .test)';
         expect(actual[0]).toBe(expected);
 
-        actual = convertAdgScriptletsToUbo(['']);
+        actual = convertToUbo(['']);
         expected = '';
         expect(actual[0]).toBe(expected);
 
-        actual = convertAdgScriptletsToUbo(undefined);
+        actual = convertToUbo(undefined);
         expected = [];
         expect(actual).toEqual(expected);
 
-        actual = convertAdgScriptletsToUbo([String.raw`example.com#%#//scriptlet('adjust-setInterval', ',dataType:_', '1000', '0.02')`]);
+        actual = convertToUbo([String.raw`example.com#%#//scriptlet('adjust-setInterval', ',dataType:_', '1000', '0.02')`]);
         expected = [String.raw`example.com##+js(adjust-setInterval, \,dataType:_, 1000, 0.02)`];
         expect(actual).toEqual(expected);
 
-        actual = convertAdgScriptletsToUbo(["example.org#%#//scriptlet('set-session-storage-item', 'acceptCookies', 'false')"]);
+        actual = convertToUbo(["example.org#%#//scriptlet('set-session-storage-item', 'acceptCookies', 'false')"]);
         expected = 'example.org##+js(set-session-storage-item, acceptCookies, false)';
         expect(actual[0]).toBe(expected);
     });
@@ -460,70 +462,70 @@ describe('converter', () => {
             expected = '||imasdk.googleapis.com/js/sdkloader/ima3.js$script,important,redirect=google-ima3,domain=example.com';
             expect(actual[0]).toBe(expected);
 
-            actual = convertAdgRedirectsToUbo(['/blockadblock.$script,redirect=prevent-bab']);
+            actual = convertToUbo(['/blockadblock.$script,redirect=prevent-bab']);
             expected = '/blockadblock.$script,redirect=nobab.js';
             expect(actual[0]).toBe(expected);
 
             // https://github.com/AdguardTeam/Scriptlets/issues/127
-            actual = convertAdgRedirectsToUbo(['||googletagmanager.com/gtm.js$script,redirect=googletagmanager-gtm,domain=example.com']);
+            actual = convertToUbo(['||googletagmanager.com/gtm.js$script,redirect=googletagmanager-gtm,domain=example.com']);
             expected = '||googletagmanager.com/gtm.js$script,redirect=google-analytics_analytics.js,domain=example.com';
             expect(actual[0]).toBe(expected);
 
             // media type for 'empty' redirect
-            actual = convertAdgRedirectsToUbo(['||example.org^$media,redirect=empty']);
+            actual = convertToUbo(['||example.org^$media,redirect=empty']);
             expected = '||example.org^$media,redirect=empty';
             expect(actual[0]).toBe(expected);
 
             // no source type is allowed for 'empty' redirect
-            actual = convertAdgRedirectsToUbo(['||example.org^$redirect=empty']);
+            actual = convertToUbo(['||example.org^$redirect=empty']);
             expected = '||example.org^$redirect=empty';
             expect(actual[0]).toBe(expected);
 
-            actual = convertAdgRedirectsToUbo(['||example.com/banner$image,redirect=32x32-transparent.png']);
+            actual = convertToUbo(['||example.com/banner$image,redirect=32x32-transparent.png']);
             expected = '||example.com/banner$image,redirect=32x32.png';
             expect(actual[0]).toBe(expected);
 
-            actual = convertAdgRedirectsToUbo(['||example.com^$script,redirect=noopjs']);
+            actual = convertToUbo(['||example.com^$script,redirect=noopjs']);
             expected = '||example.com^$script,redirect=noop.js';
             expect(actual[0]).toBe(expected);
 
-            actual = convertAdgRedirectsToUbo(['||example.com/banner$image,redirect=1x1-transparent.gif']);
+            actual = convertToUbo(['||example.com/banner$image,redirect=1x1-transparent.gif']);
             expected = '||example.com/banner$image,redirect=1x1.gif';
             expect(actual[0]).toBe(expected);
 
             // add missed source types
             // noopmp3-0.1s:
-            actual = convertAdgRedirectsToUbo(['||*/ad/$redirect=noopmp3-0.1s,domain=huaren.tv']);
+            actual = convertToUbo(['||*/ad/$redirect=noopmp3-0.1s,domain=huaren.tv']);
             expected = '||*/ad/$redirect=noop-0.1s.mp3,domain=huaren.tv,media';
             expect(actual[0]).toBe(expected);
             // noopjs:
-            actual = convertAdgRedirectsToUbo(['||example.com^$redirect=noopjs']);
+            actual = convertToUbo(['||example.com^$redirect=noopjs']);
             expected = '||example.com^$redirect=noop.js,script';
             expect(actual[0]).toBe(expected);
             // noopjson
-            actual = convertAdgRedirectsToUbo(['||example.com^$xmlhttprequest,redirect=noopjson']);
+            actual = convertToUbo(['||example.com^$xmlhttprequest,redirect=noopjson']);
             expected = '||example.com^$xhr,redirect=noop.json';
             expect(actual[0]).toBe(expected);
             // nooptext:
-            actual = convertAdgRedirectsToUbo(['||ad.example.com^$redirect=nooptext,important']);
+            actual = convertToUbo(['||ad.example.com^$redirect=nooptext,important']);
             expected = '||ad.example.com^$redirect=noop.txt,important,image,media,subdocument,stylesheet,script,xhr,other';
             expect(actual[0]).toBe(expected);
 
-            actual = convertAdgRedirectsToUbo(['||example.com/ad/vmap/*$xmlhttprequest,redirect=noopvast-2.0']);
+            actual = convertToUbo(['||example.com/ad/vmap/*$xmlhttprequest,redirect=noopvast-2.0']);
             expected = '||example.com/ad/vmap/*$xhr,redirect=noopvast-2.0';
             expect(actual[0]).toBe(expected);
 
-            actual = convertAdgRedirectsToUbo(['']);
+            actual = convertToUbo(['']);
             expected = '';
             expect(actual[0]).toBe(expected);
 
-            actual = convertAdgRedirectsToUbo(['', undefined]);
+            actual = convertToUbo(['', undefined]);
             expect(actual).toHaveLength(2);
 
             // AdGuard does not support UBO's $redirect priority and skips it during the conversion
             // https://github.com/AdguardTeam/tsurlfilter/issues/59
             // ADG -> UBO:
-            actual = convertAdgRedirectsToUbo(['||example.com^$script,redirect=noopjs:99']);
+            actual = convertToUbo(['||example.com^$script,redirect=noopjs:99']);
             expected = '||example.com^$script,redirect=noop.js';
             expect(actual[0]).toBe(expected);
 
@@ -625,35 +627,62 @@ describe('converter', () => {
                 expected: 'example.com#@#:matches-path(/page) p',
             },
             {
-                source: String.raw`[$path=/\\/(sub1|sub2)\\/page\\.html/]example.com##p`,
-                expected: String.raw`example.com##:matches-path(/\/(sub1|sub2)\/page\.html/) p`,
+                source: '[$path=/\\/(sub1|sub2)\\/page\\.html/]example.com##p',
+                expected: String.raw`example.com##:matches-path(/\\/(sub1|sub2)\\/page\\.html/) p`,
             },
             {
                 source: '[$path=/sexykpopidol]blog.livedoor.jp###containerWrap > #container > .blog-title-outer + #content.hfeed',
                 expected: 'blog.livedoor.jp##:matches-path(/sexykpopidol) #containerWrap > #container > .blog-title-outer + #content.hfeed',
             },
             {
-                source: String.raw`[$path=/\\/\[a|b|\,\]\\/page\\.html/]example.com## #test`,
-                expected: String.raw`example.com##:matches-path(/\/[a|b|,]\/page\.html/) #test`,
+                source: '[$path=/\\/\[a|b|\,\]\\/page\\.html/]example.com## #test',
+                expected: String.raw`example.com##:matches-path(/\/[a|b|):]\/page\.html/ #test`,
+            },
+            {
+                source: '[$domain=/example.(com\\|org)/]##.banner',
+                expected: '/example.(com\\|org)/##.banner',
+            },
+            {
+                source: '[$domain=/example.(com\\|org)/]##.banner',
+                expected: '/example.(com\\|org)/##.banner',
+            },
+            {
+                source: '[$domain=/example.(com\\|org)/|foo.com]##.banner',
+                expected: '/example.(com\\|org)/,foo.com##.banner',
+            },
+            {
+                source: '[$domain=/example.(com\\|org)/|foo.com]#@#.banner',
+                expected: '/example.(com\\|org)/,foo.com#@#.banner',
+            },
+            // [$url=....] modifier
+            {
+                source: '[$url=||example.com/content/*]##div.textad',
+                expected: '/^(http|https|ws|wss)://([a-z0-9-_.]+\\.)?example\\.com\\/content\\/.*/##div.textad',
+            },
+            {
+                source: '[$url=|example.org]#@#h1',
+                expected: '/^example\\.org/#@#h1',
+            },
+            {
+                source: '[$url=|example.org]#@#h1',
+                expected: '/^example\\.org/#@#h1',
+            },
+            {
+                source: '[$url=|example.org|]#@#h1',
+                expected: '/^example\\.org$/#@#h1',
             },
         ];
 
         it.each(rules)('converts path modifier to UBlock syntax', (rule) => {
-            const res = convertAdgPathModifiersToUbo([rule.source]);
-
+            const res = convertToUbo([rule.source]);
             expect(res[0]).toBe(rule.expected);
         });
     });
 
-    // FIXME: handle ADG cosmetic modifiers in AGTree's convertToUbo
-    // it('converts scriptlet rule with modifiers to UBlock syntax', () => {
-    //     const source = String.raw`[$path=/page,domain=example.com|~example.org]#%#//scriptlet('ubo-setTimeout-defuser.js', '[native code]', '8000')`;
-
-    //     let rulesList = convertAdgPathModifiersToUbo([source]);
-    //     rulesList = convertAdgScriptletsToUbo(rulesList);
-
-    //     console.log(rulesList);
-
-    //     expect(rulesList).toHaveLength(0);
-    // });
+    it('converts scriptlet rule with modifiers to UBlock syntax', () => {
+        const source = String.raw`[$path=/page,domain=example.com|~example.org]#%#//scriptlet('ubo-setTimeout-defuser.js', '[native code]', '8000')`;
+        const rulesList = convertToUbo([source]);
+        // because uBO scriptlet injection rules do not support cosmetic rule modifiers
+        expect(rulesList).toHaveLength(0);
+    });
 });

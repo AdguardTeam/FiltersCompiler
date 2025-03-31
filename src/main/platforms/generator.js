@@ -16,11 +16,7 @@ import {
     modifyBaseFilterHeader,
 } from '../utils/workaround';
 
-import {
-    convertAdgPathModifiersToUbo,
-    convertAdgRedirectsToUbo,
-    convertAdgScriptletsToUbo,
-} from '../converter';
+import { convertToUbo } from '../converter';
 
 import { getFilterOptimizationConfig } from '../optimization';
 
@@ -871,9 +867,7 @@ const writeFilterRules = function (filterId, dir, config, rulesHeader, rules, op
     // and script rules exceptions https://github.com/AdguardTeam/FiltersCompiler/issues/199
     // Modify title for base filter
     if (config.platform === 'ext_ublock') {
-        rulesList = convertAdgPathModifiersToUbo(rulesList);
-        rulesList = convertAdgScriptletsToUbo(rulesList);
-        rulesList = convertAdgRedirectsToUbo(rulesList);
+        rulesList = convertToUbo(rulesList);
         rulesList = excludeScriptRules(rulesList);
         if (filterId === 2) {
             modifyBaseFilterHeader(rulesHeader, optimized);
