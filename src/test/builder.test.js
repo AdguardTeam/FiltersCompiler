@@ -174,7 +174,7 @@ describe('Test builder', () => {
                 });
             });
 
-            it.only('Should filter "platforms/ios" with "10.txt"', async () => {
+            it('Should filter "platforms/ios" with "10.txt"', async () => {
                 const filterContent = await readFile(path.join(platformsDir, 'ios', 'filters', '10.txt'));
                 const filterLines = filterContent.split(/\r?\n/);
                 expect(filterLines.length).toEqual(34);
@@ -273,9 +273,8 @@ describe('Test builder', () => {
                 'test.com##+js(abort-on-property-read, adsShown)',
                 'example.com##+js(disable-newtab-links)',
                 'test.com#@#+js(abort-on-property-read, some.prop)',
-                '||www.ynet.co.il^$important,websocket,~third-party,domain=www.ynet.co.il',
+                '||www.ynet.co.il^$important,websocket,~3p,domain=www.ynet.co.il',
                 'example.com$$script[tag-content="12313"][max-length="262144"]',
-                '||adsnet.com/*/700x350.gif$domain=example.com',
                 '||example.com/banner$image,redirect=3x2.png',
                 '||test.com^$script,redirect=noop.js',
                 '||example.com/*.mp4$media,redirect=noop-1s.mp4',
@@ -439,7 +438,7 @@ describe('Test builder', () => {
             expect(filterContent).toBeTruthy();
 
             const filterLines = filterContent.split(/\r?\n/);
-            expect(filterLines.length).toEqual(50);
+            expect(filterLines.length).toEqual(52);
             expect(filterLines[2]).toEqual('! Title: AdGuard Base filter + EasyList');
 
             const presentLines = [
@@ -452,6 +451,8 @@ describe('Test builder', () => {
                 '!+ NOT_OPTIMIZED',
                 'test-common-2-rule.com',
                 'test.com##+js(abort-on-property-read, Object.prototype.getBanner)',
+                'example.com##+js(trusted-set-local-storage-item, iName, iValue)',
+                'example.com##+js(trusted-set-cookie, cName, cValue)',
             ];
             presentLines.forEach((rule) => {
                 expect(filterLines.includes(rule)).toBeTruthy();
@@ -477,7 +478,8 @@ describe('Test builder', () => {
             expect(filterContent).toBeTruthy();
 
             const filterLines = filterContent.split(/\r?\n/);
-            expect(filterLines.length).toEqual(34);
+            // trusted scriptlets included in full trust level filters
+            expect(filterLines.length).toEqual(36);
             expect(filterLines[2]).toEqual('! Title: AdGuard Base filter + EasyList (Optimized)');
 
             // $webrtc is deprecated
