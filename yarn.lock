@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@adguard/agtree@3.0.0-alpha.2", "@adguard/agtree@3.0.0-alpha.5", "@adguard/agtree@^3.0.0-alpha.5":
-  version "3.0.0-alpha.5"
-  resolved "https://registry.yarnpkg.com/@adguard/agtree/-/agtree-3.0.0-alpha.5.tgz#6045f3d6374d8bd0a57e9066e59cc17d0acb1047"
-  integrity sha512-z4XK+bKgO0m9P665I2E0y1i9rIVQZq+xk8hhch+e0S9QCjCW1SoAl12FnzygmFCrri9iNJzF88eUEl38RyZKoQ==
+"@adguard/agtree@3.0.0-alpha.2", "@adguard/agtree@3.0.1", "@adguard/agtree@3.1.0", "@adguard/agtree@^3.1.0":
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@adguard/agtree/-/agtree-3.1.0.tgz#28ceff4c2a9b4b872e19917f5c491ce521856595"
+  integrity sha512-0jW1V/k3kh1lMU2Q7iZSsRQMLLOXFIzhbdEIK32ZrnU5S9u/++pSPreYw/LhgKdiSJ5tnycFVLY1YLYQ3YEyFA==
   dependencies:
     "@adguard/css-tokenizer" "^1.2.0"
     camelcase-keys "^7.0.2"
@@ -60,13 +60,22 @@
     "@adguard/agtree" "3.0.0-alpha.2"
     js-yaml "^3.14.1"
 
-"@adguard/tsurlfilter@https://github.com/AdguardTeam/tsurlfilter/raw/61dcdac81bd0ecad0d68e436f3e522c15f67fb35/packages/tsurlfilter/tsurlfilter.tgz":
-  version "3.2.0-alpha.0"
-  resolved "https://github.com/AdguardTeam/tsurlfilter/raw/61dcdac81bd0ecad0d68e436f3e522c15f67fb35/packages/tsurlfilter/tsurlfilter.tgz#7567bc9c26ec075a8462fbc37f9d85455cbda359"
+"@adguard/scriptlets@^2.1.6":
+  version "2.1.6"
+  resolved "https://registry.yarnpkg.com/@adguard/scriptlets/-/scriptlets-2.1.6.tgz#f25fc43c459ca7c01d201ff42908e70d501f6bf0"
+  integrity sha512-Kod4RVgj+fEo1VrPnsMVzGVQJihakjSKEzTe0B5Sz027flFzo7/O5hOgSEuJV9yg2RMl6HgcQeb6xWZWKJ2abw==
   dependencies:
-    "@adguard/agtree" "^3.0.0-alpha.5"
+    "@adguard/agtree" "3.0.1"
+    js-yaml "^3.14.1"
+
+"@adguard/tsurlfilter@^3.2.2":
+  version "3.2.2"
+  resolved "https://registry.yarnpkg.com/@adguard/tsurlfilter/-/tsurlfilter-3.2.2.tgz#f6b1007911a0f3c1ed3e70535e9d4a576970680f"
+  integrity sha512-GZv/S3+fQDo0Rrx3lUz9HzVcEnJKBJVEle7iX35jdttwBuLVTY2V5dI+ctP7zMB1Ma4d44QMK6vXcDk3diPztA==
+  dependencies:
+    "@adguard/agtree" "^3.1.0"
     "@adguard/css-tokenizer" "^1.2.0"
-    "@adguard/scriptlets" "^2.1.4"
+    "@adguard/scriptlets" "^2.1.6"
     cidr-tools "^6.4.1"
     commander "9.4.1"
     is-cidr "4.0.2"
