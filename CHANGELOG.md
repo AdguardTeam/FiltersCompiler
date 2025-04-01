@@ -11,17 +11,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Added
 
 <!-- FIXME: mention the latest version of agtree if needed -->
-- [@adguard/agtree] v3.0.0-alpha.3 for rules conversion and validation.
+- [@adguard/agtree] v3.1.0 for rules conversion and validation.
 
 ### Changed
 
 <!-- FIXME: use the latest versions of scriptlets and tsurlfilter -->
 - Updated [@adguard/extended-css] to v2.1.1.
-- Updated [@adguard/filters-downloader] to v2.2.6.
+- Updated [@adguard/filters-downloader] to v2.4.0.
 - Updated [@adguard/scriptlets] to v2.1.4.
-- Updated [@adguard/tsurlfilter] to v3.1.0-alpha.8.
+- Updated [@adguard/tsurlfilter] to v3.2.2.
+
+### Fixed
+
+- Issue with invalid selector [#242].
+- Issue with regex in `$domain` modifier [#241].
+- Issue with regex in `$url` modifier [#237].
 
 [v1.2.1]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.149...v1.2.1
+[#242]: https://github.com/AdguardTeam/FiltersCompiler/issues/242
+[#241]: https://github.com/AdguardTeam/FiltersCompiler/issues/241
+[#237]: https://github.com/AdguardTeam/FiltersCompiler/issues/237
 
 ## [v1.1.154] - 2025-03-24
 
