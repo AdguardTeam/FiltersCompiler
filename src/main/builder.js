@@ -580,8 +580,8 @@ const compile = async function (filterDir, filterName, templateContent, trustLev
  * Creates revision object,
  * doesn't increment version if hash is not changed
  *
- * @param path
- * @param hash
+ * @param {string} path - The path to the revision file.
+ * @param {string} hash - The hash of the filter file.
  * @returns {{version: string, timeUpdated: number}}
  */
 const makeRevision = function (path, hash) {
@@ -614,9 +614,10 @@ const makeRevision = function (path, hash) {
 /**
  * Builds filter txt file from directory contents
  *
- * @param filterDir
- * @param whitelist
- * @param blacklist
+ * @param {string} filterDir - The path to the directory containing filters.
+ * @param {Array<number>} whitelist - An array whitelist filters IDs.
+ * @param {Array<number>} blacklist - An array blacklist filters IDs.
+ * @returns {Promise<void>} A promise that resolves when all filters and its subdirectories have been processed.
  */
 const buildFilter = async function (filterDir, whitelist, blacklist) {
     const templateContent = readFile(path.join(filterDir, TEMPLATE_FILE));
@@ -680,11 +681,12 @@ const buildFilter = async function (filterDir, whitelist, blacklist) {
 };
 
 /**
- * Parses directory recursive
+ * Asynchronously parses a directory and processes filters based on the provided whitelist and blacklist.
  *
- * @param filtersDir
- * @param whitelist
- * @param blacklist
+ * @param {string} filtersDir - The path to the directory containing filters.
+ * @param {Array<number>} whitelist - An array whitelist filters IDs.
+ * @param {Array<number>} blacklist - An array blacklist filters IDs.
+ * @returns {Promise<void>} A promise that resolves when all filters and its subdirectories have been processed.
  */
 const parseDirectory = async function (filtersDir, whitelist, blacklist) {
     const items = fs.readdirSync(filtersDir)
@@ -709,15 +711,18 @@ const parseDirectory = async function (filtersDir, whitelist, blacklist) {
 };
 
 /**
- * Builds all filters in child directories
+ * Asynchronously builds and processes filter files, generates platform data, and creates a report.
  *
- * @param filtersDir
- * @param logFile
- * @param reportFile
- * @param platformsPath
- * @param platformsConfig
- * @param whitelist
- * @param blacklist
+ * @async
+ * @function build
+ * @param {string} filtersDir - The directory containing filter files to be processed.
+ * @param {string} logFile - The path to the log file where logs will be written.
+ * @param {string} reportFile - The path to the report file to be created.
+ * @param {string} platformsPath - The path where platform data will be generated.
+ * @param {Object} platformsConfig - The configuration object for platforms.
+ * @param {Array<number>} whitelist - A list of filter file names to include in processing.
+ * @param {Array<number>} blacklist - A list of filter file names to exclude from processing.
+ * @returns {Promise<void>} A promise that resolves when the build process is complete.
  */
 export const build = async (
     filtersDir,

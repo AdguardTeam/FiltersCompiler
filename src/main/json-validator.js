@@ -13,8 +13,8 @@ const OLD_MAC_PLATFORMS_DIR = 'mac';
 /**
  * Loads all available schemas from dir
  *
- * @param dir
- * @returns {{}}
+ * @param {string} dir - The directory path containing the schema files.
+ * @returns {Object} An object with keys - schema file names and values - parsed JSON schema objects.
  */
 const loadSchemas = (dir) => {
     const schemas = {};
@@ -36,12 +36,12 @@ const loadSchemas = (dir) => {
 /**
  * Recursively validates dir content with provided schemas
  *
- * @param dir
- * @param validator
- * @param schemas
- * @param oldSchemas
- * @param filtersRequiredAmount
- * @returns {boolean}
+ * @param {string} dir - The directory path to validate.
+ * @param {object} validator - The JSON schema validator instance.
+ * @param {object} schemas - An object containing the current JSON schemas, keyed by file name.
+ * @param {object} oldSchemas - An object containing old JSON schemas for specific directories.
+ * @param {number} filtersRequiredAmount - The minimum required number of filters in the "filters" JSON file.
+ * @returns {boolean} - Returns `true` if all JSON files are valid, otherwise `false`.
  */
 const validateDir = (dir, validator, schemas, oldSchemas, filtersRequiredAmount) => {
     let items;
@@ -98,9 +98,9 @@ const validateDir = (dir, validator, schemas, oldSchemas, filtersRequiredAmount)
 /**
  * Validates json schemas for all the filters.json and filters_i18n.json found in platforms path
  *
- * @param platformsPath
- * @param jsonSchemasConfigDir
- * @param filtersRequiredAmount
+ * @param platformsPath - Path to platforms folder
+ * @param jsonSchemasConfigDir - Path to json schemas config folder
+ * @param filtersRequiredAmount - Minimum required amount of filters
  */
 const validate = (platformsPath, jsonSchemasConfigDir, filtersRequiredAmount) => {
     logger.info('Validating json schemas for platforms');

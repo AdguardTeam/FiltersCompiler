@@ -188,7 +188,6 @@ export const validateAndFilterRules = (list, excluded, invalid = [], filterName)
 
         let convertedRuleNodes;
         try {
-            // FIXME: check if parsing UBO and ABP syntax is needed
             const ruleNode = RuleParser.parse(ruleText, {
                 ...defaultParserOptions,
                 // tolerant mode is used for rather quick syntax validation

@@ -72,7 +72,7 @@ const areValidMessagesKeys = (keys, id) => {
 
 /**
  * Validates locale messages values
- * @param {string[]} values
+ * @param {string[]} values - locale messages values
  */
 const areValidMessagesValues = (values) => values.every((v) => v !== '');
 
@@ -91,8 +91,11 @@ const prepareWarningDetails = (obj) => {
 };
 
 /**
- * Returns map of base locale keys
- * @param dirPath
+ * Retrieves the keys from the base locale files in the specified directory.
+ *
+ * @param {string} dirPath - The path to the directory containing the base locale files.
+ * @returns {Object<string, string[]>} An object where each key is a file name and the value is an array of keys
+ * extracted from the corresponding base locale file.
  */
 const getBaseLocaleKeys = (dirPath) => {
     const baseLocaleKeys = {};
@@ -109,9 +112,9 @@ const getBaseLocaleKeys = (dirPath) => {
 
 /**
  * Compares messagesData keys to base locale keys
- * @param baseLocaleKeys
- * @param messagesData
- * @param localeWarnings
+ * @param baseLocaleKeys - Keys from base locale files
+ * @param messagesData - Messages data from the current locale
+ * @param localeWarnings - Warnings array for the current locale
  */
 const compareKeys = (baseLocaleKeys, messagesData, localeWarnings) => {
     const messagesDataKeys = messagesData.flatMap((entry) => Object.keys(entry));

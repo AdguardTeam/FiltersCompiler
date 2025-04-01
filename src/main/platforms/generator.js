@@ -189,8 +189,9 @@ const calculateChecksum = function (header, rules) {
 
 /**
  * This will create a dir given a path such as './folder/subfolder'
- *
- * @param dir
+ * @param {string} dir - The path of the directory to create. Can be absolute or relative.
+ * @returns {string} The path of the last directory created or the existing directory.
+ * @throws {Error} Throws an error if there is a permission issue or if the directory cannot be created.
  */
 const createDir = (dir) => {
     const { sep } = path;
@@ -223,10 +224,12 @@ const createDir = (dir) => {
 };
 
 /**
- * Replaces tags keywords with tag ids
+ * Replaces tag keywords in the provided filters with their corresponding tag IDs.
  *
- * @param rawFilters
- * @param tags
+ * @param {Array<Object>} rawFilters - The array of filter objects to process.
+ * @param {Array<Object>} tags - The array of tag objects.
+ * @returns {Array<Object>} A new array of filter objects with tag keywords replaced by their corresponding tag IDs.
+ * @throws {Error} If any tag keyword in the filters does not have a corresponding tag in the `tags` array.
  */
 const replaceTagKeywords = function (rawFilters, tags) {
     const tagsMap = new Map();
@@ -458,9 +461,10 @@ const parseInfo = (string, mask) => {
 };
 
 /**
- * Loads localizations
+ * Loads locale data from a specified directory and organizes it into groups, tags, and filters.
  *
- * @param dir
+ * @param {string} dir - The directory containing locale subdirectories with JSON files.
+ * @returns {Object} An object containing the loaded locale data.
  */
 const loadLocales = function (dir) {
     const result = {
@@ -609,11 +613,15 @@ export const shouldBuildFilterForPlatform = (metadata, platform) => {
 };
 
 /**
- * Writes metadata files
- * @param {string} platformsPath
- * @param {string} filtersDir
- * @param {object[]} filtersMetadata Array of filter metadata objects
- * @param {array} obsoleteFilters
+ * Writes filters metadata and localizations for different platforms.
+ *
+ * @param {string} platformsPath - The base path where platform-specific directories are located.
+ * @param {string} filtersDir - The directory containing filters metadata and related files.
+ * @param {Array<Object>} filtersMetadata - The metadata for filters to be processed.
+ * @param {Array<string>} obsoleteFilters - A list of obsolete filters to be excluded.
+ *
+ * @returns {void}
+ * @throws {Error} If reading or parsing metadata files fails.
  */
 const writeFiltersMetadata = function (platformsPath, filtersDir, filtersMetadata, obsoleteFilters) {
     logger.info('Writing filters metadata');
@@ -710,7 +718,7 @@ const writeFiltersMetadata = function (platformsPath, filtersDir, filtersMetadat
 /**
  * Separates script rules from AG filters into specified file.
  *
- * @param platformsPath
+ * @param platformsPath - Path to platforms folder
  */
 const writeLocalScriptRules = function (platformsPath) {
     logger.info('Writing local script rules');
@@ -777,10 +785,13 @@ const writeLocalScriptRules = function (platformsPath) {
 };
 
 /**
- * Loads filter metadata
+ * Loads and processes filter metadata from the specified directory.
  *
- * @param filterDir
- * @returns {null}
+ * @param {string} filterDir - The directory containing the filter metadata and revision files.
+ * @param {number[]} [whitelist] - An optional array of whitelist filter IDs.
+ * @param {number[]} [blacklist] - An optional array of blacklist filter IDs.
+ * @returns {Object} The processed filter metadata.
+ * @throws {Error} If the metadata or revision file cannot be read.
  */
 const loadFilterMetadata = function (filterDir, whitelist, blacklist) {
     const metadataFilePath = path.join(filterDir, metadataFile);
@@ -928,10 +939,10 @@ const removeRuleDuplicates = function (list) {
 /**
  * Builds platforms for filter
  *
- * @param filterDir
- * @param platformsPath
- * @param whitelist
- * @param blacklist
+ * @param filterDir - Path to filter directory
+ * @param platformsPath - Path to platforms folder
+ * @param whitelist - Array of filter ids to whitelist
+ * @param blacklist - Array of filter ids to blacklist
  */
 const buildFilter = async (filterDir, platformsPath, whitelist, blacklist) => {
     const originalRules = readFile(path.join(filterDir, filterFile)).split('\r\n');
@@ -1091,12 +1102,16 @@ const parseDirectory = async (
 };
 
 /**
- * Generates platforms builds
+ * Generates platform-specific files and metadata based on the provided filters and configurations.
  *
- * @param {String} filtersDir
- * @param {String} platformsPath
- * @param whitelist
- * @param blacklist
+ * @async
+ * @param {string} filtersDir - The directory containing filter files to be processed.
+ * @param {string} platformsPath - The output path where the generated platform files will be stored.
+ * @param {Array<number>} whitelist - A list of whitelist filter IDs.
+ * @param {Array<number>} blacklist - A list of blacklist filter IDs.
+ * @returns {Promise<void>} Resolves when the generation process is complete.
+ *
+ * @throws {Error} If `platformsPath` or `platformPathsConfig` is not specified.
  */
 export const generate = async (filtersDir, platformsPath, whitelist, blacklist) => {
     if (!platformsPath) {
