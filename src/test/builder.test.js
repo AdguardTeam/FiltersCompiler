@@ -432,65 +432,63 @@ describe('Test builder', () => {
             expect(localScriptRulesJson.rules).toBeTruthy();
         });
 
-        // FIXME: trusted scriptlets should not be converted
-        // it('platform/test filters 2.txt', async () => {
-        //     // directory 'test' is used for 'ext_ublock' platform;
-        //     // see src/test/resources/platforms.json
-        //     const filterContent = await readFile(path.join(platformsDir, 'test', 'filters', '2.txt'));
-        //     expect(filterContent).toBeTruthy();
+        it('platform/test filters 2.txt', async () => {
+            // directory 'test' is used for 'ext_ublock' platform;
+            // see src/test/resources/platforms.json
+            const filterContent = await readFile(path.join(platformsDir, 'test', 'filters', '2.txt'));
+            expect(filterContent).toBeTruthy();
 
-        //     const filterLines = filterContent.split(/\r?\n/);
-        //     expect(filterLines.length).toEqual(50);
-        //     expect(filterLines[2]).toEqual('! Title: AdGuard Base filter + EasyList');
+            const filterLines = filterContent.split(/\r?\n/);
+            expect(filterLines.length).toEqual(50);
+            expect(filterLines[2]).toEqual('! Title: AdGuard Base filter + EasyList');
 
-        //     const presentLines = [
-        //         '![Adblock Plus 2.0]',
-        //         'test-common-rule.com',
-        //         'test-common-1-rule.com',
-        //         '! some common rules could be places here',
-        //         '~example.com,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]',
-        //         'excluded_platform',
-        //         '!+ NOT_OPTIMIZED',
-        //         'test-common-2-rule.com',
-        //         'test.com##+js(abort-on-property-read, Object.prototype.getBanner)',
-        //     ];
-        //     presentLines.forEach((rule) => {
-        //         expect(filterLines.includes(rule)).toBeTruthy();
-        //     });
+            const presentLines = [
+                '![Adblock Plus 2.0]',
+                'test-common-rule.com',
+                'test-common-1-rule.com',
+                '! some common rules could be places here',
+                '~example.com,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]',
+                'excluded_platform',
+                '!+ NOT_OPTIMIZED',
+                'test-common-2-rule.com',
+                'test.com##+js(abort-on-property-read, Object.prototype.getBanner)',
+            ];
+            presentLines.forEach((rule) => {
+                expect(filterLines.includes(rule)).toBeTruthy();
+            });
 
-        //     const absentLines = [
-        //         'test_domain#%#testScript();',
-        //         'test.com#%#var isadblock=1;',
-        //         'example.org#@%#navigator.getBattery = undefined;',
-        //         'example.com#%#AG_onLoad(function() { AG_removeElementBySelector(\'span[class="intexta"]\'); });',
-        //         // $webrtc is deprecated
-        //         '||example.com^$webrtc,domain=example.org',
-        //     ];
-        //     absentLines.forEach((rule) => {
-        //         expect(filterLines.includes(rule)).toBeFalsy();
-        //     });
-        // });
+            const absentLines = [
+                'test_domain#%#testScript();',
+                'test.com#%#var isadblock=1;',
+                'example.org#@%#navigator.getBattery = undefined;',
+                'example.com#%#AG_onLoad(function() { AG_removeElementBySelector(\'span[class="intexta"]\'); });',
+                // $webrtc is deprecated
+                '||example.com^$webrtc,domain=example.org',
+            ];
+            absentLines.forEach((rule) => {
+                expect(filterLines.includes(rule)).toBeFalsy();
+            });
+        });
 
-        // FIXME: trusted scriptlets should not be converted
-        // it('platform/test filters 2_optimized.txt', async () => {
-        //     // directory 'test' is used for 'ext_ublock' platform;
-        //     // see src/test/resources/platforms.json
-        //     const filterContent = await readFile(path.join(platformsDir, 'test', 'filters', '2_optimized.txt'));
-        //     expect(filterContent).toBeTruthy();
+        it('platform/test filters 2_optimized.txt', async () => {
+            // directory 'test' is used for 'ext_ublock' platform;
+            // see src/test/resources/platforms.json
+            const filterContent = await readFile(path.join(platformsDir, 'test', 'filters', '2_optimized.txt'));
+            expect(filterContent).toBeTruthy();
 
-        //     const filterLines = filterContent.split(/\r?\n/);
-        //     expect(filterLines.length).toEqual(34);
-        //     expect(filterLines[2]).toEqual('! Title: AdGuard Base filter + EasyList (Optimized)');
+            const filterLines = filterContent.split(/\r?\n/);
+            expect(filterLines.length).toEqual(34);
+            expect(filterLines[2]).toEqual('! Title: AdGuard Base filter + EasyList (Optimized)');
 
-        //     // $webrtc is deprecated
-        //     expect(filterLines.includes('||example.com^$webrtc,domain=example.org')).toBeFalsy();
+            // $webrtc is deprecated
+            expect(filterLines.includes('||example.com^$webrtc,domain=example.org')).toBeFalsy();
 
-        //     // script `#%#` rules and script exception `#%@#` rules should be excluded for ext_ublock platform
-        //     // see excludeScriptRules() in generator.js
-        //     expect(filterLines.includes('test.com#%#var isadblock=1;')).toBeFalsy();
-        //     // https://github.com/AdguardTeam/FiltersCompiler/issues/199
-        //     expect(filterLines.includes('example.org#@%#navigator.getBattery = undefined;')).toBeFalsy();
-        // });
+            // script `#%#` rules and script exception `#%@#` rules should be excluded for ext_ublock platform
+            // see excludeScriptRules() in generator.js
+            expect(filterLines.includes('test.com#%#var isadblock=1;')).toBeFalsy();
+            // https://github.com/AdguardTeam/FiltersCompiler/issues/199
+            expect(filterLines.includes('example.org#@%#navigator.getBattery = undefined;')).toBeFalsy();
+        });
 
         it('platform/test filters 2_without_easylist.txt', async () => {
             const filterContent = await readFile(path.join(platformsDir, 'test', 'filters', '2_without_easylist.txt'));

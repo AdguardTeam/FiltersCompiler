@@ -186,6 +186,11 @@ describe('converter', () => {
         expected = 'example.org##+js(abort-on-property-read, alert)';
         expect(actual[0]).toBe(expected);
 
+        // trusted scriptlets should not be converted
+        actual = convertToUbo(['example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")']);
+        expected = '';
+        expect(actual[0]).toBe(expected);
+
         // scriptlet with two arguments
         actual = convertToUbo(["example.org#%#//scriptlet('set-constant', 'firstConst', 'false')"]);
         expected = 'example.org##+js(set-constant, firstConst, false)';

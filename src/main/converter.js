@@ -1,6 +1,13 @@
-import { RuleConverter, RuleParser, RuleGenerator } from '@adguard/agtree';
+import {
+    RuleConverter,
+    RuleParser,
+    RuleGenerator,
+    CosmeticRuleType,
+} from '@adguard/agtree';
 
 import { logger } from './utils/log';
+
+import { RuleMasks } from './rule/rule-masks';
 
 /**
  * Excludes rule
@@ -46,6 +53,25 @@ export const convertRulesToAdgSyntax = (rulesList, excluded) => {
     return result;
 };
 
+const SINGLE_QUOTE = "'";
+const DOUBLE_QUOTE = '"';
+
+/**
+ * Trims quotes (single or double) from the start and end of a string if they exist.
+ *
+ * @param {string} str - The string to trim.
+ * @returns {string} The trimmed string.
+ */
+export const trimQuotes = (str) => {
+    if (
+        (str.startsWith(SINGLE_QUOTE) && str.endsWith(SINGLE_QUOTE))
+        || (str.startsWith(DOUBLE_QUOTE) && str.endsWith(DOUBLE_QUOTE))
+    ) {
+        return str.slice(1, -1);
+    }
+    return str;
+};
+
 /**
  * Converts a list of rules into uBO (uBlock Origin) syntax.
  *
@@ -63,11 +89,31 @@ export const convertToUbo = (rules) => {
         if (rule) {
             try {
                 const ruleNode = RuleParser.parse(rule);
+                if (ruleNode.type === CosmeticRuleType.ScriptletInjectionRule) {
+                    const scriptletNode = ruleNode.body.children[0].children[0];
+                    const scriptletNameString = trimQuotes(scriptletNode.value);
+
+                    if (!scriptletNameString) {
+                        // If the scriptlet name is missing, skip processing this rule
+                        return;
+                    }
+
+                    const scriptletName = trimQuotes(scriptletNameString);
+
+                    if (scriptletName.startsWith(RuleMasks.MASK_TRUSTED_SCRIPTLET)) {
+                        // https://github.com/AdguardTeam/Scriptlets#trusted-scriptlets-restriction
+                        // does not work in other blockers
+                        const message = `Unable to convert trusted scriptlets to Ubo syntax: "${rule}"`;
+                        logger.log(message);
+                        modified.push('');
+                        return;
+                    }
+                }
                 const conversionResult = RuleConverter.convertToUbo(ruleNode);
                 const convertedRules = conversionResult.result.map((r) => RuleGenerator.generate(r));
                 modified.push(...convertedRules);
             } catch (e) {
-                const message = `Unable to convert rule to AdGuard syntax: "${rule}" due to error: ${e.message}`;
+                const message = `Unable to convert rule to Ubo syntax: "${rule}" due to error: ${e.message}`;
                 logger.log(message);
             }
         } else {
