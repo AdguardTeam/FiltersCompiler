@@ -100,7 +100,7 @@ export const convertToUbo = (rules) => {
 
                     const scriptletName = trimQuotes(scriptletNameString);
 
-                    // TODO: move this check to AGTree
+                    // TODO: move this check to AGTree AG-41266
                     if (scriptletName.startsWith(RuleMasks.MASK_TRUSTED_SCRIPTLET)) {
                         // https://github.com/AdguardTeam/Scriptlets#trusted-scriptlets-restriction
                         // does not work in other blockers
