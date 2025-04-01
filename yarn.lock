@@ -22,14 +22,13 @@
   resolved "https://registry.yarnpkg.com/@adguard/css-tokenizer/-/css-tokenizer-1.2.0.tgz#edc72c297243a0514a2aa4a4c4d4b9327b0697eb"
   integrity sha512-cUj5j/AU5z/T4//5M6KnIJBpykAY4QbDsoiQ2DaWX/r2XkepMkTb8DhIbUHJD/QLGEyLeQLpi+nlxAgf4NTRRQ==
 
-"@adguard/diff-builder@1.0.17":
-  version "1.0.17"
-  resolved "https://registry.yarnpkg.com/@adguard/diff-builder/-/diff-builder-1.0.17.tgz#d7fd5f928d75f8955668ea0f45c51ac4ef8dd03a"
-  integrity sha512-pKM8oUQcl8IrVyJIlqwiAUMX4manZrfe2S/a9Np3VDbnaQFbGTwW1cmQoKffmdFUwk7dEKzQ83ILm1OuOu6kZw==
+"@adguard/diff-builder@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@adguard/diff-builder/-/diff-builder-1.1.0.tgz#7ab1bdb8acb314f403f4b7816bcffd30f7d200e9"
+  integrity sha512-2KGzA6vzbwrTX14gopkztdT/5t/pTyf6tn8VQE2EtWlW8n0/j+HG49+CZ/or0nR3IVQi0SNQgfuKIXfz0ReZxQ==
   dependencies:
     commander "^11.1.0"
     crypto-js "^4.2.0"
-    diff "git+https://github.com/105th/jsdiff.git#2be2e7df90e8eebd99f0385c7b1dc16c2f4dcc1a"
 
 "@adguard/ecss-tree@^1.1.0":
   version "1.1.0"
@@ -43,12 +42,12 @@
   resolved "https://registry.yarnpkg.com/@adguard/extended-css/-/extended-css-2.1.1.tgz#53677a310cf39259f54dfce79b692b0a327a8bb7"
   integrity sha512-TsHZ20oUWhbtrzQ4w70B96oHkGBIUZg2FdMfkq4StGfLmXQb+kI7fQb6BtXP2D0bvraIHMq6/mtKExglDJ9vsg==
 
-"@adguard/filters-downloader@^2.2.6":
-  version "2.2.6"
-  resolved "https://registry.yarnpkg.com/@adguard/filters-downloader/-/filters-downloader-2.2.6.tgz#145f88050a706a691b442f7133db15931721783f"
-  integrity sha512-lAKrJbM8pEK2sZi4Tb9bfa3aSDZ025nYNAHF7FxYgihtbX5SxKPZBXThEjgHGTqyifsMDq/HSVC0n15EIytMdQ==
+"@adguard/filters-downloader@^2.4.0":
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/@adguard/filters-downloader/-/filters-downloader-2.4.0.tgz#d498698532d35886d0b5fdf1f64c709da70dd21f"
+  integrity sha512-xe5C10VXIajq4sr66mb1r64UIlJ54qXZiFpQHe9E7j7LQqRG31b4KB+8TggIdT54Bm3WrKjqjfatKBNYAJcKGQ==
   dependencies:
-    "@adguard/diff-builder" "1.0.17"
+    "@adguard/diff-builder" "1.1.0"
     axios "1.6.2"
     crypto-js "^4.2.0"
 
@@ -1004,10 +1003,6 @@ delayed-stream@~1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/delayed-stream/-/delayed-stream-1.0.0.tgz"
   integrity sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ==
-
-"diff@git+https://github.com/105th/jsdiff.git#2be2e7df90e8eebd99f0385c7b1dc16c2f4dcc1a":
-  version "5.1.1"
-  resolved "git+https://github.com/105th/jsdiff.git#2be2e7df90e8eebd99f0385c7b1dc16c2f4dcc1a"
 
 doctrine@^2.1.0:
   version "2.1.0"
