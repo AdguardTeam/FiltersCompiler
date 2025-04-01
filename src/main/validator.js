@@ -16,6 +16,7 @@ import {
     CosmeticRule,
     NetworkRule,
 } from '@adguard/tsurlfilter';
+import { RuleMasks } from './rule/rule-masks';
 
 import { logger } from './utils/log';
 
@@ -27,6 +28,9 @@ import { validateCssSelector } from './utils/extended-css-validator';
 
 const AFFINITY_DIRECTIVE = '!#safari_cb_affinity'; // used as closing directive
 const AFFINITY_DIRECTIVE_OPEN = `${AFFINITY_DIRECTIVE}(`;
+
+const NOT_VALIDATE_HINT = 'NOT_VALIDATE';
+const SPACE = ' ';
 
 /**
  * Push rule with warning message to excluded
@@ -162,8 +166,23 @@ export const validateAndFilterRules = (list, excluded, invalid = [], filterName)
         return [];
     }
 
-    return list.filter((ruleText) => {
+    return list.filter((ruleText, index, array) => {
         if (CommentParser.isCommentRule(ruleText)) {
+            return true;
+        }
+
+        const previousRule = index > 0 ? array[index - 1] : null;
+        // Skip validation if "ruleText" is preceded by "NOT_VALIDATE" hint
+        // https://github.com/AdguardTeam/FiltersCompiler/issues/245
+        if (
+            previousRule
+            && previousRule.startsWith(RuleMasks.MASK_HINT)
+            && (
+                previousRule.includes(`${SPACE}${NOT_VALIDATE_HINT}${SPACE}`)
+                || previousRule.endsWith(`${SPACE}${NOT_VALIDATE_HINT}`)
+            )
+
+        ) {
             return true;
         }
 

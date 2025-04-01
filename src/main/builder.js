@@ -382,7 +382,8 @@ export const include = async (filterDir, directiveLine, excluded) => {
 
         includedLines = removeAdblockVersion(includedLines);
 
-        options.forEach(({ name, value }) => {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const { name, value } of options) {
             let optionsExcludePath;
             switch (name) {
                 case EXCLUDE_OPTION:
@@ -393,7 +394,8 @@ export const include = async (filterDir, directiveLine, excluded) => {
                     includedLines = stripComments(includedLines);
                     break;
                 case OPTIMIZE_DOMAIN_BLOCKING_RULES:
-                    includedLines = optimizeDomainBlockingRules(includedLines);
+                    // eslint-disable-next-line no-await-in-loop
+                    includedLines = await optimizeDomainBlockingRules(includedLines);
                     break;
                 case NOT_OPTIMIZED_OPTION:
                     includedLines = addNotOptimizedHints(includedLines);
@@ -411,7 +413,7 @@ export const include = async (filterDir, directiveLine, excluded) => {
                 default:
                     break;
             }
-        });
+        }
 
         includedLines = fixVersionComments(includedLines);
     } else {

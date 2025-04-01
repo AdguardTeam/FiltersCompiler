@@ -23,6 +23,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [v1.2.1]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.149...v1.2.1
 
+## [v1.1.154] - 2025-03-24
+
+### Added
+
+- Support for `!+ NOT_VALIDATE` hint [#245]
+
+[v1.1.154]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.153...v1.1.154
+[#245]: https://github.com/AdguardTeam/FiltersCompiler/issues/245
+
+## [v1.1.153] - 2025-03-14
+
+### Changed
+
+- Improved performance of the `@include` directive's `/optimizeDomainBlockingRules` option [#243].
+
+[v1.1.153]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.149...v1.1.153
+[#243]: https://github.com/AdguardTeam/FiltersCompiler/issues/243
+
 ## [v1.1.149] - 2024-12-10
 
 ### Changed
@@ -169,7 +187,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Updated [@adguard/tsurlfilter] to v2.2.19:
-    - validation of `$header` modifier
+  - validation of `$header` modifier
 
 ### Fixed
 
@@ -429,7 +447,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Updated [@adguard/tsurlfilter] to v1.0.68:
-    - validation of `$hls` modifier
+  - validation of `$hls` modifier
 
 [v1.1.73]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.72...v1.1.73
 
@@ -438,7 +456,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Updated [@adguard/tsurlfilter] to v1.0.67:
-    - validation of `$jsonprune` modifier
+  - validation of `$jsonprune` modifier
 
 [v1.1.72]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.71...v1.1.72
 
@@ -447,9 +465,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Updated [@adguard/extended-css] to v2.0.33:
-    - `:not()` and `:is()` pseudo-classes with no extended selector arg
-      are considered as standard — top DOM node limitation [[1]] [[2]]
-    - validation of CSS selectors due to related third-party bugs [nwsapi#55] and [nwsapi#71]
+  - `:not()` and `:is()` pseudo-classes with no extended selector arg
+        are considered as standard — top DOM node limitation [[1]] [[2]]
+  - validation of CSS selectors due to related third-party bugs [nwsapi#55] and [nwsapi#71]
 - Updated [@adguard/scriptlets] to v1.7.19
 - Updated [@adguard/tsurlfilter] to 1.0.66
 
