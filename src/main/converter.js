@@ -100,10 +100,11 @@ export const convertToUbo = (rules) => {
 
                     const scriptletName = trimQuotes(scriptletNameString);
 
+                    // TODO: move this check to AGTree
                     if (scriptletName.startsWith(RuleMasks.MASK_TRUSTED_SCRIPTLET)) {
                         // https://github.com/AdguardTeam/Scriptlets#trusted-scriptlets-restriction
                         // does not work in other blockers
-                        const message = `Unable to convert trusted scriptlets to Ubo syntax: "${rule}"`;
+                        const message = `Trusted scriptlets should not be converted to uBO syntax. Rule: "${rule}"`;
                         logger.log(message);
                         modified.push('');
                         return;
