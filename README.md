@@ -119,7 +119,7 @@ where:
 
     1. `@include ../input.txt`: Includes the content of the file named `input.txt` from the parent directory.
 
-        ``` adblock
+        ```adblock
         # comment
         example.com
         example.org
@@ -129,7 +129,7 @@ where:
 
         Result of adding modifiers:
 
-        ``` adblock
+        ```adblock
         ! comment
         example.com$script
         example.org$script
@@ -142,14 +142,14 @@ where:
 
         Due to the content of `exclusions.txt`:
 
-        ``` adblock
+        ```adblock
         example.com$script
         example2.com$script
         ```
 
         Result of excluding:
 
-        ``` adblock
+        ```adblock
         ! comment
         example.org$script
         ```
@@ -160,7 +160,7 @@ where:
 
         Result of adding the hint:
 
-        ``` adblock
+        ```adblock
         ! comment
         !+ NOT_OPTIMIZED
         example.org$script
@@ -171,7 +171,7 @@ where:
 
     1. `/stripComments`: Removes comments in AdBlock style from the included file.
 
-        ``` adblock
+        ```adblock
         !+ NOT_OPTIMIZED
         example.org$script
         ```
@@ -180,7 +180,7 @@ where:
 
         Due to the optimization:
 
-        ``` adblock
+        ```adblock
         ||example.com^
         ||sub.example.com^
         ||domain.com^
