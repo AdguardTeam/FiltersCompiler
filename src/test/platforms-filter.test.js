@@ -1,5 +1,8 @@
 import {
-    describe, it, expect, vi,
+    describe,
+    it,
+    expect,
+    vi,
 } from 'vitest';
 
 import { cleanupAndOptimizeRules, cleanupRules } from '../main/platforms/filter';

@@ -1,5 +1,8 @@
 import {
-    describe, it, expect, test,
+    describe,
+    it,
+    expect,
+    test,
 } from 'vitest';
 import { sortMetadataFilters, shouldBuildFilterForPlatform } from '../main/platforms/generator';
 

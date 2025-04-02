@@ -2,7 +2,11 @@
  * @vitest-environment jsdom
  */
 import {
-    describe, it, expect, vi, test,
+    describe,
+    it,
+    expect,
+    vi,
+    test,
 } from 'vitest';
 import { TextEncoder, TextDecoder } from 'util';
 
