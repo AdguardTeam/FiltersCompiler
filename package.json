@@ -15,15 +15,12 @@
   "engines": {
     "node": ">=20"
   },
-  "resolutions": {
-    "@adguard/agtree": "3.1.0"
-  },
   "dependencies": {
     "@adguard/agtree": "^3.1.0",
     "@adguard/ecss-tree": "^1.1.0",
     "@adguard/extended-css": "^2.1.1",
     "@adguard/filters-downloader": "^2.4.0",
-    "@adguard/scriptlets": "^2.1.4",
+    "@adguard/scriptlets": "^2.1.7",
     "@adguard/tsurlfilter": "^3.2.2",
     "ajv": "^8.11.0",
     "child_process": ">=1.0.2",

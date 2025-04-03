@@ -2,7 +2,22 @@
 # yarn lockfile v1
 
 
-"@adguard/agtree@3.0.0-alpha.2", "@adguard/agtree@3.0.1", "@adguard/agtree@3.1.0", "@adguard/agtree@^3.1.0":
+"@adguard/agtree@3.0.1":
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@adguard/agtree/-/agtree-3.0.1.tgz#8698447b6dc251da9aff23e61cd580e9fa11c69d"
+  integrity sha512-/tx6NXr9zUUmmnIJLK8dtSwH9il3lH38iBPQ2AFfPUkqYXizBWQuA2tttz91YNpFj54ABnpMSbYGB7zMBNNmLA==
+  dependencies:
+    "@adguard/css-tokenizer" "^1.2.0"
+    camelcase-keys "^7.0.2"
+    clone-deep "^4.0.1"
+    is-ip "3.1.0"
+    json5 "^2.2.3"
+    sprintf-js "^1.1.3"
+    tldts "^5.7.112"
+    xregexp "^5.1.1"
+    zod "3.21.4"
+
+"@adguard/agtree@3.1.0", "@adguard/agtree@^3.1.0":
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/@adguard/agtree/-/agtree-3.1.0.tgz#28ceff4c2a9b4b872e19917f5c491ce521856595"
   integrity sha512-0jW1V/k3kh1lMU2Q7iZSsRQMLLOXFIzhbdEIK32ZrnU5S9u/++pSPreYw/LhgKdiSJ5tnycFVLY1YLYQ3YEyFA==
@@ -51,20 +66,20 @@
     axios "1.6.2"
     crypto-js "^4.2.0"
 
-"@adguard/scriptlets@^2.1.4":
-  version "2.1.4"
-  resolved "https://registry.yarnpkg.com/@adguard/scriptlets/-/scriptlets-2.1.4.tgz#9c369fd86b3972df82f304316f73c0c953b98676"
-  integrity sha512-zZXWIihXGCFWt8bE0i6ENK0lZ71v8zf145JE+hScqx8hDR6jOjCJIXo7kfB6ZyDkv0fXdjsWLAcxzMbyDUP1Sw==
-  dependencies:
-    "@adguard/agtree" "3.0.0-alpha.2"
-    js-yaml "^3.14.1"
-
 "@adguard/scriptlets@^2.1.6":
   version "2.1.6"
   resolved "https://registry.yarnpkg.com/@adguard/scriptlets/-/scriptlets-2.1.6.tgz#f25fc43c459ca7c01d201ff42908e70d501f6bf0"
   integrity sha512-Kod4RVgj+fEo1VrPnsMVzGVQJihakjSKEzTe0B5Sz027flFzo7/O5hOgSEuJV9yg2RMl6HgcQeb6xWZWKJ2abw==
   dependencies:
     "@adguard/agtree" "3.0.1"
+    js-yaml "^3.14.1"
+
+"@adguard/scriptlets@^2.1.7":
+  version "2.1.7"
+  resolved "https://registry.yarnpkg.com/@adguard/scriptlets/-/scriptlets-2.1.7.tgz#2fda174dacd2ab4e35721b23b010a3f7f0b3757d"
+  integrity sha512-ETU6hJ3EuR1efh0ktzZU2/+J70jXN2YX/LGU4ALLlQ5uhyf1g23PnZ1EzivlHGBzKxEHmYIPlK0w7uTKsHdeAg==
+  dependencies:
+    "@adguard/agtree" "3.1.0"
     js-yaml "^3.14.1"
 
 "@adguard/tsurlfilter@^3.2.2":

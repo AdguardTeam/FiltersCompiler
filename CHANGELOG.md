@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- FIXME: use the latest versions of scriptlets and tsurlfilter -->
 - Updated [@adguard/extended-css] to v2.1.1.
 - Updated [@adguard/filters-downloader] to v2.4.0.
-- Updated [@adguard/scriptlets] to v2.1.4.
+- Updated [@adguard/scriptlets] to v2.1.7.
 - Updated [@adguard/tsurlfilter] to v3.2.2.
 
 ### Fixed
