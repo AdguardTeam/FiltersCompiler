@@ -9,7 +9,7 @@
     "test": "vitest",
     "lint": "eslint --cache .",
     "increment": "yarn version --patch --no-git-tag-version",
-    "build-txt": "node tasks/build-txt.js",
+    "build-txt": "node tasks/build-txt.mjs",
     "prepare": "husky install"
   },
   "engines": {
