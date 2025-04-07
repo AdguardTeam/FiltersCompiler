@@ -88,6 +88,13 @@ module.exports = (() => {
                     // json can be updated with default values
                     fs.writeFileSync(item, JSON.stringify(json, null, '\t'));
 
+                    // duplicate to .js file as well
+                    const jsFileName = `${fileName}.js`;
+                    fs.writeFileSync(
+                        path.join(path.dirname(item), jsFileName),
+                        JSON.stringify(json, null, '\t'),
+                    );
+
                     if (!valid) {
                         logger.error(`Invalid json in ${item}, errors:`);
                         logger.error(validate.errors);
