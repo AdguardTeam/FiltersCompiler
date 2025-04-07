@@ -7,12 +7,9 @@ const fs = require('fs');
 const path = require('path');
 
 const {
-    FILTER_IDS,
-    GROUP_IDS,
     SCHEMA_DRAFT,
     FILTERS_I18N_SCHEMA_ID,
     SUPPORTED_LOCALES,
-    TAG_IDS,
     ROOT_DIR_RELATIVE_PATH,
     OUTPUT_SCHEMAS_DIR,
     REQUIRED_FIELDS_PER_LOCALE,
@@ -23,6 +20,7 @@ const {
 } = require('./constants');
 
 const { createSchemaTitle, createStringPropertySchema } = require('./helpers');
+const { GROUPS_DEFAULT_DATA, FILTERS_DEFAULT_DATA, TAGS_DEFAULT_DATA } = require('./filters-i18n-defaults');
 
 /**
  * File name of the generated schema.
@@ -40,7 +38,7 @@ const outputFilePath = path.join(__dirname, ROOT_DIR_RELATIVE_PATH, OUTPUT_SCHEM
  *
  * @returns {object} JSON schema definition for the language object.
  */
-const createLocaleObject = (baseId, localeCode) => {
+const createLocaleObject = (baseId, localeCode, defaultDataItem) => {
     const langObjectId = `${baseId}/properties/${localeCode}`;
 
     const properties = {};
@@ -49,6 +47,7 @@ const createLocaleObject = (baseId, localeCode) => {
         properties[field] = createStringPropertySchema({
             baseId: `${baseId}/properties`,
             propName: field,
+            defaultValue: defaultDataItem[field],
         });
     });
 
@@ -66,16 +65,17 @@ const createLocaleObject = (baseId, localeCode) => {
  *
  * @param {string} basePath The base path like "#/properties/groups"
  * @param {string} id The numeric ID string (e.g., "1")
+ * @param {object} defaultDataItem The default data object for the ID.
  *
  * @returns {object} JSON schema definition for the ID object.
  */
-const createIdObject = (basePath, id) => {
+const createIdObject = (basePath, id, defaultDataItem) => {
     const idObjectPath = `${basePath}/properties/${id}`;
 
     const properties = {};
 
     SUPPORTED_LOCALES.forEach((langCode) => {
-        properties[langCode] = createLocaleObject(idObjectPath, langCode);
+        properties[langCode] = createLocaleObject(idObjectPath, langCode, defaultDataItem);
     });
 
     return {
@@ -91,22 +91,27 @@ const createIdObject = (basePath, id) => {
  * Creates the schema definition for top-level properties (groups, tags, filters).
  *
  * @param {string} propertyName "groups", "tags", or "filters"
- * @param {string[]} requiredIds Array of required numeric ID strings.
+ * @param {object} defaultData Default data for the property (e.g., GROUPS_DEFAULT_DATA)
+ * where keys are ids and values are the default data objects for `name` and `description`.
  *
  * @returns {object} JSON schema definition for the top-level property.
  */
 const createTopLevelProperty = (
     propertyName,
-    requiredIds,
+    defaultData,
 ) => {
     const basePath = `#/properties/${propertyName}`;
 
     const properties = {};
 
+    const requiredIds = Object.keys(defaultData);
+
     requiredIds.forEach((id) => {
+        const defaultDataItem = defaultData[id];
         properties[id] = createIdObject(
             basePath,
             id.toString(),
+            defaultDataItem,
         );
     });
 
@@ -117,6 +122,27 @@ const createTopLevelProperty = (
         required: requiredIds.map((id) => id.toString()),
         properties,
     };
+};
+
+const createTopLevelGroupsProperty = () => {
+    return createTopLevelProperty(
+        GROUPS_KEY,
+        GROUPS_DEFAULT_DATA,
+    );
+};
+
+const createTopLevelTagsProperty = () => {
+    return createTopLevelProperty(
+        TAGS_KEY,
+        TAGS_DEFAULT_DATA,
+    );
+};
+
+const createTopLevelFiltersProperty = () => {
+    return createTopLevelProperty(
+        FILTERS_KEY,
+        FILTERS_DEFAULT_DATA,
+    );
 };
 
 /**
@@ -135,18 +161,9 @@ const generateFiltersI18nSchema = () => {
             FILTERS_KEY,
         ],
         properties: {
-            [GROUPS_KEY]: createTopLevelProperty(
-                GROUPS_KEY,
-                GROUP_IDS,
-            ),
-            [TAGS_KEY]: createTopLevelProperty(
-                TAGS_KEY,
-                TAG_IDS,
-            ),
-            [FILTERS_KEY]: createTopLevelProperty(
-                FILTERS_KEY,
-                FILTER_IDS,
-            ),
+            [GROUPS_KEY]: createTopLevelGroupsProperty(),
+            [TAGS_KEY]: createTopLevelTagsProperty(),
+            [FILTERS_KEY]: createTopLevelFiltersProperty(),
         },
     };
 

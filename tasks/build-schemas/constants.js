@@ -1,5 +1,3 @@
-const { GROUPS_DEFAULT_DATA, FILTERS_DEFAULT_DATA, TAGS_DEFAULT_DATA } = require('./filters-i18n-defaults');
-
 const ROOT_DIR_RELATIVE_PATH = '../..';
 const OUTPUT_SCHEMAS_DIR = 'schemas';
 
@@ -38,21 +36,6 @@ const REQUIRED_FIELDS_PER_LOCALE = [
     NAME_KEY,
     DESCRIPTION_KEY,
 ];
-
-/**
- * AdGuard-supported groups ids.
- */
-const GROUP_IDS = Object.keys(GROUPS_DEFAULT_DATA);
-
-/**
- * AdGuard-supported filters ids.
- */
-const FILTER_IDS = Object.keys(FILTERS_DEFAULT_DATA);
-
-/**
- * AdGuard-supported tags ids.
- */
-const TAG_IDS = Object.keys(TAGS_DEFAULT_DATA);
 
 /**
  * The list of supported locales.
@@ -118,9 +101,6 @@ module.exports = {
     FILTERS_I18N_SCHEMA_ID,
     FILTERS_SCHEMA_ID,
     SCHEMA_DRAFT,
-    GROUP_IDS,
-    FILTER_IDS,
-    TAG_IDS,
     SUPPORTED_LOCALES,
     REQUIRED_FIELDS_PER_LOCALE,
     GROUPS_KEY,

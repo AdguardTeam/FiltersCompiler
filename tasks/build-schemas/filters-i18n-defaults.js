@@ -5,8 +5,7 @@
  * TODO: probably refactoring should be considered so this data is passed from the filters registry.
  */
 
-const NAME_KEY = 'name';
-const DESCRIPTION_KEY = 'description';
+const { NAME_KEY, DESCRIPTION_KEY } = require('./constants');
 
 /**
  * Default data for groups, where keys are ids of AdGuard-supported groups.

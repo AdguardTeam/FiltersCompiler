@@ -61,6 +61,7 @@ const createPropertySchema = ({
  * @typedef {Object} TypedPropertySchemaCreationData
  * @property {string} baseId The base $id path (e.g., "#/properties/groups/items/properties")
  * @property {string} propName The name of the property (e.g., "groupId")
+ * @property {any} defaultValue The default value, may be undefined.
  * @property {any} example An example value.
  */
 
@@ -71,12 +72,17 @@ const createPropertySchema = ({
  *
  * @returns {object} JSON schema definition for the string property.
  */
-const createStringPropertySchema = ({ baseId, propName, example }) => {
+const createStringPropertySchema = ({
+    baseId,
+    propName,
+    defaultValue,
+    example,
+}) => {
     return createPropertySchema({
         baseId,
         propName,
         type: SCHEMA_TYPES.STRING,
-        defaultValue: '',
+        defaultValue: defaultValue || '',
         example,
         extraProps: {
             pattern: STRING_PATTERN,
