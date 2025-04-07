@@ -84,6 +84,10 @@ module.exports = (() => {
 
                     const validate = validator.compile(schema);
                     const valid = validate(json);
+
+                    // json can be updated with default values
+                    fs.writeFileSync(item, JSON.stringify(json, null, '\t'));
+
                     if (!valid) {
                         logger.error(`Invalid json in ${item}, errors:`);
                         logger.error(validate.errors);
@@ -109,7 +113,10 @@ module.exports = (() => {
         const schemas = loadSchemas(jsonSchemasConfigDir);
         const oldSchemas = loadSchemas(path.join(jsonSchemasConfigDir, OLD_MAC_SCHEMAS_SUBDIR));
 
-        const ajv = new Ajv();
+        const ajv = new Ajv({
+            allErrors: true,
+            useDefaults: true,
+        });
 
         const result = validateDir(platformsPath, ajv, schemas, oldSchemas, filtersRequiredAmount);
 
