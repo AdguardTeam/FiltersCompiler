@@ -8,6 +8,7 @@
     "test": "jest",
     "lint": "eslint .",
     "increment": "yarn version --patch --no-git-tag-version",
+    "build-schemas": "node tasks/build-schemas/index.js",
     "build-txt": "node tasks/build-txt.js",
     "prepare": "husky install"
   },
