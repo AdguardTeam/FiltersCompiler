@@ -17,7 +17,7 @@
     "@adguard/filters-downloader": "^2.2.4",
     "@adguard/scriptlets": "^1.11.16",
     "@adguard/tsurlfilter": "2.2.23",
-    "ajv": "^8.11.0",
+    "ajv": "^8.17.1",
     "child_process": ">=1.0.2",
     "jsdom": "^21.1.1",
     "md5": "2.3.0",
