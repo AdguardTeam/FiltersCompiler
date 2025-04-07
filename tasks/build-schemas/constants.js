@@ -55,6 +55,7 @@ const SUPPORTED_LOCALES = [
     'el',
     'en',
     'es',
+    'es_ES', // duplicate of 'es'
     'fa',
     'fi',
     'fr',
@@ -81,8 +82,7 @@ const SUPPORTED_LOCALES = [
     'tr',
     'uk',
     'vi',
-    // "zh_CN" is saved as "zh" in FiltersRegistry
-    'zh',
+    'zh', // "zh_CN" is saved as "zh" in FiltersRegistry
     'zh_TW',
 ];
 

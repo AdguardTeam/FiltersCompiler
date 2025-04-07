@@ -95,11 +95,7 @@ const FILTERS_DEFAULT_DATA = {
         [NAME_KEY]: 'AdGuard Mobile Ads filter',
         [DESCRIPTION_KEY]: 'Filter for all known mobile ad networks. Useful for mobile devices.',
     },
-    12: {
-        [NAME_KEY]: 'AdGuard Safari filter',
-        // eslint-disable-next-line max-len
-        [DESCRIPTION_KEY]: 'Special filter for Safari 9+ on iOS and macOS. We need a separate filter for Safari browser because it does not fully support our rules syntax.',
-    },
+    // 12 is obsolete and removed
     13: {
         [NAME_KEY]: 'AdGuard Turkish filter',
         [DESCRIPTION_KEY]: 'Filter list that specifically removes ads on websites in the Turkish language.',
