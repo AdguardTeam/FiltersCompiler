@@ -65,7 +65,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -969,24 +969,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/groups/properties/1/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/groups/properties/1/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/groups/properties/1/zh_CN/properties/name",
+                  "$id": "#/properties/groups/properties/1/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/groups/properties/1/zh_CN/properties/description",
+                  "$id": "#/properties/groups/properties/1/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Block ads",
@@ -1062,7 +1062,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -1966,24 +1966,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/groups/properties/2/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/groups/properties/2/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/groups/properties/2/zh_CN/properties/name",
+                  "$id": "#/properties/groups/properties/2/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Privacy",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/groups/properties/2/zh_CN/properties/description",
+                  "$id": "#/properties/groups/properties/2/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Block trackers",
@@ -2059,7 +2059,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -2963,24 +2963,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/groups/properties/3/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/groups/properties/3/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/groups/properties/3/zh_CN/properties/name",
+                  "$id": "#/properties/groups/properties/3/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Social widgets",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/groups/properties/3/zh_CN/properties/description",
+                  "$id": "#/properties/groups/properties/3/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Block social media elements such as Like and Share buttons",
@@ -3056,7 +3056,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -3960,24 +3960,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/groups/properties/4/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/groups/properties/4/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/groups/properties/4/zh_CN/properties/name",
+                  "$id": "#/properties/groups/properties/4/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Annoyances",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/groups/properties/4/zh_CN/properties/description",
+                  "$id": "#/properties/groups/properties/4/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Block annoying web elements, such as cookie notices or in-page popups",
@@ -4053,7 +4053,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -4957,24 +4957,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/groups/properties/5/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/groups/properties/5/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/groups/properties/5/zh_CN/properties/name",
+                  "$id": "#/properties/groups/properties/5/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Security",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/groups/properties/5/zh_CN/properties/description",
+                  "$id": "#/properties/groups/properties/5/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Block requests to phishing and malicious websites",
@@ -5050,7 +5050,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -5954,24 +5954,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/groups/properties/6/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/groups/properties/6/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/groups/properties/6/zh_CN/properties/name",
+                  "$id": "#/properties/groups/properties/6/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Other",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/groups/properties/6/zh_CN/properties/description",
+                  "$id": "#/properties/groups/properties/6/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "This group contains various filters that don't fit into other categories",
@@ -6047,7 +6047,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -6951,24 +6951,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/groups/properties/7/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/groups/properties/7/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/groups/properties/7/zh_CN/properties/name",
+                  "$id": "#/properties/groups/properties/7/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Language-specific",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/groups/properties/7/zh_CN/properties/description",
+                  "$id": "#/properties/groups/properties/7/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Block ads on websites in specified languages",
@@ -7124,7 +7124,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -8028,24 +8028,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/1/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/1/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/1/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/1/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Ad Blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/1/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/1/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed to block ads online",
@@ -8121,7 +8121,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -9025,24 +9025,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/2/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/2/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/2/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/2/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Privacy protection",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/2/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/2/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed to protect your privacy online by blocking trackers and analytics",
@@ -9118,7 +9118,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -10022,24 +10022,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/3/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/3/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/3/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/3/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Social widgets blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/3/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/3/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed to block social media elements (widgets, \"Like\" buttons, etc.)",
@@ -10115,7 +10115,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -11019,24 +11019,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/4/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/4/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/4/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/4/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Protection against malware and fraud",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/4/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/4/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed to protect you from malicious and dangerous websites",
@@ -11112,7 +11112,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -12016,24 +12016,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/5/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/5/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/5/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/5/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Anti-annoyances protection",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/5/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/5/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed to block non-ads elements that distract you from the content (subscription offers, promotion notices, etc.).",
@@ -12109,7 +12109,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -13013,24 +13013,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/6/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/6/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/6/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/6/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Cookie notices blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/6/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/6/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed to block cookie notices on websites",
@@ -13106,7 +13106,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -14010,24 +14010,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/7/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/7/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/7/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/7/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "English language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/7/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/7/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the English language",
@@ -14103,7 +14103,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -15007,24 +15007,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/8/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/8/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/8/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/8/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Russian language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/8/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/8/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Russian language",
@@ -15100,7 +15100,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -16004,24 +16004,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/9/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/9/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/9/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/9/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "EasyList reference",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/9/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/9/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Has references to the EasyList filter",
@@ -16097,7 +16097,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -17001,24 +17001,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/10/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/10/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/10/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/10/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "AdGuard recommendation",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/10/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/10/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Recommended to use with AdGuard ad blocker",
@@ -17094,7 +17094,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -17998,24 +17998,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/11/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/11/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/11/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/11/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "AdGuard Base filter reference",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/11/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/11/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Has references to the AdGuard Base filter",
@@ -18091,7 +18091,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -18995,24 +18995,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/12/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/12/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/12/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/12/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "German language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/12/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/12/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the German language",
@@ -19088,7 +19088,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -19992,24 +19992,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/13/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/13/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/13/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/13/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "EasyList Germany filter reference",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/13/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/13/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Has references to the EasyList Germany filter",
@@ -20085,7 +20085,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -20989,24 +20989,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/14/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/14/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/14/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/14/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Japanese language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/14/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/14/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Japanese language",
@@ -21082,7 +21082,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -21986,24 +21986,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/15/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/15/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/15/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/15/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Dutch language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/15/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/15/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Dutch language",
@@ -22079,7 +22079,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -22983,24 +22983,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/16/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/16/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/16/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/16/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "EasyList Dutch filter reference",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/16/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/16/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Has references to the EasyList Dutch filter",
@@ -23076,7 +23076,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -23980,24 +23980,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/17/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/17/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/17/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/17/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Spanish language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/17/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/17/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Spanish language",
@@ -24073,7 +24073,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -24977,24 +24977,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/18/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/18/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/18/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/18/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Portuguese language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/18/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/18/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Portuguese language",
@@ -25070,7 +25070,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -25974,24 +25974,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/19/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/19/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/19/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/19/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "For mobile devices",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/19/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/19/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads and trackers on mobile devices",
@@ -26067,7 +26067,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -26971,24 +26971,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/20/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/20/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/20/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/20/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Compatibility",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/20/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/20/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Contains set of rules to fix compatibility issues",
@@ -27064,7 +27064,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -27968,24 +27968,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/21/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/21/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/21/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/21/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "iOS-specific",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/21/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/21/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to work on iOS-based devices",
@@ -28061,7 +28061,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -28965,24 +28965,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/22/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/22/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/22/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/22/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Safari-specific",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/22/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/22/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to work with Safari browser content blockers",
@@ -29058,7 +29058,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -29962,24 +29962,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/23/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/23/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/23/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/23/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Specific for AdGuard Content Blocker",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/23/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/23/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to work with AdGuard Content Blocker",
@@ -30055,7 +30055,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -30959,24 +30959,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/24/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/24/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/24/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/24/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Turkish language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/24/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/24/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Turkish language",
@@ -31052,7 +31052,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -31956,24 +31956,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/25/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/25/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/25/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/25/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Tracking Protection filter reference",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/25/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/25/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Has references to the Tracking Protection filter",
@@ -32049,7 +32049,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -32953,24 +32953,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/26/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/26/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/26/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/26/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Mobile Ads filter reference",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/26/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/26/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Has references to the Mobile Ads filter",
@@ -33046,7 +33046,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -33950,24 +33950,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/27/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/27/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/27/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/27/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "French language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/27/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/27/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the French language",
@@ -34043,7 +34043,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -34947,24 +34947,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/28/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/28/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/28/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/28/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Liste FR filter reference",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/28/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/28/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Has references to the Liste FR filter",
@@ -35040,7 +35040,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -35944,24 +35944,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/29/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/29/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/29/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/29/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Indonesian language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/29/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/29/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Indonesian language",
@@ -36037,7 +36037,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -36941,24 +36941,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/30/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/30/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/30/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/30/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Bulgarian language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/30/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/30/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Bulgarian language",
@@ -37034,7 +37034,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -37938,24 +37938,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/31/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/31/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/31/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/31/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Chinese language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/31/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/31/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Chinese language",
@@ -38031,7 +38031,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -38935,24 +38935,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/32/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/32/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/32/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/32/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Czech language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/32/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/32/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Czech language",
@@ -39028,7 +39028,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -39932,24 +39932,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/33/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/33/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/33/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/33/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Slovak language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/33/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/33/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Slovak language",
@@ -40025,7 +40025,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -40929,24 +40929,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/34/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/34/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/34/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/34/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Hebrew language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/34/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/34/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Hebrew language",
@@ -41022,7 +41022,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -41926,24 +41926,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/35/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/35/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/35/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/35/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Italian language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/35/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/35/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Italian language",
@@ -42019,7 +42019,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -42923,24 +42923,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/36/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/36/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/36/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/36/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Latvian language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/36/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/36/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Latvian language",
@@ -43016,7 +43016,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -43920,24 +43920,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/37/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/37/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/37/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/37/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Lithuanian language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/37/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/37/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Lithuanian language",
@@ -44013,7 +44013,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -44917,24 +44917,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/38/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/38/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/38/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/38/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Arabic language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/38/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/38/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Arabic language",
@@ -45010,7 +45010,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -45914,24 +45914,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/39/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/39/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/39/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/39/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Romanian language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/39/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/39/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Romanian language",
@@ -46007,7 +46007,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -46911,24 +46911,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/40/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/40/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/40/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/40/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Finnish language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/40/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/40/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Finnish language",
@@ -47004,7 +47004,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -47908,24 +47908,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/41/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/41/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/41/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/41/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Polish language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/41/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/41/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Polish language",
@@ -48001,7 +48001,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -48905,24 +48905,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/42/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/42/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/42/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/42/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Icelandic language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/42/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/42/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Icelandic language",
@@ -48998,7 +48998,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -49902,24 +49902,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/43/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/43/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/43/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/43/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Norwegian language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/43/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/43/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Norwegian language",
@@ -49995,7 +49995,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -50899,24 +50899,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/44/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/44/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/44/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/44/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Greek language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/44/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/44/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Greek language",
@@ -50992,7 +50992,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -51896,24 +51896,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/45/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/45/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/45/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/45/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Potentially problematic",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/45/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/45/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Can cause issues depending on your ad blocker and the specific website",
@@ -51989,7 +51989,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -52893,24 +52893,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/46/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/46/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/46/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/46/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Obsolete",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/46/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/46/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Outdated or not supported anymore",
@@ -52986,7 +52986,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -53890,24 +53890,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/47/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/47/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/47/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/47/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Czech language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/47/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/47/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Czech language",
@@ -53983,7 +53983,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -54887,24 +54887,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/48/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/48/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/48/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/48/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Hungarian language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/48/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/48/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Hungarian language",
@@ -54980,7 +54980,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -55884,24 +55884,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/49/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/49/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/49/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/49/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Danish language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/49/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/49/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Danish language",
@@ -55977,7 +55977,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -56881,24 +56881,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/50/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/50/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/50/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/50/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Protection from adblock circumvention scripts",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/50/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/50/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed to resist adblock circumvention scripts on websites",
@@ -56974,7 +56974,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -57878,24 +57878,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/51/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/51/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/51/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/51/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Cookie alerts blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/51/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/51/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed to block websites' alerts about cookie policies",
@@ -57971,7 +57971,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -58875,24 +58875,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/52/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/52/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/52/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/52/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Vietnamese language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/52/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/52/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Vietnamese language",
@@ -58968,7 +58968,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -59872,24 +59872,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/53/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/53/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/53/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/53/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Estonian language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/53/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/53/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Estonian language",
@@ -59965,7 +59965,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -60869,24 +60869,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/54/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/54/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/54/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/54/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Persian language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/54/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/54/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Persian language",
@@ -60962,7 +60962,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -61866,24 +61866,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/55/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/55/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/55/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/55/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Swedish language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/55/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/55/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Swedish language",
@@ -61959,7 +61959,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -62863,24 +62863,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/56/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/56/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/56/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/56/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Korean language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/56/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/56/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Korean language",
@@ -62956,7 +62956,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -63860,24 +63860,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/57/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/57/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/57/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/57/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "ROList filter reference",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/57/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/57/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Has references to the ROList filter",
@@ -63953,7 +63953,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -64857,24 +64857,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/58/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/58/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/58/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/58/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "EasyPrivacy filter reference",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/58/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/58/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Has references to the EasyPrivacy filter",
@@ -64950,7 +64950,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -65854,24 +65854,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/59/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/59/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/59/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/59/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "ABPindo filter reference",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/59/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/59/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Has references to the ABPindo filter",
@@ -65947,7 +65947,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -66851,24 +66851,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/60/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/60/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/60/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/60/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "AdGuard Turkish filter reference",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/60/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/60/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Has references to the AdGuard Turkish filter",
@@ -66944,7 +66944,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -67848,24 +67848,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/61/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/61/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/61/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/61/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "AdGuard French filter reference",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/61/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/61/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Has references to the AdGuard French filter",
@@ -67941,7 +67941,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -68845,24 +68845,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/62/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/62/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/62/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/62/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Polish Annoyance filter reference",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/62/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/62/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Has references to the Polish Annoyance filter",
@@ -68938,7 +68938,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -69842,24 +69842,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/63/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/63/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/63/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/63/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Faroese language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/63/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/63/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Faroese language",
@@ -69935,7 +69935,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -70839,24 +70839,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/64/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/64/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/64/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/64/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Thai language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/64/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/64/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Thai language",
@@ -70932,7 +70932,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -71836,24 +71836,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/65/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/65/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/65/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/65/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Serbian language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/65/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/65/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Serbian language",
@@ -71929,7 +71929,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -72833,24 +72833,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/66/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/66/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/66/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/66/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Croatian language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/66/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/66/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Croatian language",
@@ -72926,7 +72926,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -73830,24 +73830,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/67/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/67/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/67/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/67/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Hindi language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/67/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/67/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Hindi language",
@@ -73923,7 +73923,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -74827,24 +74827,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/68/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/68/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/68/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/68/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Ukrainian language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/68/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/68/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Ukrainian language",
@@ -74920,7 +74920,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -75824,24 +75824,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/69/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/69/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/69/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/69/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Tajik language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/69/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/69/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Tajik language",
@@ -75917,7 +75917,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -76821,24 +76821,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/70/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/70/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/70/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/70/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Pashto language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/70/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/70/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Pashto language",
@@ -76914,7 +76914,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -77818,24 +77818,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/tags/properties/71/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/tags/properties/71/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/tags/properties/71/zh_CN/properties/name",
+                  "$id": "#/properties/tags/properties/71/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Macedonian language-specific ad blocking",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/tags/properties/71/zh_CN/properties/description",
+                  "$id": "#/properties/tags/properties/71/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Designed specifically to block ads on web pages in the Macedonian language",
@@ -77944,7 +77944,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -78848,24 +78848,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/filters/properties/1/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/filters/properties/1/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/filters/properties/1/zh_CN/properties/name",
+                  "$id": "#/properties/filters/properties/1/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "AdGuard Russian filter",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/filters/properties/1/zh_CN/properties/description",
+                  "$id": "#/properties/filters/properties/1/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Filter that enables ad blocking on websites in the Russian language.",
@@ -78941,7 +78941,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -79845,24 +79845,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/filters/properties/2/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/filters/properties/2/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/filters/properties/2/zh_CN/properties/name",
+                  "$id": "#/properties/filters/properties/2/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "AdGuard Base filter",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/filters/properties/2/zh_CN/properties/description",
+                  "$id": "#/properties/filters/properties/2/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "EasyList + AdGuard Base filter. This filter is necessary for quality ad blocking.",
@@ -79938,7 +79938,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -80842,24 +80842,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/filters/properties/3/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/filters/properties/3/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/filters/properties/3/zh_CN/properties/name",
+                  "$id": "#/properties/filters/properties/3/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "AdGuard Tracking Protection filter",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/filters/properties/3/zh_CN/properties/description",
+                  "$id": "#/properties/filters/properties/3/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "The most comprehensive list of various online counters and web analytics tools. Use this filter, if you do not want your actions on the Internet to be tracked.",
@@ -80935,7 +80935,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -81839,24 +81839,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/filters/properties/4/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/filters/properties/4/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/filters/properties/4/zh_CN/properties/name",
+                  "$id": "#/properties/filters/properties/4/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "AdGuard Social Media filter",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/filters/properties/4/zh_CN/properties/description",
+                  "$id": "#/properties/filters/properties/4/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Filter for social media widgets (\"Like\" buttons and such).",
@@ -81932,7 +81932,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -82836,24 +82836,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/filters/properties/5/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/filters/properties/5/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/filters/properties/5/zh_CN/properties/name",
+                  "$id": "#/properties/filters/properties/5/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "AdGuard Experimental filter",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/filters/properties/5/zh_CN/properties/description",
+                  "$id": "#/properties/filters/properties/5/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Filter designed to test certain hazardous filtering rules before they are added to the basic filters.",
@@ -82929,7 +82929,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -83833,24 +83833,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/filters/properties/6/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/filters/properties/6/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/filters/properties/6/zh_CN/properties/name",
+                  "$id": "#/properties/filters/properties/6/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "AdGuard German filter",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/filters/properties/6/zh_CN/properties/description",
+                  "$id": "#/properties/filters/properties/6/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "EasyList Germany + AdGuard German filter. Filter list that specifically removes ads on websites in the German language.",
@@ -83926,7 +83926,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -84830,24 +84830,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/filters/properties/7/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/filters/properties/7/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/filters/properties/7/zh_CN/properties/name",
+                  "$id": "#/properties/filters/properties/7/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "AdGuard Japanese filter",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/filters/properties/7/zh_CN/properties/description",
+                  "$id": "#/properties/filters/properties/7/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Filter that enables ad blocking on websites in the Japanese language.",
@@ -84923,7 +84923,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -85827,24 +85827,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/filters/properties/8/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/filters/properties/8/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/filters/properties/8/zh_CN/properties/name",
+                  "$id": "#/properties/filters/properties/8/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "AdGuard Dutch filter",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/filters/properties/8/zh_CN/properties/description",
+                  "$id": "#/properties/filters/properties/8/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "EasyList Dutch + AdGuard Dutch filter. Filter list that specifically removes ads on websites in the Dutch language.",
@@ -85920,7 +85920,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -86824,24 +86824,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/filters/properties/9/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/filters/properties/9/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/filters/properties/9/zh_CN/properties/name",
+                  "$id": "#/properties/filters/properties/9/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "AdGuard Spanish/Portuguese filter",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/filters/properties/9/zh_CN/properties/description",
+                  "$id": "#/properties/filters/properties/9/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Filter list that specifically removes ads on websites in Spanish, Portuguese, and Brazilian Portuguese languages.",
@@ -86917,7 +86917,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -87821,24 +87821,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/filters/properties/10/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/filters/properties/10/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/filters/properties/10/zh_CN/properties/name",
+                  "$id": "#/properties/filters/properties/10/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "Filter unblocking search ads and self-promotion",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/filters/properties/10/zh_CN/properties/description",
+                  "$id": "#/properties/filters/properties/10/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Filter that unblocks search ads in Google, DuckDuckGo, Bing, or Yahoo and self-promotion on websites.",
@@ -87914,7 +87914,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -88818,24 +88818,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/filters/properties/11/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/filters/properties/11/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/filters/properties/11/zh_CN/properties/name",
+                  "$id": "#/properties/filters/properties/11/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "AdGuard Mobile Ads filter",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/filters/properties/11/zh_CN/properties/description",
+                  "$id": "#/properties/filters/properties/11/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Filter for all known mobile ad networks. Useful for mobile devices.",
@@ -88911,7 +88911,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -89815,24 +89815,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/filters/properties/12/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/filters/properties/12/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/filters/properties/12/zh_CN/properties/name",
+                  "$id": "#/properties/filters/properties/12/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "AdGuard Safari filter",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/filters/properties/12/zh_CN/properties/description",
+                  "$id": "#/properties/filters/properties/12/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Special filter for Safari 9+ on iOS and macOS. We need a separate filter for Safari browser because it does not fully support our rules syntax.",
@@ -89908,7 +89908,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -90812,24 +90812,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/filters/properties/13/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/filters/properties/13/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/filters/properties/13/zh_CN/properties/name",
+                  "$id": "#/properties/filters/properties/13/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "AdGuard Turkish filter",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/filters/properties/13/zh_CN/properties/description",
+                  "$id": "#/properties/filters/properties/13/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Filter list that specifically removes ads on websites in the Turkish language.",
@@ -90905,7 +90905,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -91809,24 +91809,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/filters/properties/14/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/filters/properties/14/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/filters/properties/14/zh_CN/properties/name",
+                  "$id": "#/properties/filters/properties/14/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "AdGuard Annoyances filter",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/filters/properties/14/zh_CN/properties/description",
+                  "$id": "#/properties/filters/properties/14/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Blocks irritating elements on web pages including cookie notices, third-party widgets and in-page pop-ups. Contains the following AdGuard filters: Cookie Notices, Popups, Mobile App Banners, Other Annoyances and Widgets.",
@@ -91902,7 +91902,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -92806,24 +92806,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/filters/properties/15/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/filters/properties/15/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/filters/properties/15/zh_CN/properties/name",
+                  "$id": "#/properties/filters/properties/15/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "AdGuard DNS filter",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/filters/properties/15/zh_CN/properties/description",
+                  "$id": "#/properties/filters/properties/15/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Filter composed of several other filters (AdGuard Base filter, Social Media filter, Tracking Protection filter, Mobile Ads filter, EasyList and EasyPrivacy) and simplified specifically to be better compatible with DNS-level ad blocking.",
@@ -92899,7 +92899,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -93803,24 +93803,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/filters/properties/16/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/filters/properties/16/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/filters/properties/16/zh_CN/properties/name",
+                  "$id": "#/properties/filters/properties/16/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "AdGuard French filter",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/filters/properties/16/zh_CN/properties/description",
+                  "$id": "#/properties/filters/properties/16/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Liste FR + AdGuard French filter. Filter list that specifically removes ads on websites in the French language.",
@@ -93896,7 +93896,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -94800,24 +94800,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/filters/properties/17/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/filters/properties/17/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/filters/properties/17/zh_CN/properties/name",
+                  "$id": "#/properties/filters/properties/17/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "AdGuard URL Tracking filter",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/filters/properties/17/zh_CN/properties/description",
+                  "$id": "#/properties/filters/properties/17/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Filter that enhances privacy by removing tracking parameters from URLs.",
@@ -94893,7 +94893,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -95797,24 +95797,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/filters/properties/18/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/filters/properties/18/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/filters/properties/18/zh_CN/properties/name",
+                  "$id": "#/properties/filters/properties/18/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "AdGuard Cookie Notices filter",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/filters/properties/18/zh_CN/properties/description",
+                  "$id": "#/properties/filters/properties/18/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Blocks cookie notices on web pages.",
@@ -95890,7 +95890,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -96794,24 +96794,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/filters/properties/19/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/filters/properties/19/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/filters/properties/19/zh_CN/properties/name",
+                  "$id": "#/properties/filters/properties/19/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "AdGuard Popups filter",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/filters/properties/19/zh_CN/properties/description",
+                  "$id": "#/properties/filters/properties/19/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Blocks all kinds of pop-ups that are not necessary for websites' operation according to our Filter policy.",
@@ -96887,7 +96887,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -97791,24 +97791,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/filters/properties/20/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/filters/properties/20/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/filters/properties/20/zh_CN/properties/name",
+                  "$id": "#/properties/filters/properties/20/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "AdGuard Mobile App Banners filter",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/filters/properties/20/zh_CN/properties/description",
+                  "$id": "#/properties/filters/properties/20/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Blocks irritating banners that promote mobile apps of websites.",
@@ -97884,7 +97884,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -98788,24 +98788,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/filters/properties/21/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/filters/properties/21/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/filters/properties/21/zh_CN/properties/name",
+                  "$id": "#/properties/filters/properties/21/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "AdGuard Other Annoyances filter",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/filters/properties/21/zh_CN/properties/description",
+                  "$id": "#/properties/filters/properties/21/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Blocks irritating elements on web pages that do not fall under the popular categories of annoyances.",
@@ -98881,7 +98881,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -99785,24 +99785,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/filters/properties/22/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/filters/properties/22/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/filters/properties/22/zh_CN/properties/name",
+                  "$id": "#/properties/filters/properties/22/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "AdGuard Widgets filter",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/filters/properties/22/zh_CN/properties/description",
+                  "$id": "#/properties/filters/properties/22/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Blocks annoying third-party widgets: online assistants, live support chats, etc.",
@@ -99878,7 +99878,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -100782,24 +100782,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/filters/properties/23/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/filters/properties/23/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/filters/properties/23/zh_CN/properties/name",
+                  "$id": "#/properties/filters/properties/23/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "AdGuard Ukrainian filter",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/filters/properties/23/zh_CN/properties/description",
+                  "$id": "#/properties/filters/properties/23/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "Filter that enables ad blocking on websites in the Ukrainian language.",
@@ -100875,7 +100875,7 @@
             "tr",
             "uk",
             "vi",
-            "zh_CN",
+            "zh",
             "zh_TW"
           ],
           "properties": {
@@ -101779,24 +101779,24 @@
                 }
               }
             },
-            "zh_CN": {
-              "$id": "#/properties/filters/properties/224/properties/zh_CN",
+            "zh": {
+              "$id": "#/properties/filters/properties/224/properties/zh",
               "type": "object",
-              "title": "The ZH_CN Schema",
+              "title": "The ZH Schema",
               "required": [
                 "name",
                 "description"
               ],
               "properties": {
                 "name": {
-                  "$id": "#/properties/filters/properties/224/zh_CN/properties/name",
+                  "$id": "#/properties/filters/properties/224/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
                   "default": "AdGuard Chinese filter",
                   "pattern": "^(.*)$"
                 },
                 "description": {
-                  "$id": "#/properties/filters/properties/224/zh_CN/properties/description",
+                  "$id": "#/properties/filters/properties/224/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
                   "default": "EasyList China + AdGuard Chinese filter. Filter list that specifically removes ads on websites in Chinese language.",

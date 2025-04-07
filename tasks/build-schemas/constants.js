@@ -81,7 +81,8 @@ const SUPPORTED_LOCALES = [
     'tr',
     'uk',
     'vi',
-    'zh_CN',
+    // "zh_CN" is saved as "zh" in FiltersRegistry
+    'zh',
     'zh_TW',
 ];
 
