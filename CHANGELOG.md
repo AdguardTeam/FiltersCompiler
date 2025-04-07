@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+<!-- FIXME: specify date -->
+## [v1.1.155] - 2025-04-xx
+
+### Added
+
+- Required `description` property for groups in `filters_i18n` schema.
+
+### Changed
+
+- Unified list of required locales in `filters_i18n` schema for filters, groups, and tags.
+
+[v1.1.155]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.154...v1.1.155
+
 ## [v1.1.154] - 2025-03-24
 
 ### Added
