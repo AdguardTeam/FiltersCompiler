@@ -45,7 +45,7 @@ const createLocaleObject = (baseId, localeCode, defaultDataItem) => {
 
     REQUIRED_FIELDS_PER_LOCALE.forEach((field) => {
         properties[field] = createStringPropertySchema({
-            baseId: `${baseId}/properties`,
+            baseId: `${baseId}/${localeCode}/properties`,
             propName: field,
             defaultValue: defaultDataItem[field],
         });
