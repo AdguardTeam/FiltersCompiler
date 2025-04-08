@@ -108,7 +108,9 @@ const validate = (platformsPath, jsonSchemasConfigDir, filtersRequiredAmount) =>
     const schemas = loadSchemas(jsonSchemasConfigDir);
     const oldSchemas = loadSchemas(path.join(jsonSchemasConfigDir, OLD_MAC_SCHEMAS_SUBDIR));
 
-    const ajv = new Ajv();
+    const ajv = new Ajv({
+        allErrors: true,
+    });
 
     const result = validateDir(platformsPath, ajv, schemas, oldSchemas, filtersRequiredAmount);
 

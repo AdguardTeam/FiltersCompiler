@@ -9,7 +9,7 @@ export default {
     plugins: [
         copy({
             targets: [
-                { src: 'schemas/**/*', dest: 'dist/schemas' },
+                { src: 'schemas/*', dest: 'dist/schemas' },
             ],
         }),
     ],

@@ -9255,6 +9255,28 @@
       "$id": "#/properties/filters",
       "type": "object",
       "title": "The Filters Schema",
+      "required": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "13",
+        "16",
+        "18",
+        "19",
+        "20",
+        "21",
+        "22",
+        "23",
+        "224"
+      ],
       "properties": {
         "1": {
           "$id": "#/properties/filters/properties/1",
