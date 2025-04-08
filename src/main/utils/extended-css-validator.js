@@ -14,7 +14,9 @@ const dom = new JSDOM('<!DOCTYPE html><p>Empty</p>');
 
 global.window = dom.window;
 global.document = global.window.document;
-global.navigator = global.window.navigator;
+if (!global.navigator) {
+    global.navigator = global.window.navigator;
+}
 global.Element = global.window.Element;
 
 const require = createRequire(import.meta.url);

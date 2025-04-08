@@ -6,7 +6,7 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "build": "rollup index.js -f esm -d dist --preserveModules",
+    "build": "rollup --config rollup.config.js --silent",
     "test": "vitest",
     "lint": "eslint --cache .",
     "increment": "yarn version --patch --no-git-tag-version",
@@ -39,6 +39,7 @@
     "eslint-plugin-import": "^2.31.0",
     "husky": "^8.0.2",
     "rollup": "^4.39.0",
+    "rollup-plugin-copy": "^3.5.0",
     "vitest": "^3.0.5"
   }
 }
