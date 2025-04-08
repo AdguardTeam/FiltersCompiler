@@ -5,17 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-<!-- FIXME: add release date -->
-## [v1.2.1]
+## [v1.2.1] - 2025-04-09
 
 ## Added
 
-<!-- FIXME: mention the latest version of agtree if needed -->
 - [@adguard/agtree] v3.1.0 for rules conversion and validation.
 
 ### Changed
 
-<!-- FIXME: use the latest versions of scriptlets and tsurlfilter -->
 - Updated [@adguard/extended-css] to v2.1.1.
 - Updated [@adguard/filters-downloader] to v2.4.0.
 - Updated [@adguard/scriptlets] to v2.1.7.
