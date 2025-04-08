@@ -9,6 +9,8 @@ import { logger } from './src/main/utils/log';
 // default platforms config
 import { platformsConfig } from './src/main/platforms-config';
 
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+
 // Sets RuleConverter to use logger of current library
 setLogger(logger);
 

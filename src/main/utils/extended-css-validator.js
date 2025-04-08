@@ -3,10 +3,9 @@
  * so we pass some wrapper dummy.
  */
 import { TextEncoder, TextDecoder } from 'util';
+import { createRequire } from 'module';
 
 import { JSDOM } from 'jsdom';
-
-import { ExtendedCss } from '@adguard/extended-css';
 
 global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder;
@@ -17,6 +16,9 @@ global.window = dom.window;
 global.document = global.window.document;
 global.navigator = global.window.navigator;
 global.Element = global.window.Element;
+
+const require = createRequire(import.meta.url);
+const { ExtendedCss } = require('@adguard/extended-css');
 
 // TODO: in future SelectorValidationResult from ExtendedCss may be imported and used instead of it
 /**

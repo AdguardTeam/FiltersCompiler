@@ -3,6 +3,8 @@ import fs from 'fs';
 import path from 'path';
 import { logger } from './utils/log';
 
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+
 const FULL_REQUIRED_ENDINGS = ['name', 'description'];
 const ONLY_NAME_REQUIRED_ENDINGS = ['name'];
 const LOCALES_FILE_EXTENSION = '.json';
