@@ -6,8 +6,8 @@ import {
     RuleGenerator,
     RuleCategory,
     RegExpUtils,
-    defaultParserOptions,
 } from '@adguard/agtree';
+import { defaultParserOptions } from '@adguard/agtree/parser';
 
 import { parse } from '@adguard/ecss-tree';
 

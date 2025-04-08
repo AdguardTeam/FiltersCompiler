@@ -22,6 +22,8 @@ import { getFilterOptimizationConfig } from '../optimization';
 
 import { RuleMasks } from '../rule/rule-masks';
 
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+
 const RULES_SEPARATOR = '\r\n';
 let filterIdsPool = [];
 const metadataFilterIdsPool = [];

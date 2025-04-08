@@ -16,6 +16,8 @@ import { promises as fs, existsSync } from 'fs';
 import { disableOptimization } from '../main/optimization';
 import { build, include } from '../main/builder';
 
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+
 // Mock log to hide error messages
 vi.mock('../main/utils/log');
 

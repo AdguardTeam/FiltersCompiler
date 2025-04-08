@@ -1,5 +1,8 @@
 /* eslint-disable global-require */
+import { createRequire } from 'module';
 import { logger } from './log';
+
+const require = createRequire(import.meta.url);
 
 /**
  * Some sources require proper user-agents and forbid downloading without.

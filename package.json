@@ -4,8 +4,9 @@
   "description": "AdGuard filters compiler",
   "homepage": "http://adguard.com",
   "type": "module",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
+    "build": "rollup index.js -f esm -d dist --preserveModules",
     "test": "vitest",
     "lint": "eslint --cache .",
     "increment": "yarn version --patch --no-git-tag-version",
@@ -37,6 +38,7 @@
     "eslint-import-resolver-exports": "^1.0.0-beta.5",
     "eslint-plugin-import": "^2.31.0",
     "husky": "^8.0.2",
+    "rollup": "^4.39.0",
     "vitest": "^3.0.5"
   }
 }
