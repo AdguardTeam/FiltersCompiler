@@ -91,4 +91,11 @@ export const logger = {
             console.warn('Log file is not specified');
         }
     },
+
+    debug(message) {
+        if (isLevelIncluded(Levels.LOG)) {
+            console.debug(message);
+            appendFile(message, 'DEBUG');
+        }
+    },
 };
