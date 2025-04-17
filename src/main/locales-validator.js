@@ -4,26 +4,26 @@ module.exports = (() => {
     const path = require('path');
     const logger = require('./utils/log');
 
-    const FULL_REQUIRED_ENDINGS = ['name', 'description'];
-    const ONLY_NAME_REQUIRED_ENDINGS = ['name'];
+    /**
+     * Each filter, group, tag should have two keys.
+     */
+    const REQUIRED_ENDINGS = [
+        'name',
+        'description',
+    ];
+
     const LOCALES_FILE_EXTENSION = '.json';
     const BASE_LOCALE = 'en';
+
+    const REQUIRED_FILES = [
+        'filters',
+        'groups',
+        'tags',
+    ].map((el) => `${el}${LOCALES_FILE_EXTENSION}`);
 
     // each message key should consist of three parts
     // e.g. 'filter.3.name' or 'tag.29.description'
     const MESSAGE_KEY_NAME_PARTS_COUNT = 3;
-
-    const LOCALES_DATA = {
-        filters: {
-            required: FULL_REQUIRED_ENDINGS,
-        },
-        groups: {
-            required: ONLY_NAME_REQUIRED_ENDINGS,
-        },
-        tags: {
-            required: FULL_REQUIRED_ENDINGS,
-        },
-    };
 
     const WARNING_REASONS = {
         MISSED_FILES: 'missed files',
@@ -54,7 +54,7 @@ module.exports = (() => {
      * @param {string} id filters / groups / tags
      */
     const areValidMessagesKeys = (keys, id) => {
-        if (keys.length !== LOCALES_DATA[id].required.length) {
+        if (keys.length !== REQUIRED_ENDINGS.length) {
             return false;
         }
         const areValidKeys = !keys
@@ -66,7 +66,7 @@ module.exports = (() => {
                     || keyNameParts[0] !== propPrefix
                     || !(Number.isInteger(filterId))
                     || !(filterId > 0)
-                    || !(LOCALES_DATA[id].required.includes(keyNameParts[2]));
+                    || !(REQUIRED_ENDINGS.includes(keyNameParts[2]));
             });
         return areValidKeys;
     };
@@ -202,16 +202,13 @@ module.exports = (() => {
             throw new Error(`Locales dir '${dirPath}' is empty`);
         }
 
-        const requiredFiles = Object.keys(LOCALES_DATA)
-            .map((el) => `${el}${LOCALES_FILE_EXTENSION}`);
-
         const baseLocaleKeysMap = getBaseLocaleKeys(dirPath);
 
         locales.forEach((locale) => {
             const localeWarnings = [];
             const filesList = readDir(path.join(dirPath, locale));
             // checks all needed files presence
-            const missedFiles = requiredFiles
+            const missedFiles = REQUIRED_FILES
                 .filter((el) => !filesList.includes(el));
             if (missedFiles.length !== 0) {
                 localeWarnings.push([
@@ -222,7 +219,7 @@ module.exports = (() => {
                 ]);
             }
 
-            const presentFiles = requiredFiles
+            const presentFiles = REQUIRED_FILES
                 .filter((el) => !missedFiles.includes(el));
 
             // iterate over existent files

@@ -6,6 +6,7 @@ It is used in [FiltersRegistry].
 - [Usage](#usage)
 - [Tests](#tests)
 - [Development](#development)
+    - [Schemas maintenance](#schemas-maintenance)
 - [Filters metadata](#filters-metadata)
 - [`@include` directive and its options](#include-directive)
 
@@ -56,6 +57,18 @@ const customPlatformsConfig = {
 compiler.compile(filtersDir, logPath, reportPath, platformsPath, whitelist, blacklist, customPlatformsConfig);
 ```
 
+The built filters for the platforms can be validated by schemas.
+And there is `validateJSONSchema()` method for that:
+
+```javascript
+const compiler = require("adguard-filters-compiler");
+
+const validationResult = compiler.validateJSONSchema(<platformsPath>, <FILTERS_REQUIRED_AMOUNT>);
+```
+
+where `<platformsPath>` is the path to the platforms directory
+and `<FILTERS_REQUIRED_AMOUNT>` is an expected minimum number of filters.
+
 ## Tests
 
 ```bash
@@ -67,7 +80,26 @@ yarn test
 In order to add support for new scriptlets and redirects,
 you should update `@adguard/tsurlfilter` with updated scriptlets.
 
-For fixing scriptlets converting or validation you should update `scriptlets`.
+For fixing scriptlets converting or validation you should update `@adguard/scriptlets`.
+
+### Schemas maintenance
+
+Schemas which are used for `validateJSONSchema()` method are located in `schemas/` directory:
+
+- `filters.schema.json` — schema for *filters* metadata;
+- `filters_i18n.schema.json` — schema for *filters_i18n* metadata.
+
+> Schemas in `schemas/mac/` directory are needed for legacy macOS v1 platform, so they should not be changed.
+
+If any changes should be made in the schemas, e.g. adding a new locale or filter or tag,
+**never edit them directly in `schemas/` manually**.
+
+Instead of that, you should edit scripts in `tasks/build-schemas/` directory
+and use the following command to generate the schemas:
+
+```bash
+yarn build-schemas
+```
 
 ## Filters metadata
 

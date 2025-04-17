@@ -61,6 +61,13 @@ describe('locales validator', () => {
                     },
                     {
                         details: [
+                            'group.3.description',
+                        ],
+                        reason: 'invalid or absent message key/value',
+                        type: 'critical',
+                    },
+                    {
+                        details: [
                             '"group.3.name": ""',
                         ],
                         reason: 'invalid or absent message key/value',

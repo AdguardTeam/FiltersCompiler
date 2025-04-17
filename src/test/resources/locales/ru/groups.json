@@ -1,9 +1,11 @@
 [
 	{
-		"group.1.name": "Localized Adguard Filters"
+		"group.1.name": "Localized group1 name",
+		"group.1.description": "Localized group1 description"
 	},
 	{
-		"group.2.name": "Localized EasyList"
+		"group.2.name": "Localized group2 name",
+		"group.2.description":"Localized group2 description"
 	},
 	{
 		"group.3.name": ""

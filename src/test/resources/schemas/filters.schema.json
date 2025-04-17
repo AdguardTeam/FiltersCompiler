@@ -43,6 +43,16 @@
             ],
             "pattern": "^(.*)$"
           },
+          "groupDescription": {
+            "$id": "#/properties/groups/items/properties/groupDescription",
+            "type": "string",
+            "title": "The GROUPDESCRIPTION Schema",
+            "default": "",
+            "examples": [
+              "Block ads"
+            ],
+            "pattern": "^(.*)$"
+          },
           "displayNumber": {
             "$id": "#/properties/groups/items/properties/displayNumber",
             "type": "integer",
