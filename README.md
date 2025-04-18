@@ -77,6 +77,9 @@ yarn test
 
 ## Development
 
+> No new fields should be added to the metadata files for old `mac` platform,
+> check [generator.js](./src/main/platforms/generator.js) for more details.
+
 In order to add support for new scriptlets and redirects,
 you should update `@adguard/tsurlfilter` with updated scriptlets.
 

@@ -392,6 +392,13 @@ describe('Test builder', () => {
             // Obsolete Filter test
             expect(filtersMetadata.filters.some((filter) => filter.filterId === 6)).toBeFalsy();
             expect(filtersMetadata.filters.some((filter) => filter.name === 'Obsolete Test Filter')).toBeFalsy();
+
+            expect(filtersMetadata.groups).toBeTruthy();
+            expect(filtersMetadata.groups[0]).toBeTruthy();
+            expect(filtersMetadata.groups[0].groupId).toEqual(1);
+            expect(filtersMetadata.groups[0].groupName).toEqual('Adguard Filters');
+            expect(filtersMetadata.groups[0].groupDescription).toEqual('Adguard Filters description');
+            expect(filtersMetadata.groups[0].displayNumber).toEqual(1);
         });
 
         it('platform/test filters_i18n.json', async () => {
@@ -403,6 +410,14 @@ describe('Test builder', () => {
 
             // Obsolete Filter test
             expect(filtersI18nMetadataFilterIds.some((id) => id === '6')).toBeFalsy();
+
+            expect(filtersI18nMetadata.groups).toBeTruthy();
+            const i18nGroup = filtersI18nMetadata.groups['1'];
+            expect(i18nGroup).toBeTruthy();
+            const enGroup = i18nGroup['en'];
+            expect(enGroup).toBeTruthy();
+            expect(enGroup.name).toEqual('Adguard Filters');
+            expect(enGroup.description).toEqual('Adguard Filters description');
         });
 
         it('platform/test local_script_rules.txt', async () => {
@@ -635,6 +650,8 @@ describe('Test builder', () => {
                 expect(Object.keys(group).length).toEqual(3);
                 expect(group.groupId).toEqual(1);
                 expect(group.groupName).toEqual('Adguard Filters');
+                // no new field should be added to old 'mac' platform
+                expect(group.groupDescription).toEqual(undefined);
                 expect(group.displayNumber).toEqual(1);
 
                 const englishFilter = macFiltersMetadata.filters[0];
@@ -667,6 +684,18 @@ describe('Test builder', () => {
                 const macFiltersI18nMetadata = JSON.parse(macFiltersI18nMetadataContent);
                 expect(macFiltersI18nMetadata).toBeTruthy();
                 expect(Object.keys(macFiltersI18nMetadata).length).toEqual(2);
+
+                expect(macFiltersI18nMetadata.filters).toBeTruthy();
+                expect(macFiltersI18nMetadata.groups).toBeTruthy();
+                expect(macFiltersI18nMetadata.tags).toEqual(undefined);
+
+                const group = macFiltersI18nMetadata.groups['1'];
+                expect(group).toBeTruthy();
+                const enGroup = group.en;
+                expect(enGroup).toBeTruthy();
+                expect(enGroup.name).toEqual('Adguard Filters');
+                // no new field should be added to old 'mac' platform
+                expect(enGroup.description).toEqual(undefined);
             });
 
             it('platform/mac filters 2.txt', async () => {

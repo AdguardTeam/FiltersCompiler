@@ -688,9 +688,31 @@ module.exports = (() => {
                 tags: localizations.tags,
                 filters: localizedFilters,
             };
+
+            let i18nGroups = localizations.groups;
+
+            // no new fields should be added for old 'MAC' platform
             if (platform === 'MAC') {
                 delete i18nMetadata.tags;
+
+                i18nGroups = {};
+                Object.keys(localizations.groups).forEach((groupId) => {
+                    i18nGroups[groupId] = {};
+
+                    Object.keys(localizations.groups[groupId]).forEach((locale) => {
+                        const localeData = localizations.groups[groupId][locale];
+                        const cleanedLocaleData = { ...localeData };
+
+                        if (cleanedLocaleData.description) {
+                            delete cleanedLocaleData.description;
+                        }
+
+                        i18nGroups[groupId][locale] = cleanedLocaleData;
+                    });
+                });
             }
+
+            i18nMetadata.groups = i18nGroups;
 
             const i18nContent = JSON.stringify(i18nMetadata, null, '\t');
 

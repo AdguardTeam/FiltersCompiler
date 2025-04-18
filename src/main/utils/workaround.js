@@ -135,10 +135,10 @@ module.exports = (() => {
      * @param metadata
      */
     const rewriteMetadataForOldMac = function (metadata) {
-        const result = {};
-
-        result.groups = metadata.groups.slice(0);
-        result.filters = [];
+        const result = {
+            filters: [],
+            groups: [],
+        };
 
         // eslint-disable-next-line no-restricted-syntax
         for (const f of metadata.filters) {
@@ -150,6 +150,16 @@ module.exports = (() => {
             delete copy.deprecated;
 
             result.filters.push(copy);
+        }
+
+        const groups = metadata.groups.slice(0);
+        // eslint-disable-next-line no-restricted-syntax
+        for (const g of groups) {
+            const copy = { ...g };
+
+            delete copy.groupDescription;
+
+            result.groups.push(copy);
         }
 
         return result;

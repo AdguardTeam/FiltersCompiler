@@ -2,26 +2,31 @@
   {
     "groupId": 1,
     "groupName": "Adguard Filters",
+    "groupDescription": "Adguard Filters description",
     "displayNumber": 1
   },
   {
     "groupId": 2,
     "groupName": "EasyList",
+    "groupDescription": "EasyList description",
     "displayNumber": 2
   },
   {
     "groupId": 3,
     "groupName": "Other",
+    "groupDescription": "Other description",
     "displayNumber": 100
   },
   {
     "groupId": 4,
     "groupName": "Directives",
+    "groupDescription": "Directives description",
     "displayNumber": 100
   },
   {
     "groupId": 5,
     "groupName": "Trust Levels tests",
+    "groupDescription": "Trust Levels tests description",
     "displayNumber": 250
   }
 ]
