@@ -6,10 +6,10 @@ module.exports = (() => {
     const path = require('path');
     const Ajv = require('ajv');
 
-    const OLD_MAC_SCHEMAS_SUBDIR = 'mac';
     const SCHEMA_EXTENSION = '.schema.json';
 
-    const OLD_MAC_PLATFORMS_DIR = 'mac';
+    const OLD_MAC_V1_PLATFORM = 'mac';
+    const OLD_MAC_V2_PLATFORM = 'mac_v2';
 
     /**
      * Loads all available schemas from dir
@@ -63,10 +63,16 @@ module.exports = (() => {
                 const fileName = path.basename(item, '.json');
                 let schema = schemas[fileName];
 
-                // Validate mac dir with old schemas
-                if (path.basename(path.dirname(item)) === OLD_MAC_PLATFORMS_DIR) {
+                // Validate `mac` (mac v1) dir with old schemas
+                if (path.basename(path.dirname(item)) === OLD_MAC_V1_PLATFORM) {
                     logger.log('Look up old schemas for mac directory');
-                    schema = oldSchemas[fileName];
+                    schema = oldSchemas[OLD_MAC_V1_PLATFORM][fileName];
+                }
+
+                // Validate `mac_v2` dir with old schemas
+                if (path.basename(path.dirname(item)) === OLD_MAC_V2_PLATFORM) {
+                    logger.log('Look up old schemas for mac_v2 directory');
+                    schema = oldSchemas[OLD_MAC_V2_PLATFORM][fileName];
                 }
 
                 if (schema) {
@@ -118,7 +124,13 @@ module.exports = (() => {
         logger.info('Validating json schemas for platforms');
 
         const schemas = loadSchemas(jsonSchemasConfigDir);
-        const oldSchemas = loadSchemas(path.join(jsonSchemasConfigDir, OLD_MAC_SCHEMAS_SUBDIR));
+
+        const oldSchemasMacV1 = loadSchemas(path.join(jsonSchemasConfigDir, OLD_MAC_V1_PLATFORM));
+        const oldSchemasMacV2 = loadSchemas(path.join(jsonSchemasConfigDir, OLD_MAC_V2_PLATFORM));
+        const oldSchemas = {
+            [OLD_MAC_V1_PLATFORM]: oldSchemasMacV1,
+            [OLD_MAC_V2_PLATFORM]: oldSchemasMacV2,
+        };
 
         const ajv = new Ajv({
             allErrors: true,

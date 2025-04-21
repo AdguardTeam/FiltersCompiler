@@ -1,0 +1,765 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/mac_v2/filters_i18n.json",
+  "type": "object",
+  "title": "The Root Schema",
+  "required": [
+    "groups",
+    "tags",
+    "filters"
+  ],
+  "properties": {
+    "groups": {
+      "$id": "#/properties/groups",
+      "type": "object",
+      "title": "The Groups Schema",
+      "required": [
+        "1",
+        "2",
+        "3"
+      ],
+      "properties": {
+        "1": {
+          "$id": "#/properties/groups/properties/1",
+          "type": "object",
+          "title": "The 1 Schema",
+          "required": [
+            "en",
+            "ru"
+          ],
+          "properties": {
+            "en": {
+              "$id": "#/properties/groups/properties/1/properties/en",
+              "type": "object",
+              "title": "The En Schema",
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "$id": "#/properties/groups/properties/1/properties/en/properties/name",
+                  "type": "string",
+                  "title": "The Name Schema",
+                  "default": "",
+                  "examples": [
+                    "Group name"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              }
+            },
+            "ru": {
+              "$id": "#/properties/groups/properties/1/properties/ru",
+              "type": "object",
+              "title": "The Ru Schema",
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "$id": "#/properties/groups/properties/1/properties/ru/properties/name",
+                  "type": "string",
+                  "title": "The Name Schema",
+                  "default": "",
+                  "examples": [
+                    "Localized group name"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              }
+            }
+          }
+        },
+        "2": {
+          "$id": "#/properties/groups/properties/2",
+          "type": "object",
+          "title": "The 2 Schema",
+          "required": [
+            "en",
+            "ru"
+          ],
+          "properties": {
+            "en": {
+              "$id": "#/properties/groups/properties/2/properties/en",
+              "type": "object",
+              "title": "The En Schema",
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "$id": "#/properties/groups/properties/2/properties/en/properties/name",
+                  "type": "string",
+                  "title": "The Name Schema",
+                  "default": "",
+                  "examples": [
+                    "EasyList"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              }
+            },
+            "ru": {
+              "$id": "#/properties/groups/properties/2/properties/ru",
+              "type": "object",
+              "title": "The Ru Schema",
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "$id": "#/properties/groups/properties/2/properties/ru/properties/name",
+                  "type": "string",
+                  "title": "The Name Schema",
+                  "default": "",
+                  "examples": [
+                    "Localized EasyList"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              }
+            }
+          }
+        },
+        "3": {
+          "$id": "#/properties/groups/properties/3",
+          "type": "object",
+          "title": "The 3 Schema",
+          "required": [
+            "en",
+            "ru"
+          ],
+          "properties": {
+            "en": {
+              "$id": "#/properties/groups/properties/3/properties/en",
+              "type": "object",
+              "title": "The En Schema",
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "$id": "#/properties/groups/properties/3/properties/en/properties/name",
+                  "type": "string",
+                  "title": "The Name Schema",
+                  "default": "",
+                  "examples": [
+                    "Other"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              }
+            },
+            "ru": {
+              "$id": "#/properties/groups/properties/3/properties/ru",
+              "type": "object",
+              "title": "The Ru Schema",
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "$id": "#/properties/groups/properties/3/properties/ru/properties/name",
+                  "type": "string",
+                  "title": "The Name Schema",
+                  "default": "",
+                  "examples": [
+                    "Localized Other"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "tags": {
+      "$id": "#/properties/tags",
+      "type": "object",
+      "title": "The Tags Schema",
+      "required": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10"
+      ],
+      "properties": {
+        "1": {
+          "$id": "#/properties/tags/properties/1",
+          "type": "object",
+          "title": "The 1 Schema",
+          "required": [
+            "en"
+          ],
+          "properties": {
+            "en": {
+              "$id": "#/properties/tags/properties/1/properties/en",
+              "type": "object",
+              "title": "The En Schema",
+              "required": [
+                "description",
+                "name"
+              ],
+              "properties": {
+                "description": {
+                  "$id": "#/properties/tags/properties/1/properties/en/properties/description",
+                  "type": "string",
+                  "title": "The Description Schema",
+                  "default": "",
+                  "examples": [
+                    "Blocks ads"
+                  ],
+                  "pattern": "^(.*)$"
+                },
+                "name": {
+                  "$id": "#/properties/tags/properties/1/properties/en/properties/name",
+                  "type": "string",
+                  "title": "The Name Schema",
+                  "default": "",
+                  "examples": [
+                    "Blocks ads"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              }
+            }
+          }
+        },
+        "2": {
+          "$id": "#/properties/tags/properties/2",
+          "type": "object",
+          "title": "The 2 Schema",
+          "required": [
+            "en"
+          ],
+          "properties": {
+            "en": {
+              "$id": "#/properties/tags/properties/2/properties/en",
+              "type": "object",
+              "title": "The En Schema",
+              "required": [
+                "description",
+                "name"
+              ],
+              "properties": {
+                "description": {
+                  "$id": "#/properties/tags/properties/2/properties/en/properties/description",
+                  "type": "string",
+                  "title": "The Description Schema",
+                  "default": "",
+                  "examples": [
+                    "Blocks trackers"
+                  ],
+                  "pattern": "^(.*)$"
+                },
+                "name": {
+                  "$id": "#/properties/tags/properties/2/properties/en/properties/name",
+                  "type": "string",
+                  "title": "The Name Schema",
+                  "default": "",
+                  "examples": [
+                    "Blocks trackers"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              }
+            }
+          }
+        },
+        "3": {
+          "$id": "#/properties/tags/properties/3",
+          "type": "object",
+          "title": "The 3 Schema",
+          "required": [
+            "en"
+          ],
+          "properties": {
+            "en": {
+              "$id": "#/properties/tags/properties/3/properties/en",
+              "type": "object",
+              "title": "The En Schema",
+              "required": [
+                "description",
+                "name"
+              ],
+              "properties": {
+                "description": {
+                  "$id": "#/properties/tags/properties/3/properties/en/properties/description",
+                  "type": "string",
+                  "title": "The Description Schema",
+                  "default": "",
+                  "examples": [
+                    "Blocks social widgets"
+                  ],
+                  "pattern": "^(.*)$"
+                },
+                "name": {
+                  "$id": "#/properties/tags/properties/3/properties/en/properties/name",
+                  "type": "string",
+                  "title": "The Name Schema",
+                  "default": "",
+                  "examples": [
+                    "Blocks social widgets"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              }
+            }
+          }
+        },
+        "4": {
+          "$id": "#/properties/tags/properties/4",
+          "type": "object",
+          "title": "The 4 Schema",
+          "required": [
+            "en"
+          ],
+          "properties": {
+            "en": {
+              "$id": "#/properties/tags/properties/4/properties/en",
+              "type": "object",
+              "title": "The En Schema",
+              "required": [
+                "description",
+                "name"
+              ],
+              "properties": {
+                "description": {
+                  "$id": "#/properties/tags/properties/4/properties/en/properties/description",
+                  "type": "string",
+                  "title": "The Description Schema",
+                  "default": "",
+                  "examples": [
+                    "Security-related filter"
+                  ],
+                  "pattern": "^(.*)$"
+                },
+                "name": {
+                  "$id": "#/properties/tags/properties/4/properties/en/properties/name",
+                  "type": "string",
+                  "title": "The Name Schema",
+                  "default": "",
+                  "examples": [
+                    "Security-related filter"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              }
+            }
+          }
+        },
+        "5": {
+          "$id": "#/properties/tags/properties/5",
+          "type": "object",
+          "title": "The 5 Schema",
+          "required": [
+            "en"
+          ],
+          "properties": {
+            "en": {
+              "$id": "#/properties/tags/properties/5/properties/en",
+              "type": "object",
+              "title": "The En Schema",
+              "required": [
+                "description",
+                "name"
+              ],
+              "properties": {
+                "description": {
+                  "$id": "#/properties/tags/properties/5/properties/en/properties/description",
+                  "type": "string",
+                  "title": "The Description Schema",
+                  "default": "",
+                  "examples": [
+                    "Filter is for blocking annoyances"
+                  ],
+                  "pattern": "^(.*)$"
+                },
+                "name": {
+                  "$id": "#/properties/tags/properties/5/properties/en/properties/name",
+                  "type": "string",
+                  "title": "The Name Schema",
+                  "default": "",
+                  "examples": [
+                    "Filter is for blocking annoyances"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              }
+            }
+          }
+        },
+        "6": {
+          "$id": "#/properties/tags/properties/6",
+          "type": "object",
+          "title": "The 6 Schema",
+          "required": [
+            "en"
+          ],
+          "properties": {
+            "en": {
+              "$id": "#/properties/tags/properties/6/properties/en",
+              "type": "object",
+              "title": "The En Schema",
+              "required": [
+                "description",
+                "name"
+              ],
+              "properties": {
+                "description": {
+                  "$id": "#/properties/tags/properties/6/properties/en/properties/description",
+                  "type": "string",
+                  "title": "The Description Schema",
+                  "default": "",
+                  "examples": [
+                    "Blocks EU cookie notices"
+                  ],
+                  "pattern": "^(.*)$"
+                },
+                "name": {
+                  "$id": "#/properties/tags/properties/6/properties/en/properties/name",
+                  "type": "string",
+                  "title": "The Name Schema",
+                  "default": "",
+                  "examples": [
+                    "Blocks EU cookie notices"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              }
+            }
+          }
+        },
+        "7": {
+          "$id": "#/properties/tags/properties/7",
+          "type": "object",
+          "title": "The 7 Schema",
+          "required": [
+            "en"
+          ],
+          "properties": {
+            "en": {
+              "$id": "#/properties/tags/properties/7/properties/en",
+              "type": "object",
+              "title": "The En Schema",
+              "required": [
+                "name",
+                "description"
+              ],
+              "properties": {
+                "name": {
+                  "$id": "#/properties/tags/properties/7/properties/en/properties/name",
+                  "type": "string",
+                  "title": "The Name Schema",
+                  "default": "",
+                  "examples": [
+                    "Language-specific filter"
+                  ],
+                  "pattern": "^(.*)$"
+                },
+                "description": {
+                  "$id": "#/properties/tags/properties/7/properties/en/properties/description",
+                  "type": "string",
+                  "title": "The Description Schema",
+                  "default": "",
+                  "examples": [
+                    "Language-specific filter"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              }
+            }
+          }
+        },
+        "8": {
+          "$id": "#/properties/tags/properties/8",
+          "type": "object",
+          "title": "The 8 Schema",
+          "required": [
+            "en"
+          ],
+          "properties": {
+            "en": {
+              "$id": "#/properties/tags/properties/8/properties/en",
+              "type": "object",
+              "title": "The En Schema",
+              "required": [
+                "description",
+                "name"
+              ],
+              "properties": {
+                "description": {
+                  "$id": "#/properties/tags/properties/8/properties/en/properties/description",
+                  "type": "string",
+                  "title": "The Description Schema",
+                  "default": "",
+                  "examples": [
+                    "Language-specific filter"
+                  ],
+                  "pattern": "^(.*)$"
+                },
+                "name": {
+                  "$id": "#/properties/tags/properties/8/properties/en/properties/name",
+                  "type": "string",
+                  "title": "The Name Schema",
+                  "default": "",
+                  "examples": [
+                    "Language-specific filter"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              }
+            }
+          }
+        },
+        "9": {
+          "$id": "#/properties/tags/properties/9",
+          "type": "object",
+          "title": "The 9 Schema",
+          "required": [
+            "en"
+          ],
+          "properties": {
+            "en": {
+              "$id": "#/properties/tags/properties/9/properties/en",
+              "type": "object",
+              "title": "The En Schema",
+              "required": [
+                "description",
+                "name"
+              ],
+              "properties": {
+                "description": {
+                  "$id": "#/properties/tags/properties/9/properties/en/properties/description",
+                  "type": "string",
+                  "title": "The Description Schema",
+                  "default": "",
+                  "examples": [
+                    "Filter references EasyList"
+                  ],
+                  "pattern": "^(.*)$"
+                },
+                "name": {
+                  "$id": "#/properties/tags/properties/9/properties/en/properties/name",
+                  "type": "string",
+                  "title": "The Name Schema",
+                  "default": "",
+                  "examples": [
+                    "Filter references EasyList"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              }
+            }
+          }
+        },
+        "10": {
+          "$id": "#/properties/tags/properties/10",
+          "type": "object",
+          "title": "The 10 Schema",
+          "required": [
+            "en"
+          ],
+          "properties": {
+            "en": {
+              "$id": "#/properties/tags/properties/10/properties/en",
+              "type": "object",
+              "title": "The En Schema",
+              "required": [
+                "name",
+                "description"
+              ],
+              "properties": {
+                "name": {
+                  "$id": "#/properties/tags/properties/10/properties/en/properties/name",
+                  "type": "string",
+                  "title": "The Name Schema",
+                  "default": "",
+                  "examples": [
+                    "Filter is recommended to be used with AdGuard"
+                  ],
+                  "pattern": "^(.*)$"
+                },
+                "description": {
+                  "$id": "#/properties/tags/properties/10/properties/en/properties/description",
+                  "type": "string",
+                  "title": "The Description Schema",
+                  "default": "",
+                  "examples": [
+                    "Filter is recommended to be used with AdGuard"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "filters": {
+      "$id": "#/properties/filters",
+      "type": "object",
+      "title": "The Filters Schema",
+      "required": [
+        "1",
+        "2"
+      ],
+      "properties": {
+        "1": {
+          "$id": "#/properties/filters/properties/1",
+          "type": "object",
+          "title": "The 1 Schema",
+          "required": [
+            "en",
+            "ru"
+          ],
+          "properties": {
+            "en": {
+              "$id": "#/properties/filters/properties/1/properties/en",
+              "type": "object",
+              "title": "The En Schema",
+              "required": [
+                "name",
+                "description"
+              ],
+              "properties": {
+                "name": {
+                  "$id": "#/properties/filters/properties/1/properties/en/properties/name",
+                  "type": "string",
+                  "title": "The Name Schema",
+                  "default": "",
+                  "examples": [
+                    "Russian filter"
+                  ],
+                  "pattern": "^(.*)$"
+                },
+                "description": {
+                  "$id": "#/properties/filters/properties/1/properties/en/properties/description",
+                  "type": "string",
+                  "title": "The Description Schema",
+                  "default": "",
+                  "examples": [
+                    "Adguard Russian filter. Filter that enables blocking of ads on websites in Russian."
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              }
+            },
+            "ru": {
+              "$id": "#/properties/filters/properties/1/properties/ru",
+              "type": "object",
+              "title": "The Ru Schema",
+              "required": [
+                "name",
+                "description"
+              ],
+              "properties": {
+                "name": {
+                  "$id": "#/properties/filters/properties/1/properties/ru/properties/name",
+                  "type": "string",
+                  "title": "The Name Schema",
+                  "default": "",
+                  "examples": [
+                    "Localized Russian filter"
+                  ],
+                  "pattern": "^(.*)$"
+                },
+                "description": {
+                  "$id": "#/properties/filters/properties/1/properties/ru/properties/description",
+                  "type": "string",
+                  "title": "The Description Schema",
+                  "default": "",
+                  "examples": [
+                    "Localized Adguard Russian filter. Filter that enables blocking of ads on websites in Russian."
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              }
+            }
+          }
+        },
+        "2": {
+          "$id": "#/properties/filters/properties/2",
+          "type": "object",
+          "title": "The 2 Schema",
+          "required": [
+            "en",
+            "ru"
+          ],
+          "properties": {
+            "en": {
+              "$id": "#/properties/filters/properties/2/properties/en",
+              "type": "object",
+              "title": "The En Schema",
+              "required": [
+                "name",
+                "description"
+              ],
+              "properties": {
+                "name": {
+                  "$id": "#/properties/filters/properties/2/properties/en/properties/name",
+                  "type": "string",
+                  "title": "The Name Schema",
+                  "default": "",
+                  "examples": [
+                    "English filter"
+                  ],
+                  "pattern": "^(.*)$"
+                },
+                "description": {
+                  "$id": "#/properties/filters/properties/2/properties/en/properties/description",
+                  "type": "string",
+                  "title": "The Description Schema",
+                  "default": "",
+                  "examples": [
+                    "EasyList + Adguard English filter. Filter list that specifically removes adverts on English language websites."
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              }
+            },
+            "ru": {
+              "$id": "#/properties/filters/properties/2/properties/ru",
+              "type": "object",
+              "title": "The Ru Schema",
+              "required": [
+                "name",
+                "description"
+              ],
+              "properties": {
+                "name": {
+                  "$id": "#/properties/filters/properties/2/properties/ru/properties/name",
+                  "type": "string",
+                  "title": "The Name Schema",
+                  "default": "",
+                  "examples": [
+                    "Localized English filter"
+                  ],
+                  "pattern": "^(.*)$"
+                },
+                "description": {
+                  "$id": "#/properties/filters/properties/2/properties/ru/properties/description",
+                  "type": "string",
+                  "title": "The Description Schema",
+                  "default": "",
+                  "examples": [
+                    "Localized EasyList + Adguard English filter. Filter list that specifically removes adverts on English language websites."
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

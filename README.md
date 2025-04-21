@@ -77,7 +77,7 @@ yarn test
 
 ## Development
 
-> No new fields should be added to the metadata files for old `mac` platform,
+> No new fields should be added to the metadata files for old `mac` and current `mac_v2` platforms,
 > check [generator.js](./src/main/platforms/generator.js) for more details.
 
 In order to add support for new scriptlets and redirects,
@@ -93,6 +93,7 @@ Schemas which are used for `validateJSONSchema()` method are located in `schemas
 - `filters_i18n.schema.json` — schema for *filters_i18n* metadata.
 
 > Schemas in `schemas/mac/` directory are needed for legacy macOS v1 platform, so they should not be changed.
+> The same is true for `schemas/mac_v2/` directory.
 
 If any changes should be made in the schemas, e.g. adding a new locale or filter or tag,
 **never edit them directly in `schemas/` manually**.

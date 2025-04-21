@@ -603,6 +603,32 @@ module.exports = (() => {
     };
 
     /**
+     * Removes group descriptions from the input groups.
+     *
+     * @param {Object} inputGroups Input groups metadata.
+     * @returns {Object} Output groups metadata.
+     */
+    const removeGroupDescriptions = (inputGroups) => {
+        const result = {};
+        Object.keys(inputGroups).forEach((groupId) => {
+            result[groupId] = {};
+
+            Object.keys(inputGroups[groupId]).forEach((locale) => {
+                const localeData = inputGroups[groupId][locale];
+                const cleanedLocaleData = { ...localeData };
+
+                if (cleanedLocaleData.description) {
+                    delete cleanedLocaleData.description;
+                }
+
+                result[groupId][locale] = cleanedLocaleData;
+            });
+        });
+
+        return result;
+    };
+
+    /**
      * Writes metadata files
      * @param {string} platformsPath
      * @param {string} filtersDir
@@ -652,7 +678,9 @@ module.exports = (() => {
             metadata = removeRedundantFiltersMetadata(metadata, config.platform);
 
             if (platform === 'MAC') {
-                metadata = workaround.rewriteMetadataForOldMac(metadata);
+                metadata = workaround.rewriteMetadataForOldMacV1(metadata);
+            } else if (platform === 'MAC_V2') {
+                metadata = workaround.rewriteMetadataForOldMacV2(metadata);
             } else {
                 metadata = removeObsoleteFilters(metadata);
             }
@@ -694,22 +722,7 @@ module.exports = (() => {
             // no new fields should be added for old 'MAC' platform
             if (platform === 'MAC') {
                 delete i18nMetadata.tags;
-
-                i18nGroups = {};
-                Object.keys(localizations.groups).forEach((groupId) => {
-                    i18nGroups[groupId] = {};
-
-                    Object.keys(localizations.groups[groupId]).forEach((locale) => {
-                        const localeData = localizations.groups[groupId][locale];
-                        const cleanedLocaleData = { ...localeData };
-
-                        if (cleanedLocaleData.description) {
-                            delete cleanedLocaleData.description;
-                        }
-
-                        i18nGroups[groupId][locale] = cleanedLocaleData;
-                    });
-                });
+                i18nGroups = removeGroupDescriptions(localizations.groups);
             }
 
             i18nMetadata.groups = i18nGroups;

@@ -1,7 +1,7 @@
 {
   "definitions": {},
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "http://example.com/filters.json",
+  "$id": "http://example.com/mac_v2/filters.json",
   "type": "object",
   "title": "The Root Schema",
   "required": [
@@ -21,7 +21,6 @@
         "required": [
           "groupId",
           "groupName",
-          "groupDescription",
           "displayNumber"
         ],
         "properties": {

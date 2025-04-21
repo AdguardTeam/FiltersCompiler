@@ -86,6 +86,19 @@
             "adguard_app_mac": true
         }
     },
+    "MAC_V2": {
+        "platform": "mac",
+        "path": "mac_v2",
+        "configuration": {
+            "removeRulePatterns": false,
+            "ignoreRuleHints": false
+        },
+        "expires": "12 hours",
+        "defines": {
+            "adguard": true,
+            "adguard_app_mac": true
+        }
+    },
     "TEST_HINTS": {
         "platform": "test",
         "path": "hints",

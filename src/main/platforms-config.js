@@ -574,7 +574,6 @@ module.exports = {
             'adguard_app_mac': true,
         },
     },
-
     'ANDROID': {
         'platform': 'android',
         'path': 'android',

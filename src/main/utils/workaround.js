@@ -129,15 +129,37 @@ module.exports = (() => {
     };
 
     /**
-     * Corrects metadata for backward compatibility with old clients on MAC platform
+     * Removes `groupDescription` field from `groups`.
+     *
+     * @param rawGroups
+     * @returns Corrected groups
+     */
+    const removeGroupDescriptions = function (rawGroups) {
+        const groups = [];
+
+        // eslint-disable-next-line no-restricted-syntax
+        for (const g of rawGroups) {
+            const copy = { ...g };
+
+            delete copy.groupDescription;
+
+            groups.push(copy);
+        }
+
+        return groups;
+    };
+
+    /**
+     * Corrects metadata for backward compatibility with old clients on MAC (v1) platform
      * Hides tag fields
      *
      * @param metadata
+     * @returns Corrected metadata
      */
-    const rewriteMetadataForOldMac = function (metadata) {
+    const rewriteMetadataForOldMacV1 = function (metadata) {
         const result = {
+            groups: removeGroupDescriptions(metadata.groups.slice(0)),
             filters: [],
-            groups: [],
         };
 
         // eslint-disable-next-line no-restricted-syntax
@@ -152,16 +174,19 @@ module.exports = (() => {
             result.filters.push(copy);
         }
 
-        const groups = metadata.groups.slice(0);
-        // eslint-disable-next-line no-restricted-syntax
-        for (const g of groups) {
-            const copy = { ...g };
+        return result;
+    };
 
-            delete copy.groupDescription;
-
-            result.groups.push(copy);
-        }
-
+    /**
+     * Corrects metadata for backward compatibility with old clients on MAC_V2 platform —
+     * removed `groupDescription` field from `groups`.
+     *
+     * @param metadata
+     * @returns Corrected metadata
+     */
+    const rewriteMetadataForOldMacV2 = function (metadata) {
+        const result = { ...metadata };
+        result.groups = removeGroupDescriptions(result.groups.slice(0));
         return result;
     };
 
@@ -178,7 +203,8 @@ module.exports = (() => {
         rewriteRules,
         fixVersionComments,
         removeAdblockVersion,
-        rewriteMetadataForOldMac,
+        rewriteMetadataForOldMacV1,
+        rewriteMetadataForOldMacV2,
         modifyBaseFilterHeader,
         removeScriptletRules,
     };
