@@ -574,6 +574,19 @@ module.exports = {
             'adguard_app_mac': true,
         },
     },
+    'MAC_V3': {
+        'platform': 'mac',
+        'path': 'mac_v3',
+        'expires': '12 hours',
+        'configuration': {
+            'ignoreRuleHints': false,
+            'replacements': null,
+        },
+        'defines': {
+            'adguard': true,
+            'adguard_app_mac': true,
+        },
+    },
     'ANDROID': {
         'platform': 'android',
         'path': 'android',

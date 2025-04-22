@@ -828,6 +828,96 @@ describe('Test builder', () => {
             });
         });
 
+        describe('check MAC_V3 platform', () => {
+            it('platform/mac_v3 filters.json', async () => {
+                const macV3FiltersMetadataContent = await readFile(path.join(platformsDir, 'mac_v3', 'filters.json'));
+                expect(macV3FiltersMetadataContent).toBeTruthy();
+                const macV3FiltersMetadata = JSON.parse(macV3FiltersMetadataContent);
+                expect(Object.keys(macV3FiltersMetadata).length).toEqual(3);
+
+                expect(macV3FiltersMetadata.filters).toBeTruthy();
+                expect(macV3FiltersMetadata.groups).toBeTruthy();
+                expect(macV3FiltersMetadata.tags).toBeTruthy();
+
+                const group = macV3FiltersMetadata.groups[0];
+                expect(group).toBeTruthy();
+                // limited list of fields is expected: groupId, groupName, displayNumber, groupDescription
+                expect(Object.keys(group).length).toEqual(4);
+                expect(group.groupId).toEqual(1);
+                expect(group.groupName).toEqual('Adguard Filters');
+                expect(group.displayNumber).toEqual(1);
+                // compare to MAC_V2 platform, MAC_V3 platform has additional fields for groups
+                expect(group.groupDescription).toEqual('Adguard Filters description');
+
+                const englishFilter = macV3FiltersMetadata.filters[0];
+                expect(englishFilter).toBeTruthy();
+                expect(Object.keys(englishFilter).length).toEqual(16);
+                expect(englishFilter.filterId).toEqual(2);
+                expect(englishFilter.name).toEqual('AdGuard Base filter');
+                expect(englishFilter.description).toEqual('EasyList + AdGuard English filter. This filter is necessary for quality ad blocking.');
+                expect(englishFilter.homepage).toEqual('https://easylist.adblockplus.org/');
+                // due to the override value set in the platforms.json for mac platform
+                // the value is "12 hours" which is 43200 seconds
+                expect(englishFilter.expires).toEqual(43200);
+                expect(englishFilter.displayNumber).toEqual(101);
+                expect(englishFilter.groupId).toEqual(2);
+                expect(englishFilter.subscriptionUrl).toEqual('https://filters.adtidy.org/mac_v3/filters/2.txt');
+                expect(englishFilter.version).toBeTruthy();
+                expect(englishFilter.timeUpdated).toBeTruthy();
+                expect(englishFilter.languages.length).toEqual(2);
+                expect(englishFilter.languages[0]).toEqual('en');
+                expect(englishFilter.languages[1]).toEqual('pl');
+                expect(englishFilter.tags).toEqual([1, 7, 41, 10]);
+                expect(englishFilter.timeAdded).toBeTruthy();
+                expect(englishFilter.trustLevel).toEqual('full');
+                expect(englishFilter.downloadUrl).toEqual('https://filters.adtidy.org/mac_v3/filters/2.txt');
+                expect(englishFilter.deprecated).toEqual(true);
+            });
+
+            it('platform/mac_v2 filters_i18n.json', async () => {
+                const macV2FiltersI18nMetadataContent = await readFile(path.join(platformsDir, 'mac_v2', 'filters_i18n.json'));
+                expect(macV2FiltersI18nMetadataContent).toBeTruthy();
+
+                const macV2FiltersI18nMetadata = JSON.parse(macV2FiltersI18nMetadataContent);
+                expect(macV2FiltersI18nMetadata).toBeTruthy();
+                expect(Object.keys(macV2FiltersI18nMetadata).length).toEqual(3);
+
+                expect(macV2FiltersI18nMetadata.filters).toBeTruthy();
+                expect(macV2FiltersI18nMetadata.groups).toBeTruthy();
+                expect(macV2FiltersI18nMetadata.tags).toBeTruthy();
+
+                const group = macV2FiltersI18nMetadata.groups['1'];
+                expect(group).toBeTruthy();
+                const enGroup = group.en;
+                expect(enGroup).toBeTruthy();
+                expect(enGroup.name).toEqual('Adguard Filters');
+                expect(enGroup.description).toEqual('Adguard Filters description');
+            });
+
+            it('platform/mac_v2 filters 2.txt', async () => {
+                const filterContent = await readFile(path.join(platformsDir, 'mac_v2', 'filters', '2.txt'));
+                expect(filterContent).toBeTruthy();
+
+                const filterLines = filterContent.split(/\r?\n/);
+
+                // expires value can be overridden by platforms.json for specific platforms
+                expect(filterLines.includes('! Expires: 12 hours (update frequency)')).toBeTruthy();
+
+                // Check conditions
+                expect(filterLines.includes('!#if adguard')).toBeFalsy();
+                expect(filterLines.includes('!#endif')).toBeFalsy();
+                expect(filterLines.includes('if_not_adguard_rule')).toBeFalsy();
+                expect(filterLines.includes('if_adguard_included_rule')).toBeTruthy();
+                expect(filterLines.includes('if_adguard_rule')).toBeTruthy();
+
+                // wrong condition
+                expect(filterLines.includes('wrong_condition')).toBeFalsy();
+
+                // Check includes
+                expect(filterLines.includes('!#include')).toBeFalsy();
+            });
+        });
+
         describe('condition directives for platforms', () => {
             it('platform/test filters 4.txt', async () => {
                 const filterContent = await readFile(path.join(platformsDir, 'test', 'filters', '4.txt'));
