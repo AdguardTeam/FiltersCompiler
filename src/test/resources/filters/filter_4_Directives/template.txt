@@ -22,3 +22,6 @@ ios_rule
 non_ios_rule
 !#endif
 !#endif
+!#if (adguard_app_cli)
+app_cli_specific_rule
+!#endif

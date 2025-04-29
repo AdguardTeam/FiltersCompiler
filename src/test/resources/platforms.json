@@ -112,6 +112,19 @@
             "adguard_app_mac": true
         }
     },
+    "CLI": {
+        "platform": "cli",
+        "path": "cli",
+        "configuration": {
+            "removeRulePatterns": false,
+            "ignoreRuleHints": false
+        },
+        "expires": "12 hours",
+        "defines": {
+            "adguard": true,
+            "adguard_app_cli": true
+        }
+    },
     "TEST_HINTS": {
         "platform": "test",
         "path": "hints",

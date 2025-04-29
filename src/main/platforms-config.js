@@ -599,6 +599,19 @@ module.exports = {
             'adguard_app_android': true,
         },
     },
+    'CLI': {
+        'platform': 'cli',
+        'path': 'cli',
+        'expires': '12 hours',
+        'configuration': {
+            'ignoreRuleHints': false,
+            'replacements': null,
+        },
+        'defines': {
+            'adguard': true,
+            'adguard_app_cli': true,
+        },
+    },
     'EXTENSION_CHROMIUM': {
         'platform': 'ext_chromium',
         'path': 'extension/chromium',

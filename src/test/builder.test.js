@@ -991,6 +991,17 @@ describe('Test builder', () => {
                 expect(ifLines.includes('chrome_mv3_specific_rule')).toBeTruthy();
                 expect(ifLines.includes('ios_rule')).toBeFalsy();
             });
+
+            it('filters4.txt - adguard_app_cli constant for the if directive', async () => {
+                const ifContent = await readFile(path.join(platformsDir, 'cli', 'filters', '4.txt'));
+                expect(ifContent).toBeTruthy();
+
+                const ifLines = ifContent.split(/\r?\n/);
+                expect(ifLines.length).toEqual(23);
+                expect(ifLines.includes('app_cli_specific_rule')).toBeTruthy();
+                expect(ifLines.includes('if_not_ublock')).toBeTruthy();
+                expect(ifLines.includes('ios_rule')).toBeFalsy();
+            });
         });
 
         describe('platformsIncluded directive', () => {
