@@ -3,7 +3,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "http://adguard.com/filters.json",
   "type": "object",
-  "title": "The Root Schema",
+  "title": "The ROOT Schema",
   "required": [
     "groups",
     "tags",
@@ -13,21 +13,22 @@
     "groups": {
       "$id": "#/properties/groups",
       "type": "array",
-      "title": "The Groups Schema",
+      "title": "The GROUPS Schema",
       "items": {
         "$id": "#/properties/groups/items",
         "type": "object",
-        "title": "The Items Schema",
+        "title": "The ITEMS Schema",
         "required": [
           "groupId",
           "groupName",
+          "groupDescription",
           "displayNumber"
         ],
         "properties": {
           "groupId": {
             "$id": "#/properties/groups/items/properties/groupId",
             "type": "integer",
-            "title": "The Groupid Schema",
+            "title": "The GROUPID Schema",
             "default": 0,
             "examples": [
               1
@@ -36,17 +37,27 @@
           "groupName": {
             "$id": "#/properties/groups/items/properties/groupName",
             "type": "string",
-            "title": "The Groupname Schema",
+            "title": "The GROUPNAME Schema",
             "default": "",
             "examples": [
               "Ad Blocking"
             ],
             "pattern": "^(.*)$"
           },
+          "groupDescription": {
+            "$id": "#/properties/groups/items/properties/groupDescription",
+            "type": "string",
+            "title": "The GROUPDESCRIPTION Schema",
+            "default": "",
+            "examples": [
+              "Block ads"
+            ],
+            "pattern": "^(.*)$"
+          },
           "displayNumber": {
             "$id": "#/properties/groups/items/properties/displayNumber",
             "type": "integer",
-            "title": "The Displaynumber Schema",
+            "title": "The DISPLAYNUMBER Schema",
             "default": 0,
             "examples": [
               1
@@ -58,11 +69,11 @@
     "tags": {
       "$id": "#/properties/tags",
       "type": "array",
-      "title": "The Tags Schema",
+      "title": "The TAGS Schema",
       "items": {
         "$id": "#/properties/tags/items",
         "type": "object",
-        "title": "The Items Schema",
+        "title": "The ITEMS Schema",
         "required": [
           "tagId",
           "keyword"
@@ -71,7 +82,7 @@
           "tagId": {
             "$id": "#/properties/tags/items/properties/tagId",
             "type": "integer",
-            "title": "The Tagid Schema",
+            "title": "The TAGID Schema",
             "default": 0,
             "examples": [
               1
@@ -80,7 +91,7 @@
           "keyword": {
             "$id": "#/properties/tags/items/properties/keyword",
             "type": "string",
-            "title": "The Keyword Schema",
+            "title": "The KEYWORD Schema",
             "default": "",
             "examples": [
               "purpose:ads"
@@ -93,11 +104,11 @@
     "filters": {
       "$id": "#/properties/filters",
       "type": "array",
-      "title": "The Filters Schema",
+      "title": "The FILTERS Schema",
       "items": {
         "$id": "#/properties/filters/items",
         "type": "object",
-        "title": "The Items Schema",
+        "title": "The ITEMS Schema",
         "required": [
           "filterId",
           "name",
@@ -119,7 +130,7 @@
           "filterId": {
             "$id": "#/properties/filters/items/properties/filterId",
             "type": "integer",
-            "title": "The Filterid Schema",
+            "title": "The FILTERID Schema",
             "default": 0,
             "examples": [
               101
@@ -128,7 +139,7 @@
           "name": {
             "$id": "#/properties/filters/items/properties/name",
             "type": "string",
-            "title": "The Name Schema",
+            "title": "The NAME Schema",
             "default": "",
             "examples": [
               "EasyList"
@@ -138,7 +149,7 @@
           "description": {
             "$id": "#/properties/filters/items/properties/description",
             "type": "string",
-            "title": "The Description Schema",
+            "title": "The DESCRIPTION Schema",
             "default": "",
             "examples": [
               "EasyList is the primary subscription that removes adverts from web pages in English language."
@@ -148,7 +159,7 @@
           "timeAdded": {
             "$id": "#/properties/filters/items/properties/timeAdded",
             "type": "string",
-            "title": "The Timeadded Schema",
+            "title": "The TIMEADDED Schema",
             "default": "",
             "examples": [
               "2014-06-30T10:56:55+0300"
@@ -158,13 +169,13 @@
           "deprecated": {
             "$id": "#/properties/filters/items/properties/deprecated",
             "type": "boolean",
-            "title": "Filter is deprecated and shoudln't be used",
+            "title": "The DEPRECATED Schema",
             "default": false
           },
           "homepage": {
             "$id": "#/properties/filters/items/properties/homepage",
             "type": "string",
-            "title": "The Homepage Schema",
+            "title": "The HOMEPAGE Schema",
             "default": "",
             "examples": [
               "https://easylist.to/"
@@ -174,7 +185,7 @@
           "expires": {
             "$id": "#/properties/filters/items/properties/expires",
             "type": "integer",
-            "title": "The Expires Schema",
+            "title": "The EXPIRES Schema",
             "default": 0,
             "examples": [
               172800
@@ -183,7 +194,7 @@
           "displayNumber": {
             "$id": "#/properties/filters/items/properties/displayNumber",
             "type": "integer",
-            "title": "The Displaynumber Schema",
+            "title": "The DISPLAYNUMBER Schema",
             "default": 0,
             "examples": [
               3
@@ -192,7 +203,7 @@
           "groupId": {
             "$id": "#/properties/filters/items/properties/groupId",
             "type": "integer",
-            "title": "The Groupid Schema",
+            "title": "The GROUPID Schema",
             "default": 0,
             "examples": [
               1
@@ -201,7 +212,7 @@
           "subscriptionUrl": {
             "$id": "#/properties/filters/items/properties/subscriptionUrl",
             "type": "string",
-            "title": "The Subscriptionurl Schema",
+            "title": "The SUBSCRIPTIONURL Schema",
             "default": "",
             "examples": [
               "https://easylist.to/easylist/easylist.txt"
@@ -211,7 +222,7 @@
           "downloadUrl": {
             "$id": "#/properties/filters/items/properties/downloadUrl",
             "type": "string",
-            "title": "The download URL Schema",
+            "title": "The DOWNLOADURL Schema",
             "default": "",
             "examples": [
               "https://filters.adtidy.org/extension/safari/filters/1.txt"
@@ -221,7 +232,7 @@
           "version": {
             "$id": "#/properties/filters/items/properties/version",
             "type": "string",
-            "title": "The Version Schema",
+            "title": "The VERSION Schema",
             "default": "",
             "examples": [
               "2.0.20.32"
@@ -231,7 +242,7 @@
           "timeUpdated": {
             "$id": "#/properties/filters/items/properties/timeUpdated",
             "type": "string",
-            "title": "The Timeupdated Schema",
+            "title": "The TIMEUPDATED Schema",
             "default": "",
             "examples": [
               "2018-12-04T16:00:16+0300"
@@ -241,12 +252,12 @@
           "languages": {
             "$id": "#/properties/filters/items/properties/languages",
             "type": "array",
-            "title": "The Languages Schema"
+            "title": "The LANGUAGES Schema"
           },
           "tags": {
             "$id": "#/properties/filters/items/properties/tags",
             "type": "array",
-            "title": "The Tags Schema",
+            "title": "The TAGS Schema",
             "items": {
               "$id": "#/properties/filters/items/properties/tags/items",
               "type": "integer",

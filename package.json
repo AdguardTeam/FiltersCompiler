@@ -1,6 +1,6 @@
 {
   "name": "adguard-filters-compiler",
-  "version": "1.2.0",
+  "version": "1.2.6",
   "description": "AdGuard filters compiler",
   "homepage": "http://adguard.com",
   "type": "module",
@@ -11,6 +11,7 @@
     "lint": "eslint --cache .",
     "increment": "yarn version --patch --no-git-tag-version",
     "build-txt": "node tasks/build-txt.mjs",
+    "build-schemas": "node tasks/build-schemas/index.js",
     "prepare": "husky install"
   },
   "engines": {
@@ -23,7 +24,7 @@
     "@adguard/filters-downloader": "^2.4.0",
     "@adguard/scriptlets": "^2.1.7",
     "@adguard/tsurlfilter": "^3.2.2",
-    "ajv": "^8.11.0",
+    "ajv": "^8.17.1",
     "child_process": ">=1.0.2",
     "jsdom": "^21.1.1",
     "md5": "2.3.0",

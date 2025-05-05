@@ -31,7 +31,7 @@ module.exports = {
     },
     rules: {
         'import/no-extraneous-dependencies': 0,
-        'no-new': 'off',
+        'import/prefer-default-export': 0,
         'indent': [
             'error',
             4,
@@ -72,7 +72,6 @@ module.exports = {
                 'ignoreComments': false,
             },
         ],
-        'import/prefer-default-export': 'off',
         'no-useless-escape': 'off',
         'no-param-reassign': 'off',
         'wrap-iife': 'off',

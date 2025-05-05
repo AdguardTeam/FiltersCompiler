@@ -163,3 +163,65 @@ export const rewriteMetadataForOldMac = function (metadata) {
  * @return {array} rules
  */
 export const removeScriptletRules = (rules) => rules.filter((rule) => !rule.script.startsWith(ADG_SCRIPTLET_MASK));
+
+/**
+ * Removes `groupDescription` field from `groups`.
+ *
+ * @param rawGroups
+ * @returns Corrected groups
+ */
+export const removeGroupDescriptions = function (rawGroups) {
+    const groups = [];
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const g of rawGroups) {
+        const copy = { ...g };
+
+        delete copy.groupDescription;
+
+        groups.push(copy);
+    }
+
+    return groups;
+};
+
+/**
+ * Corrects metadata for backward compatibility with old clients on MAC (v1) platform
+ * Hides tag fields
+ *
+ * @param metadata
+ * @returns Corrected metadata
+ */
+export const rewriteMetadataForOldMacV1 = function (metadata) {
+    const result = {
+        groups: removeGroupDescriptions(metadata.groups.slice(0)),
+        filters: [],
+    };
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const f of metadata.filters) {
+        const copy = { ...f };
+        delete copy.tags;
+        delete copy.timeAdded;
+        delete copy.trustLevel;
+        delete copy.downloadUrl;
+        delete copy.deprecated;
+
+        result.filters.push(copy);
+    }
+
+    return result;
+};
+
+/**
+ * Corrects metadata for backward compatibility with old clients on MAC_V2 platform —
+ * removed `groupDescription` field from `groups`.
+ *
+ * @param metadata
+ * @returns Corrected metadata
+ */
+export const rewriteMetadataForOldMacV2 = function (metadata) {
+    const result = { ...metadata };
+    result.groups = removeGroupDescriptions(result.groups.slice(0));
+    return result;
+};

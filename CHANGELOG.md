@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v1.2.1] - 2025-04-09
+## [v1.2.7] - 2025-05-03
 
 ## Added
 
@@ -28,6 +28,63 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#242]: https://github.com/AdguardTeam/FiltersCompiler/issues/242
 [#241]: https://github.com/AdguardTeam/FiltersCompiler/issues/241
 [#237]: https://github.com/AdguardTeam/FiltersCompiler/issues/237
+
+## [v1.2.6] - 2025-04-29
+
+### Added
+
+- Support of a new `cli` platform for AdGuard for Linux [#248].
+
+[v1.2.6]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.2.5...v1.2.6
+[#248]: https://github.com/AdguardTeam/FiltersCompiler/issues/248
+
+## [v1.2.5] - 2025-04-23
+
+### Added
+
+- Support of `hi`, `hy`, `lt`, `ms`, `th` locales as required in `filters_i18n` schema [#246].
+
+[v1.2.5]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.2.4...v1.2.5
+[#246]: https://github.com/AdguardTeam/FiltersCompiler/issues/246
+
+## [v1.2.4] - 2025-04-22
+
+### Added
+
+- Support of a new `mac_v3` platform [#247].
+
+[v1.2.4]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.2.3...v1.2.4
+[#247]: https://github.com/AdguardTeam/FiltersCompiler/issues/247
+
+## [v1.2.3] - 2025-04-21
+
+### Changed
+
+- Removed `groupDescriptions` for `mac_v2` platform in `filters.json` metadata.
+
+[v1.2.3]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.2.2...v1.2.3
+
+## [v1.2.2] - 2025-04-18
+
+### Fixed
+
+- Metadata building for old `mac` platform.
+
+[v1.2.2]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.2.1...v1.2.2
+
+## [v1.2.1] - 2025-04-17
+
+### Added
+
+- Required properties for groups:
+    - `groupDescription` in `filters` schema;
+    - `description` in `filters_i18n` schema.
+
+### Changed
+
+- Unified list of required locales in `filters_i18n` schema for filters, groups, and tags.
+
+[v1.2.1]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.154...v1.2.1
 
 ## [v1.1.154] - 2025-03-24
 

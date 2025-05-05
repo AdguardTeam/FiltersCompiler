@@ -1,11 +1,14 @@
 [
 	{
-		"group.1.name": "Adguard Filters"
+		"group.1.name": "Adguard Filters",
+		"group.1.description": "Adguard Filters description"
 	},
 	{
-		"group.2.name": "EasyList"
+		"group.2.name": "EasyList",
+		"group.2.description": "EasyList description"
 	},
 	{
-		"group.3.name": "Other"
+		"group.3.name": "Other",
+		"group.3.description": "Other description"
 	}
 ]

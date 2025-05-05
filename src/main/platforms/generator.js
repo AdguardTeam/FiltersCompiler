@@ -1,5 +1,4 @@
 /* eslint-disable global-require */
-
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
@@ -12,7 +11,8 @@ import {
     rewriteRules,
     rewriteHeader,
     removeScriptletRules,
-    rewriteMetadataForOldMac,
+    rewriteMetadataForOldMacV1,
+    rewriteMetadataForOldMacV2,
     modifyBaseFilterHeader,
 } from '../utils/workaround';
 
@@ -615,6 +615,32 @@ export const shouldBuildFilterForPlatform = (metadata, platform) => {
 };
 
 /**
+ * Removes group descriptions from the input groups.
+ *
+ * @param {Object} inputGroups Input groups metadata.
+ * @returns {Object} Output groups metadata.
+ */
+const removeGroupDescriptions = (inputGroups) => {
+    const result = {};
+    Object.keys(inputGroups).forEach((groupId) => {
+        result[groupId] = {};
+
+        Object.keys(inputGroups[groupId]).forEach((locale) => {
+            const localeData = inputGroups[groupId][locale];
+            const cleanedLocaleData = { ...localeData };
+
+            if (cleanedLocaleData.description) {
+                delete cleanedLocaleData.description;
+            }
+
+            result[groupId][locale] = cleanedLocaleData;
+        });
+    });
+
+    return result;
+};
+
+/**
  * Writes filters metadata and localizations for different platforms.
  *
  * @param {string} platformsPath - The base path where platform-specific directories are located.
@@ -630,13 +656,13 @@ const writeFiltersMetadata = function (platformsPath, filtersDir, filtersMetadat
 
     const groups = JSON.parse(readFile(path.join(filtersDir, '../groups', 'metadata.json')));
     if (!groups) {
-        logger.log('Error reading groups metadata');
+        logger.error('Error reading groups metadata');
         return;
     }
 
     const tags = JSON.parse(readFile(path.join(filtersDir, '../tags', 'metadata.json')));
     if (!tags) {
-        logger.log('Error reading tags metadata');
+        logger.error('Error reading tags metadata');
         return;
     }
 
@@ -668,7 +694,9 @@ const writeFiltersMetadata = function (platformsPath, filtersDir, filtersMetadat
         metadata = removeRedundantFiltersMetadata(metadata, config.platform);
 
         if (platform === 'MAC') {
-            metadata = rewriteMetadataForOldMac(metadata);
+            metadata = rewriteMetadataForOldMacV1(metadata);
+        } else if (platform === 'MAC_V2') {
+            metadata = rewriteMetadataForOldMacV2(metadata);
         } else {
             metadata = removeObsoleteFilters(metadata);
         }
@@ -704,9 +732,16 @@ const writeFiltersMetadata = function (platformsPath, filtersDir, filtersMetadat
             tags: localizations.tags,
             filters: localizedFilters,
         };
+
+        let i18nGroups = localizations.groups;
+
+        // no new fields should be added for old 'MAC' platform
         if (platform === 'MAC') {
             delete i18nMetadata.tags;
+            i18nGroups = removeGroupDescriptions(localizations.groups);
         }
+
+        i18nMetadata.groups = i18nGroups;
 
         const i18nContent = JSON.stringify(i18nMetadata, null, '\t');
 
@@ -722,7 +757,7 @@ const writeFiltersMetadata = function (platformsPath, filtersDir, filtersMetadat
  *
  * @param platformsPath - Path to platforms folder
  */
-const writeLocalScriptRules = function (platformsPath) {
+export const writeLocalScriptRules = function (platformsPath) {
     logger.info('Writing local script rules');
 
     // eslint-disable-next-line guard-for-in,no-restricted-syntax
@@ -1064,7 +1099,7 @@ const isObsoleteFilter = (metadata) => metadata.tags && metadata.tags.some((tag)
  * @param blacklist
  * @param obsoleteFiltersMetadata
  */
-const parseDirectory = async (
+export const parseDirectory = async (
     filtersDir,
     filtersMetadata,
     platformsPath,

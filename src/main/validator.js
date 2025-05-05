@@ -83,6 +83,7 @@ class RuleValidator {
         }
 
         try {
+            // eslint-disable-next-line no-new
             new RegExp(pattern.slice(1, -1));
         } catch (e) {
             throw new SyntaxError(`Rule has invalid regex pattern: "${ruleText}"`);
@@ -113,6 +114,7 @@ class RuleValidator {
         try {
             // Validate cosmetic rules
             if (ruleNode.category === RuleCategory.Cosmetic) {
+                // eslint-disable-next-line no-new
                 new CosmeticRule(ruleNode, 0);
                 return RuleValidator.createValidationResult(true);
             }

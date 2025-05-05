@@ -5,10 +5,9 @@ import path from 'path';
 import Ajv from 'ajv';
 import { logger } from './utils/log';
 
-const OLD_MAC_SCHEMAS_SUBDIR = 'mac';
 const SCHEMA_EXTENSION = '.schema.json';
-
-const OLD_MAC_PLATFORMS_DIR = 'mac';
+const OLD_MAC_V1_PLATFORM = 'mac';
+const OLD_MAC_V2_PLATFORM = 'mac_v2';
 
 /**
  * Loads all available schemas from dir
@@ -36,12 +35,12 @@ const loadSchemas = (dir) => {
 /**
  * Recursively validates dir content with provided schemas
  *
- * @param {string} dir - The directory path to validate.
- * @param {object} validator - The JSON schema validator instance.
- * @param {object} schemas - An object containing the current JSON schemas, keyed by file name.
- * @param {object} oldSchemas - An object containing old JSON schemas for specific directories.
- * @param {number} filtersRequiredAmount - The minimum required number of filters in the "filters" JSON file.
- * @returns {boolean} - Returns `true` if all JSON files are valid, otherwise `false`.
+ * @param dir
+ * @param validator
+ * @param schemas
+ * @param oldSchemas
+ * @param filtersRequiredAmount
+ * @returns {boolean}
  */
 const validateDir = (dir, validator, schemas, oldSchemas, filtersRequiredAmount) => {
     let items;
@@ -62,10 +61,16 @@ const validateDir = (dir, validator, schemas, oldSchemas, filtersRequiredAmount)
             const fileName = path.basename(item, '.json');
             let schema = schemas[fileName];
 
-            // Validate mac dir with old schemas
-            if (path.basename(path.dirname(item)) === OLD_MAC_PLATFORMS_DIR) {
+            // Validate `mac` (mac v1) dir with old schemas
+            if (path.basename(path.dirname(item)) === OLD_MAC_V1_PLATFORM) {
                 logger.log('Look up old schemas for mac directory');
-                schema = oldSchemas[fileName];
+                schema = oldSchemas[OLD_MAC_V1_PLATFORM][fileName];
+            }
+
+            // Validate `mac_v2` dir with old schemas
+            if (path.basename(path.dirname(item)) === OLD_MAC_V2_PLATFORM) {
+                logger.log('Look up old schemas for mac_v2 directory');
+                schema = oldSchemas[OLD_MAC_V2_PLATFORM][fileName];
             }
 
             if (schema) {
@@ -83,6 +88,17 @@ const validateDir = (dir, validator, schemas, oldSchemas, filtersRequiredAmount)
 
                 const validate = validator.compile(schema);
                 const valid = validate(json);
+
+                // json can be updated with default values
+                fs.writeFileSync(item, JSON.stringify(json, null, '\t'));
+
+                // duplicate to .js file as well
+                const jsFileName = `${fileName}.js`;
+                fs.writeFileSync(
+                    path.join(path.dirname(item), jsFileName),
+                    JSON.stringify(json, null, '\t'),
+                );
+
                 if (!valid) {
                     logger.error(`Invalid json in ${item}, errors:`);
                     logger.error(validate.errors);
@@ -106,10 +122,17 @@ const validate = (platformsPath, jsonSchemasConfigDir, filtersRequiredAmount) =>
     logger.info('Validating json schemas for platforms');
 
     const schemas = loadSchemas(jsonSchemasConfigDir);
-    const oldSchemas = loadSchemas(path.join(jsonSchemasConfigDir, OLD_MAC_SCHEMAS_SUBDIR));
+
+    const oldSchemasMacV1 = loadSchemas(path.join(jsonSchemasConfigDir, OLD_MAC_V1_PLATFORM));
+    const oldSchemasMacV2 = loadSchemas(path.join(jsonSchemasConfigDir, OLD_MAC_V2_PLATFORM));
+    const oldSchemas = {
+        [OLD_MAC_V1_PLATFORM]: oldSchemasMacV1,
+        [OLD_MAC_V2_PLATFORM]: oldSchemasMacV2,
+    };
 
     const ajv = new Ajv({
         allErrors: true,
+        useDefaults: true,
     });
 
     const result = validateDir(platformsPath, ajv, schemas, oldSchemas, filtersRequiredAmount);

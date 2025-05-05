@@ -21,6 +21,7 @@
         "required": [
           "groupId",
           "groupName",
+          "groupDescription",
           "displayNumber"
         ],
         "properties": {
@@ -40,6 +41,16 @@
             "default": "",
             "examples": [
               "Adguard Filters"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "groupDescription": {
+            "$id": "#/properties/groups/items/properties/groupDescription",
+            "type": "string",
+            "title": "The GROUPDESCRIPTION Schema",
+            "default": "",
+            "examples": [
+              "Block ads"
             ],
             "pattern": "^(.*)$"
           },

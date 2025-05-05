@@ -34,7 +34,8 @@
               "type": "object",
               "title": "The En Schema",
               "required": [
-                "name"
+                "name",
+                "description"
               ],
               "properties": {
                 "name": {
@@ -43,7 +44,17 @@
                   "title": "The Name Schema",
                   "default": "",
                   "examples": [
-                    "Adguard Filters"
+                    "Group name"
+                  ],
+                  "pattern": "^(.*)$"
+                },
+                "description": {
+                  "$id": "#/properties/groups/properties/1/properties/en/properties/description",
+                  "type": "string",
+                  "title": "The Description Schema",
+                  "default": "",
+                  "examples": [
+                    "Group description"
                   ],
                   "pattern": "^(.*)$"
                 }
@@ -54,7 +65,8 @@
               "type": "object",
               "title": "The Ru Schema",
               "required": [
-                "name"
+                "name",
+                "description"
               ],
               "properties": {
                 "name": {
@@ -63,7 +75,17 @@
                   "title": "The Name Schema",
                   "default": "",
                   "examples": [
-                    "Localized Adguard Filters"
+                    "Localized group name"
+                  ],
+                  "pattern": "^(.*)$"
+                },
+                "description": {
+                  "$id": "#/properties/groups/properties/1/properties/ru/properties/description",
+                  "type": "string",
+                  "title": "The Description Schema",
+                  "default": "",
+                  "examples": [
+                    "Localized group description"
                   ],
                   "pattern": "^(.*)$"
                 }

@@ -5,26 +5,26 @@ import { logger } from './utils/log';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
-const FULL_REQUIRED_ENDINGS = ['name', 'description'];
-const ONLY_NAME_REQUIRED_ENDINGS = ['name'];
+/**
+ * Each filter, group, tag should have two keys.
+ */
+const REQUIRED_ENDINGS = [
+    'name',
+    'description',
+];
+
 const LOCALES_FILE_EXTENSION = '.json';
 const BASE_LOCALE = 'en';
+
+const REQUIRED_FILES = [
+    'filters',
+    'groups',
+    'tags',
+].map((el) => `${el}${LOCALES_FILE_EXTENSION}`);
 
 // each message key should consist of three parts
 // e.g. 'filter.3.name' or 'tag.29.description'
 const MESSAGE_KEY_NAME_PARTS_COUNT = 3;
-
-const LOCALES_DATA = {
-    filters: {
-        required: FULL_REQUIRED_ENDINGS,
-    },
-    groups: {
-        required: ONLY_NAME_REQUIRED_ENDINGS,
-    },
-    tags: {
-        required: FULL_REQUIRED_ENDINGS,
-    },
-};
 
 const WARNING_REASONS = {
     MISSED_FILES: 'missed files',
@@ -55,7 +55,7 @@ const readDir = (dirPath) => fs.readdirSync(path.resolve(__dirname, dirPath), 'u
  * @param {string} id filters / groups / tags
  */
 const areValidMessagesKeys = (keys, id) => {
-    if (keys.length !== LOCALES_DATA[id].required.length) {
+    if (keys.length !== REQUIRED_ENDINGS.length) {
         return false;
     }
     const areValidKeys = !keys
@@ -67,14 +67,14 @@ const areValidMessagesKeys = (keys, id) => {
                 || keyNameParts[0] !== propPrefix
                 || !(Number.isInteger(filterId))
                 || !(filterId > 0)
-                || !(LOCALES_DATA[id].required.includes(keyNameParts[2]));
+                || !(REQUIRED_ENDINGS.includes(keyNameParts[2]));
         });
     return areValidKeys;
 };
 
 /**
  * Validates locale messages values
- * @param {string[]} values - locale messages values
+ * @param {string[]} values
  */
 const areValidMessagesValues = (values) => values.every((v) => v !== '');
 
@@ -93,11 +93,8 @@ const prepareWarningDetails = (obj) => {
 };
 
 /**
- * Retrieves the keys from the base locale files in the specified directory.
- *
- * @param {string} dirPath - The path to the directory containing the base locale files.
- * @returns {Object<string, string[]>} An object where each key is a file name and the value is an array of keys
- * extracted from the corresponding base locale file.
+ * Returns map of base locale keys
+ * @param dirPath
  */
 const getBaseLocaleKeys = (dirPath) => {
     const baseLocaleKeys = {};
@@ -114,9 +111,9 @@ const getBaseLocaleKeys = (dirPath) => {
 
 /**
  * Compares messagesData keys to base locale keys
- * @param baseLocaleKeys - Keys from base locale files
- * @param messagesData - Messages data from the current locale
- * @param localeWarnings - Warnings array for the current locale
+ * @param baseLocaleKeys
+ * @param messagesData
+ * @param localeWarnings
  */
 const compareKeys = (baseLocaleKeys, messagesData, localeWarnings) => {
     const messagesDataKeys = messagesData.flatMap((entry) => Object.keys(entry));
@@ -206,16 +203,13 @@ const validate = (dirPath, requiredLocales) => {
         throw new Error(`Locales dir '${dirPath}' is empty`);
     }
 
-    const requiredFiles = Object.keys(LOCALES_DATA)
-        .map((el) => `${el}${LOCALES_FILE_EXTENSION}`);
-
     const baseLocaleKeysMap = getBaseLocaleKeys(dirPath);
 
     locales.forEach((locale) => {
         const localeWarnings = [];
         const filesList = readDir(path.join(dirPath, locale));
         // checks all needed files presence
-        const missedFiles = requiredFiles
+        const missedFiles = REQUIRED_FILES
             .filter((el) => !filesList.includes(el));
         if (missedFiles.length !== 0) {
             localeWarnings.push([
@@ -226,7 +220,7 @@ const validate = (dirPath, requiredLocales) => {
             ]);
         }
 
-        const presentFiles = requiredFiles
+        const presentFiles = REQUIRED_FILES
             .filter((el) => !missedFiles.includes(el));
 
         // iterate over existent files
