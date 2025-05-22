@@ -2,7 +2,7 @@
  * @file Platforms configuration.
  *
  * It shall be overridden by custom configuration:
- * @see {@link https://github.com/AdguardTeam/FiltersRegistry/blob/master/custom_platforms.js}
+ * @see {@link https://github.com/AdguardTeam/FiltersRegistry/blob/master/scripts/build/custom_platforms.js}
  *
  * IMPORTANT: During making any changes in this file,
  * the custom_platforms.js should also be updated through PR on GitHub.
