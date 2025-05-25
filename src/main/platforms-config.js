@@ -436,8 +436,8 @@ const JAVASCRIPT_RULES_PATTERNS = [
  * ```windowslite.net#$#body { overflow: auto !important; }```
  */
 const CSS_RULES_PATTERNS = [
-    '#%#',
-    '#@%#',
+    '#\\$#',
+    '#@\\$#',
 ];
 
 /**
@@ -536,17 +536,27 @@ const SAFARI_BASED_EXTENSION_PATTERNS = [
 ];
 
 /**
- * Pattern to detect entries which are not supported in uBlock Origin
- * among them known to be `:matches-property` and generic style rules
+ * Pattern to detect Extended CSS `:matches-property()` rules
  *
  * @example
  * ```unsplash.com#?#.ripi6 > div:matches-property(/__reactFiber/.return.return.memoizedProps.ad)```
  * @example
- * ```##div[class="adsbygoogle"][id="ad-detector"] { display: block !important; }```
+ * ```androidauthority.com#?#main div[class]:has(> div[class]:matches-property(/__reactFiber/.return.memoizedProps.type=med_rect_atf))```
  */
-const UBLOCK_BASED_EXTENSION_PATTERNS = [
+const CSS_MATCHES_PROPERTY_RULES_PATTERNS = [
     ':matches-property\\(',
-    '^#.* ?\{ ?[a-z]'
+];
+
+/**
+ * Pattern to detect generic CSS rules
+ *
+ * @example
+ * ```#$#div[class="adsbygoogle"][id="ad-detector"] { display: block !important; }```
+ * @example
+ * ```#$#.pub_728x90.text-ad.textAd.text_ad.text_ads.text-ads.text-ad-links { display: block !important; }```
+ */
+const CSS_GENERIC_RULES_PATTERNS = [
+    '^#\\$#',
 ];
 
 module.exports = {
@@ -800,7 +810,8 @@ module.exports = {
                 ...JSONPRUNE_MODIFIER_PATTERNS,
                 ...UNBLOCKING_IMPORTANT_RULES_PATTERNS,
                 ...REMOVEHEADER_MODIFIER_PATTERNS,
-                ...UBLOCK_BASED_EXTENSION_PATTERNS,
+                ...CSS_MATCHES_PROPERTY_RULES_PATTERNS, // TODO: remove when this issue is fixed - https://github.com/AdguardTeam/FiltersCompiler/issues/252
+                ...CSS_GENERIC_RULES_PATTERNS,
             ],
             'ignoreRuleHints': false,
             'adbHeader': '![Adblock Plus 2.0]',
