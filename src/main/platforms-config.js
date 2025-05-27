@@ -535,6 +535,7 @@ const SAFARI_BASED_EXTENSION_PATTERNS = [
     ...JSONPRUNE_MODIFIER_PATTERNS,
 ];
 
+/* eslint-disable max-len */
 /**
  * Pattern to detect Extended CSS `:matches-property()` rules
  *
@@ -546,6 +547,7 @@ const SAFARI_BASED_EXTENSION_PATTERNS = [
 const CSS_MATCHES_PROPERTY_RULES_PATTERNS = [
     ':matches-property\\(',
 ];
+/* eslint-enable max-len */
 
 /**
  * Pattern to detect generic CSS rules
