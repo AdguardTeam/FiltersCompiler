@@ -122,6 +122,7 @@ describe('platforms filter', () => {
                 'removeRulePatterns': [
                     '\\[-ext-',
                     ':has\\(',
+                    ':matches-property\\(',
                     '\\$stealth',
                     '\\$content',
                     ',content(,|$)',
@@ -155,6 +156,7 @@ describe('platforms filter', () => {
             '@@||example.com$stealth',
             'javarchive.com##.sidebar_list > .widget_text:has(a[title = "ads"])',
             "aranzulla.it##body > div[id][class][-ext-has=\"a[href^='/locked-no-script.php']\"]",
+            'example.org#?#div:matches-property(/__reactFiber/.return.return.memoizedProps.ad)',
             '@@||example.net^$content',
             '@@||example.com^$content,elemhide,jsinject',
             '@@||example.com^$elemhide,content,jsinject',
@@ -166,6 +168,84 @@ describe('platforms filter', () => {
             '||example.org^$xmlhttprequest,removeparam=param',
             '@@||example.org^$all',
             '||example.org^$xmlhttprequest,removeheader=location',
+        ];
+
+        const before = [
+            ...notMatchRules,
+            ...matchRules,
+        ];
+
+        const after = filter.cleanupRules(before, config, 0);
+
+        expect(after).toBeDefined();
+        expect(after).toEqual(notMatchRules);
+    });
+
+    it('Test remove generic CSS rule patterns', () => {
+        const config = {
+            'platform': 'test',
+            'path': 'hints',
+            'configuration': {
+                'removeRulePatterns': [
+                    '^#\\$#',
+                ],
+                'ignoreRuleHints': false,
+            },
+        };
+
+        const notMatchRules = [
+            'example.com',
+            'example.com###ad3',
+            '||example.org^$domain=example.com',
+            '@@||example.org^$domain=example.com,elemhide',
+            'apkpure.com#%#//scriptlet("set-constant", "$$.analytics.send", "noopFunc")',
+            'example.com#$#.advert { display: none !important; }',
+            'example.com#$#.cookie { position: absolute !important; left: -9999px !important; }',
+        ];
+        const matchRules = [
+            '#$#div[class="adsbygoogle"][id="ad-detector"] { display: block !important; }',
+            '#$#.adsbygoogle[style] { position: absolute !important; left: -9999px !important; }',
+            '#$#.pub_728x90.text-ad.textAd.text_ad.text_ads.text-ads.text-ad-links { display: block !important; }',
+        ];
+
+        const before = [
+            ...notMatchRules,
+            ...matchRules,
+        ];
+
+        const after = filter.cleanupRules(before, config, 0);
+
+        expect(after).toBeDefined();
+        expect(after).toEqual(notMatchRules);
+    });
+
+    it('Test remove CSS rule patterns', () => {
+        const config = {
+            'platform': 'test',
+            'path': 'hints',
+            'configuration': {
+                'removeRulePatterns': [
+                    '#\\$#',
+                    '#@\\$#',
+                ],
+                'ignoreRuleHints': false,
+            },
+        };
+
+        const notMatchRules = [
+            'example.com',
+            'example.com###ad3',
+            '||example.org^$domain=example.com',
+            '@@||example.org^$domain=example.com,elemhide',
+            'apkpure.com#%#//scriptlet("set-constant", "$$.analytics.send", "noopFunc")',
+        ];
+        const matchRules = [
+            'example.com#@$#.ads { display: none !important; }',
+            'example.com#$#.advert { display: none !important; }',
+            'example.com#$#.cookie { position: absolute !important; left: -9999px !important; }',
+            '#$#div[class="adsbygoogle"][id="ad-detector"] { display: block !important; }',
+            '#$#.adsbygoogle[style] { position: absolute !important; left: -9999px !important; }',
+            '#$#.pub_728x90.text-ad.textAd.text_ad.text_ads.text-ads.text-ad-links { display: block !important; }',
         ];
 
         const before = [
