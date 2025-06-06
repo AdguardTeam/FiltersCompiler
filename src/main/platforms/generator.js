@@ -681,6 +681,7 @@ module.exports = (() => {
                 metadata = workaround.rewriteMetadataForOldMacV1(metadata);
             } else if (platform === 'MAC_V2') {
                 metadata = workaround.rewriteMetadataForOldMacV2(metadata);
+                metadata = removeObsoleteFilters(metadata);
             } else {
                 metadata = removeObsoleteFilters(metadata);
             }

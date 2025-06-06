@@ -675,6 +675,10 @@ describe('Test builder', () => {
                 expect(englishFilter.languages[1]).toEqual('pl');
                 expect(englishFilter.tags).toEqual(undefined);
                 expect(englishFilter.trustLevel).toEqual(undefined);
+
+                // Obsolete filters should be present for `mac` (v1) platform
+                expect(macFiltersMetadata.filters.some((filter) => filter.filterId === 6)).toBeTruthy();
+                expect(macFiltersMetadata.filters.some((filter) => filter.name === 'Obsolete Test Filter')).toBeTruthy();
             });
 
             it('platform/mac filters_i18n.json', async () => {
@@ -696,6 +700,9 @@ describe('Test builder', () => {
                 expect(enGroup.name).toEqual('Adguard Filters');
                 // no new field should be added to old 'mac' platform
                 expect(enGroup.description).toEqual(undefined);
+
+                // obsolete filter i18n metadata should be present
+                expect(Object.keys(macFiltersI18nMetadata.filters).some((id) => id === '6')).toBeTruthy();
             });
 
             it('platform/mac filters 2.txt', async () => {
@@ -780,6 +787,10 @@ describe('Test builder', () => {
                 expect(englishFilter.trustLevel).toEqual('full');
                 expect(englishFilter.downloadUrl).toEqual('https://filters.adtidy.org/mac_v2/filters/2.txt');
                 expect(englishFilter.deprecated).toEqual(true);
+
+                // Obsolete filters should be removed for `mac_v2` platform
+                expect(macV2FiltersMetadata.filters.some((filter) => filter.filterId === 6)).toBeFalsy();
+                expect(macV2FiltersMetadata.filters.some((filter) => filter.name === 'Obsolete Test Filter')).toBeFalsy();
             });
 
             it('platform/mac_v2 filters_i18n.json', async () => {
@@ -802,6 +813,9 @@ describe('Test builder', () => {
                 expect(enGroup.name).toEqual('Adguard Filters');
                 // group description in localized metadata should not break anything
                 expect(enGroup.description).toEqual('Adguard Filters description');
+
+                // obsolete filter i18n metadata should be removed
+                expect(Object.keys(macV2FiltersI18nMetadata.filters).some((id) => id === '6')).toBeFalsy();
             });
 
             it('platform/mac_v2 filters 2.txt', async () => {
@@ -872,30 +886,37 @@ describe('Test builder', () => {
                 expect(englishFilter.trustLevel).toEqual('full');
                 expect(englishFilter.downloadUrl).toEqual('https://filters.adtidy.org/mac_v3/filters/2.txt');
                 expect(englishFilter.deprecated).toEqual(true);
+
+                // Obsolete filters should be removed for `mac_v3` platform
+                expect(macV3FiltersMetadata.filters.some((filter) => filter.filterId === 6)).toBeFalsy();
+                expect(macV3FiltersMetadata.filters.some((filter) => filter.name === 'Obsolete Test Filter')).toBeFalsy();
             });
 
-            it('platform/mac_v2 filters_i18n.json', async () => {
-                const macV2FiltersI18nMetadataContent = await readFile(path.join(platformsDir, 'mac_v2', 'filters_i18n.json'));
-                expect(macV2FiltersI18nMetadataContent).toBeTruthy();
+            it('platform/mac_v3 filters_i18n.json', async () => {
+                const macV3FiltersI18nMetadataContent = await readFile(path.join(platformsDir, 'mac_v3', 'filters_i18n.json'));
+                expect(macV3FiltersI18nMetadataContent).toBeTruthy();
 
-                const macV2FiltersI18nMetadata = JSON.parse(macV2FiltersI18nMetadataContent);
-                expect(macV2FiltersI18nMetadata).toBeTruthy();
-                expect(Object.keys(macV2FiltersI18nMetadata).length).toEqual(3);
+                const macV3FiltersI18nMetadata = JSON.parse(macV3FiltersI18nMetadataContent);
+                expect(macV3FiltersI18nMetadata).toBeTruthy();
+                expect(Object.keys(macV3FiltersI18nMetadata).length).toEqual(3);
 
-                expect(macV2FiltersI18nMetadata.filters).toBeTruthy();
-                expect(macV2FiltersI18nMetadata.groups).toBeTruthy();
-                expect(macV2FiltersI18nMetadata.tags).toBeTruthy();
+                expect(macV3FiltersI18nMetadata.filters).toBeTruthy();
+                expect(macV3FiltersI18nMetadata.groups).toBeTruthy();
+                expect(macV3FiltersI18nMetadata.tags).toBeTruthy();
 
-                const group = macV2FiltersI18nMetadata.groups['1'];
+                const group = macV3FiltersI18nMetadata.groups['1'];
                 expect(group).toBeTruthy();
                 const enGroup = group.en;
                 expect(enGroup).toBeTruthy();
                 expect(enGroup.name).toEqual('Adguard Filters');
                 expect(enGroup.description).toEqual('Adguard Filters description');
+
+                // obsolete filter i18n metadata should be removed
+                expect(Object.keys(macV3FiltersI18nMetadata.filters).some((id) => id === '6')).toBeFalsy();
             });
 
-            it('platform/mac_v2 filters 2.txt', async () => {
-                const filterContent = await readFile(path.join(platformsDir, 'mac_v2', 'filters', '2.txt'));
+            it('platform/mac_v3 filters 2.txt', async () => {
+                const filterContent = await readFile(path.join(platformsDir, 'mac_v3', 'filters', '2.txt'));
                 expect(filterContent).toBeTruthy();
 
                 const filterLines = filterContent.split(/\r?\n/);
