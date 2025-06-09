@@ -5,11 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v1.2.7] - 2025-05-03
+## [v2.0.0] - 2025-06-09
 
 ## Added
 
-- [@adguard/agtree] v3.1.0 for rules conversion and validation.
+- [@adguard/agtree] v3.2.1 for rules conversion and validation.
 
 ### Changed
 
@@ -24,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Issue with regex in `$domain` modifier [#241].
 - Issue with regex in `$url` modifier [#237].
 
-[v1.2.1]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.149...v1.2.1
+[v2.0.0]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.2.6...v2.0.0
 [#242]: https://github.com/AdguardTeam/FiltersCompiler/issues/242
 [#241]: https://github.com/AdguardTeam/FiltersCompiler/issues/241
 [#237]: https://github.com/AdguardTeam/FiltersCompiler/issues/237
