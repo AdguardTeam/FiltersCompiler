@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v2.0.0] - 2025-06-09
+## [v2.0.0] - 2025-06-11
 
 ## Added
 
@@ -24,10 +24,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Issue with regex in `$domain` modifier [#241].
 - Issue with regex in `$url` modifier [#237].
 
-[v2.0.0]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.2.6...v2.0.0
+[v2.0.0]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.2.8...v2.0.0
 [#242]: https://github.com/AdguardTeam/FiltersCompiler/issues/242
 [#241]: https://github.com/AdguardTeam/FiltersCompiler/issues/241
 [#237]: https://github.com/AdguardTeam/FiltersCompiler/issues/237
+
+## [v1.2.8] - 2025-06-06
+
+### Fixed
+
+- Removing obsolete filters from `filters.json` and `filters_i18n.json` metadata
+  for `mac_v2` platform.
+
+[v1.2.8]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.2.7...v1.2.8
+
+## [v1.2.7] - 2025-05-28
+
+### Added
+
+- Patterns for `:matches-property()` and generic CSS rules.
+
+### Changed
+
+- Exclude `$removeheader`, `:matches-property()` and generic CSS rules from uBO filter lists.
+
+### Fixed
+
+- Patterns for CSS rules.
+
+[v1.2.7]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.2.6...v1.2.7
 
 ## [v1.2.6] - 2025-04-29
 
