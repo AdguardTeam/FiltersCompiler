@@ -93,10 +93,6 @@ export const convertToUbo = (rules) => {
                 if (ruleNode.type === CosmeticRuleType.JsInjectionRule) {
                     return;
                 }
-                // TODO: implement HTML filtering rules conversion in uBO
-                if (ruleNode.type === CosmeticRuleType.HtmlFilteringRule) {
-                    return;
-                }
                 if (ruleNode.type === CosmeticRuleType.ScriptletInjectionRule) {
                     const scriptletNode = ruleNode.body.children[0].children[0];
                     const scriptletNameString = trimQuotes(scriptletNode.value);

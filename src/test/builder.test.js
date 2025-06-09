@@ -264,42 +264,40 @@ describe('Test builder', () => {
             expect(filterLines.includes('regularexpression_not_excluded')).toBeTruthy();
         });
 
-        // FIXME: Uncomment when the test is fixed
-        // it('platforms/test filters 5.txt', async () => {
-        //     const filterContent = await readFile(path.join(__dirname, 'resources/platforms/test', 'filters', '5.txt'));
-        //     const filterLines = filterContent.split(/\r?\n/);
-        //     expect(filterLines.length).toEqual(55);
+        it('platforms/test filters 5.txt', async () => {
+            const filterContent = await readFile(path.join(__dirname, 'resources/platforms/test', 'filters', '5.txt'));
+            const filterLines = filterContent.split(/\r?\n/);
+            expect(filterLines.length).toEqual(55);
+            const presentRules = [
+                '||adsnet.com/*/700x350.gif$domain=example.com',
+                'example.com##+js(set-constant, ads, false)',
+                'test.com##+js(abort-on-property-read, adsShown)',
+                'example.com##+js(disable-newtab-links)',
+                'test.com#@#+js(abort-on-property-read, some.prop)',
+                '||www.ynet.co.il^$important,websocket,~3p,domain=www.ynet.co.il',
+                'example.com##^script:has-text(12313)',
+                '||adsnet.com/*/700x350.gif$domain=example.com',
+                '||example.com/banner$image,redirect=3x2.png',
+                '||test.com^$script,redirect=noop.js',
+                '||example.com/*.mp4$media,redirect=noop-1s.mp4',
+                '||example.com^$script,redirect-rule=noop.js',
+            ];
+            presentRules.forEach((rule) => {
+                expect(filterLines.includes(rule)).toBeTruthy();
+            });
 
-        //     const presentRules = [
-        //         '||adsnet.com/*/700x350.gif$domain=example.com',
-        //         'example.com##+js(set-constant, ads, false)',
-        //         'test.com##+js(abort-on-property-read, adsShown)',
-        //         'example.com##+js(disable-newtab-links)',
-        //         'test.com#@#+js(abort-on-property-read, some.prop)',
-        //         '||www.ynet.co.il^$important,websocket,~3p,domain=www.ynet.co.il',
-        //         'example.com$$script[tag-content="12313"][max-length="262144"]',
-        //         '||adsnet.com/*/700x350.gif$domain=example.com',
-        //         '||example.com/banner$image,redirect=3x2.png',
-        //         '||test.com^$script,redirect=noop.js',
-        //         '||example.com/*.mp4$media,redirect=noop-1s.mp4',
-        //         '||example.com^$script,redirect-rule=noop.js',
-        //     ];
-        //     presentRules.forEach((rule) => {
-        //         expect(filterLines.includes(rule)).toBeTruthy();
-        //     });
-
-        //     const absentRules = [
-        //         'rybnik.com.pl##^iframe[name]:not([class]):not([id]):not([src])[style="display:none"]',
-        //         'test.com#%#AG_setConstant("ads", "false");',
-        //         "test.com#@%#Object.defineProperty(window, 'abcde', { get: function() { return []; } });",
-        //         '||example.com/api/v1/ad/*/json$replace=/html/abcd\\,/i',
-        //         'example.com#%#//scriptlet(\'trusted-set-local-storage-item\', \'iName\', \'iValue\')',
-        //         'example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")',
-        //     ];
-        //     absentRules.forEach((rule) => {
-        //         expect(filterLines.includes(rule)).toBeFalsy();
-        //     });
-        // });
+            const absentRules = [
+                'rybnik.com.pl##^iframe[name]:not([class]):not([id]):not([src])[style="display:none"]',
+                'test.com#%#AG_setConstant("ads", "false");',
+                "test.com#@%#Object.defineProperty(window, 'abcde', { get: function() { return []; } });",
+                '||example.com/api/v1/ad/*/json$replace=/html/abcd\\,/i',
+                'example.com#%#//scriptlet(\'trusted-set-local-storage-item\', \'iName\', \'iValue\')',
+                'example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")',
+            ];
+            absentRules.forEach((rule) => {
+                expect(filterLines.includes(rule)).toBeFalsy();
+            });
+        });
 
         it('platforms/test2 filters 5.txt', async () => {
             const filterContent = await readFile(path.join(__dirname, 'resources/platforms/test2', 'filters', '5.txt'));
@@ -450,7 +448,6 @@ describe('Test builder', () => {
             expect(localScriptRulesJson.rules).toBeTruthy();
         });
 
-        // FIXME: Uncomment when the test is fixed
         it('platform/test filters 2.txt', async () => {
             // directory 'test' is used for 'ext_ublock' platform;
             // see src/test/resources/platforms.json
@@ -458,8 +455,7 @@ describe('Test builder', () => {
             expect(filterContent).toBeTruthy();
 
             const filterLines = filterContent.split(/\r?\n/);
-            expect(filterLines.length).toEqual(49);
-            // expect(filterLines.length).toEqual(50);
+            expect(filterLines.length).toEqual(50);
             expect(filterLines[2]).toEqual('! Title: AdGuard Base filter + EasyList');
 
             const presentLines = [
@@ -467,8 +463,7 @@ describe('Test builder', () => {
                 'test-common-rule.com',
                 'test-common-1-rule.com',
                 '! some common rules could be places here',
-                // Revert when HTML conversion will be implemented
-                // '~example.com,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]',
+                '~example.com,google.com##^div[id="ad_text"][wildcard="*teasernet*tararar*"]',
                 'excluded_platform',
                 '!+ NOT_OPTIMIZED',
                 'test-common-2-rule.com',
@@ -498,9 +493,7 @@ describe('Test builder', () => {
             expect(filterContent).toBeTruthy();
 
             const filterLines = filterContent.split(/\r?\n/);
-            expect(filterLines.length).toEqual(33);
-            // Revert when HTML conversion will be implemented
-            // expect(filterLines.length).toEqual(34);
+            expect(filterLines.length).toEqual(34);
             expect(filterLines[2]).toEqual('! Title: AdGuard Base filter + EasyList (Optimized)');
 
             // $webrtc is deprecated
