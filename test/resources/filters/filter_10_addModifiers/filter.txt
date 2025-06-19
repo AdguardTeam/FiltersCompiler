@@ -1,0 +1,57 @@
+! Homepage: http://adguard.com/filters.html#english
+! License: http://creativecommons.org/licenses/by-sa/3.0/
+!
+!#if (adguard_app_mac)
+a155e09a56.reuters.tv$image
+albany.townsquarenewsletters.com$image
+alerts.dmgt.com$image
+aremedia.e.aremedia.com.au$image
+auto.scissorsscotch.com$image
+track.domain.com$image
+criteo.com$image,script
+go.pardot.com$all,image
+!#endif
+!#if (adguard_app_ios)
+! Title: AdGuard CNAME disguised mail_trackers list
+! Description: The list of unique mail_trackers domains that disguise the real trackers by using CNAME records.
+! TimeUpdated: 2023-10-16T08:00:16+00:00
+! Homepage: https://github.com/AdguardTeam/cname-trackers
+!
+!+ NOT_OPTIMIZED
+a155e09a56.reuters.tv$image,script
+!+ NOT_OPTIMIZED
+albany.townsquarenewsletters.com$image,script
+!+ NOT_OPTIMIZED
+alerts.dmgt.com$image,script
+! comment
+!+ NOT_OPTIMIZED
+aremedia.e.aremedia.com.au$image,script
+!+ NOT_OPTIMIZED
+auto.scissorsscotch.com$image,script
+! Avoid duplicates in modifiers list
+! Add new entries to the end of the list comma-separated
+!+ NOT_OPTIMIZED
+track.domain.com$image,script
+!+ NOT_OPTIMIZED
+criteo.com$image,script
+!+ NOT_OPTIMIZED
+go.pardot.com$all,image,script
+!#endif
+!#if (adguard_ext_edge)
+!+ NOT_OPTIMIZED
+a155e09a56.reuters.tv$all
+!+ NOT_OPTIMIZED
+albany.townsquarenewsletters.com$all
+!+ NOT_OPTIMIZED
+alerts.dmgt.com$all
+!+ NOT_OPTIMIZED
+aremedia.e.aremedia.com.au$all
+!+ NOT_OPTIMIZED
+auto.scissorsscotch.com$all
+!+ NOT_OPTIMIZED
+track.domain.com$image,all
+!+ NOT_OPTIMIZED
+criteo.com$image,script,all
+!+ NOT_OPTIMIZED
+go.pardot.com$all
+!#endif

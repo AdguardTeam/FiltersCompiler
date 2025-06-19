@@ -1,0 +1,7 @@
+! Homepage: http://adguard.com/filters.html#test
+! License: http://creativecommons.org/licenses/by-sa/3.0/
+!
+test.com###advert
+||example.com$script
+example.com#$#body { background: green !important }
+@@||test.net$jsinject
