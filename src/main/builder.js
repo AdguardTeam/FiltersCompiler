@@ -81,7 +81,7 @@ const writeFile = function (path, data) {
  * @param string
  */
 const splitLines = function (string) {
-    return string.split(/[\r\n]+/);
+    return string.split(/\r?\n/);
 };
 
 /**
