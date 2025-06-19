@@ -83,14 +83,7 @@ const areValidMessagesValues = (values) => values.every((v) => v !== '');
  * @param {Object} obj iterable locales messages object
  * @returns {Array}
  */
-const prepareWarningDetails = (obj) => {
-    const details = Object.keys(obj)
-        .reduce((acc, key) => {
-            acc.push(`"${key}": "${obj[key]}"`);
-            return acc;
-        }, []);
-    return details;
-};
+const prepareWarningDetails = (obj) => Object.entries(obj).map(([key, value]) => `"${key}": "${value}"`);
 
 /**
  * Returns map of base locale keys
@@ -134,15 +127,7 @@ const compareKeys = (baseLocaleKeys, messagesData, localeWarnings) => {
  * @param {Array[]} warnings collected raw warnings
  * @returns {Warning[]}
  */
-const prepareWarnings = (warnings) => {
-    const output = warnings
-        .reduce((acc, data) => {
-            const [type, reason, details] = data;
-            acc.push({ type, reason, details });
-            return acc;
-        }, []);
-    return output;
-};
+const prepareWarnings = (warnings) => warnings.map(([type, reason, details]) => ({ type, reason, details }));
 
 /**
  * @typedef {Object} Warning

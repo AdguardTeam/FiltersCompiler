@@ -15,11 +15,8 @@ import {
     rewriteMetadataForOldMacV2,
     modifyBaseFilterHeader,
 } from '../utils/workaround';
-
 import { convertToUbo } from '../converter';
-
 import { getFilterOptimizationConfig } from '../optimization';
-
 import { RuleMasks } from '../rule/rule-masks';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);

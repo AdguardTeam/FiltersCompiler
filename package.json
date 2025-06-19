@@ -1,46 +1,46 @@
 {
-  "name": "adguard-filters-compiler",
-  "version": "2.0.0",
-  "description": "AdGuard filters compiler",
-  "homepage": "http://adguard.com",
-  "type": "module",
-  "main": "dist/index.js",
-  "scripts": {
-    "build": "rollup --config rollup.config.js --silent",
-    "test": "vitest",
-    "lint": "eslint --cache .",
-    "increment": "yarn version --patch --no-git-tag-version",
-    "build-txt": "node tasks/build-txt.mjs",
-    "build-schemas": "node tasks/build-schemas/index.js",
-    "prepare": "husky install"
-  },
-  "engines": {
-    "node": ">=20"
-  },
-  "dependencies": {
-    "@adguard/agtree": "^3.2.1",
-    "@adguard/ecss-tree": "^1.1.0",
-    "@adguard/extended-css": "^2.1.1",
-    "@adguard/filters-downloader": "^2.4.0",
-    "@adguard/scriptlets": "^2.1.7",
-    "@adguard/tsurlfilter": "^3.2.2",
-    "ajv": "^8.17.1",
-    "child_process": ">=1.0.2",
-    "jsdom": "^21.1.1",
-    "md5": "2.3.0",
-    "moment": "^2.29.4",
-    "tldts": "^5.7.112",
-    "utf8": "^3.0.0"
-  },
-  "devDependencies": {
-    "@types/jsdom": "^21.1.7",
-    "eslint": "8.57.1",
-    "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-import-resolver-exports": "^1.0.0-beta.5",
-    "eslint-plugin-import": "^2.31.0",
-    "husky": "^8.0.2",
-    "rollup": "^4.39.0",
-    "rollup-plugin-copy": "^3.5.0",
-    "vitest": "^3.0.5"
-  }
+    "name": "adguard-filters-compiler",
+    "version": "2.0.0",
+    "description": "AdGuard filters compiler",
+    "homepage": "http://adguard.com",
+    "type": "module",
+    "main": "dist/index.js",
+    "scripts": {
+        "build": "rollup --config rollup.config.js --silent",
+        "test": "vitest",
+        "lint": "eslint --cache .",
+        "increment": "yarn version --patch --no-git-tag-version",
+        "build-txt": "node tasks/build-txt.mjs",
+        "build-schemas": "node tasks/build-schemas/index.js",
+        "prepare": "husky install"
+    },
+    "engines": {
+        "node": ">=20"
+    },
+    "dependencies": {
+        "@adguard/agtree": "^3.2.1",
+        "@adguard/ecss-tree": "^1.1.0",
+        "@adguard/extended-css": "^2.1.1",
+        "@adguard/filters-downloader": "^2.4.0",
+        "@adguard/scriptlets": "^2.1.7",
+        "@adguard/tsurlfilter": "^3.2.2",
+        "ajv": "^8.17.1",
+        "child_process": ">=1.0.2",
+        "jsdom": "^21.1.1",
+        "md5": "2.3.0",
+        "moment": "^2.29.4",
+        "tldts": "^5.7.112",
+        "utf8": "^3.0.0"
+    },
+    "devDependencies": {
+        "@types/jsdom": "^21.1.7",
+        "eslint": "8.57.1",
+        "eslint-config-airbnb-base": "^15.0.0",
+        "eslint-import-resolver-exports": "^1.0.0-beta.5",
+        "eslint-plugin-import": "^2.31.0",
+        "husky": "^8.0.2",
+        "rollup": "^4.39.0",
+        "rollup-plugin-copy": "^3.5.0",
+        "vitest": "^3.0.5"
+    }
 }

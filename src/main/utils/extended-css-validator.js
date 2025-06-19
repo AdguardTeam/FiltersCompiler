@@ -2,6 +2,7 @@
  * ExtendedCss is not supposed to work without window environment,
  * so we pass some wrapper dummy.
  */
+// TODO: switch to aglint in compiler
 import { TextEncoder, TextDecoder } from 'util';
 import { createRequire } from 'module';
 

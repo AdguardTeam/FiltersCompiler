@@ -97,8 +97,10 @@ const stripComments = function (lines) {
             return true;
         }
 
-        if (line.startsWith(RuleMasks.MASK_HINT)
-            || line.startsWith(RuleMasks.MASK_DIRECTIVES)) {
+        if (
+            line.startsWith(RuleMasks.MASK_HINT)
+            || line.startsWith(RuleMasks.MASK_DIRECTIVES)
+        ) {
             return true;
         }
 
