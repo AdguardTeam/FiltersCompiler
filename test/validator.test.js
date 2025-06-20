@@ -214,12 +214,12 @@ describe('validator', () => {
             });
 
             it.each([
-                'example.com#$##header-floating\\ navbar { position: absolute !important; }',
-                'example.com#$##site-header\\ 1 > .site-header-main { height: 167.3px !important; }',
-                'example.com#$#.pmc-u-background-white.\\/\\/.header__bar { position: relative !important; transform: translateY(0) !important; }',
-                'example.com#$#.o-sticky_header\\@tp- { position: relative !important; }',
-                'example.com#$##atomic .Mt\\(headerHeight\\) { margin-top: 22px !important; }',
-                'example.com#$##\\#novella-header { position: relative !important; top: 0 !important; }',
+                String.raw`example.com#$##header-floating\ navbar { position: absolute !important; }`,
+                String.raw`example.com#$##site-header\ 1 > .site-header-main { height: 167.3px !important; }`,
+                String.raw`example.com#$#.pmc-u-background-white.\/\.header__bar { position: relative !important; transform: translateY(0) !important; }`,
+                String.raw`example.com#$#.o-sticky_header\@tp- { position: relative !important; }`,
+                String.raw`example.com#$##atomic .Mt\(headerHeight\) { margin-top: 22px !important; }`,
+                String.raw`example.com#$##\#novella-header { position: relative !important; top: 0 !important; }`,
             ])('%s', (rule) => {
                 const invalid = [];
                 const result = validateAndFilterRules([rule], [], invalid);

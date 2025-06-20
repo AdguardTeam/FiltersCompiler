@@ -603,7 +603,7 @@ describe('converter', () => {
             expect(excluded).toHaveLength(2);
             expect(excluded).toEqual(
                 [
-                    '! Unable to convert rule to AdGuard syntax: "example.org#$#selector:style()" due to error: \'AdblockPlus\' syntax cannot be mixed with \'UblockOrigin\' syntax',
+                    "! Unable to convert rule to AdGuard syntax: \"example.org#$#selector:style()\" due to error: 'AdblockPlus' syntax cannot be mixed with 'UblockOrigin' syntax",
                     'example.org#$#selector:style()',
                 ],
             );
@@ -615,7 +615,7 @@ describe('converter', () => {
             expect(excluded).toHaveLength(2);
             expect(excluded).toEqual(
                 [
-                    '! Unable to convert rule to AdGuard syntax: "yamareco.com#$#body.header_bg_ad.modal-open:style(padding-right: auto !important;overflow: auto!important)" due to error: \'AdblockPlus\' syntax cannot be mixed with \'UblockOrigin\' syntax',
+                    "! Unable to convert rule to AdGuard syntax: \"yamareco.com#$#body.header_bg_ad.modal-open:style(padding-right: auto !important;overflow: auto!important)\" due to error: 'AdblockPlus' syntax cannot be mixed with 'UblockOrigin' syntax",
                     'yamareco.com#$#body.header_bg_ad.modal-open:style(padding-right: auto !important;overflow: auto!important)',
                 ],
             );
@@ -633,16 +633,16 @@ describe('converter', () => {
                 expected: 'example.com#@#:matches-path(/page) p',
             },
             {
-                source: '[$path=/\\/(sub1|sub2)\\/page\\.html/]example.com##p',
-                expected: String.raw`example.com##:matches-path(/\\/(sub1|sub2)\\/page\\.html/) p`,
+                source: String.raw`[$path=/\\/(sub1|sub2)\\/page\\.html/]example.com##p`,
+                expected: String.raw`example.com##:matches-path(/\\\\/(sub1|sub2)\\\\/page\\\\.html/) p`,
             },
             {
                 source: '[$path=/sexykpopidol]blog.livedoor.jp###containerWrap > #container > .blog-title-outer + #content.hfeed',
                 expected: 'blog.livedoor.jp##:matches-path(/sexykpopidol) #containerWrap > #container > .blog-title-outer + #content.hfeed',
             },
             {
-                source: '[$path=/\\/\[a|b|\,\]\\/page\\.html/]example.com## #test',
-                expected: String.raw`example.com##:matches-path(/\/[a|b|):]\/page\.html/ #test`,
+                source: String.raw`[$path=/\/\[a|b|\,\]\/page\.html/]example.com## #test`,
+                expected: String.raw`example.com##:matches-path(/\\/\\\[a|b|\\\,\\\]\\/page\\.html/) #test`,
             },
             {
                 source: '[$domain=/example.(com\\|org)/]##.banner',
