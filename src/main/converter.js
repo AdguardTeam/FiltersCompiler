@@ -1,10 +1,13 @@
-const { RuleConverter } = require('@adguard/tsurlfilter');
-const scriptlets = require('@adguard/scriptlets');
+import {
+    RuleConverter,
+    RuleParser,
+    RuleGenerator,
+    CosmeticRuleType,
+} from '@adguard/agtree';
 
-const logger = require('./utils/log');
-const cosmeticRuleModifiers = require('./rule/cosmetic-rule-modifiers');
+import { logger } from './utils/log';
 
-const { redirects } = scriptlets;
+import { RuleMasks } from './rule/rule-masks';
 
 /**
  * Excludes rule
@@ -12,7 +15,7 @@ const { redirects } = scriptlets;
  * @param {array} excluded
  * @param {string} message
  */
-const excludeRule = (rule, excluded, message) => {
+export const excludeRule = (rule, excluded, message) => {
     if (excluded) {
         excluded.push(`! ${message}`);
         excluded.push(rule);
@@ -25,20 +28,23 @@ const excludeRule = (rule, excluded, message) => {
  * @param {array} [excluded]
  * @return {array} result
  */
-const convertRulesToAdgSyntax = function (rulesList, excluded) {
+export const convertRulesToAdgSyntax = (rulesList, excluded) => {
     const result = [];
 
     for (let i = 0; i < rulesList.length; i += 1) {
         const rule = rulesList[i];
         try {
-            const converted = RuleConverter.convertRule(rule, { ignoreAllModifier: true });
-            result.push(...converted);
-            if (converted && converted[0] !== rule) {
-                const message = `Rule "${rule}" converted to: "${[...converted]}"`;
+            const ruleNode = RuleParser.parse(rule);
+            const conversionResult = RuleConverter.convertToAdg(ruleNode);
+            const convertedRules = conversionResult.result.map((r) => RuleGenerator.generate(r));
+            result.push(...convertedRules);
+
+            if (conversionResult.isConverted) {
+                const message = `Rule "${rule}" converted to: "${[...convertedRules]}"`;
                 excludeRule(rule, excluded, message);
             }
         } catch (e) {
-            const message = `Unable to convert rule to AdGuard syntax: ${rule}`;
+            const message = `Unable to convert rule to AdGuard syntax: "${rule}" due to error: ${e.message}`;
             logger.log(message);
             excludeRule(rule, excluded, message);
         }
@@ -47,84 +53,77 @@ const convertRulesToAdgSyntax = function (rulesList, excluded) {
     return result;
 };
 
+const SINGLE_QUOTE = "'";
+const DOUBLE_QUOTE = '"';
+
 /**
- * Converts AdGuard rules to uBlock syntax
- * @param {array} rules
- * @param {string} ruleType
- * @param {function} validateMethod
- * @param {function} convertMethod
- * @return {array} modified rules
+ * Trims quotes (single or double) from the start and end of a string if they exist.
+ *
+ * @param {string} str - The string to trim.
+ * @returns {string} The trimmed string.
  */
-const convertToUbo = (rules, ruleType, validateMethod, convertMethod) => {
+export const trimQuotes = (str) => {
+    if (
+        (str.startsWith(SINGLE_QUOTE) && str.endsWith(SINGLE_QUOTE))
+        || (str.startsWith(DOUBLE_QUOTE) && str.endsWith(DOUBLE_QUOTE))
+    ) {
+        return str.slice(1, -1);
+    }
+    return str;
+};
+
+/**
+ * Converts a list of rules into uBO (uBlock Origin) syntax.
+ *
+ * @param {string[]} rules - An array of rules to be converted.
+ * @returns {string[]} An array of converted rules in uBO syntax. If no rules are provided, an empty array is returned.
+ *
+ * @throws {Error} Logs an error message if a rule cannot be converted due to a parsing or conversion issue.
+ */
+export const convertToUbo = (rules) => {
     const modified = [];
+    if (!rules) {
+        return modified;
+    }
     rules.forEach((rule) => {
-        if (rule && validateMethod(rule)) {
+        if (rule) {
             try {
-                const convertedRule = convertMethod(rule);
-                logger.log(`AdGuard ${ruleType} ${rule} converted to uBlock: ${convertedRule}`);
-                modified.push(convertedRule);
-            } catch (error) {
-                logger.error(`Cannot convert AdGuard ${ruleType} to uBlock: ${rule}\n${error}`);
+                const ruleNode = RuleParser.parse(rule);
+                // js injection rules are not supported in uBO
+                if (ruleNode.type === CosmeticRuleType.JsInjectionRule) {
+                    return;
+                }
+                if (ruleNode.type === CosmeticRuleType.ScriptletInjectionRule) {
+                    const scriptletNode = ruleNode.body.children[0].children[0];
+                    const scriptletNameString = trimQuotes(scriptletNode.value);
+
+                    if (!scriptletNameString) {
+                        // If the scriptlet name is missing, skip processing this rule
+                        return;
+                    }
+
+                    const scriptletName = trimQuotes(scriptletNameString);
+
+                    // TODO: move this check to AGTree AG-41266
+                    if (scriptletName.startsWith(RuleMasks.MASK_TRUSTED_SCRIPTLET)) {
+                        // https://github.com/AdguardTeam/Scriptlets#trusted-scriptlets-restriction
+                        // does not work in other blockers
+                        const message = `Trusted scriptlets should not be converted to uBO syntax. Rule: "${rule}"`;
+                        logger.log(message);
+                        modified.push('');
+                        return;
+                    }
+                }
+                const conversionResult = RuleConverter.convertToUbo(ruleNode);
+                const convertedRules = conversionResult.result.map((r) => RuleGenerator.generate(r));
+                modified.push(...convertedRules);
+            } catch (e) {
+                const message = `Unable to convert rule to Ubo syntax: "${rule}" due to error: ${e.message}`;
+                logger.log(message);
             }
         } else {
-            modified.push(rule);
+            modified.push('');
         }
     });
     return modified;
-};
-
-/**
- * Convert AdGuard scriptlets to uBlock
- * @param {array} rules
- * @return {array} modified rules
- */
-const convertAdgScriptletsToUbo = (rules) => {
-    if (!rules) {
-        return [];
-    }
-    return convertToUbo(
-        rules,
-        'scriptlet',
-        scriptlets.isAdgScriptletRule,
-        scriptlets.convertAdgToUbo,
-    );
-};
-
-/**
- * Converts AdGuard redirect rules to uBlock
- * @param {array} rules
- * @return {array} modified rules
- */
-const convertAdgRedirectsToUbo = (rules) => {
-    if (!rules) {
-        return [];
-    }
-    return convertToUbo(
-        rules,
-        'redirect',
-        // validate AdGuard redirect rules
-        redirects.isValidAdgRedirectRule,
-        // and skip ubo-unsupported redirects for ubo filters
-        // https://github.com/AdguardTeam/AdguardFilters/issues/68028
-        redirects.convertAdgRedirectToUbo,
-    );
-};
-
-const convertAdgPathModifierToUbo = (rules) => {
-    if (!rules) {
-        return [];
-    }
-    return convertToUbo(
-        rules,
-        '$path',
-        cosmeticRuleModifiers.isAdgCosmeticRuleWithPathModifier,
-        cosmeticRuleModifiers.convertAdgPathModifierToUbo,
-    );
-};
-
-module.exports = {
-    convertRulesToAdgSyntax,
-    convertAdgScriptletsToUbo,
-    convertAdgRedirectsToUbo,
-    convertAdgPathModifierToUbo,
 };

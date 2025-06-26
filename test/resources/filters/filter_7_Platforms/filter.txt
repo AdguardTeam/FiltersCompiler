@@ -1,0 +1,34 @@
+! Homepage: http://adguard.com/filters.html#english
+! License: http://creativecommons.org/licenses/by-sa/3.0/
+!
+||test1.com
+||test2.com
+!#safari_cb_affinity(security)
+||test3.com
+!#safari_cb_affinity
+||test4.com
+||test5.com
+!#safari_cb_affinity(advanced)
+||test6.com/ads.js$domain=example.com
+example.com#%#//scriptlet('set-constant', 'test123', '123')
+!#safari_cb_affinity
+||test7.com
+! Some test rules
+||test.com^
+||example.com^$third-party
+!+ NOT_VALIDATE
+||test.org^$newmodifier
+!+ NOT_VALIDATE_TYPO
+!+ PLATFORM(mac, windows) NOT_VALIDATE
+||foo.bar^$newmodifier
+somesite.com##.main-banner
+!+ NOT_VALIDATE PLATFORM(mac, windows)
+||example.org^$newmodifier
+!#safari_cb_affinity(security)
+||example1.org
+!+ PLATFORM(ios)
+||example2.org
+!#safari_cb_affinity
+!#if non_existing_variable
+!#include non_existing_file.txt
+!#endif

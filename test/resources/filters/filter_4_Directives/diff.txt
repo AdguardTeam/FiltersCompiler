@@ -1,0 +1,4 @@
+! Unable to convert rule to AdGuard syntax: "||test-common-rule.com^$replace=" due to error: Modifier value cannot be empty
+||test-common-rule.com^$replace=
+! Rule "example.com##h1:style(background-color: blue !important)" converted to: "example.com#$#h1 { background-color: blue !important }"
+example.com##h1:style(background-color: blue !important)

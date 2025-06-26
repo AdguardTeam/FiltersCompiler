@@ -1,4 +1,4 @@
-const fs = require('fs');
+import fs from 'fs';
 
 const { log } = console;
 const reportDate = new Date();
@@ -11,7 +11,7 @@ let reportData = `\nFiltersCompiler report ${reportDate.toLocaleDateString()} ${
  * @param {object} filterRules
  * @param {string[]} invalidRules
  */
-const addFilter = (metadata, filterRules, invalidRules) => {
+export const addFilter = (metadata, filterRules, invalidRules) => {
     if (metadata && filterRules) {
         const { filterId, name, subscriptionUrl } = metadata;
         const filterLength = filterRules.lines.length;
@@ -37,7 +37,7 @@ const addFilter = (metadata, filterRules, invalidRules) => {
  * Adds disabled filters data to report
  * @param {object} metadata
  */
-const skipFilter = (metadata) => {
+export const skipFilter = (metadata) => {
     if (metadata) {
         const { filterId, name, subscriptionUrl } = metadata;
 
@@ -53,16 +53,10 @@ const skipFilter = (metadata) => {
  * Creates report file or outputs report
  * @param {string} reportPath
  */
-const create = (reportPath) => {
+export const create = (reportPath) => {
     if (reportPath) {
         fs.writeFileSync(reportPath, reportData, 'utf8');
         return;
     }
     log(reportData);
-};
-
-module.exports = {
-    addFilter,
-    skipFilter,
-    create,
 };

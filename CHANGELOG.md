@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.0.0] - 2025-06-26
+
+## Added
+
+- [@adguard/agtree] v3.2.1 for rules conversion and validation.
+- [@adguard/ecss-tree] v1.1.0 for selector lists validation.
+
+### Changed
+
+- Updated [@adguard/extended-css] to v2.1.1.
+- Updated [@adguard/filters-downloader] to v2.4.0.
+- Updated [@adguard/scriptlets] to v2.1.7.
+- Updated [@adguard/tsurlfilter] to v3.2.2.
+
+### Fixed
+
+- Issue with invalid selector [#242].
+- Issue with regex in `$domain` modifier [#241].
+- Issue with regex in `$url` modifier [#237].
+
+[v2.0.0]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.2.8...v2.0.0
+[#242]: https://github.com/AdguardTeam/FiltersCompiler/issues/242
+[#241]: https://github.com/AdguardTeam/FiltersCompiler/issues/241
+[#237]: https://github.com/AdguardTeam/FiltersCompiler/issues/237
+
 ## [v1.2.8] - 2025-06-06
 
 ### Fixed
@@ -251,7 +276,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Updated [@adguard/tsurlfilter] to v2.2.19:
-    - validation of `$header` modifier
+  - validation of `$header` modifier
 
 ### Fixed
 
@@ -289,7 +314,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [v1.1.121] - 2023-12-15
 
-## Added
+### Added
 
 - New `@include` directive option `/ignoreTrustLevel` [#202]
 
@@ -511,7 +536,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Updated [@adguard/tsurlfilter] to v1.0.68:
-    - validation of `$hls` modifier
+  - validation of `$hls` modifier
 
 [v1.1.73]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.72...v1.1.73
 
@@ -520,7 +545,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Updated [@adguard/tsurlfilter] to v1.0.67:
-    - validation of `$jsonprune` modifier
+  - validation of `$jsonprune` modifier
 
 [v1.1.72]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.71...v1.1.72
 
@@ -529,9 +554,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Updated [@adguard/extended-css] to v2.0.33:
-    - `:not()` and `:is()` pseudo-classes with no extended selector arg
+  - `:not()` and `:is()` pseudo-classes with no extended selector arg
         are considered as standard — top DOM node limitation [[1]] [[2]]
-    - validation of CSS selectors due to related third-party bugs [nwsapi#55] and [nwsapi#71]
+  - validation of CSS selectors due to related third-party bugs [nwsapi#55] and [nwsapi#71]
 - Updated [@adguard/scriptlets] to v1.7.19
 - Updated [@adguard/tsurlfilter] to 1.0.66
 
@@ -615,6 +640,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [v1.1.63]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.61...v1.1.63
 
+[@adguard/agtree]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/agtree/CHANGELOG.md
+[@adguard/ecss-tree]: https://github.com/AdguardTeam/ecsstree/blob/master/CHANGELOG.md
 [@adguard/extended-css]: https://github.com/AdguardTeam/ExtendedCss/blob/master/CHANGELOG.md
 [@adguard/filters-downloader]: https://github.com/AdguardTeam/FiltersDownloader/blob/master/CHANGELOG.md
 [@adguard/scriptlets]: https://github.com/AdguardTeam/Scriptlets/blob/master/CHANGELOG.md

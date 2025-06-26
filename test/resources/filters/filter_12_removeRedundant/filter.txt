@@ -1,0 +1,57 @@
+! Homepage: http://adguard.com/filters.html#english
+! License: http://creativecommons.org/licenses/by-sa/3.0/
+!
+!#if (adguard_app_mac)
+||0031.lookinews.com^$script
+||0021.lookinews.com^$script
+||1.lookinews.com^$script
+||0051.lookinews.com^$script
+||0071.lookinews.com^$script
+||4189.freshalldaynews.com^$script
+||9.freshalldaynews.com^$script
+||4179.freshalldaynews.com^$script
+||39.freshalldaynews.com^$script
+||pl02.owen.prolitteris.ch^$script
+||met.vgwort.de^$script
+||intense.vgwort.de^$script
+!#endif
+!#if (adguard_app_ios)
+||0031.lookinews.com^
+||0021.lookinews.com^
+||1.lookinews.com^
+||0051.lookinews.com^
+||0071.lookinews.com^
+||4189.freshalldaynews.com^
+||9.freshalldaynews.com^
+||4179.freshalldaynews.com^
+||39.freshalldaynews.com^
+||pl02.owen.prolitteris.ch^
+||met.vgwort.de^
+||intense.vgwort.de^
+!#endif
+!#if (adguard_ext_edge)
+!+ NOT_OPTIMIZED
+||0031.lookinews.com^
+!+ NOT_OPTIMIZED
+||0021.lookinews.com^
+!+ NOT_OPTIMIZED
+||1.lookinews.com^
+!+ NOT_OPTIMIZED
+||0051.lookinews.com^
+!+ NOT_OPTIMIZED
+||0071.lookinews.com^
+!+ NOT_OPTIMIZED
+||4189.freshalldaynews.com^
+!+ NOT_OPTIMIZED
+||9.freshalldaynews.com^
+!+ NOT_OPTIMIZED
+||4179.freshalldaynews.com^
+!+ NOT_OPTIMIZED
+||39.freshalldaynews.com^
+!+ NOT_OPTIMIZED
+||pl02.owen.prolitteris.ch^
+!+ NOT_OPTIMIZED
+||met.vgwort.de^
+!+ NOT_OPTIMIZED
+||intense.vgwort.de^
+!#endif

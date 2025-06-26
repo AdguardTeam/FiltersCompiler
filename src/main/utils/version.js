@@ -1,11 +1,14 @@
-module.exports = (() => {
+/**
+ * Version utility functions
+ */
+export const version = {
     /**
      * Parses version from string
      *
      * @param v version string
      * @returns {Array}
      */
-    const parse = function (v) {
+    parse(v) {
         const version = [];
         const parts = String(v || '').split('.');
 
@@ -22,7 +25,7 @@ module.exports = (() => {
         }
 
         return version;
-    };
+    },
 
     /**
      * Increments build part of version '0.0.0.0'
@@ -30,8 +33,8 @@ module.exports = (() => {
      * @param v version string
      * @returns {string}
      */
-    const increment = function (v) {
-        const version = parse(v);
+    increment(v) {
+        const version = this.parse(v);
 
         if (version.length > 0) {
             version[version.length - 1] = version[version.length - 1] + 1;
@@ -45,9 +48,5 @@ module.exports = (() => {
         }
 
         return version.join('.');
-    };
-
-    return {
-        increment,
-    };
-})();
+    },
+};

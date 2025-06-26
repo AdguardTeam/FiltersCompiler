@@ -1,0 +1,16 @@
+! example.com#$#.additional { color: red; } is excluded by "#$#" in exclusions-low.txt
+example.com#$#.additional { color: red; }
+! ||example.com$replace=/"additional"/"__additional"/ is excluded by "$replace" in exclusions-low.txt
+||example.com$replace=/"additional"/"__additional"/
+! example.com#%#AG_setConstant('additional1', '1'); is excluded by "#%#" in exclusions-low.txt
+example.com#%#AG_setConstant('additional1', '1');
+! example.com#%#//scriptlet('set-constant', 'additional2', '2') is excluded by "#%#//scriptlet" in exclusions-low.txt
+example.com#%#//scriptlet('set-constant', 'additional2', '2')
+! example.com#$#.template { color: red; } is excluded by "#$#" in exclusions-low.txt
+example.com#$#.template { color: red; }
+! ||example.com$replace=/"template"/"__template"/ is excluded by "$replace" in exclusions-low.txt
+||example.com$replace=/"template"/"__template"/
+! example.com#%#AG_setConstant('template1', '1'); is excluded by "#%#" in exclusions-low.txt
+example.com#%#AG_setConstant('template1', '1');
+! example.com#%#//scriptlet('set-constant', 'template2', '2') is excluded by "#%#//scriptlet" in exclusions-low.txt
+example.com#%#//scriptlet('set-constant', 'template2', '2')

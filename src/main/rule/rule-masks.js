@@ -1,7 +1,8 @@
+// TODO: a lot of these masks can be imported from @adguard/agtree
 /**
  * Rule masks constants
  */
-module.exports = (() => ({
+export const RuleMasks = {
     MASK_REGEX_RULE: '/',
     MASK_RULE_SEPARATOR: '^',
     MASK_WHITE_LIST: '@@',
@@ -24,5 +25,5 @@ module.exports = (() => ({
     MASK_DIRECTIVES: '!#',
     MASK_SCRIPTLET: '#%#//scriptlet',
     MASK_SCRIPTLET_EXCEPTION: '#@%#//scriptlet',
-})
-)();
+    MASK_TRUSTED_SCRIPTLET: 'trusted-',
+};

@@ -1,14 +1,30 @@
-const {
-    RuleValidator,
-    RuleFactory,
+import {
+    CommentParser,
     CosmeticRuleType,
-    CosmeticRule,
     RuleConverter,
-} = require('@adguard/tsurlfilter');
+    RuleParser,
+    RuleGenerator,
+    RuleCategory,
+    RegExpUtils,
+} from '@adguard/agtree';
+import { defaultParserOptions } from '@adguard/agtree/parser';
 
-const logger = require('./utils/log');
-const RuleMasks = require('./rule/rule-masks');
-const extendedCssValidator = require('./utils/extended-css-validator');
+import { parse } from '@adguard/ecss-tree';
+
+import {
+    RuleFactory,
+    CosmeticRule,
+    NetworkRule,
+} from '@adguard/tsurlfilter';
+import { RuleMasks } from './rule/rule-masks';
+
+import { logger } from './utils/log';
+
+import { validateCssSelector } from './utils/extended-css-validator';
+
+/**
+ * @typedef {import('@adguard/agtree').AnyRule} AnyRule
+ */
 
 const AFFINITY_DIRECTIVE = '!#safari_cb_affinity'; // used as closing directive
 const AFFINITY_DIRECTIVE_OPEN = `${AFFINITY_DIRECTIVE}(`;
@@ -30,22 +46,130 @@ const excludeRule = (excluded, warning, rule) => {
 };
 
 /**
- * Removes invalid rules from the list of rules
- * and logs process in the excluded list
- *
- * @param {string[]} list of rule texts
- * @param {string[]} excluded - list of messages with validation results
- * @param {string[]} invalid
- * @param {string} filterName
- * @returns {Array}
+ * @typedef {object} ValidationResult
+ * @property {boolean} valid Whether the rule is valid.
+ * @property {string|null} error Error message if the rule is invalid.
  */
-const validate = function (list, excluded, invalid = [], filterName) { // eslint-disable-line default-param-last
+
+/**
+ * Class to validate filter rules.
+ */
+class RuleValidator {
+    /**
+     * Creates validation result for rule.
+     *
+     * @param {boolean} valid Whether the rule is valid.
+     * @param {string} [error] Error message if the rule is invalid.
+     */
+    static createValidationResult(valid, error) {
+        if (error) {
+            return { valid, error };
+        }
+
+        return { valid, error: null };
+    }
+
+    /**
+     * Validates regexp pattern.
+     *
+     * @param {string} pattern Regexp pattern to validate.
+     * @param {string} ruleText Rule text.
+     *
+     * @throws {SyntaxError} If the pattern is invalid, otherwise nothing.
+     */
+    static validateRegexp(pattern, ruleText) {
+        if (!RegExpUtils.isRegexPattern(pattern)) {
+            return;
+        }
+
+        try {
+            // eslint-disable-next-line no-new
+            new RegExp(pattern.slice(1, -1));
+        } catch (e) {
+            throw new SyntaxError(`Rule has invalid regex pattern: "${ruleText}"`);
+        }
+    }
+
+    /**
+     * Validates rule node.
+     *
+     * @param {AnyRule} ruleNode Rule node to validate.
+     *
+     * @returns {ValidationResult} Validation result.
+     */
+    static validate(ruleNode) {
+        if (ruleNode.category === RuleCategory.Invalid) {
+            return RuleValidator.createValidationResult(
+                false,
+                ruleNode.error.message,
+            );
+        }
+
+        if (ruleNode.category === RuleCategory.Empty || ruleNode.category === RuleCategory.Comment) {
+            return RuleValidator.createValidationResult(true);
+        }
+
+        const ruleText = RuleGenerator.generate(ruleNode);
+
+        try {
+            // Validate cosmetic rules
+            if (ruleNode.category === RuleCategory.Cosmetic) {
+                // eslint-disable-next-line no-new
+                new CosmeticRule(ruleNode, 0);
+                return RuleValidator.createValidationResult(true);
+            }
+
+            // Validate network rules
+            const rule = new NetworkRule(ruleNode, 0);
+            RuleValidator.validateRegexp(rule.getPattern(), ruleText);
+        } catch (error) {
+            // TODO: add getErrorMessage as a helper
+            const message = error instanceof Error ? error.message : String(error);
+            const errorMessage = `Error: "${message}" in the rule: "${ruleText}"`;
+            return RuleValidator.createValidationResult(false, errorMessage);
+        }
+
+        return RuleValidator.createValidationResult(true);
+
+        // TODO: validate host rules
+    }
+}
+
+/**
+ * Universal function for validating CSS context.
+ *
+ * @param {string} input - string to be validated.
+ * @param {string} contextName - context (e.g., 'selectorList', 'declarationList', 'mediaQueryList').
+ * @throws {Error} Throws an error if parsing fails.
+ */
+const validateCssContext = (input, contextName) => {
+    parse(input, {
+        context: contextName,
+        onParseError(error) {
+            throw error;
+        },
+    });
+};
+
+/**
+ * Removes invalid rules from the list of rules
+ * and logs process in the excluded list.
+ *
+ * @param {string[]} list List of rule texts.
+ * @param {string[]} excluded List of messages with validation results.
+ * @param {string[]} invalid List of messages with validation errors.
+ * @param {string} filterName Name of the filter.
+ *
+ * @returns {string[]} List of valid rules.
+ */
+// eslint-disable-next-line default-param-last
+export const validateAndFilterRules = (list, excluded, invalid = [], filterName) => {
     if (!list) {
         return [];
     }
 
     return list.filter((ruleText, index, array) => {
-        if (RuleFactory.isComment(ruleText)) {
+        if (CommentParser.isCommentRule(ruleText)) {
             return true;
         }
 
@@ -64,12 +188,44 @@ const validate = function (list, excluded, invalid = [], filterName) { // eslint
             return true;
         }
 
-        let convertedRules;
-
-        // unsupported UBO HTML rules throws error while conversion
-        // https://github.com/AdguardTeam/tsurlfilter/issues/55
+        let convertedRuleNodes;
         try {
-            convertedRules = RuleConverter.convertRule(ruleText);
+            const ruleNode = RuleParser.parse(ruleText, {
+                ...defaultParserOptions,
+                // tolerant mode is used for rather quick syntax validation
+                tolerant: true,
+                isLocIncluded: false,
+                includeRaws: false,
+                parseAbpSpecificRules: false,
+                parseUboSpecificRules: false,
+            });
+            const conversionResult = RuleConverter.convertToAdg(ruleNode);
+            convertedRuleNodes = conversionResult.result;
+            // eslint-disable-next-line no-restricted-syntax
+            for (const convertedRuleNode of convertedRuleNodes) {
+                if (convertedRuleNode.category !== RuleCategory.Cosmetic) {
+                    continue;
+                }
+                switch (convertedRuleNode.type) {
+                    case CosmeticRuleType.ElementHidingRule: {
+                        validateCssContext(convertedRuleNode.body.selectorList.value, 'selectorList');
+                        break;
+                    }
+                    case CosmeticRuleType.CssInjectionRule: {
+                        validateCssContext(convertedRuleNode.body.selectorList.value, 'selectorList');
+                        if (convertedRuleNode.body.remove === true) {
+                            break;
+                        }
+                        validateCssContext(convertedRuleNode.body.declarationList.value, 'declarationList');
+                        if (convertedRuleNode.body.mediaQueryList && convertedRuleNode.body.mediaQueryList.value) {
+                            validateCssContext(convertedRuleNode.body.mediaQueryList.value, 'mediaQueryList');
+                        }
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
         } catch (e) {
             logger.error(`Invalid rule in ${filterName}: ${ruleText}`);
             excludeRule(excluded, e.message, ruleText);
@@ -77,14 +233,27 @@ const validate = function (list, excluded, invalid = [], filterName) { // eslint
             return false;
         }
 
-        if (convertedRules.length === 0) {
+        // optional chaining is needed for the length property because convertedRules can be undefined
+        // if RuleParser.parse() or RuleConverter.convertToAdg() throws an error
+        if (!convertedRuleNodes || convertedRuleNodes.length === 0) {
             return false;
         }
 
-        for (let i = 0; i < convertedRules.length; i += 1) {
-            const convertedRuleText = convertedRules[i];
+        for (let i = 0; i < convertedRuleNodes.length; i += 1) {
+            const convertedRuleNode = convertedRuleNodes[i];
 
-            const validationResult = RuleValidator.validate(convertedRuleText);
+            let validationResult = RuleValidator.validate(convertedRuleNode);
+
+            // TODO: remove this checking when $header is fixed
+            // https://github.com/AdguardTeam/AdguardBrowserExtension/issues/2942
+            if (
+                !validationResult.valid
+                && validationResult.error.includes('$header rules are not compatible with some other modifiers')
+            ) {
+                // $header rules are not compatible with other modifiers ONLY in the tsurlfilter
+                // but it is fine for corelibs
+                validationResult = { valid: true };
+            }
 
             if (!validationResult.valid) {
                 // log source rule text to the excluded log
@@ -96,12 +265,13 @@ const validate = function (list, excluded, invalid = [], filterName) { // eslint
                 return false;
             }
 
-            const rule = RuleFactory.createRule(convertedRuleText);
+            const rule = RuleFactory.createRule(convertedRuleNode);
 
             // It is impossible to bundle jsdom into tsurlfilter, so we check if rules are valid in the compiler
-            if (rule instanceof CosmeticRule && rule.getType() === CosmeticRuleType.ElementHiding) {
-                const validationResult = extendedCssValidator.validateCssSelector(rule.getContent());
+            if (rule instanceof CosmeticRule && rule.getType() === CosmeticRuleType.ElementHidingRule) {
+                const validationResult = validateCssSelector(rule.getContent());
                 if (!validationResult.ok) {
+                    // TODO: rule selector can be validated by agtree
                     logger.error(`Invalid rule selector in ${filterName}: ${ruleText}`);
                     // log source rule text to the excluded log
                     excludeRule(excluded, `! ${validationResult.error} in rule:`, ruleText);
@@ -120,7 +290,7 @@ const validate = function (list, excluded, invalid = [], filterName) { // eslint
  *
  * @param lines
  */
-const checkAffinityDirectives = (lines) => {
+export const checkAffinityDirectives = (lines) => {
     if (!(lines && lines.length)) {
         // skip empty filter
         return true;
@@ -142,9 +312,4 @@ const checkAffinityDirectives = (lines) => {
     }
 
     return !stack.length;
-};
-
-module.exports = {
-    validate,
-    checkAffinityDirectives,
 };

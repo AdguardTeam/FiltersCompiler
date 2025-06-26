@@ -1,0 +1,11 @@
+! some common rules could be places here, but comment are stripped
+test-common-1-rule.com
+||test-common-1-rule.com^$replace=
+test-common-1-rule.com$xmlhttprequest
+regularexpressionexcluded
+regularexpression_not_excluded
+###adsbox
+###adsbox-not-excluded
+!#if test_not_stripped_directives
+directives_not_stripped
+!#endif

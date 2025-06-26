@@ -1,0 +1,7 @@
+#%#test.com^$third-party
+test_domain#%#testScript();
+test.com#%#var isadblock=1;
+example.com#%#AG_onLoad(function() { AG_removeElementBySelector('span[class="intexta"]'); });
+test.com#%#//scriptlet('ubo-abort-on-property-read.js', 'Object.prototype.getBanner')
+example.com#%#//scriptlet('trusted-set-local-storage-item', 'iName', 'iValue')
+example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")

@@ -1,6 +1,6 @@
-const { parse } = require('tldts');
+import { parse } from 'tldts';
 
-const RuleMasks = require('../rule/rule-masks');
+import { RuleMasks } from '../rule/rule-masks';
 
 const DOT = '.';
 
@@ -77,7 +77,7 @@ const findWidestDomains = (domains) => {
  * @param {string[]} lines - An array of text lines.
  * @returns {string[]} - An array of of text lines with redundant rules removed.
  */
-const optimizeDomainBlockingRules = async (lines) => {
+export const optimizeDomainBlockingRules = async (lines) => {
     const linesToSkipOptimization = new Set();
     const rawDomainsToOptimize = new Set();
 
@@ -139,8 +139,4 @@ const optimizeDomainBlockingRules = async (lines) => {
 
         return widerDomains.has(domain);
     });
-};
-
-module.exports = {
-    optimizeDomainBlockingRules,
 };

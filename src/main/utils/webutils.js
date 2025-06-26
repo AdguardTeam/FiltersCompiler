@@ -1,60 +1,57 @@
 /* eslint-disable global-require */
-module.exports = (() => {
-    const logger = require('./log');
+import { createRequire } from 'module';
+import { logger } from './log';
 
-    /**
-     * Some sources require proper user-agents and forbid downloading without.
-     */
-    const USER_AGENT = 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko)'
-        + 'Chrome/63.0.3239.132 Mobile Safari/537.36';
+const require = createRequire(import.meta.url);
 
-    /**
-     * Sync downloads file from url
-     *
-     * @param url
-     * @param {number} [retryNum=0] number of times to retry downloading, defaults to 0
-     * @returns {*}
-     */
-    const tryDownloadFile = function (url, retryNum = 0) {
-        let args = ['--fail', '--silent', '--user-agent', USER_AGENT, '-L', url];
-        if (retryNum) {
-            args.push('--retry');
-            args.push(retryNum);
-        }
-        const options = { encoding: 'utf8', maxBuffer: Infinity };
-        const tlsCheck = process.env.TLS;
-        if (tlsCheck === 'insecure') {
-            args = ['--insecure'].concat(args);
-        }
-        return require('child_process')
-            .execFileSync('curl', args, options);
-    };
+/**
+ * Some sources require proper user-agents and forbid downloading without.
+ */
+const USER_AGENT = 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko)'
+    + 'Chrome/63.0.3239.132 Mobile Safari/537.36';
 
-    /**
-     * Sync downloads file from url with two attempts
-     *
-     * @param url
-     * @returns {*}
-     */
-    const downloadFile = function (url) {
-        logger.log(`Downloading: ${url}`);
+/**
+ * Sync downloads file from url
+ *
+ * @param url
+ * @param {number} [retryNum=0] number of times to retry downloading, defaults to 0
+ * @returns {*}
+ */
+const tryDownloadFile = function (url, retryNum = 0) {
+    let args = ['--fail', '--silent', '--user-agent', USER_AGENT, '-L', url];
+    if (retryNum) {
+        args.push('--retry');
+        args.push(retryNum);
+    }
+    const options = { encoding: 'utf8', maxBuffer: Infinity };
+    const tlsCheck = process.env.TLS;
+    if (tlsCheck === 'insecure') {
+        args = ['--insecure'].concat(args);
+    }
+    return require('child_process')
+        .execFileSync('curl', args, options);
+};
 
-        // 5 times to retry after first fail attempt:
-        // 1 sec for first time, double for every forthcoming attempts
-        // so it will take: 1 + 2 + 4 + 8 + 16 = 31 seconds
-        // https://curl.se/docs/manpage.html#--retry
-        const RETRY_NUM = 5;
+/**
+ * Sync downloads file from url with two attempts
+ *
+ * @param url
+ * @returns {*}
+ */
+export const downloadFile = (url) => {
+    logger.log(`Downloading: ${url}`);
 
-        try {
-            return tryDownloadFile(url);
-        } catch (e) {
-            logger.warn(e);
-            logger.warn(`Retry downloading: ${url}`);
-            return tryDownloadFile(url, RETRY_NUM);
-        }
-    };
+    // 5 times to retry after first fail attempt:
+    // 1 sec for first time, double for every forthcoming attempts
+    // so it will take: 1 + 2 + 4 + 8 + 16 = 31 seconds
+    // https://curl.se/docs/manpage.html#--retry
+    const RETRY_NUM = 5;
 
-    return {
-        downloadFile,
-    };
-})();
+    try {
+        return tryDownloadFile(url);
+    } catch (e) {
+        logger.warn(e);
+        logger.warn(`Retry downloading: ${url}`);
+        return tryDownloadFile(url, RETRY_NUM);
+    }
+};

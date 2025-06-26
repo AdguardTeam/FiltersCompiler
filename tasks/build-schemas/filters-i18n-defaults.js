@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /**
  * @file
  * This is a temporary solution for default strings in filters_i18n.json.
@@ -5,12 +6,12 @@
  * TODO: probably refactoring should be considered so this data is passed from the filters registry AG-41700.
  */
 
-const { NAME_KEY, DESCRIPTION_KEY } = require('./constants');
+import { NAME_KEY, DESCRIPTION_KEY } from './constants';
 
 /**
  * Default data for groups, where keys are ids of AdGuard-supported groups.
  */
-const GROUPS_DEFAULT_DATA = {
+export const GROUPS_DEFAULT_DATA = {
     1: {
         [NAME_KEY]: 'Ad blocking',
         [DESCRIPTION_KEY]: 'Block ads',
@@ -44,7 +45,7 @@ const GROUPS_DEFAULT_DATA = {
 /**
  * Default data for filters, where keys are ids of AdGuard-supported filters.
  */
-const FILTERS_DEFAULT_DATA = {
+export const FILTERS_DEFAULT_DATA = {
     1: {
         [NAME_KEY]: 'AdGuard Russian filter',
         [DESCRIPTION_KEY]: 'Filter that enables ad blocking on websites in the Russian language.',
@@ -55,7 +56,6 @@ const FILTERS_DEFAULT_DATA = {
     },
     3: {
         [NAME_KEY]: 'AdGuard Tracking Protection filter',
-        // eslint-disable-next-line max-len
         [DESCRIPTION_KEY]: 'The most comprehensive list of various online counters and web analytics tools. Use this filter, if you do not want your actions on the Internet to be tracked.',
     },
     4: {
@@ -64,12 +64,10 @@ const FILTERS_DEFAULT_DATA = {
     },
     5: {
         [NAME_KEY]: 'AdGuard Experimental filter',
-        // eslint-disable-next-line max-len
         [DESCRIPTION_KEY]: 'Filter designed to test certain hazardous filtering rules before they are added to the basic filters.',
     },
     6: {
         [NAME_KEY]: 'AdGuard German filter',
-        // eslint-disable-next-line max-len
         [DESCRIPTION_KEY]: 'EasyList Germany + AdGuard German filter. Filter list that specifically removes ads on websites in the German language.',
     },
     7: {
@@ -78,17 +76,14 @@ const FILTERS_DEFAULT_DATA = {
     },
     8: {
         [NAME_KEY]: 'AdGuard Dutch filter',
-        // eslint-disable-next-line max-len
         [DESCRIPTION_KEY]: 'EasyList Dutch + AdGuard Dutch filter. Filter list that specifically removes ads on websites in the Dutch language.',
     },
     9: {
         [NAME_KEY]: 'AdGuard Spanish/Portuguese filter',
-        // eslint-disable-next-line max-len
         [DESCRIPTION_KEY]: 'Filter list that specifically removes ads on websites in Spanish, Portuguese, and Brazilian Portuguese languages.',
     },
     10: {
         [NAME_KEY]: 'Filter unblocking search ads and self-promotion',
-        // eslint-disable-next-line max-len
         [DESCRIPTION_KEY]: 'Filter that unblocks search ads in Google, DuckDuckGo, Bing, or Yahoo and self-promotion on websites.',
     },
     11: {
@@ -102,17 +97,14 @@ const FILTERS_DEFAULT_DATA = {
     },
     14: {
         [NAME_KEY]: 'AdGuard Annoyances filter',
-        // eslint-disable-next-line max-len
         [DESCRIPTION_KEY]: 'Blocks irritating elements on web pages including cookie notices, third-party widgets and in-page pop-ups. Contains the following AdGuard filters: Cookie Notices, Popups, Mobile App Banners, Other Annoyances and Widgets.',
     },
     15: {
         [NAME_KEY]: 'AdGuard DNS filter',
-        // eslint-disable-next-line max-len
         [DESCRIPTION_KEY]: 'Filter composed of several other filters (AdGuard Base filter, Social Media filter, Tracking Protection filter, Mobile Ads filter, EasyList and EasyPrivacy) and simplified specifically to be better compatible with DNS-level ad blocking.',
     },
     16: {
         [NAME_KEY]: 'AdGuard French filter',
-        // eslint-disable-next-line max-len
         [DESCRIPTION_KEY]: 'Liste FR + AdGuard French filter. Filter list that specifically removes ads on websites in the French language.',
     },
     17: {
@@ -125,7 +117,6 @@ const FILTERS_DEFAULT_DATA = {
     },
     19: {
         [NAME_KEY]: 'AdGuard Popups filter',
-        // eslint-disable-next-line max-len
         [DESCRIPTION_KEY]: 'Blocks all kinds of pop-ups that are not necessary for websites\' operation according to our Filter policy.',
     },
     20: {
@@ -134,7 +125,6 @@ const FILTERS_DEFAULT_DATA = {
     },
     21: {
         [NAME_KEY]: 'AdGuard Other Annoyances filter',
-        // eslint-disable-next-line max-len
         [DESCRIPTION_KEY]: 'Blocks irritating elements on web pages that do not fall under the popular categories of annoyances.',
     },
     22: {
@@ -147,7 +137,6 @@ const FILTERS_DEFAULT_DATA = {
     },
     224: {
         [NAME_KEY]: 'AdGuard Chinese filter',
-        // eslint-disable-next-line max-len
         [DESCRIPTION_KEY]: 'EasyList China + AdGuard Chinese filter. Filter list that specifically removes ads on websites in Chinese language.',
     },
 };
@@ -155,7 +144,7 @@ const FILTERS_DEFAULT_DATA = {
 /**
  * Default data for tags, where keys are ids of AdGuard-supported tags.
  */
-const TAGS_DEFAULT_DATA = {
+export const TAGS_DEFAULT_DATA = {
     1: {
         [NAME_KEY]: 'Ad Blocking',
         [DESCRIPTION_KEY]: 'Designed to block ads online',
@@ -174,7 +163,6 @@ const TAGS_DEFAULT_DATA = {
     },
     5: {
         [NAME_KEY]: 'Anti-annoyances protection',
-        // eslint-disable-next-line max-len
         [DESCRIPTION_KEY]: 'Designed to block non-ads elements that distract you from the content (subscription offers, promotion notices, etc.).',
     },
     6: {
@@ -441,10 +429,4 @@ const TAGS_DEFAULT_DATA = {
         [NAME_KEY]: 'Macedonian language-specific ad blocking',
         [DESCRIPTION_KEY]: 'Designed specifically to block ads on web pages in the Macedonian language',
     },
-};
-
-module.exports = {
-    GROUPS_DEFAULT_DATA,
-    FILTERS_DEFAULT_DATA,
-    TAGS_DEFAULT_DATA,
 };

@@ -3,10 +3,11 @@
  * Generates the JSON schema for AdGuard filters.json.
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { logger } from '../../src/main/utils/log';
 
-const {
+import {
     SCHEMA_DRAFT,
     FILTERS_SCHEMA_ID,
     ROOT_DIR_RELATIVE_PATH,
@@ -33,20 +34,25 @@ const {
     VERSION_KEY,
     TIME_UPDATED_KEY,
     LANGUAGES_KEY,
-} = require('./constants');
-const {
+} from './constants';
+import {
     createSchemaTitle,
     createIntegerPropertySchema,
     createStringPropertySchema,
     createPropertySchema,
-} = require('./helpers');
+} from './helpers';
 
 /**
  * File name of the generated schema.
  */
 const OUTPUT_FILE_NAME = 'filters.schema.json';
 
-const outputFilePath = path.join(__dirname, ROOT_DIR_RELATIVE_PATH, OUTPUT_SCHEMAS_DIR, OUTPUT_FILE_NAME);
+const outputFilePath = path.join(
+    path.dirname(new URL(import.meta.url).pathname),
+    ROOT_DIR_RELATIVE_PATH,
+    OUTPUT_SCHEMAS_DIR,
+    OUTPUT_FILE_NAME,
+);
 
 /**
  * @typedef {Object} ItemsObjectSchemaCreationData
@@ -309,7 +315,7 @@ const createFiltersSchema = () => {
 /**
  * Generates the JSON schema for whole filters.json.
  */
-const generateFiltersSchema = () => {
+export const generateFiltersSchema = () => {
     const schema = {
         definitions: {},
         '$schema': SCHEMA_DRAFT,
@@ -330,14 +336,8 @@ const generateFiltersSchema = () => {
 
     try {
         fs.writeFileSync(outputFilePath, JSON.stringify(schema, null, 2), 'utf8');
-        // eslint-disable-next-line no-console
-        console.log(`Schema successfully written to ${outputFilePath}`);
+        logger.log(`Schema successfully written to ${outputFilePath}`);
     } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error(`Error writing schema to ${outputFilePath}:`, error);
+        logger.error(`Error writing schema to ${outputFilePath}:`, error);
     }
-};
-
-module.exports = {
-    generateFiltersSchema,
 };

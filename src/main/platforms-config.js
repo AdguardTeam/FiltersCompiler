@@ -542,12 +542,13 @@ const SAFARI_BASED_EXTENSION_PATTERNS = [
  * @example
  * ```unsplash.com#?#.ripi6 > div:matches-property(/__reactFiber/.return.return.memoizedProps.ad)```
  * @example
- * ```androidauthority.com#?#main div[class]:has(> div[class]:matches-property(/__reactFiber/.return.memoizedProps.type=med_rect_atf))```
+ * ```
+ * androidauthority.com#?#main div[class]:has(> div[class]:matches-property(/__reactFiber/.return.memoizedProps.type=med_rect_atf))
+ * ```
  */
-const CSS_MATCHES_PROPERTY_RULES_PATTERNS = [
+export const CSS_MATCHES_PROPERTY_RULES_PATTERNS = [
     ':matches-property\\(',
 ];
-/* eslint-enable max-len */
 
 /**
  * Pattern to detect generic CSS rules
@@ -557,11 +558,11 @@ const CSS_MATCHES_PROPERTY_RULES_PATTERNS = [
  * @example
  * ```#$#.pub_728x90.text-ad.textAd.text_ad.text_ads.text-ads.text-ad-links { display: block !important; }```
  */
-const CSS_GENERIC_RULES_PATTERNS = [
+export const CSS_GENERIC_RULES_PATTERNS = [
     '^#\\$#',
 ];
 
-module.exports = {
+export const platformsConfig = {
     'WINDOWS': {
         'platform': 'windows',
         'path': 'windows',

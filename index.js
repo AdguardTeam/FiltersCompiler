@@ -1,13 +1,15 @@
-const path = require('path');
-const { setLogger, setConfiguration, CompatibilityTypes } = require('@adguard/tsurlfilter');
+import path from 'path';
+import { setLogger, setConfiguration, CompatibilityTypes } from '@adguard/tsurlfilter';
 
-const builder = require('./src/main/builder');
-const schemaValidator = require('./src/main/json-validator');
-const localesValidator = require('./src/main/locales-validator');
-const logger = require('./src/main/utils/log');
+import { build } from './src/main/builder';
+import { schemaValidator } from './src/main/json-validator';
+import { localesValidator } from './src/main/locales-validator';
+import { logger } from './src/main/utils/log';
 
 // default platforms config
-const platformsConfig = require('./src/main/platforms-config');
+import { platformsConfig } from './src/main/platforms-config';
+
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 // Sets RuleConverter to use logger of current library
 setLogger(logger);
@@ -21,7 +23,7 @@ process.on('unhandledRejection', (error) => {
     throw error;
 });
 
-const compile = function (path, logPath, reportFile, platformsPath, whitelist, blacklist, customPlatformsConfig) {
+export const compile = (path, logPath, reportFile, platformsPath, whitelist, blacklist, customPlatformsConfig) => {
     if (customPlatformsConfig) {
         logger.log('Using custom platforms configuration');
         // eslint-disable-next-line no-restricted-syntax, guard-for-in
@@ -31,7 +33,7 @@ const compile = function (path, logPath, reportFile, platformsPath, whitelist, b
         }
     }
 
-    return builder.build(
+    return build(
         path,
         logPath,
         reportFile,
@@ -42,16 +44,10 @@ const compile = function (path, logPath, reportFile, platformsPath, whitelist, b
     );
 };
 
-const validateJSONSchema = function (platformsPath, requiredFiltersAmount) {
+export const validateJSONSchema = (platformsPath, requiredFiltersAmount) => {
     return schemaValidator.validate(platformsPath, jsonSchemasConfigDir, requiredFiltersAmount);
 };
 
-const validateLocales = function (localesDirPath, requiredLocales) {
+export const validateLocales = (localesDirPath, requiredLocales) => {
     return localesValidator.validate(localesDirPath, requiredLocales);
-};
-
-module.exports = {
-    compile,
-    validateJSONSchema,
-    validateLocales,
 };

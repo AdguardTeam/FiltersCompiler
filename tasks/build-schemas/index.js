@@ -7,8 +7,8 @@
  * e.g. when new filter id or locale is added, much less manual work is needed.
  */
 
-const { generateFiltersI18nSchema } = require('./build-filters-i18n-schema');
-const { generateFiltersSchema } = require('./build-filters-schema');
+import { generateFiltersI18nSchema } from './build-filters-i18n-schema';
+import { generateFiltersSchema } from './build-filters-schema';
 
 generateFiltersI18nSchema();
 generateFiltersSchema();

@@ -1,0 +1,2 @@
+! Error: "Unknown modifier: unsupported" in the rule: "||test.org^$unsupported"
+||test.org^$unsupported

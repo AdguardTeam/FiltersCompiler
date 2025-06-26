@@ -1,2 +1,3 @@
 src/main/third-party/
-src/test/resources/platforms/*
+test/resources/platforms/*
+dist/

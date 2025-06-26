@@ -1,4 +1,4 @@
-const { SCHEMA_TYPES, STRING_PATTERN } = require('./constants');
+import { SCHEMA_TYPES, STRING_PATTERN } from './constants';
 
 /**
  * Creates a schema title based on the property name.
@@ -7,7 +7,7 @@ const { SCHEMA_TYPES, STRING_PATTERN } = require('./constants');
  *
  * @returns {string} Formatted schema title.
  */
-const createSchemaTitle = (propName) => {
+export const createSchemaTitle = (propName) => {
     return `The ${propName.toUpperCase()} Schema`;
 };
 
@@ -28,7 +28,7 @@ const createSchemaTitle = (propName) => {
  *
  * @returns {object} JSON schema definition for the property.
  */
-const createPropertySchema = ({
+export const createPropertySchema = ({
     baseId,
     propName,
     type,
@@ -72,7 +72,7 @@ const createPropertySchema = ({
  *
  * @returns {object} JSON schema definition for the string property.
  */
-const createStringPropertySchema = ({
+export const createStringPropertySchema = ({
     baseId,
     propName,
     defaultValue,
@@ -97,7 +97,7 @@ const createStringPropertySchema = ({
  *
  * @returns {object} JSON schema definition for the integer property.
  */
-const createIntegerPropertySchema = ({ baseId, propName, example }) => {
+export const createIntegerPropertySchema = ({ baseId, propName, example }) => {
     return createPropertySchema({
         baseId,
         propName,
@@ -105,11 +105,4 @@ const createIntegerPropertySchema = ({ baseId, propName, example }) => {
         defaultValue: 0,
         example: example || 1,
     });
-};
-
-module.exports = {
-    createSchemaTitle,
-    createPropertySchema,
-    createStringPropertySchema,
-    createIntegerPropertySchema,
 };
