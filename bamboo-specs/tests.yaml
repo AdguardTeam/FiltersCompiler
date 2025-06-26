@@ -21,7 +21,7 @@ Test:
   docker:
     image: "${bamboo.dockerNode}"
     volumes:
-      ${system.YARN_DIR}: "${bamboo.yarnCache}"
+      ${system.PNPM_DIR}: "${bamboo.cachePnpm}"
   tasks:
     - checkout:
         force-clean-build: true
@@ -35,9 +35,9 @@ Test:
             # Fix mixed logs
             exec 2>&1
 
-            yarn install
-            yarn lint
-            yarn test
+            pnpm install
+            pnpm lint
+            pnpm test
   requirements:
     - adg-docker: 'true'
   final-tasks:

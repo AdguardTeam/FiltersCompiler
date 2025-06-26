@@ -4,7 +4,7 @@ node_modules
 .vscode
 .eslintcache
 *.iml
-yarn-error.log
+pnpm-error.log
 src/test/resources/platforms/*
 src/test/resources/log.txt
 src/test/resources/report.txt

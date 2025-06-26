@@ -1,3 +1,4 @@
 src/main/third-party/
+tasks/build-schemas/
 test/resources/platforms/*
 dist/

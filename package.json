@@ -9,9 +9,9 @@
         "build": "rollup --config rollup.config.js --silent",
         "test": "vitest",
         "lint": "eslint --cache .",
-        "increment": "yarn version --patch --no-git-tag-version",
+        "increment": "pnpm version patch --no-git-tag-version",
         "build-txt": "node tasks/build-txt.mjs",
-        "build-schemas": "node tasks/build-schemas/index.js",
+        "build-schemas": "node --experimental-specifier-resolution=node tasks/build-schemas/index.js",
         "prepare": "husky install"
     },
     "engines": {

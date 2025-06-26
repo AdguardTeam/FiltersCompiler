@@ -72,7 +72,7 @@ and `<FILTERS_REQUIRED_AMOUNT>` is an expected minimum number of filters.
 ## Tests
 
 ```bash
-yarn test
+pnpm test
 ```
 
 ## Development
@@ -102,7 +102,7 @@ Instead of that, you should edit scripts in `tasks/build-schemas/` directory
 and use the following command to generate the schemas:
 
 ```bash
-yarn build-schemas
+pnpm build-schemas
 ```
 
 ## Filters metadata

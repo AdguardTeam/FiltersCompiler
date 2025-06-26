@@ -39,12 +39,7 @@ const NON_REQUIRED_FILTER_IDS = [
  */
 const OUTPUT_FILE_NAME = 'filters_i18n.schema.json';
 
-const outputFilePath = path.join(
-    path.dirname(new URL(import.meta.url).pathname),
-    ROOT_DIR_RELATIVE_PATH,
-    OUTPUT_SCHEMAS_DIR,
-    OUTPUT_FILE_NAME,
-);
+const outputFilePath = path.join(__dirname, ROOT_DIR_RELATIVE_PATH, OUTPUT_SCHEMAS_DIR, OUTPUT_FILE_NAME);
 
 /**
  * Creates the schema definition for a specific language within a group/tag/filter item.
@@ -175,7 +170,7 @@ const createTopLevelFiltersProperty = () => {
 /**
  * Generates the JSON schema for filters_i18n.json.
  */
-const generateFiltersI18nSchema = () => {
+export const generateFiltersI18nSchema = () => {
     const schema = {
         definitions: {},
         '$schema': SCHEMA_DRAFT,
@@ -202,8 +197,4 @@ const generateFiltersI18nSchema = () => {
         // eslint-disable-next-line no-console
         console.error(`Error writing schema to ${outputFilePath}:`, error);
     }
-};
-
-export {
-    generateFiltersI18nSchema,
 };

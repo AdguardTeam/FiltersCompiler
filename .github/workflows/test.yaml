@@ -18,14 +18,14 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: yarn install
-        run: yarn install
+      - name: pnpm install
+        run: pnpm install
 
-      - name: yarn lint
-        run: yarn lint
+      - name: pnpm lint
+        run: pnpm lint
 
-      - name: yarn test
-        run: yarn test
+      - name: pnpm test
+        run: pnpm test
 
   notify:
     needs:

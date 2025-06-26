@@ -6,7 +6,7 @@
  * TODO: probably refactoring should be considered so this data is passed from the filters registry AG-41700.
  */
 
-import { NAME_KEY, DESCRIPTION_KEY } from './constants';
+import { NAME_KEY, DESCRIPTION_KEY } from './constants.js';
 
 /**
  * Default data for groups, where keys are ids of AdGuard-supported groups.

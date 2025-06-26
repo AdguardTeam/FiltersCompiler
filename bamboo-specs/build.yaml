@@ -21,7 +21,7 @@ Build:
   docker:
     image: ${bamboo.dockerNode}
     volumes:
-      ${system.YARN_DIR}: "${bamboo.cacheYarn}"
+      ${system.PNPM_DIR}: "${bamboo.cachePnpm}"
   tasks:
     - checkout:
         force-clean-build: true
@@ -33,9 +33,9 @@ Build:
             set -e
             ls -al
 
-            yarn install ${bamboo.varsYarn}
-            yarn build
-            yarn build-txt
+            pnpm install ${bamboo.varsPnpm}
+            pnpm build
+            pnpm build-txt
     - inject-variables:
         file: dist/build.txt
         scope: RESULT

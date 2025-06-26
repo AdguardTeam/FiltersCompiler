@@ -7,8 +7,8 @@
  * e.g. when new filter id or locale is added, much less manual work is needed.
  */
 
-import { generateFiltersI18nSchema } from './build-filters-i18n-schema';
-import { generateFiltersSchema } from './build-filters-schema';
+import { generateFiltersI18nSchema } from './build-filters-i18n-schema.js';
+import { generateFiltersSchema } from './build-filters-schema.js';
 
 generateFiltersI18nSchema();
 generateFiltersSchema();

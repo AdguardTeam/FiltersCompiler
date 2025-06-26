@@ -1,4 +1,4 @@
-import { SCHEMA_TYPES, STRING_PATTERN } from './constants';
+import { SCHEMA_TYPES, STRING_PATTERN } from './constants.js';
 
 /**
  * Creates a schema title based on the property name.
