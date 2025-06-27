@@ -4,7 +4,6 @@
     "description": "AdGuard filters compiler",
     "homepage": "http://adguard.com",
     "type": "module",
-    "main": "dist/index.js",
     "files": [
         "dist"
     ],
