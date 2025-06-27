@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [@adguard/logger] v2.0.0 for logging.
 
-## [v2.0.3] - 2025-06-26
+## [v2.0.4] - 2025-06-26
 
 ### Added
 
@@ -31,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Issue with regex in `$domain` modifier [#241].
 - Issue with regex in `$url` modifier [#237].
 
-[v2.0.0]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.2.8...v2.0.0
+[v2.0.4]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.2.8...v2.0.4
 [#242]: https://github.com/AdguardTeam/FiltersCompiler/issues/242
 [#241]: https://github.com/AdguardTeam/FiltersCompiler/issues/241
 [#237]: https://github.com/AdguardTeam/FiltersCompiler/issues/237
@@ -652,3 +652,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [@adguard/filters-downloader]: https://github.com/AdguardTeam/FiltersDownloader/blob/master/CHANGELOG.md
 [@adguard/scriptlets]: https://github.com/AdguardTeam/Scriptlets/blob/master/CHANGELOG.md
 [@adguard/tsurlfilter]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/tsurlfilter/CHANGELOG.md
+[@adguard/logger]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/logger/CHANGELOG.md
