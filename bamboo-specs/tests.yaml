@@ -36,6 +36,7 @@ Test:
             exec 2>&1
 
             pnpm install
+            pnpm build
             pnpm lint
             pnpm test
   requirements:
