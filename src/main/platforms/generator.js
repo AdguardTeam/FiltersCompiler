@@ -964,7 +964,7 @@ const removeRuleDuplicates = function (list) {
         const result = item.startsWith(RuleMasks.MASK_COMMENT) || duplicatePosition === pos;
 
         if (!result) {
-            logger.log(`${item} removed as duplicate`);
+            logger.info(`${item} removed as duplicate`);
         }
 
         return result;
@@ -1023,7 +1023,7 @@ const buildFilter = async (filterDir, platformsPath, whitelist, blacklist) => {
         rules = removeRuleDuplicates(rules);
 
         // Apply replacement rules
-        if (config.configuration.replacements) {
+        if (config.configuration?.replacements) {
             rules = rules.map((rule) => {
                 // eslint-disable-next-line no-restricted-syntax
                 for (const repl of config.configuration.replacements) {

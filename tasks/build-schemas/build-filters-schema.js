@@ -336,7 +336,7 @@ export const generateFiltersSchema = () => {
 
     try {
         fs.writeFileSync(outputFilePath, JSON.stringify(schema, null, 2), 'utf8');
-        logger.log(`Schema successfully written to ${outputFilePath}`);
+        logger.info(`Schema successfully written to ${outputFilePath}`);
     } catch (error) {
         logger.error(`Error writing schema to ${outputFilePath}:`, error);
     }

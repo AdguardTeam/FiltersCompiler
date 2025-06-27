@@ -25,10 +25,10 @@ process.on('unhandledRejection', (error) => {
 
 export const compile = (path, logPath, reportFile, platformsPath, whitelist, blacklist, customPlatformsConfig) => {
     if (customPlatformsConfig) {
-        logger.log('Using custom platforms configuration');
+        logger.info('Using custom platforms configuration');
         // eslint-disable-next-line no-restricted-syntax, guard-for-in
         for (const platform in customPlatformsConfig) {
-            logger.log(`Redefining platform ${platform}`);
+            logger.info(`Redefining platform ${platform}`);
             platformsConfig[platform] = customPlatformsConfig[platform];
         }
     }

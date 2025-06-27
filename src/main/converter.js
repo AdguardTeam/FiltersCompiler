@@ -45,7 +45,7 @@ export const convertRulesToAdgSyntax = (rulesList, excluded) => {
             }
         } catch (e) {
             const message = `Unable to convert rule to AdGuard syntax: "${rule}" due to error: ${e.message}`;
-            logger.log(message);
+            logger.info(message);
             excludeRule(rule, excluded, message);
         }
     }
@@ -109,7 +109,7 @@ export const convertToUbo = (rules) => {
                         // https://github.com/AdguardTeam/Scriptlets#trusted-scriptlets-restriction
                         // does not work in other blockers
                         const message = `Trusted scriptlets should not be converted to uBO syntax. Rule: "${rule}"`;
-                        logger.log(message);
+                        logger.info(message);
                         modified.push('');
                         return;
                     }
@@ -119,7 +119,7 @@ export const convertToUbo = (rules) => {
                 modified.push(...convertedRules);
             } catch (e) {
                 const message = `Unable to convert rule to Ubo syntax: "${rule}" due to error: ${e.message}`;
-                logger.log(message);
+                logger.info(message);
             }
         } else {
             modified.push('');
