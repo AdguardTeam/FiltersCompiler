@@ -10,7 +10,7 @@
     ],
     "exports": {
         ".": {
-            "default": "./dist/index.js"
+            "import": "./dist/index.js"
         }
     },
     "scripts": {
