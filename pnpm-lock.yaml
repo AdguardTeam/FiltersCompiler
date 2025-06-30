@@ -38,9 +38,6 @@ importers:
       jsdom:
         specifier: ^21.1.1
         version: 21.1.2
-      json5:
-        specifier: ^2.2.3
-        version: 2.2.3
       md5:
         specifier: 2.3.0
         version: 2.3.0
