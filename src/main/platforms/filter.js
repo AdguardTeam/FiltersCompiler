@@ -159,7 +159,7 @@ const shouldOmitRule = function (rule, config, filterId) {
 
     // Omit rules by filtration settings
     if (!config.configuration.ignoreRuleHints && !isPlatformSupported(rule, config.platform)) {
-        logger.log(`${ruleText} removed with platform hint ${rule.hint}`);
+        logger.info(`${ruleText} removed with platform hint ${rule.hint}`);
         return true;
     }
 
@@ -168,7 +168,7 @@ const shouldOmitRule = function (rule, config, filterId) {
         for (const pattern of config.configuration.removeRulePatterns) {
             if (ruleText.match(new RegExp(pattern))) {
                 // eslint-disable-next-line max-len
-                logger.log(`${ruleText} removed with removeRulePattern ${pattern} in filter ${filterId} for ${config.platform} platform`);
+                logger.info(`${ruleText} removed with removeRulePattern ${pattern} in filter ${filterId} for ${config.platform} platform`);
                 return true;
             }
         }

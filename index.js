@@ -1,5 +1,5 @@
 import path from 'path';
-import { setLogger, setConfiguration, CompatibilityTypes } from '@adguard/tsurlfilter';
+import { setConfiguration, CompatibilityTypes } from '@adguard/tsurlfilter';
 
 import { build } from './src/main/builder';
 import { schemaValidator } from './src/main/json-validator';
@@ -10,9 +10,6 @@ import { logger } from './src/main/utils/log';
 import { platformsConfig } from './src/main/platforms-config';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
-
-// Sets RuleConverter to use logger of current library
-setLogger(logger);
 
 // Sets configuration compatibility
 setConfiguration({ compatibility: CompatibilityTypes.Corelibs });
@@ -25,10 +22,10 @@ process.on('unhandledRejection', (error) => {
 
 export const compile = (path, logPath, reportFile, platformsPath, whitelist, blacklist, customPlatformsConfig) => {
     if (customPlatformsConfig) {
-        logger.log('Using custom platforms configuration');
+        logger.info('Using custom platforms configuration');
         // eslint-disable-next-line no-restricted-syntax, guard-for-in
         for (const platform in customPlatformsConfig) {
-            logger.log(`Redefining platform ${platform}`);
+            logger.info(`Redefining platform ${platform}`);
             platformsConfig[platform] = customPlatformsConfig[platform];
         }
     }

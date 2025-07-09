@@ -5,6 +5,14 @@
     "homepage": "http://adguard.com",
     "type": "module",
     "main": "dist/index.js",
+    "files": [
+        "dist"
+    ],
+    "exports": {
+        ".": {
+            "import": "./dist/index.js"
+        }
+    },
     "scripts": {
         "build": "rollup --config rollup.config.js --silent",
         "test": "vitest",
@@ -18,12 +26,13 @@
         "node": ">=20"
     },
     "dependencies": {
-        "@adguard/agtree": "^3.2.1",
+        "@adguard/agtree": "^3.2.2",
         "@adguard/ecss-tree": "^1.1.0",
         "@adguard/extended-css": "^2.1.1",
         "@adguard/filters-downloader": "^2.4.0",
-        "@adguard/scriptlets": "^2.1.7",
-        "@adguard/tsurlfilter": "^3.2.2",
+        "@adguard/logger": "^2.0.0",
+        "@adguard/scriptlets": "^2.1.8",
+        "@adguard/tsurlfilter": "^3.2.4",
         "ajv": "^8.17.1",
         "child_process": ">=1.0.2",
         "jsdom": "^21.1.1",

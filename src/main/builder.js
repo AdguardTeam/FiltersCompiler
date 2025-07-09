@@ -90,7 +90,7 @@ const splitLines = function (string) {
  * @param lines
  */
 const stripComments = function (lines) {
-    logger.log('Stripping comments..');
+    logger.info('Stripping comments..');
 
     return lines.filter((line, pos) => {
         if (pos > 0 && lines[pos - 1].startsWith(RuleMasks.MASK_HINT)) {
@@ -114,7 +114,7 @@ const stripComments = function (lines) {
  * @param lines
  */
 const addNotOptimizedHints = function (lines) {
-    logger.log('Adding hints..');
+    logger.info('Adding hints..');
 
     const result = [];
 
@@ -198,7 +198,7 @@ const isExcluded = function (line, exclusions, excluded, reason) {
                 && line.match(new RegExp(exclusion.substring(1, exclusion.length - 1)));
 
             if ((isExcludedByRegexp || line.includes(exclusion)) && !scriptletException(line, exclusion)) {
-                logger.log(message);
+                logger.info(message);
                 excluded.push(`${RuleMasks.MASK_COMMENT}${SPACE}${message}`);
                 excluded.push(line);
                 return exclusion;
@@ -364,7 +364,7 @@ export const include = async (filterDir, directiveLine, excluded) => {
         return includedLines;
     }
 
-    logger.log(`Applying inclusion from: ${url}`);
+    logger.info(`Applying inclusion from: ${url}`);
 
     const externalInclude = url.includes(':');
 
@@ -424,8 +424,8 @@ export const include = async (filterDir, directiveLine, excluded) => {
         throw new Error(`Error handling include from: ${options.url}`);
     }
 
-    logger.log(`Inclusion lines: ${includedLines.length}`);
-    logger.log(`Should be filtered due to trust level: ${shouldIgnoreTrustLevel}`);
+    logger.info(`Inclusion lines: ${includedLines.length}`);
+    logger.info(`Should be filtered due to trust level: ${shouldIgnoreTrustLevel}`);
 
     return {
         includedLines,

@@ -47,7 +47,7 @@ const validateDir = (dir, validator, schemas, oldSchemas, filtersRequiredAmount)
     try {
         items = fs.readdirSync(dir);
     } catch (e) {
-        logger.log(e.message);
+        logger.info(e.message);
         return false;
     }
     // eslint-disable-next-line no-restricted-syntax
@@ -63,13 +63,13 @@ const validateDir = (dir, validator, schemas, oldSchemas, filtersRequiredAmount)
 
             // Validate `mac` (mac v1) dir with old schemas
             if (path.basename(path.dirname(item)) === OLD_MAC_V1_PLATFORM) {
-                logger.log('Look up old schemas for mac directory');
+                logger.info('Look up old schemas for mac directory');
                 schema = oldSchemas[OLD_MAC_V1_PLATFORM][fileName];
             }
 
             // Validate `mac_v2` dir with old schemas
             if (path.basename(path.dirname(item)) === OLD_MAC_V2_PLATFORM) {
-                logger.log('Look up old schemas for mac_v2 directory');
+                logger.info('Look up old schemas for mac_v2 directory');
                 schema = oldSchemas[OLD_MAC_V2_PLATFORM][fileName];
             }
 

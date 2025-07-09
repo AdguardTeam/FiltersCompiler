@@ -5,9 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.0.5] - 2025-07-09
+
+### Added
+
+- [@adguard/logger] v2.0.0 for logging.
+
+### Changed
+
+- Updated [@adguard/scriptlets] to v2.1.8.
+- Updated [@adguard/agtree] to v3.2.2.
+- Updated [@adguard/tsurlfilter] to v3.2.4.
+
+[v2.0.5]: https://github.com/AdguardTeam/FiltersCompiler/compare/v2.0.4...v2.0.5
+
 ## [v2.0.4] - 2025-06-26
 
-## Added
+### Added
 
 - [@adguard/agtree] v3.2.1 for rules conversion and validation.
 - [@adguard/ecss-tree] v1.1.0 for selector lists validation.
@@ -25,7 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Issue with regex in `$domain` modifier [#241].
 - Issue with regex in `$url` modifier [#237].
 
-[v2.0.0]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.2.8...v2.0.0
+[v2.0.4]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.2.8...v2.0.4
 [#242]: https://github.com/AdguardTeam/FiltersCompiler/issues/242
 [#241]: https://github.com/AdguardTeam/FiltersCompiler/issues/241
 [#237]: https://github.com/AdguardTeam/FiltersCompiler/issues/237
@@ -646,3 +660,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [@adguard/filters-downloader]: https://github.com/AdguardTeam/FiltersDownloader/blob/master/CHANGELOG.md
 [@adguard/scriptlets]: https://github.com/AdguardTeam/Scriptlets/blob/master/CHANGELOG.md
 [@adguard/tsurlfilter]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/tsurlfilter/CHANGELOG.md
+[@adguard/logger]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/logger/CHANGELOG.md

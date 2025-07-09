@@ -43,6 +43,9 @@ describe('converter', () => {
         c = convertRulesToAdgSyntax(['benchmark.pl###bannerDBB:style(height: 10px !important;)']);
         expect(c[0]).toBe('benchmark.pl#$##bannerDBB { height: 10px !important; }');
 
+        c = convertRulesToAdgSyntax(['example.org##body[style^="position: fixed"]:style(position: static !important;)']);
+        expect(c[0]).toBe('example.org#$#body[style^="position: fixed"] { position: static !important; }');
+
         // https://github.com/AdguardTeam/FiltersCompiler/issues/24
         c = convertRulesToAdgSyntax(['720hd.club#?##all:style(margin-top: 0 !important)']);
         expect(c[0]).toBe('720hd.club#$##all { margin-top: 0 !important }');
@@ -342,6 +345,10 @@ describe('converter', () => {
         expected = "example.org#%#//scriptlet('ubo-rc', '.locked', 'body, html', 'stay')";
         expect(actual[0]).toBe(expected);
 
+        actual = convertScriptletToAdg('example.org##+js(nobab)');
+        expected = "example.org#%#//scriptlet('ubo-nobab')";
+        expect(actual[0]).toBe(expected);
+
         actual = convertScriptletToAdg('example.org#$#hide-if-has-and-matches-style \'d[id^="_"]\' \'div > s\' \'display: none\'; hide-if-contains /.*/ .p \'a[href^="/ad__c?"]\'');
         expected = [
             'example.org#%#//scriptlet(\'abp-hide-if-has-and-matches-style\', \'d[id^="_"]\', \'div > s\', \'display: none\')',
@@ -566,7 +573,7 @@ describe('converter', () => {
         expect(actual[0]).toBe(expected);
 
         actual = convertRulesToAdgSyntax(['besplatka.ua,forumodua.com##body > div:not([id]):not([class]):not([style]):empty:remove()']);
-        expected = 'besplatka.ua,forumodua.com#?#body > div:not([id]):not([class]):not([style]):empty:remove()';
+        expected = 'besplatka.ua,forumodua.com#$?#body > div:not([id]):not([class]):not([style]):empty { remove: true; }';
         expect(actual[0]).toBe(expected);
     });
 
@@ -629,6 +636,10 @@ describe('converter', () => {
 
     describe('converts cosmetic rule modifiers to UBlock syntax', () => {
         const rules = [
+            {
+                source: 'example.org##body[style^="position: fixed"] { position: static !important; }',
+                expected: 'example.org##body[style^="position: fixed"]:style(position: static !important;)',
+            },
             {
                 source: '[$path=/page]example.com##p',
                 expected: 'example.com##:matches-path(/page) p',
