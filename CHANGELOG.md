@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Dist for better compatibility with `cjs` packages.
+- CJS build for better compatibility.
 
 [v2.0.6]: https://github.com/AdguardTeam/FiltersCompiler/compare/v2.0.5...v2.0.6
 
