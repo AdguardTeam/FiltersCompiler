@@ -1,6 +1,6 @@
 {
-    "name": "adguard-filters-compiler",
-    "version": "2.0.6",
+    "name": "@adguard/filters-compiler",
+    "version": "3.0.0",
     "description": "AdGuard filters compiler",
     "homepage": "http://adguard.com",
     "type": "module",
@@ -21,7 +21,8 @@
         "increment": "pnpm version patch --no-git-tag-version",
         "build-txt": "node tasks/build-txt.mjs",
         "build-schemas": "node --experimental-specifier-resolution=node tasks/build-schemas/index.js",
-        "prepare": "husky install"
+        "prepare": "husky install",
+        "tgz": "pnpm pack --out filters-compiler.tgz"
     },
     "engines": {
         "node": ">=20"

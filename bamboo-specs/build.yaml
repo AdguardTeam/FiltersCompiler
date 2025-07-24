@@ -36,6 +36,7 @@ Build:
             pnpm install ${bamboo.varsPnpm}
             pnpm build
             pnpm build-txt
+            pnpm pack --out filters-compiler.tgz
     - inject-variables:
         file: dist/build.txt
         scope: RESULT
@@ -61,6 +62,11 @@ Build:
             echo "Size before cleanup:" && du -h | tail -n 1
             rm -rf node_modules
             echo "Size after cleanup:" && du -h | tail -n 1
+  artifacts:
+    - name: filters-compiler.tgz
+      pattern: filters-compiler.tgz
+      shared: true
+      required: true
   requirements:
     - adg-docker: 'true'
 
