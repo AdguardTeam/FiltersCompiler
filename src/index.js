@@ -1,5 +1,5 @@
 import path from 'path';
-import { setLogger, setConfiguration, CompatibilityTypes } from '@adguard/tsurlfilter';
+import { setConfiguration, CompatibilityTypes } from '@adguard/tsurlfilter';
 
 import { build } from './main/builder';
 import { schemaValidator } from './main/json-validator';
@@ -8,9 +8,6 @@ import { logger } from './main/utils/log';
 
 // default platforms config
 import { platformsConfig } from './main/platforms-config';
-
-// Sets RuleConverter to use logger of current library
-setLogger(logger);
 
 // Sets configuration compatibility
 setConfiguration({ compatibility: CompatibilityTypes.Corelibs });
