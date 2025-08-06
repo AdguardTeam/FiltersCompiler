@@ -1024,6 +1024,16 @@ describe('Test builder', () => {
                 expect(ifLines.includes('ios_rule')).toBeFalsy();
             });
 
+            it('filters4.txt - adguard_ext_opera_mv3 constant for the if directive', async () => {
+                const ifContent = await readFile(path.join(platformsDir, 'opera-mv3', 'filters', '4.txt'));
+                expect(ifContent).toBeTruthy();
+
+                const ifLines = ifContent.split(/\r?\n/);
+                expect(ifLines.length).toEqual(24);
+                expect(ifLines.includes('opera_mv3_specific_rule')).toBeTruthy();
+                expect(ifLines.includes('ios_rule')).toBeFalsy();
+            });
+
             it('filters4.txt - adguard_app_cli constant for the if directive', async () => {
                 const ifContent = await readFile(path.join(platformsDir, 'cli', 'filters', '4.txt'));
                 expect(ifContent).toBeTruthy();

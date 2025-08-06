@@ -176,6 +176,22 @@
             "adguard_ext_chromium": true
         }
     },
+    "EXTENSION_OPERA_MV3": {
+        "platform": "ext_opera_mv3",
+        "path": "opera-mv3",
+        "configuration": {
+            "removeRulePatterns": [
+                "\\$redirect-rule=",
+                ",redirect-rule="
+            ],
+            "ignoreRuleHints": false
+        },
+        "defines": {
+            "adguard": true,
+            "adguard_ext_opera_mv3": true,
+            "adguard_ext_chromium_mv3": true
+        }
+    },
     "TEST_REPLACEMENTS": {
         "platform": "test",
         "path": "replacements",

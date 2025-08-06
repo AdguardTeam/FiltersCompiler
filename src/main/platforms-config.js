@@ -493,7 +493,8 @@ const EXTENDED_CSS_RULES_PATTERNS = [
 ];
 
 /**
- * Used for `EXTENSION_CHROMIUM`, `EXTENSION_CHROMIUM_MV3`, `EXTENSION_EDGE`, and `EXTENSION_OPERA` platforms.
+ * Used for `EXTENSION_CHROMIUM`, `EXTENSION_CHROMIUM_MV3`, `EXTENSION_EDGE`,
+ * `EXTENSION_OPERA`, and `EXTENSION_OPERA_MV3` platforms.
  */
 const CHROMIUM_BASED_EXTENSION_PATTERNS = [
     ...HTML_FILTERING_MODIFIER_PATTERNS,
@@ -698,6 +699,24 @@ export const platformsConfig = {
             'adguard': true,
             'adguard_ext_opera': true,
             'adguard_ext_chromium': true,
+        },
+    },
+    'EXTENSION_OPERA_MV3': {
+        'platform': 'ext_opera_mv3',
+        'path': 'extension/opera-mv3',
+        'expires': '10 days',
+        'configuration': {
+            'removeRulePatterns': [
+                ...CHROMIUM_BASED_EXTENSION_PATTERNS,
+                ...REDIRECT_MODIFIER_PATTERNS,
+            ],
+            'replacements': null,
+            'ignoreRuleHints': false,
+        },
+        'defines': {
+            'adguard': true,
+            'adguard_ext_opera_mv3': true,
+            'adguard_ext_chromium_mv3': true,
         },
     },
     'EXTENSION_FIREFOX': {

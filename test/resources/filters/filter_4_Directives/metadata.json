@@ -16,6 +16,7 @@
     "cli",
     "ext_ublock",
     "ext_edge",
-    "ext_chromium_mv3"
+    "ext_chromium_mv3",
+    "ext_opera_mv3"
   ]
 }
