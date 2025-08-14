@@ -101,10 +101,8 @@ class CompilerLogger extends Logger {
      * Log regular message
      * @param {string} message - Message to log
      */
+    /* eslint-disable class-methods-use-this */
     log(message) {
-        // Call parent implementation like in debug method
-        super.log(message);
-
         // Additional file logging
         if (isLevelIncluded(Levels.LOG)) {
             appendFile(message, 'LOG');
