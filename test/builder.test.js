@@ -55,6 +55,14 @@ describe('Test builder', () => {
         await build(filtersDir, logFile, reportFile, platformsDir, platformsConfig);
     });
 
+    describe('Log file tests', () => {
+        it('should contain text', async () => {
+            const logContent = await readFile(logFile);
+            expect(logContent).toBeTruthy();
+            expect(logContent.length).toBeGreaterThan(0);
+        });
+    });
+
     describe('Works', () => {
         it('revision', async () => {
             const revisionContent = await readFile(path.join(filtersDir, 'filter_3_Test', 'revision.json'));
