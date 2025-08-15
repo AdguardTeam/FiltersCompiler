@@ -84,20 +84,6 @@ class CompilerLogger extends Logger {
     }
 
     /**
-     * Log debug message
-     * @param {string} message - Message to log
-     */
-    debug(message) {
-        // Call parent implementation
-        super.debug(message);
-
-        // Additional file logging
-        if (isLevelIncluded(Levels.DEBUG)) {
-            appendFile(message, 'DEBUG');
-        }
-    }
-
-    /**
      * Log regular message
      * @param {string} message - Message to log
      */
