@@ -21,7 +21,7 @@ const levelMap = {
     'Warn': 2,
     'Info': 3,
     'Debug': 4,
-    'Verbose': 5
+    'Verbose': 5,
 };
 
 /**
@@ -30,10 +30,9 @@ const levelMap = {
  * @returns {boolean} True if level should be logged
  */
 const isLevelIncluded = (level) => {
-    
     const levelValue = levelMap[level];
     const currentLevelValue = levelMap[logLevel];
-    
+
     return levelValue && currentLevelValue && levelValue <= currentLevelValue;
 };
 
@@ -92,7 +91,7 @@ class CompilerLogger extends Logger {
 
         // Additional file logging
         if (isLevelIncluded('Warn')) {
-                appendFile(message, 'WARN');
+            appendFile(message, 'WARN');
         }
     }
 
@@ -101,13 +100,13 @@ class CompilerLogger extends Logger {
      *
      * @param {string} logFilePath - log file path
      * @param {string} level - log level (optional)
-     * 
+     *
      * The log file is opened with 'w' mode (write-only), which:
      * - Creates the file if it doesn't exist (and creates parent directories if needed)
      * - Truncates the file to zero length if it already exists (overwrites existing content)
      * - Opens the file for writing only
      * This means any existing log content will be lost when the logger is initialized.
-     * 
+     *
      */
     initialize(logFilePath, level) {
         if (level) {
@@ -117,7 +116,7 @@ class CompilerLogger extends Logger {
             // Ensure the directory exists before creating the log file
             const dir = path.dirname(logFilePath);
             fs.mkdirSync(dir, { recursive: true });
-            
+
             fileDir = fs.openSync(logFilePath, 'w');
             this.logFile = logFilePath;
         } else {
@@ -129,4 +128,4 @@ class CompilerLogger extends Logger {
 
 const logger = new CompilerLogger();
 
-export { logger, Levels };
+export { logger };
