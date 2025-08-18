@@ -4,37 +4,9 @@ import os from 'os';
 import path from 'path';
 
 /*
- * Logging level (default: Info)
- */
-let logLevel = 'Info';
-
-/*
  * File directory for logging
  */
 let fileDir;
-
-/*
- * Hardcoded mapping based on LogLevelNumeric enum values
- */
-const levelMap = {
-    'Error': 1,
-    'Warn': 2,
-    'Info': 3,
-    'Debug': 4,
-    'Verbose': 5,
-};
-
-/**
- * Check if specified level is included in current logging level
- * @param {string} level - Level to check
- * @returns {boolean} True if level should be logged
- */
-const isLevelIncluded = (level) => {
-    const levelValue = levelMap[level];
-    const currentLevelValue = levelMap[logLevel];
-
-    return levelValue && currentLevelValue && levelValue <= currentLevelValue;
-};
 
 /**
  * Append message to log file
@@ -62,9 +34,7 @@ class CompilerLogger extends Logger {
         super.info(message);
 
         // Additional file logging
-        if (isLevelIncluded('Info')) {
-            appendFile(message, 'INFO');
-        }
+        appendFile(message, 'INFO');
     }
 
     /**
@@ -76,9 +46,7 @@ class CompilerLogger extends Logger {
         super.error(message);
 
         // Additional file logging
-        if (isLevelIncluded('Error')) {
-            appendFile(message, 'ERROR');
-        }
+        appendFile(message, 'ERROR');
     }
 
     /**
@@ -90,9 +58,7 @@ class CompilerLogger extends Logger {
         super.warn(message);
 
         // Additional file logging
-        if (isLevelIncluded('Warn')) {
-            appendFile(message, 'WARN');
-        }
+        appendFile(message, 'WARN');
     }
 
     /**
@@ -108,10 +74,7 @@ class CompilerLogger extends Logger {
      * This means any existing log content will be lost when the logger is initialized.
      *
      */
-    initialize(logFilePath, level) {
-        if (level) {
-            logLevel = level;
-        }
+    initialize(logFilePath) {
         if (logFilePath) {
             // Ensure the directory exists before creating the log file
             const dir = path.dirname(logFilePath);
