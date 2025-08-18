@@ -1,18 +1,27 @@
 import { Logger } from '@adguard/logger';
 import fs from 'fs';
 import os from 'os';
+import path from 'path';
 
-let logLevel = 'LOG';
-let fd;
-
-/**
- * Log levels
+/*
+ * Logging level (default: Info)
  */
-const Levels = {
-    LOG: 0,
-    INFO: 1,
-    WARN: 2,
-    ERROR: 3,
+let logLevel = 'Info';
+
+/*
+ * File directory for logging
+ */
+let fileDir;
+
+/*
+ * Hardcoded mapping based on LogLevelNumeric enum values
+ */
+const levelMap = {
+    'Error': 1,
+    'Warn': 2,
+    'Info': 3,
+    'Debug': 4,
+    'Verbose': 5
 };
 
 /**
@@ -21,7 +30,11 @@ const Levels = {
  * @returns {boolean} True if level should be logged
  */
 const isLevelIncluded = (level) => {
-    return Levels[logLevel] <= level;
+    
+    const levelValue = levelMap[level];
+    const currentLevelValue = levelMap[logLevel];
+    
+    return levelValue && currentLevelValue && levelValue <= currentLevelValue;
 };
 
 /**
@@ -30,10 +43,10 @@ const isLevelIncluded = (level) => {
  * @param {string} level - Log level
  */
 const appendFile = (message, level) => {
-    if (fd) {
-        message = `[${new Date().toLocaleTimeString()}][${level}]:${message}${os.EOL}`;
+    if (fileDir) {
+        message = `[${new Date().toLocaleTimeString()}] [${level}]: ${message}${os.EOL}`;
 
-        fs.appendFileSync(fd, message, 'utf8');
+        fs.appendFileSync(fileDir, message, 'utf8');
     }
 };
 
@@ -50,7 +63,7 @@ class CompilerLogger extends Logger {
         super.info(message);
 
         // Additional file logging
-        if (isLevelIncluded(Levels.INFO)) {
+        if (isLevelIncluded('Info')) {
             appendFile(message, 'INFO');
         }
     }
@@ -64,7 +77,7 @@ class CompilerLogger extends Logger {
         super.error(message);
 
         // Additional file logging
-        if (isLevelIncluded(Levels.ERROR)) {
+        if (isLevelIncluded('Error')) {
             appendFile(message, 'ERROR');
         }
     }
@@ -78,36 +91,35 @@ class CompilerLogger extends Logger {
         super.warn(message);
 
         // Additional file logging
-        if (isLevelIncluded(Levels.WARN)) {
-            appendFile(message, 'WARN');
-        }
-    }
-
-    /**
-     * Log regular message
-     * @param {string} message - Message to log
-     */
-    /* eslint-disable class-methods-use-this */
-    log(message) {
-        // Additional file logging
-        if (isLevelIncluded(Levels.LOG)) {
-            appendFile(message, 'LOG');
+        if (isLevelIncluded('Warn')) {
+                appendFile(message, 'WARN');
         }
     }
 
     /**
      * Initializes logger
      *
-     * @param {string} path - log file path
+     * @param {string} logFilePath - log file path
      * @param {string} level - log level (optional)
+     * 
+     * The log file is opened with 'w' mode (write-only), which:
+     * - Creates the file if it doesn't exist (and creates parent directories if needed)
+     * - Truncates the file to zero length if it already exists (overwrites existing content)
+     * - Opens the file for writing only
+     * This means any existing log content will be lost when the logger is initialized.
+     * 
      */
-    initialize(path, level) {
+    initialize(logFilePath, level) {
         if (level) {
             logLevel = level;
         }
-        if (path) {
-            fd = fs.openSync(path, 'w');
-            this.logFile = path;
+        if (logFilePath) {
+            // Ensure the directory exists before creating the log file
+            const dir = path.dirname(logFilePath);
+            fs.mkdirSync(dir, { recursive: true });
+            
+            fileDir = fs.openSync(logFilePath, 'w');
+            this.logFile = logFilePath;
         } else {
             /* eslint-disable no-console */
             console.warn('Log file is not specified');

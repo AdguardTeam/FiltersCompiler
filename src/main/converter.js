@@ -109,7 +109,7 @@ export const convertToUbo = (rules) => {
                         // https://github.com/AdguardTeam/Scriptlets#trusted-scriptlets-restriction
                         // does not work in other blockers
                         const message = `Trusted scriptlets should not be converted to uBO syntax. Rule: "${rule}"`;
-                        logger.log(message);
+                        logger.warn(message);
                         modified.push('');
                         return;
                     }
