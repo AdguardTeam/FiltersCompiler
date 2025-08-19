@@ -247,7 +247,6 @@ The compiler generates a log file (log.txt by default) containing detailed infor
 
 The logger supports the following log levels:
 
-- `LOG`: Detailed operational messages (most verbose)
 - `INFO`: General information about the process
 - `WARN`: Warning messages that don't stop the process
 - `ERROR`: Error messages indicating failures
@@ -256,9 +255,7 @@ The logger supports the following log levels:
 
 The logger is initialized during compilation.
 
-The `initialize` function accepts two parameters:
-- `path`: Path to the log file (required)
-- `level`: Log level (optional, default is 'LOG'). If you want less verbose logs, you can set it to `INFO`, `WARN`, or `ERROR`.
+The `initialize` function accepts parameter `path`: Path to the log file (required)
 
 [FiltersRegistry]: https://github.com/AdguardTeam/FiltersRegistry/
 [filters-metadata]: https://github.com/AdguardTeam/FiltersRegistry/blob/master/README.md#filters-metadata
