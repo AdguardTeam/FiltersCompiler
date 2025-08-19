@@ -241,7 +241,13 @@ where:
 
 ## Logging
 
-The compiler generates a log file (log.txt by default) containing detailed information about the filter compilation process.
+In order for the compiler to write logs, you need to pass `logPath` to the `compile` function as the second argument:
+
+```javascript
+compile = (path, logPath, reportFile, platformsPath, whitelist, blacklist, customPlatformsConfig)
+```
+
+If the `logPath` argument is not passed, the log file will not be written. If the directory with the file does not exist, it will be created.
 
 ### Log Levels
 
@@ -253,9 +259,7 @@ The logger supports the following log levels:
 
 ### Logger Initialization
 
-The logger is initialized during compilation.
-
-The `initialize` function accepts parameter `path`: Path to the log file (required)
+The logger is initialized during compilation when a valid `logPath` is provided.
 
 [FiltersRegistry]: https://github.com/AdguardTeam/FiltersRegistry/
 [filters-metadata]: https://github.com/AdguardTeam/FiltersRegistry/blob/master/README.md#filters-metadata
