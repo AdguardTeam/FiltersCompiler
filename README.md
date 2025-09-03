@@ -9,6 +9,7 @@ It is used in [FiltersRegistry].
     - [Schemas maintenance](#schemas-maintenance)
 - [Filters metadata](#filters-metadata)
 - [`@include` directive and its options](#include-directive)
+- [Logging](#logging)
 
 ## Usage
 
@@ -237,6 +238,28 @@ where:
     ```adblock
     @include ./input.txt /ignoreTrustLevel
     ```
+
+## Logging
+
+In order for the compiler to write logs, you need to pass `logPath` to the `compile` function as the second argument:
+
+```javascript
+compile = (path, logPath, reportFile, platformsPath, whitelist, blacklist, customPlatformsConfig)
+```
+
+If the `logPath` argument is not passed, the log file will not be written. If the directory with the file does not exist, it will be created.
+
+### Log Levels
+
+The logger supports the following log levels:
+
+- `INFO`: General information about the process
+- `WARN`: Warning messages that don't stop the process
+- `ERROR`: Error messages indicating failures
+
+### Logger Initialization
+
+The logger is initialized during compilation when a valid `logPath` is provided.
 
 [FiltersRegistry]: https://github.com/AdguardTeam/FiltersRegistry/
 [filters-metadata]: https://github.com/AdguardTeam/FiltersRegistry/blob/master/README.md#filters-metadata

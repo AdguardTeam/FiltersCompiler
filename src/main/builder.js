@@ -452,7 +452,7 @@ const getResolvedPreprocessorIncludes = async function (filterDir, filterName, l
     try {
         rules = await FiltersDownloader.resolveIncludes(lines, filterDir);
     } catch (e) {
-        logger.warn(`Error resolving includes in ${filterName}: ${e.message}`);
+        logger.error(`Error resolving includes in ${filterName}: ${e.message}`);
     }
     return rules;
 };
@@ -633,6 +633,13 @@ const buildFilter = async function (filterDir, whitelist, blacklist) {
 
     const { filterId } = metadata;
 
+    // check whether the filter is disabled after other checks to avoid unnecessary logging
+    if (metadata.disabled) {
+        logger.warn(`Filter ${filterId} skipped as disabled`);
+        skipFilter(metadata);
+        return;
+    }
+
     if (whitelist && whitelist.length > 0 && whitelist.indexOf(filterId) < 0) {
         logger.info(`Filter ${filterId} skipped due to '--include' option`);
         return;
@@ -640,13 +647,6 @@ const buildFilter = async function (filterDir, whitelist, blacklist) {
 
     if (blacklist && blacklist.length > 0 && blacklist.indexOf(filterId) >= 0) {
         logger.info(`Filter ${filterId} skipped due to '--skip' option`);
-        return;
-    }
-
-    // check whether the filter is disabled after other checks to avoid unnecessary logging
-    if (metadata.disabled) {
-        logger.warn(`Filter ${filterId} skipped as disabled`);
-        skipFilter(metadata);
         return;
     }
 
