@@ -1485,3 +1485,40 @@ describe('apply platformsExcluded directive during limited filters list build', 
         expect(localizedFilterIds.includes('3')).toBeTruthy();
     });
 });
+
+describe('Invalid rules collection in report', () => {
+    beforeAll(async () => {
+        const platformsConfig = await getPlatformsConfig();
+
+        // remove platformsDir if it exists
+        if (existsSync(platformsDir)) {
+            await fs.rmdir(platformsDir, { recursive: true });
+        }
+
+        const filtersToBuild = [14];
+        await build(filtersDir, logFile, reportFile, platformsDir, platformsConfig, filtersToBuild);
+    });
+
+    it('should collect invalid rules from conversion errors in report file', async () => {
+        const reportContent = await readFile(reportFile);
+        expect(reportContent).toBeTruthy();
+        expect(reportContent.length).toBeGreaterThan(0);
+
+        // Check that the invalid rule from conversion error is in the report
+        expect(reportContent).toContain('INVALID RULES:');
+        expect(reportContent).toContain('jpopsingles.eu$$script:contains(eval(function(p,a,c,k,e,d))');
+        expect(reportContent).toContain('Unable to convert rule to AdGuard syntax');
+        expect(reportContent).not.toContain('||filter14.example.com^');
+    });
+
+    it('should collect invalid rules from conversion errors in diff file', async () => {
+        const diffFilePath = path.join(__dirname, 'resources/filters/filter_14_InvalidRules/diff.txt');
+        const diffContent = await readFile(diffFilePath);
+        expect(diffContent).toBeTruthy();
+        expect(diffContent.length).toBeGreaterThan(0);
+
+        const diffLines = diffContent.split('\n');
+        expect(diffLines[0]).toContain('Unable to convert rule to AdGuard syntax');
+        expect(diffLines[1]).toContain('jpopsingles.eu$$script:contains(eval(function(p,a,c,k,e,d))');
+    });
+});

@@ -1,0 +1,8 @@
+! Homepage: https://example.com/
+! License: https://creativecommons.org/licenses/by-sa/3.0/
+!
+! Test filter with invalid rules that should be collected in the report
+! TODO (AG-24662): fix the following rule conversion
+jpopsingles.eu$$script:contains(eval(function(p,a,c,k,e,d))
+! Valid rule
+||filter14.example.com^

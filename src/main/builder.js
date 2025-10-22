@@ -463,13 +463,20 @@ const getResolvedPreprocessorIncludes = async function (filterDir, filterName, l
  * @param {string} filterDir Filter directory.
  * @param {string} filterName Filter name.
  * @param {string[]} lines Array of raw rules and possibly preprocessor `!#include` directives.
- * @param {string} excluded Array of rules to exclude.
+ * @param {string[]} excluded Array of rules to exclude.
+ * @param {string[]} invalidRules Invalid rules for the report file.
  *
  * @returns {Promise<string[]>} Promise which resolves to array of AdGuard syntax rules.
  */
-const prepareAdgRules = async function (filterDir, filterName, lines, excluded) {
+const prepareAdgRules = async function (
+    filterDir,
+    filterName,
+    lines,
+    excluded,
+    invalidRules,
+) {
     const resolvedIncludes = await getResolvedPreprocessorIncludes(filterDir, filterName, lines);
-    return convertRulesToAdgSyntax(resolvedIncludes, excluded);
+    return convertRulesToAdgSyntax(resolvedIncludes, excluded, invalidRules);
 };
 
 /**
@@ -535,7 +542,13 @@ const compile = async function (filterDir, filterName, templateContent, trustLev
             includedLines.forEach((line) => includedRules.push(line.trim()));
 
             // eslint-disable-next-line no-await-in-loop
-            includedRules = await prepareAdgRules(filterDir, filterName, includedRules, excluded);
+            includedRules = await prepareAdgRules(
+                filterDir,
+                filterName,
+                includedRules,
+                excluded,
+                invalid,
+            );
 
             if (shouldIgnoreTrustLevel) {
                 logger.info(`Ignoring trust level for ${filterName} due to @include directive: ${line}`);
@@ -553,7 +566,13 @@ const compile = async function (filterDir, filterName, templateContent, trustLev
             let inlineRules = [line.trim()];
 
             // eslint-disable-next-line no-await-in-loop
-            inlineRules = await prepareAdgRules(filterDir, filterName, inlineRules, excluded);
+            inlineRules = await prepareAdgRules(
+                filterDir,
+                filterName,
+                inlineRules,
+                excluded,
+                invalid,
+            );
 
             logger.info('Applying trust-level exclusions to inline template.txt rules...');
             inlineRules = exclude(inlineRules, trustLevelSettings, excluded);
