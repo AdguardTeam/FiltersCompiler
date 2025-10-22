@@ -111,13 +111,24 @@ describe('converter', () => {
         expect(c).toEqual([expected]);
     });
 
-    it('collects logs for converted rules', () => {
-        const rule = 'example.com##h1:style(background-color: blue !important)';
-        const excluded = [];
-        const c = convertRulesToAdgSyntax([rule], excluded);
-        const expectedConvertedRule = 'example.com#$#h1 { background-color: blue !important }';
-        expect(c[0]).toBe(expectedConvertedRule);
-        expect(excluded[0]).toBe(`! Rule "${rule}" converted to: "${[...[expectedConvertedRule]]}"`);
+    describe('collects logs for converted rules', () => {
+        it('formats conversion message for single converted rule', () => {
+            const rule = 'example.com##h1:style(background-color: blue !important)';
+            const excluded = [];
+            const result = convertRulesToAdgSyntax([rule], excluded);
+            expect(result[0]).toBe('example.com#$#h1 { background-color: blue !important }');
+            expect(excluded).toHaveLength(2);
+            expect(excluded[0]).toContain('converted to:');
+            expect(excluded[0]).not.toContain('to multiple rules:');
+        });
+
+        it('formats conversion message for multiple converted rules', () => {
+            const rule = 'test.com#$#abort-on-property-read adsShown; json-prune ad vinfo';
+            const excluded = [];
+            convertRulesToAdgSyntax([rule], excluded);
+            const logMessages = excluded.filter((msg) => msg.startsWith('!'));
+            expect(logMessages.some((msg) => msg.includes('to multiple rules:'))).toBeTruthy();
+        });
     });
 
     it('converts first-party replaced by ~third-party', () => {

@@ -40,7 +40,11 @@ export const convertRulesToAdgSyntax = (rulesList, excluded) => {
             result.push(...convertedRules);
 
             if (conversionResult.isConverted) {
-                const message = `Rule "${rule}" converted to: "${[...convertedRules]}"`;
+                const messagePostfix = convertedRules.length > 1
+                    // eslint-disable-next-line quotes
+                    ? `to multiple rules: "${convertedRules.join(", ")}"`
+                    : `to: "${convertedRules[0]}"`;
+                const message = `Rule "${rule}" converted ${messagePostfix}`;
                 excludeRule(rule, excluded, message);
             }
         } catch (e) {
