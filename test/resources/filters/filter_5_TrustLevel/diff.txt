@@ -12,9 +12,9 @@ example.com##^script:contains(banner)
 ||www.ynet.co.il^$important,websocket,1p,domain=www.ynet.co.il
 ! Rule "@@.com/ads.js|$3p,domain=~3ppt.com']" converted to: "@@.com/ads.js|$third-party,domain=~3ppt.com']"
 @@.com/ads.js|$3p,domain=~3ppt.com']
-! Unable to convert rule to AdGuard syntax: "example.com##^script:has-text(/.advert/)" due to error: Cannot convert RegExp parameter '/.advert/' from 'has-text' pseudo class, because converting RegExp patterns are not supported yet
+! Error: Unable to convert rule to AdGuard syntax: "example.com##^script:has-text(/.advert/)" due to error: Cannot convert RegExp parameter '/.advert/' from 'has-text' pseudo class, because converting RegExp patterns are not supported yet
 example.com##^script:has-text(/.advert/)
-! Unable to convert rule to AdGuard syntax: "rybnik.com.pl##^iframe[name]:not([class]):not([id]):not([src])[style="display:none"]" due to error: Unsupported pseudo class 'not'
+! Error: Unable to convert rule to AdGuard syntax: "rybnik.com.pl##^iframe[name]:not([class]):not([id]):not([src])[style="display:none"]" due to error: Unsupported pseudo class 'not'
 rybnik.com.pl##^iframe[name]:not([class]):not([id]):not([src])[style="display:none"]
 ! Rule "test.com#$#abort-on-property-read adsShown" converted to: "test.com#%#//scriptlet('abp-abort-on-property-read', 'adsShown')"
 test.com#$#abort-on-property-read adsShown

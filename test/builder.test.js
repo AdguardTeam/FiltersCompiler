@@ -1506,8 +1506,8 @@ describe('Invalid rules collection in report', () => {
 
         // Check that the invalid rule from conversion error is in the report
         expect(reportContent).toContain('INVALID RULES:');
-        expect(reportContent).toContain('jpopsingles.eu$$script:contains(eval(function(p,a,c,k,e,d))');
-        expect(reportContent).toContain('Unable to convert rule to AdGuard syntax');
+        expect(reportContent).toContain('filter14.example.com$$script:contains(eval(function(p,a,c,k,e,d))');
+        expect(reportContent).toContain('Error: Unable to convert rule to AdGuard syntax');
         expect(reportContent).not.toContain('||filter14.example.com^');
     });
 
@@ -1518,7 +1518,7 @@ describe('Invalid rules collection in report', () => {
         expect(diffContent.length).toBeGreaterThan(0);
 
         const diffLines = diffContent.split('\n');
-        expect(diffLines[0]).toContain('Unable to convert rule to AdGuard syntax');
-        expect(diffLines[1]).toContain('jpopsingles.eu$$script:contains(eval(function(p,a,c,k,e,d))');
+        expect(diffLines[0]).toContain('Error: Unable to convert rule to AdGuard syntax');
+        expect(diffLines[1]).toContain('filter14.example.com$$script:contains(eval(function(p,a,c,k,e,d))');
     });
 });

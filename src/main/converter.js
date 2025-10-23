@@ -50,7 +50,7 @@ export const convertRulesToAdgSyntax = (rulesList, excluded = [], invalidRules =
                 excludeRule(rule, excluded, message);
             }
         } catch (e) {
-            const message = `Unable to convert rule to AdGuard syntax: "${rule}" due to error: ${e.message}`;
+            const message = `Error: Unable to convert rule to AdGuard syntax: "${rule}" due to error: ${e.message}`;
             logger.error(message);
             excludeRule(rule, excluded, message);
 

@@ -626,7 +626,7 @@ describe('converter', () => {
             expect(excluded).toHaveLength(2);
             expect(excluded).toEqual(
                 [
-                    "! Unable to convert rule to AdGuard syntax: \"example.org#$#selector:style()\" due to error: 'AdblockPlus' syntax cannot be mixed with 'UblockOrigin' syntax",
+                    "! Error: Unable to convert rule to AdGuard syntax: \"example.org#$#selector:style()\" due to error: 'AdblockPlus' syntax cannot be mixed with 'UblockOrigin' syntax",
                     'example.org#$#selector:style()',
                 ],
             );
@@ -638,7 +638,7 @@ describe('converter', () => {
             expect(excluded).toHaveLength(2);
             expect(excluded).toEqual(
                 [
-                    "! Unable to convert rule to AdGuard syntax: \"yamareco.com#$#body.header_bg_ad.modal-open:style(padding-right: auto !important;overflow: auto!important)\" due to error: 'AdblockPlus' syntax cannot be mixed with 'UblockOrigin' syntax",
+                    "! Error: Unable to convert rule to AdGuard syntax: \"yamareco.com#$#body.header_bg_ad.modal-open:style(padding-right: auto !important;overflow: auto!important)\" due to error: 'AdblockPlus' syntax cannot be mixed with 'UblockOrigin' syntax",
                     'yamareco.com#$#body.header_bg_ad.modal-open:style(padding-right: auto !important;overflow: auto!important)',
                 ],
             );
