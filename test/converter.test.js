@@ -271,6 +271,19 @@ describe('converter', () => {
         expect(actual[0]).toBe(undefined);
     });
 
+    describe('converts html rules with pseudo-classes', () => {
+        it.each([
+            'example.com$$script:contains(eval(function(p,a,c,k,e,d))',
+            'example.com$$script:contains((function(_0x)',
+            'example.com$$script:contains(Array.from(document.querySelectorAll)',
+            "example.com$$script:contains(document.addEventListener('click')",
+        ])('$input', (input) => {
+            const actual = convertRulesToAdgSyntax([input]);
+            // keep the rule as is. TODO: check while AG-24662 resolving
+            expect(actual[0]).toBe(input);
+        });
+    });
+
     it('converts $1p to $~third-party and $3p to $third-party', () => {
         let actual = convertRulesToAdgSyntax(['||www.ynet.co.il^$important,websocket,1p,domain=www.ynet.co.il']);
         let expected = '||www.ynet.co.il^$important,websocket,~third-party,domain=www.ynet.co.il';

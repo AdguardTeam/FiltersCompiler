@@ -1,4 +1,4 @@
-import { ADG_SCRIPTLET_MASK } from '@adguard/agtree';
+import { AdblockSyntax, ADG_SCRIPTLET_MASK, CosmeticRuleType } from '@adguard/agtree';
 
 import { RuleMasks } from '../rule/rule-masks';
 
@@ -224,4 +224,43 @@ export const rewriteMetadataForOldMacV2 = function (metadata) {
     const result = { ...metadata };
     result.groups = removeGroupDescriptions(result.groups.slice(0));
     return result;
+};
+
+/**
+ * Markers of pseudo-classes for HTML filtering rules.
+ *
+ * Already supported by the AdGuard apps, but not implemented for the extension yet.
+ * TODO: AG-24662.
+ *
+ * @see {@link https://adgkb.service.agrd.dev/kb/general/ad-filtering/create-own-filters/#html-filtering-rules--pseudo-classes}
+ */
+const HTML_RULES_PSEUDO_CLASS_MARKERS = [
+    // AdGuard-specific pseudo-classes
+    ':contains(',
+    // aliases
+    ':-abp-contains(',
+    ':has-text(',
+];
+
+/**
+ * Checks if the rule should be kept as is,
+ * i.e. no conversion and no validation,
+ * since it is not supported by the extension yet.
+ *
+ * Conditions for keeping the rule as is:
+ * - rule is HTML filtering rule
+ * - rule is AdGuard syntax
+ * - rule contains pseudo-class marker.
+ *
+ * Planned to be fixed:
+ * https://github.com/AdguardTeam/tsurlfilter/issues/96.
+ *
+ * @param {import('@adguard/agtree').AnyRule} ruleNode Rule node to check.
+ *
+ * @returns {boolean} True if the rule should be kept as is, otherwise false.
+ */
+export const shouldKeepAdgHtmlFilteringRuleAsIs = (ruleNode) => {
+    return ruleNode.type === CosmeticRuleType.HtmlFilteringRule
+        && ruleNode.syntax === AdblockSyntax.Adg
+        && HTML_RULES_PSEUDO_CLASS_MARKERS.some((marker) => ruleNode.body.value.includes(marker));
 };

@@ -1506,19 +1506,21 @@ describe('Invalid rules collection in report', () => {
 
         // Check that the invalid rule from conversion error is in the report
         expect(reportContent).toContain('INVALID RULES:');
-        expect(reportContent).toContain('filter14.example.com$$script:contains(eval(function(p,a,c,k,e,d))');
+        expect(reportContent).toContain('filter14.example.com#$#selector:style()');
         expect(reportContent).toContain('Error: Unable to convert rule to AdGuard syntax');
         expect(reportContent).not.toContain('||filter14.example.com^');
+        expect(reportContent).not.toContain('filter14.example.com$$script:contains(eval(function(p,a,c,k,e,d))');
     });
 
     it('should collect invalid rules from conversion errors in diff file', async () => {
         const diffFilePath = path.join(__dirname, 'resources/filters/filter_14_InvalidRules/diff.txt');
-        const diffContent = await readFile(diffFilePath);
+        const diffContent = (await readFile(diffFilePath)).trim();
         expect(diffContent).toBeTruthy();
         expect(diffContent.length).toBeGreaterThan(0);
 
         const diffLines = diffContent.split('\n');
+        expect(diffLines.length).toBe(2);
         expect(diffLines[0]).toContain('Error: Unable to convert rule to AdGuard syntax');
-        expect(diffLines[1]).toContain('filter14.example.com$$script:contains(eval(function(p,a,c,k,e,d))');
+        expect(diffLines[1]).toContain('filter14.example.com#$#selector:style()');
     });
 });

@@ -4,10 +4,11 @@ import {
     RuleGenerator,
     CosmeticRuleType,
 } from '@adguard/agtree';
+import { getErrorMessage } from '@adguard/logger';
 
 import { logger } from './utils/log';
-
 import { RuleMasks } from './rule/rule-masks';
+import { shouldKeepAdgHtmlFilteringRuleAsIs } from './utils/workaround';
 
 /**
  * Excludes rule
@@ -24,11 +25,12 @@ export const excludeRule = (rule, excluded, message) => {
 
 /**
  * Converts rules to AdGuard syntax
- * @param {array} rulesList
+ *
+ * @param {string[]} rulesList Input rules.
  * @param {string[]} [excluded=[]] Rules to exclude.
  * @param {string[]} [invalidRules=[]] Collected invalid rules for the report file.
  *
- * @return {array} result
+ * @return {string[]} Rules converted to AdGuard syntax.
  */
 export const convertRulesToAdgSyntax = (rulesList, excluded = [], invalidRules = []) => {
     const result = [];
@@ -37,6 +39,16 @@ export const convertRulesToAdgSyntax = (rulesList, excluded = [], invalidRules =
         const rule = rulesList[i];
         try {
             const ruleNode = RuleParser.parse(rule);
+
+            // temporary workaround for AdGuard's HTML filtering rules with pseudo-classes.
+            // TODO: remove during AG-24662 resolving
+            if (shouldKeepAdgHtmlFilteringRuleAsIs(ruleNode)) {
+                const message = `Keeping HTML filtering rule with pseudo-classes as is: "${rule}"`;
+                logger.warn(message);
+                result.push(rule);
+                continue;
+            }
+
             const conversionResult = RuleConverter.convertToAdg(ruleNode);
             const convertedRules = conversionResult.result.map((r) => RuleGenerator.generate(r));
             result.push(...convertedRules);
@@ -50,7 +62,8 @@ export const convertRulesToAdgSyntax = (rulesList, excluded = [], invalidRules =
                 excludeRule(rule, excluded, message);
             }
         } catch (e) {
-            const message = `Error: Unable to convert rule to AdGuard syntax: "${rule}" due to error: ${e.message}`;
+            // eslint-disable-next-line max-len
+            const message = `Error: Unable to convert rule to AdGuard syntax: "${rule}" due to error: ${getErrorMessage(e)}`;
             logger.error(message);
             excludeRule(rule, excluded, message);
 

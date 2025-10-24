@@ -16,11 +16,12 @@ import {
     CosmeticRule,
     NetworkRule,
 } from '@adguard/tsurlfilter';
+import { getErrorMessage } from '@adguard/logger';
+
 import { RuleMasks } from './rule/rule-masks';
-
 import { logger } from './utils/log';
-
 import { validateCssSelector } from './utils/extended-css-validator';
+import { shouldKeepAdgHtmlFilteringRuleAsIs } from './utils/workaround';
 
 /**
  * @typedef {import('@adguard/agtree').AnyRule} AnyRule
@@ -199,6 +200,13 @@ export const validateAndFilterRules = (list, excluded, invalid = [], filterName)
                 parseAbpSpecificRules: false,
                 parseUboSpecificRules: false,
             });
+
+            // temporary workaround for AdGuard's HTML filtering rules with pseudo-classes.
+            // TODO: remove during AG-24662 resolving
+            if (shouldKeepAdgHtmlFilteringRuleAsIs(ruleNode)) {
+                return true;
+            }
+
             const conversionResult = RuleConverter.convertToAdg(ruleNode);
             convertedRuleNodes = conversionResult.result;
             // eslint-disable-next-line no-restricted-syntax
@@ -227,9 +235,10 @@ export const validateAndFilterRules = (list, excluded, invalid = [], filterName)
                 }
             }
         } catch (e) {
-            logger.error(`Invalid rule in ${filterName}: ${ruleText}`);
-            excludeRule(excluded, e.message, ruleText);
-            invalid.push(e.message);
+            const message = `Error: Invalid rule in ${filterName}: "${ruleText}" due to error: ${getErrorMessage(e)}`;
+            logger.error(message);
+            excludeRule(excluded, message, ruleText);
+            invalid.push(message);
             return false;
         }
 

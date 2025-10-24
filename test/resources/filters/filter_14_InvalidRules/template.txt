@@ -1,8 +1,10 @@
 ! Homepage: https://example.com/
 ! License: https://creativecommons.org/licenses/by-sa/3.0/
 !
-! Test filter with invalid rules that should be collected in the report
-! TODO (AG-24662): fix the following rule conversion
+! keep this rule as is — no conversion and validation
+! TODO: re-check while AG-24662 resolving
 filter14.example.com$$script:contains(eval(function(p,a,c,k,e,d))
 ! Valid rule
 ||filter14.example.com^
+! Invalid rule — should be collected in the report
+filter14.example.com#$#selector:style()
