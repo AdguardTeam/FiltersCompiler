@@ -491,6 +491,7 @@ describe('validator', () => {
                 "arctic.de#%#//scriptlet('set-cookie-reload', 'cookie-preference', '1')",
                 "example.org#%#//scriptlet('trusted-prune-inbound-object', 'Object.getOwnPropertyNames', 'example')",
                 "example.org#%#//scriptlet('trusted-dispatch-event', 'click')",
+                "example.com#%#//scriptlet('trusted-replace-argument', 'Math.round', '0', '121', '/^(\d\d?|1[0-2]\d)\.\d+$/')",
             ];
             test.each(validRules)('%s', (rule) => {
                 expect(validateAndFilterRules([rule])).toHaveLength(1);

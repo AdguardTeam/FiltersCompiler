@@ -43,14 +43,21 @@ const getPlatformsConfig = async () => {
 
 disableOptimization();
 
-describe('Test builder', () => {
+/**
+ * Cleanup platforms directory.
+ */
+const cleanup = async () => {
+    // remove platformsDir if it exists
+    if (existsSync(platformsDir)) {
+        await fs.rmdir(platformsDir, { recursive: true });
+    }
+};
+
+describe('Test builder', async () => {
     beforeAll(async () => {
         const platformsConfig = await getPlatformsConfig();
 
-        // remove platformsDir if it exists
-        if (existsSync(platformsDir)) {
-            await fs.rmdir(platformsDir, { recursive: true });
-        }
+        await cleanup();
 
         await build(filtersDir, logFile, reportFile, platformsDir, platformsConfig);
     });
@@ -456,15 +463,23 @@ describe('Test builder', () => {
             expect(localScriptRulesJson.rules).toBeTruthy();
         });
 
-        it('platform/test filters 2.txt', async () => {
+        describe('platforms/test filters 2.txt', async () => {
             // directory 'test' is used for 'ext_ublock' platform;
             // see src/test/resources/platforms.json
-            const filterContent = await readFile(path.join(platformsDir, 'test', 'filters', '2.txt'));
-            expect(filterContent).toBeTruthy();
 
-            const filterLines = filterContent.split(/\r?\n/);
-            expect(filterLines.length).toEqual(50);
-            expect(filterLines[2]).toEqual('! Title: AdGuard Base filter + EasyList');
+            let filterContent;
+            let filterLines;
+
+            beforeAll(async () => {
+                filterContent = await readFile(path.join(platformsDir, 'test', 'filters', '2.txt'));
+                filterLines = filterContent.split(/\r?\n/);
+            });
+
+            it('check content lines', () => {
+                expect(filterContent).toBeTruthy();
+                expect(filterLines.length).toEqual(50);
+                expect(filterLines[2]).toEqual('! Title: AdGuard Base filter + EasyList');
+            });
 
             const presentLines = [
                 '![Adblock Plus 2.0]',
@@ -477,7 +492,7 @@ describe('Test builder', () => {
                 'test-common-2-rule.com',
                 'test.com##+js(abort-on-property-read, Object.prototype.getBanner)',
             ];
-            presentLines.forEach((rule) => {
+            it.each(presentLines)('present line: %s', (rule) => {
                 expect(filterLines.includes(rule)).toBeTruthy();
             });
 
@@ -488,8 +503,12 @@ describe('Test builder', () => {
                 'example.com#%#AG_onLoad(function() { AG_removeElementBySelector(\'span[class="intexta"]\'); });',
                 // $webrtc is deprecated
                 '||example.com^$webrtc,domain=example.org',
+                // platform/test for ubo so no trusted scriptlets (which are adg-only)
+                "example.com#%#//scriptlet('trusted-set-local-storage-item', 'iName', 'iValue')",
+                'example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")',
+                "example.com#%#//scriptlet('trusted-replace-argument', 'Math.round', '0', '121', '/^(\d\d?|1[0-2]\d)\.\d+$/')",
             ];
-            absentLines.forEach((rule) => {
+            it.each(absentLines)('absent line: %s', (rule) => {
                 expect(filterLines.includes(rule)).toBeFalsy();
             });
         });
@@ -523,43 +542,12 @@ describe('Test builder', () => {
             expect(filterLines[2]).toEqual('! Title: AdGuard Base filter');
         });
 
-        it('platforms/config/test filters 2.txt', async () => {
-            const filterContent = await readFile(path.join(platformsDir, 'config/test', 'filters', '2.txt'));
-            expect(filterContent).toBeTruthy();
-
-            const filterLines = filterContent.split(/\r?\n/);
-            expect(filterLines.length).toEqual(38);
-
-            const presentLines = [
-                'test-common-rule.com',
-                'excluded_platform',
-                'test_domain#%#testScript();',
-                // 'trusted-' scriptlets should be included in full trust level filters
-                'example.com#%#//scriptlet(\'trusted-set-local-storage-item\', \'iName\', \'iValue\')',
-                'example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")',
-            ];
-            presentLines.forEach((rule) => {
-                expect(filterLines.includes(rule)).toBeTruthy();
-            });
-
-            const absentLines = [
-                'test-common-1-rule.com',
-                '! some common rules could be places here',
-                '~example.com,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]',
-                // $webrtc is deprecated
-                '||example.com^$webrtc,domain=example.org',
-            ];
-            absentLines.forEach((rule) => {
-                expect(filterLines.includes(rule)).toBeFalsy();
-            });
-        });
-
         it('platforms/hints filters 2.txt', async () => {
             const filterContent = await readFile(path.join(platformsDir, 'hints', 'filters', '2.txt'));
             expect(filterContent).toBeTruthy();
 
             const filterLines = filterContent.split(/\r?\n/);
-            expect(filterLines.length).toEqual(52);
+            expect(filterLines.length).toEqual(53);
 
             const presentLines = [
                 'test-common-rule.com',
@@ -587,7 +575,7 @@ describe('Test builder', () => {
             expect(filterContent).toBeTruthy();
 
             const filterLines = filterContent.split(/\r?\n/);
-            expect(filterLines.length).toEqual(53);
+            expect(filterLines.length).toEqual(54);
 
             // expires value in set from the filters metadata
             // if there is no 'expires' property in platform.json for the platform
@@ -618,16 +606,22 @@ describe('Test builder', () => {
             });
         });
 
-        it('platforms/chromium-mv3 filters 2.txt', async () => {
-            const filterContent = await readFile(path.join(platformsDir, 'chromium-mv3', 'filters', '2.txt'));
-            expect(filterContent).toBeTruthy();
+        describe('platforms/chromium-mv3 filters 2.txt', async () => {
+            let filterContent;
+            let filterLines;
 
-            const filterLines = filterContent.split(/\r?\n/);
-            expect(filterLines.length).toEqual(56);
+            beforeAll(async () => {
+                filterContent = await readFile(path.join(platformsDir, 'chromium-mv3', 'filters', '2.txt'));
+                filterLines = filterContent.split(/\r?\n/);
+            });
 
-            // expires value in set from the filters metadata
-            // if there is no 'expires' property in platform.json for the platform
-            expect(filterLines.includes('! Expires: 2 days (update frequency)')).toBeTruthy();
+            it('check content', () => {
+                expect(filterContent).toBeTruthy();
+                expect(filterLines.length).toEqual(57);
+                // expires value in set from the filters metadata
+                // if there is no 'expires' property in platform.json for the platform
+                expect(filterLines.includes('! Expires: 2 days (update frequency)')).toBeTruthy();
+            });
 
             const presentLines = [
                 'test_domain#%#testScript();',
@@ -638,8 +632,13 @@ describe('Test builder', () => {
                 'test.com#@$?#.banner { padding: 0!important; }',
                 'example.net#?#.banner:matches-css(width: 360px)',
                 'test.com#@?#.banner:matches-css(height: 200px)',
+                // 'trusted-' scriptlets should be included in full trust level filters
+                // + for supported platforms, i.e. adguard only
+                "example.com#%#//scriptlet('trusted-set-local-storage-item', 'iName', 'iValue')",
+                'example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")',
+                String.raw`example.com#%#//scriptlet('trusted-replace-argument', 'Math.round', '0', '121', '/^(\d\d?|1[0-2]\d)\.\d+$/')`,
             ];
-            presentLines.forEach((rule) => {
+            it.each(presentLines)('chromium-mv3 present line: %s', (rule) => {
                 expect(filterLines.includes(rule)).toBeTruthy();
             });
 
@@ -647,8 +646,7 @@ describe('Test builder', () => {
                 '||example.com^$script,redirect-rule=noopjs',
                 '*$redirect-rule=noopjs,xmlhttprequest,domain=example.com',
             ];
-
-            absentLines.forEach((rule) => {
+            it.each(absentLines)('chromium-mv3 absent line: %s', (rule) => {
                 expect(filterLines.includes(rule)).toBeFalsy();
             });
         });
@@ -1424,9 +1422,7 @@ describe('apply platformsExcluded directive during limited filters list build', 
         const platformsConfig = await getPlatformsConfig();
 
         // remove platformsDir if it exists
-        if (existsSync(platformsDir)) {
-            await fs.rmdir(platformsDir, { recursive: true });
-        }
+        await cleanup();
 
         const filtersToBuild = [2, 3];
         await build(filtersDir, logFile, reportFile, platformsDir, platformsConfig, filtersToBuild);
@@ -1491,9 +1487,7 @@ describe('Invalid rules collection in report', () => {
         const platformsConfig = await getPlatformsConfig();
 
         // remove platformsDir if it exists
-        if (existsSync(platformsDir)) {
-            await fs.rmdir(platformsDir, { recursive: true });
-        }
+        await cleanup();
 
         const filtersToBuild = [14];
         await build(filtersDir, logFile, reportFile, platformsDir, platformsConfig, filtersToBuild);

@@ -45,3 +45,4 @@ test.com#@?#.banner:matches-css(height: 200px)
 !
 example.com#%#//scriptlet('trusted-set-local-storage-item', 'iName', 'iValue')
 example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")
+example.com#%#//scriptlet('trusted-replace-argument', 'Math.round', '0', '121', '/^(\d\d?|1[0-2]\d)\.\d+$/')

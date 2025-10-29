@@ -189,6 +189,12 @@ describe('converter', () => {
         expect(actual[0]).toBe(expected);
     });
 
+    it('convertRulesToAdgSyntax scriptlets', () => {
+        const input = "example.com#%#//scriptlet('trusted-replace-argument', 'Math.round', '0', '121', '/^(\d\d?|1[0-2]\d)\.\d+$/')";
+        const converted = convertRulesToAdgSyntax([input]);
+        expect(converted[0]).toEqual(input);
+    });
+
     it('converts scriptlets to UBlock syntax', () => {
         // scriptlet with one argument
         let actual = convertToUbo(['example.org#%#//scriptlet("abort-on-property-read", "alert")']);
@@ -200,8 +206,12 @@ describe('converter', () => {
         expected = 'example.org##+js(abort-on-property-read, alert)';
         expect(actual[0]).toBe(expected);
 
-        // trusted scriptlets should not be converted
+        // trusted scriptlets should not be converted to uBlock syntax
         actual = convertToUbo(['example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")']);
+        expected = '';
+        expect(actual[0]).toBe(expected);
+
+        actual = convertToUbo(["example.com#%#//scriptlet('trusted-replace-argument', 'Math.round', '0', '121', '/^(\d\d?|1[0-2]\d)\.\d+$/')"]);
         expected = '';
         expect(actual[0]).toBe(expected);
 

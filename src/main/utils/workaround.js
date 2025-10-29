@@ -175,9 +175,12 @@ export const removeGroupDescriptions = function (rawGroups) {
 
     // eslint-disable-next-line no-restricted-syntax
     for (const g of rawGroups) {
-        const copy = { ...g };
-
-        delete copy.groupDescription;
+        // Explicitly keep only the required fields for backward compatibility
+        const copy = {
+            groupId: g.groupId,
+            groupName: g.groupName,
+            displayNumber: g.displayNumber,
+        };
 
         groups.push(copy);
     }
