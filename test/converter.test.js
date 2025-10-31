@@ -195,6 +195,22 @@ describe('converter', () => {
         expect(converted[0]).toEqual(input);
     });
 
+    describe('convertRulesToAdgSyntax - non-basic modifiers', () => {
+        it.each([
+            {
+                input: '[$domain=/^example[0-9]+.com/]##.ad-banner',
+                expected: '[$domain=/^example[0-9]+.com/]##.ad-banner',
+            },
+            {
+                input: '[$domain=/example[0-9]+\.com/]##a:has(> img[src])',
+                expected: '[$domain=/example[0-9]+\.com/]##a:has(> img[src])',
+            },
+        ])('$input -> $expected', ({ input, expected }) => {
+            const actual = convertRulesToAdgSyntax([input]);
+            expect(actual[0]).toEqual(expected);
+        });
+    });
+
     it('converts scriptlets to UBlock syntax', () => {
         // scriptlet with one argument
         let actual = convertToUbo(['example.org#%#//scriptlet("abort-on-property-read", "alert")']);
