@@ -31,27 +31,27 @@ describe('converter', () => {
         c = convertRulesToAdgSyntax(['example.com#@#h1:style(background-color: blue !important)']);
         expect(c[0]).toBe('example.com#@$#h1 { background-color: blue !important }');
 
-        c = convertRulesToAdgSyntax(['yourconroenews.com#@##siteNav:style(transform: none !important;)']);
-        expect(c[0]).toBe('yourconroenews.com#@$##siteNav { transform: none !important; }');
+        c = convertRulesToAdgSyntax(['example.com#@##siteNav:style(transform: none !important;)']);
+        expect(c[0]).toBe('example.com#@$##siteNav { transform: none !important; }');
 
-        c = convertRulesToAdgSyntax(['apkmirror.com##body .google-ad-leaderboard-smaller:style(position: absolute!important; left: -4000px!important; display:block!important;)']);
-        expect(c[0]).toBe('apkmirror.com#$#body .google-ad-leaderboard-smaller { position: absolute!important; left: -4000px!important; display:block!important; }');
+        c = convertRulesToAdgSyntax(['example.com##body .google-ad-leaderboard-smaller:style(position: absolute!important; left: -4000px!important; display:block!important;)']);
+        expect(c[0]).toBe('example.com#$#body .google-ad-leaderboard-smaller { position: absolute!important; left: -4000px!important; display:block!important; }');
 
-        c = convertRulesToAdgSyntax(['apkmirror.com##body .google-ad-square-sidebar:style(position: absolute!important; left: -4000px!important; display:block!important;)']);
-        expect(c[0]).toBe('apkmirror.com#$#body .google-ad-square-sidebar { position: absolute!important; left: -4000px!important; display:block!important; }');
+        c = convertRulesToAdgSyntax(['example.com##body .google-ad-square-sidebar:style(position: absolute!important; left: -4000px!important; display:block!important;)']);
+        expect(c[0]).toBe('example.com#$#body .google-ad-square-sidebar { position: absolute!important; left: -4000px!important; display:block!important; }');
 
-        c = convertRulesToAdgSyntax(['benchmark.pl###bannerDBB:style(height: 10px !important;)']);
-        expect(c[0]).toBe('benchmark.pl#$##bannerDBB { height: 10px !important; }');
+        c = convertRulesToAdgSyntax(['example.com###bannerDBB:style(height: 10px !important;)']);
+        expect(c[0]).toBe('example.com#$##bannerDBB { height: 10px !important; }');
 
         c = convertRulesToAdgSyntax(['example.org##body[style^="position: fixed"]:style(position: static !important;)']);
         expect(c[0]).toBe('example.org#$#body[style^="position: fixed"] { position: static !important; }');
 
         // https://github.com/AdguardTeam/FiltersCompiler/issues/24
-        c = convertRulesToAdgSyntax(['720hd.club#?##all:style(margin-top: 0 !important)']);
-        expect(c[0]).toBe('720hd.club#$##all { margin-top: 0 !important }');
+        c = convertRulesToAdgSyntax(['example.com#?##all:style(margin-top: 0 !important)']);
+        expect(c[0]).toBe('example.com#$##all { margin-top: 0 !important }');
 
-        c = convertRulesToAdgSyntax(['720hd.club#@?##all:style(margin-top: 0 !important)']);
-        expect(c[0]).toBe('720hd.club#@$##all { margin-top: 0 !important }');
+        c = convertRulesToAdgSyntax(['example.com#@?##all:style(margin-top: 0 !important)']);
+        expect(c[0]).toBe('example.com#@$##all { margin-top: 0 !important }');
 
         // https://github.com/AdguardTeam/FiltersCompiler/issues/54
         c = convertRulesToAdgSyntax(['#####']);
@@ -64,11 +64,25 @@ describe('converter', () => {
         expect(c[0]).toBe('##selector');
 
         // https://github.com/AdguardTeam/FiltersCompiler/issues/242
-        c = convertRulesToAdgSyntax([String.raw`new.lewd.ninja##div[class^="box ~!@$%^&*()_+-=,./';:?><[]"]`]);
-        expect(c[0]).toBe(String.raw`new.lewd.ninja##div[class^="box ~!@$%^&*()_+-=,./';:?><[]"]`);
+        c = convertRulesToAdgSyntax([String.raw`example.com##div[class^="box ~!@$%^&*()_+-=,./';:?><[]"]`]);
+        expect(c[0]).toBe(String.raw`example.com##div[class^="box ~!@$%^&*()_+-=,./';:?><[]"]`);
 
         c = convertRulesToAdgSyntax(['']);
         expect(c[0]).toEqual('');
+    });
+
+    // TODO: add more rules under this section
+    describe('convert rules with no change', () => {
+        it.each([
+            '##div > span',
+            '##div > a[href^="/AllRes/Vlog"]',
+            '##p > span',
+            '##p > a[href^="/AllRes/Vlog"]',
+        ])('converts rule %s', (rule) => {
+            const convertedRules = convertRulesToAdgSyntax([rule]);
+
+            expect(convertedRules[0]).toEqual(rule);
+        });
     });
 
     it('converts network rule modifiers', () => {

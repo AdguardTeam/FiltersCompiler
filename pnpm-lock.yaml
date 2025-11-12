@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@adguard/agtree':
-        specifier: ^3.2.4
-        version: 3.2.4
+        specifier: ^3.2.5
+        version: 3.2.5
       '@adguard/ecss-tree':
         specifier: ^1.1.0
         version: 1.1.0
@@ -24,10 +24,10 @@ importers:
         specifier: ^2.0.0
         version: 2.0.0
       '@adguard/scriptlets':
-        specifier: ^2.2.11
-        version: 2.2.11
+        specifier: ^2.2.12
+        version: 2.2.12
       '@adguard/tsurlfilter':
-        specifier: ^3.2.7
+        specifier: ^3.2.8
         version: 3.4.0(@adguard/re2-wasm@1.2.0)
       ajv:
         specifier: ^8.17.1
@@ -81,8 +81,8 @@ importers:
 
 packages:
 
-  '@adguard/agtree@3.2.4':
-    resolution: {integrity: sha512-Zn5YzCQuCXRxsYvXHtb6IvwbeZ4C6Sn7sQQrME3RxSeIZnSH2Qdt4POY5L2k1icR3Ecxvdm22kHdYUfZhLAsSw==}
+  '@adguard/agtree@3.2.5':
+    resolution: {integrity: sha512-yGtbTQtxWd1u56oRjU+ILFluKp/1uostYDE0DP/k5CAhG5MdsVwvpYRM4n/BoCes3fQBHwdcJVaIdNTlwWsnSg==}
     engines: {node: '>=22'}
 
   '@adguard/css-tokenizer@1.2.0':
@@ -112,8 +112,8 @@ packages:
     resolution: {integrity: sha512-yMtEJfThxN9rEYm2Zg3X8jUKaPYq5wByc90JbMspSWJo7MXw664gTvLD7/wijl6y79VSuAs77bXUIgBXutMp7A==}
     engines: {node: '>=10'}
 
-  '@adguard/scriptlets@2.2.11':
-    resolution: {integrity: sha512-SIT81uL4HWRm6YZ+xO+wvWsuXZSm3SbbJQZ6TIPOqOZn1llw9JaGGmbNvfHVj3vxVk/23AKO7JsZdHoXSCIyaA==}
+  '@adguard/scriptlets@2.2.12':
+    resolution: {integrity: sha512-N37pY4Ai6RE9bCVvnYdJhH1v3TNIZ6B+FijmOAAt+gxb3me3ym2dagmIlrblPleTDObQMTNc4Iymbg1f6gOCIw==}
 
   '@adguard/tsurlfilter@3.4.0':
     resolution: {integrity: sha512-BdlhU2w2JHUAj9Y3jhB9hCznFzLslalVO6bn9ea+2EEAF86u3dVfpvdnoJRGftxs3i1a6KusjfskHS3kRkE/rQ==}
@@ -122,8 +122,8 @@ packages:
     peerDependencies:
       '@adguard/re2-wasm': 1.2.0
 
-  '@babel/runtime-corejs3@7.27.6':
-    resolution: {integrity: sha512-vDVrlmRAY8z9Ul/HxT+8ceAru95LQgkSKiXkSYZvqtbkPSfhZJgpRp45Cldbh1GJ1kxzQkI70AqyrTI58KpaWQ==}
+  '@babel/runtime-corejs3@7.28.4':
+    resolution: {integrity: sha512-h7iEYiW4HebClDEhtvFObtPmIvrd1SSfpI9EhOeKk4CtIK/ngBWFpuhCzhdmRKtg71ylcue+9I6dv54XYO1epQ==}
     engines: {node: '>=6.9.0'}
 
   '@esbuild/aix-ppc64@0.25.5':
@@ -685,8 +685,8 @@ packages:
   confusing-browser-globals@1.0.11:
     resolution: {integrity: sha512-JsPKdmh8ZkmnHxDk55FZ1TqVLvEQTvoByJZRN9jzI0UjxK/QgAmsphz7PGtqgPieQZ/CQcHWXCR7ATDNhGe+YA==}
 
-  core-js-pure@3.43.0:
-    resolution: {integrity: sha512-i/AgxU2+A+BbJdMxh3v7/vxi2SbFqxiFmg6VsDwYB4jkucrd1BZNA9a9gphC0fYMG5IBSgQcbQnk865VCLe7xA==}
+  core-js-pure@3.46.0:
+    resolution: {integrity: sha512-NMCW30bHNofuhwLhYPt66OLOKTMbOhgTTatKVbaQC3KRHpTCiRIBYvtshr+NBYSnBxwAFhjW/RfJ0XbIjS16rw==}
 
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
@@ -1971,7 +1971,7 @@ packages:
 
 snapshots:
 
-  '@adguard/agtree@3.2.4':
+  '@adguard/agtree@3.2.5':
     dependencies:
       '@adguard/css-tokenizer': 1.2.0
       camelcase-keys: 7.0.2
@@ -2008,19 +2008,19 @@ snapshots:
 
   '@adguard/re2-wasm@1.2.0': {}
 
-  '@adguard/scriptlets@2.2.11':
+  '@adguard/scriptlets@2.2.12':
     dependencies:
-      '@adguard/agtree': 3.2.4
+      '@adguard/agtree': 3.2.5
       '@types/trusted-types': 2.0.7
       js-yaml: 3.14.1
 
   '@adguard/tsurlfilter@3.4.0(@adguard/re2-wasm@1.2.0)':
     dependencies:
-      '@adguard/agtree': 3.2.4
+      '@adguard/agtree': 3.2.5
       '@adguard/css-tokenizer': 1.2.0
       '@adguard/logger': 2.0.0
       '@adguard/re2-wasm': 1.2.0
-      '@adguard/scriptlets': 2.2.11
+      '@adguard/scriptlets': 2.2.12
       cidr-tools: 6.4.2
       commander: 12.1.0
       is-cidr: 4.0.2
@@ -2031,9 +2031,9 @@ snapshots:
       zod: 3.24.4
       zod-validation-error: 3.5.2(zod@3.24.4)
 
-  '@babel/runtime-corejs3@7.27.6':
+  '@babel/runtime-corejs3@7.28.4':
     dependencies:
-      core-js-pure: 3.43.0
+      core-js-pure: 3.46.0
 
   '@esbuild/aix-ppc64@0.25.5':
     optional: true
@@ -2522,7 +2522,7 @@ snapshots:
 
   confusing-browser-globals@1.0.11: {}
 
-  core-js-pure@3.43.0: {}
+  core-js-pure@3.46.0: {}
 
   cross-spawn@7.0.6:
     dependencies:
@@ -3979,7 +3979,7 @@ snapshots:
 
   xregexp@5.1.2:
     dependencies:
-      '@babel/runtime-corejs3': 7.27.6
+      '@babel/runtime-corejs3': 7.28.4
 
   yocto-queue@0.1.0: {}
 
