@@ -11,9 +11,12 @@ importers:
       '@adguard/agtree':
         specifier: ^3.3.0
         version: 3.3.0
+      '@adguard/css-tokenizer':
+        specifier: ^1.2.0
+        version: 1.2.0
       '@adguard/ecss-tree':
-        specifier: ^1.1.0
-        version: 1.1.0
+        specifier: ^2.0.1
+        version: 2.0.1
       '@adguard/extended-css':
         specifier: ^2.1.1
         version: 2.1.1
@@ -29,6 +32,9 @@ importers:
       '@adguard/tsurlfilter':
         specifier: ^3.5.0
         version: 3.5.0(@adguard/re2-wasm@1.2.0)
+      '@eslint/css-tree':
+        specifier: 3.6.6
+        version: 3.6.6
       ajv:
         specifier: ^8.17.1
         version: 8.17.1
@@ -93,8 +99,8 @@ packages:
     engines: {node: '>=18.13.0'}
     hasBin: true
 
-  '@adguard/ecss-tree@1.1.0':
-    resolution: {integrity: sha512-Qs7cpUH5AexO9JAXxMPmh6CwdNEnP1qUBSpvHnGxPmHQDjBzpAn4qz8zsJILmX4Rc5Up0iqeYcYC7Pq5HBvoyQ==}
+  '@adguard/ecss-tree@2.0.1':
+    resolution: {integrity: sha512-GvVz3rLQqcZkNVpUbdowimokhPxNL6pODwmZbiWTUfa3bEAT7XI+4ydxVZmtK2WS2u7qu/IISmI69PSFXE0ucw==}
 
   '@adguard/extended-css@2.1.1':
     resolution: {integrity: sha512-TsHZ20oUWhbtrzQ4w70B96oHkGBIUZg2FdMfkq4StGfLmXQb+kI7fQb6BtXP2D0bvraIHMq6/mtKExglDJ9vsg==}
@@ -285,6 +291,10 @@ packages:
   '@eslint-community/regexpp@4.12.1':
     resolution: {integrity: sha512-CCZCDJuduB9OUkFkY2IgppNZMi2lBQgD2qzwXkEia16cge2pijY/aXi96CJMquDMn3nJdlPV1A5KrJEXwfLNzQ==}
     engines: {node: ^12.0.0 || ^14.0.0 || >=16.0.0}
+
+  '@eslint/css-tree@3.6.6':
+    resolution: {integrity: sha512-C3YiJMY9OZyZ/3vEMFWJIesdGaRY6DmIYvmtyxMT934CbrOKqRs+Iw7NWSRlJQEaK4dPYy2lZ2y1zkaj8z0p5A==}
+    engines: {node: ^10 || ^12.20.0 || ^14.13.0 || >=15.0.0}
 
   '@eslint/eslintrc@2.1.4':
     resolution: {integrity: sha512-269Z39MS6wVJtsoUl10L60WdkhJVdPG24Q4eZTH3nnF6lpvSShEK3wQjDX9JRWAUPvPh7COouPpU9IrqaZFvtQ==}
@@ -697,10 +707,6 @@ packages:
 
   crypto-js@4.2.0:
     resolution: {integrity: sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==}
-
-  css-tree@2.3.1:
-    resolution: {integrity: sha512-6Fv1DV/TYw//QF5IzQdqsNDjx/wc8TrMBZsqjL9eW01tWb7R7k/mq+/VXfJCl7SoD5emsJop9cOByJZfs8hYIw==}
-    engines: {node: ^10 || ^12.20.0 || ^14.13.0 || >=15.0.0}
 
   cssstyle@3.0.0:
     resolution: {integrity: sha512-N4u2ABATi3Qplzf0hWbVCdjenim8F3ojEXpBDF5hBpjzW182MjNGLqfmQ0SkSPeQ+V86ZXgeH8aXj6kayd4jgg==}
@@ -1357,8 +1363,8 @@ packages:
   md5@2.3.0:
     resolution: {integrity: sha512-T1GITYmFaKuO91vxyoQMFETst+O71VUPEU3ze5GNzDm0OWdP8v1ziTaAEPUr/3kLsY3Sftgz242A1SetQiDL7g==}
 
-  mdn-data@2.0.30:
-    resolution: {integrity: sha512-GaqWWShW4kv/G9IEucWScBx9G1/vsFZZJUO+tD26M8J8z3Kw5RDQjaoZe03YAClgeS/SWPOcb4nkFBTEi5DUEA==}
+  mdn-data@2.23.0:
+    resolution: {integrity: sha512-786vq1+4079JSeu2XdcDjrhi/Ry7BWtjDl9WtGPWLiIHb2T66GvIVflZTBoSNZ5JqTtJGYEVMuFA/lbQlMOyDQ==}
 
   merge2@1.4.1:
     resolution: {integrity: sha512-8q7VEgMJW4J8tcfVPy8g09NcQwZdbwFEqhe/WZkoIzjn/3TGDwtOCYtXGxA3O8tPzpczCCDgv+P2P5y00ZJOOg==}
@@ -1990,9 +1996,10 @@ snapshots:
       commander: 11.1.0
       crypto-js: 4.2.0
 
-  '@adguard/ecss-tree@1.1.0':
+  '@adguard/ecss-tree@2.0.1':
     dependencies:
-      css-tree: 2.3.1
+      '@adguard/css-tokenizer': 1.2.0
+      '@eslint/css-tree': 3.6.6
 
   '@adguard/extended-css@2.1.1': {}
 
@@ -2116,6 +2123,11 @@ snapshots:
       eslint-visitor-keys: 3.4.3
 
   '@eslint-community/regexpp@4.12.1': {}
+
+  '@eslint/css-tree@3.6.6':
+    dependencies:
+      mdn-data: 2.23.0
+      source-map-js: 1.2.1
 
   '@eslint/eslintrc@2.1.4':
     dependencies:
@@ -2533,11 +2545,6 @@ snapshots:
   crypt@0.0.2: {}
 
   crypto-js@4.2.0: {}
-
-  css-tree@2.3.1:
-    dependencies:
-      mdn-data: 2.0.30
-      source-map-js: 1.2.1
 
   cssstyle@3.0.0:
     dependencies:
@@ -3331,7 +3338,7 @@ snapshots:
       crypt: 0.0.2
       is-buffer: 1.1.6
 
-  mdn-data@2.0.30: {}
+  mdn-data@2.23.0: {}
 
   merge2@1.4.1: {}
 

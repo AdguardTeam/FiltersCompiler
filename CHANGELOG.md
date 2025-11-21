@@ -7,16 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+- `@adguard/css-tokenizer` and `@eslint/css-tree` as direct dependencies
+  since [@adguard/ecss-tree] v2 marks them as external.
+
 ### Changed
 
 - Updated [@adguard/agtree] to v3.3.0.
+- Updated [@adguard/ecss-tree] to v2.0.1
 - Updated [@adguard/tsurlfilter] to v3.5.0.
 
 ### Fixed
 
 - Fixed parsing of network rules with regex patterns containing commas in quantifiers.
 
-[v3.2.0]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.1.4...v3.2.0
+<!-- TODO: uncomment before release -->
+<!-- [v3.2.0]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.1.4...v3.2.0 -->
 
 ## [v3.1.4] - 2025-11-12
 

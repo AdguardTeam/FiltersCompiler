@@ -29,7 +29,9 @@
     },
     "dependencies": {
         "@adguard/agtree": "^3.3.0",
-        "@adguard/ecss-tree": "^1.1.0",
+        "@adguard/css-tokenizer": "^1.2.0",
+        "@adguard/ecss-tree": "^2.0.1",
+        "@eslint/css-tree": "3.6.6",
         "@adguard/extended-css": "^2.1.1",
         "@adguard/filters-downloader": "^2.4.0",
         "@adguard/logger": "^2.0.0",

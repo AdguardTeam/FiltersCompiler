@@ -87,6 +87,7 @@ describe('converter', () => {
             String.raw`/^[a-z0-9]{5,}\.(?=.*[a-z])(?=.*[0-9])[a-z0-9]{17,}\.(cfd|sbs|shop)$/##.ad`,
             String.raw`/example\d{1,}\.com/,example.net##.ad`,
             String.raw`[$domain=/example\d{1,}\.(com|org)/]##.ad`,
+            '.su-label:contains(/sponsra/i):upward(.wpb_text_column, .td_block_text_with_title)',
         ])('converts rule %s', (rule) => {
             const convertedRules = convertRulesToAdgSyntax([rule]);
 

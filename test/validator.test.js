@@ -172,6 +172,9 @@ describe('validator', () => {
             '.l-main.js-main div.c-block:has(div.c-header:contains(Реклама))',
             '.l-main.js-main div.c-block:has(> div.c-header)',
             "[-ext-has='script:contains(var banner)']",
+            '.banner:upward(.container)',
+            '.banner:upward(2)',
+            '.su-label:contains(/sponsra/i):upward(.wpb_text_column, .td_block_text_with_title)',
         ];
 
         test.each(validExtCssSelectors)('%s', (selector) => {
