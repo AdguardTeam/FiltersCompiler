@@ -136,6 +136,26 @@ describe('validator', () => {
         expect(validateAndFilterRules(rules)).toHaveLength(0);
     });
 
+    describe('validate cosmetic rules with regexp pattern', () => {
+        const validRules = [
+            String.raw`/example\d+\.com/##.banner`,
+            String.raw`/example\d+\.com/##div[class="ad"]`,
+            String.raw`/^example[0-9]+\.com$/##.advertisement`,
+            // regex domains with commas in quantifiers and alternations
+            String.raw`/example\d{1,}\.com/##.ad`,
+            String.raw`/example\d{1,}\.(com|org)/##.ad`,
+            String.raw`/^[a-z0-9]{5,}\.(?=.*[a-z])(?=.*[0-9])[a-z0-9]{17,}\.(cfd|sbs|shop)$/##.ad`,
+            String.raw`/example\d{1,}\.com/,example.net##.ad`,
+            String.raw`[$domain=/example\d{1,}\.(com|org)/]##.ad`,
+        ];
+        test.each(validRules)('%s', (rule) => {
+            const invalid = [];
+            const result = validateAndFilterRules([rule], [], invalid);
+            expect(result).toHaveLength(1);
+            expect(invalid).toEqual([]);
+        });
+    });
+
     describe('validate extended-css', () => {
         const validExtCssSelectors = [
             '#main > table.w3-table-all.notranslate:first-child > tbody > tr:nth-child(17) > td.notranslate:nth-child(2)',
@@ -618,6 +638,7 @@ describe('validator', () => {
                 'example.com$removeparam',
                 '||example.com$removeparam',
                 '||example.org^$removeparam=p,object',
+                '$document,removeparam=/^kk=\\w{6,}-\\w{10,}-\\w{5,}$/',
             ];
             test.each(validRules)('%s', (rule) => {
                 expect(validateAndFilterRules([rule])).toHaveLength(1);

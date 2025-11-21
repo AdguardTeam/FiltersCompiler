@@ -78,6 +78,15 @@ describe('converter', () => {
             '##div > a[href^="/AllRes/Vlog"]',
             '##p > span',
             '##p > a[href^="/AllRes/Vlog"]',
+            String.raw`/example\d+\.com/##.banner`,
+            String.raw`/^[a-z0-9]{5,}\.(?=.*[a-z])(?=.*[0-9])[a-z0-9]{17,}\.(cfd|sbs|shop)$/#$?#*:contains(/(test1|test2)77/i) { scrollbar-width: thin!important; }`,
+            String.raw`[$path=/id]/^[a-z0-9]{5,}\.(?=.*[a-z])(?=.*[0-9])[a-z0-9]{17,}\.(cfd|sbs|shop)$/#?#body:contains(/(test1|test2)77/i) div:matches-css(position: fixed):has(> img)`,
+            // regex domains with commas in quantifiers and alternations
+            String.raw`/example\d{1,}\.com/##.ad`,
+            String.raw`/example\d{1,}\.(com|org)/##.ad`,
+            String.raw`/^[a-z0-9]{5,}\.(?=.*[a-z])(?=.*[0-9])[a-z0-9]{17,}\.(cfd|sbs|shop)$/##.ad`,
+            String.raw`/example\d{1,}\.com/,example.net##.ad`,
+            String.raw`[$domain=/example\d{1,}\.(com|org)/]##.ad`,
         ])('converts rule %s', (rule) => {
             const convertedRules = convertRulesToAdgSyntax([rule]);
 
@@ -98,6 +107,10 @@ describe('converter', () => {
 
         c = convertRulesToAdgSyntax([String.raw`||example.org/*/*/$removeparam=/^__s=[A-Za-z0-9]{6\,}/`]);
         expect(c[0]).toBe(String.raw`||example.org/*/*/$removeparam=/^__s=[A-Za-z0-9]{6\,}/`);
+
+        // Test for rule with multiple hyphen-separated groups in regex
+        c = convertRulesToAdgSyntax([String.raw`$document,removeparam=/^kk=\w{6,}-\w{10,}-\w{5,}$/`]);
+        expect(c[0]).toBe(String.raw`$document,removeparam=/^kk=\w{6,}-\w{10,}-\w{5,}$/`);
 
         c = convertRulesToAdgSyntax([String.raw`||example.org/*/*/$replace=/<item type=\"banner\">.{280\,400}.*<\/background><\/item>//`]);
         expect(c[0]).toBe(String.raw`||example.org/*/*/$replace=/<item type=\"banner\">.{280\,400}.*<\/background><\/item>//`);

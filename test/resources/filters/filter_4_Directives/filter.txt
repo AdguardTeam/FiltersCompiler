@@ -37,6 +37,7 @@ if_edge_chromium
 ios_rule
 !#else
 non_ios_rule
+/example\d+\.com/##.banner
 !#endif
 !#endif
 !#if (adguard_app_cli)

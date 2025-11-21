@@ -751,7 +751,7 @@ describe('Test builder', async () => {
                 expect(filterContent).toBeTruthy();
 
                 const filterLines = filterContent.split(/\r?\n/);
-                expect(filterLines.length).toEqual(14);
+                expect(filterLines.length).toEqual(15);
 
                 expect(filterLines.includes('if_mac_included_rule')).toBeTruthy();
             });
@@ -1015,9 +1015,12 @@ describe('Test builder', async () => {
                 expect(elseContent).toBeTruthy();
 
                 const elseLines = elseContent.split(/\r?\n/);
-                expect(elseLines.length).toEqual(24);
+                expect(elseLines.length).toEqual(25);
                 expect(elseLines.includes('ios_rule')).toBeFalsy();
                 expect(elseLines.includes('non_ios_rule')).toBeTruthy();
+                expect(elseLines.includes(
+                    String.raw`/example\d+\.com/##.banner`,
+                )).toBeTruthy();
             });
 
             it('filters4.txt - adguard_ext_chromium_mv3 constant for the if directive', async () => {
