@@ -17,6 +17,9 @@ export default {
         copy({
             targets: [
                 { src: 'schemas/*', dest: 'dist/schemas' },
+                // Trust-level exclusion files are required for filtering rules
+                // based on filter list trust level (low, high, full)
+                { src: 'src/main/utils/trust-levels/*', dest: 'dist/utils/trust-levels' },
             ],
         }),
     ],
