@@ -624,6 +624,11 @@ describe('converter', () => {
             actual = convertToUbo(['||example.com^$script,redirect=noopjs:99']);
             expected = '||example.com^$script,redirect=noop.js';
             expect(actual[0]).toBe(expected);
+            // negative value for redirect priority is supported by UBO
+            // but anyway it should be skipped during the conversion
+            actual = convertRulesToAdgSyntax(['@@$xmlhttprequest,third-party,redirect-rule=nooptext:-1,method=head,domain=example.com']);
+            expected = '@@$xmlhttprequest,third-party,redirect-rule=nooptext,method=head,domain=example.com';
+            expect(actual[0]).toBe(expected);
 
             // UBO -> ADG:
             actual = convertRulesToAdgSyntax(['||example.com^$redirect=noop.js:99']);

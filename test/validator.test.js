@@ -668,6 +668,9 @@ describe('validator', () => {
 
         rules = ['example.org/ads.js$script,redirect-rule'];
         expect(validateAndFilterRules(rules)).toHaveLength(0);
+
+        rules = ['@@$xmlhttprequest,third-party,redirect-rule=nooptext:-1,method=head,domain=example.com'];
+        expect(validateAndFilterRules(rules)).toHaveLength(1);
     });
 
     describe('validate jsonprune modifier', () => {

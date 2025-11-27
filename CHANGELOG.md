@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [v3.2.0] - 2025-11-27
 
 ### Added
 
@@ -14,16 +14,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Updated [@adguard/agtree] to v3.3.0.
-- Updated [@adguard/ecss-tree] to v2.0.1
-- Updated [@adguard/tsurlfilter] to v3.5.0.
+- Updated [@adguard/agtree] to v3.3.1.
+- Updated [@adguard/ecss-tree] to v2.0.1.
+- Updated [@adguard/scriptlets] to v2.2.13.
+- Updated [@adguard/tsurlfilter] to v3.5.1.
 
 ### Fixed
 
 - Fixed parsing of network rules with regex patterns containing commas in quantifiers.
 
-<!-- TODO: uncomment before release -->
-<!-- [v3.2.0]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.1.4...v3.2.0 -->
+[v3.2.0]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.1.4...v3.2.0
 
 ## [v3.1.4] - 2025-11-12
 
