@@ -31,6 +31,10 @@ jobs:
       - name: pnpm lint
         run: pnpm lint
 
+      # building is needed for tests (bundle test depends on it)
+      - name: Build package
+        run: pnpm build
+
       - name: pnpm test
         run: pnpm test
 

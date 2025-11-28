@@ -47,12 +47,16 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           registry-url: https://registry.npmjs.org
           cache: pnpm
-      
+
       - name: Install dependencies
         run: pnpm install
 
       - name: Run ESLint
         run: pnpm lint
+
+      # building is needed for tests (bundle test depends on it)
+      - name: Build package
+        run: pnpm build
 
       - name: Run tests
         run: pnpm test
