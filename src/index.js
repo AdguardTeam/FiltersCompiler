@@ -1,4 +1,5 @@
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { setConfiguration, CompatibilityTypes } from '@adguard/tsurlfilter';
 
 import { build } from './main/builder';
@@ -12,7 +13,7 @@ import { platformsConfig } from './main/platforms-config';
 // Sets configuration compatibility
 setConfiguration({ compatibility: CompatibilityTypes.Corelibs });
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const jsonSchemasConfigDir = path.join(__dirname, './schemas/');
 

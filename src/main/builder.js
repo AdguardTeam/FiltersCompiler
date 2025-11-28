@@ -2,6 +2,7 @@
 
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import md5 from 'md5';
 
 import { FiltersDownloader } from '@adguard/filters-downloader';
@@ -17,7 +18,7 @@ import { downloadFile } from './utils/webutils';
 import { getFilterIdFromDirName } from './utils/utils';
 import { optimizeDomainBlockingRules } from './utils/builder-utils';
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const TEMPLATE_FILE = 'template.txt';
 const FILTER_FILE = 'filter.txt';

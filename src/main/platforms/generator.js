@@ -1,6 +1,7 @@
 /* eslint-disable global-require */
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import crypto from 'crypto';
 import moment from 'moment';
 
@@ -19,7 +20,7 @@ import { convertToUbo } from '../converter';
 import { getFilterOptimizationConfig } from '../optimization';
 import { RuleMasks } from '../rule/rule-masks';
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const RULES_SEPARATOR = '\r\n';
 let filterIdsPool = [];
