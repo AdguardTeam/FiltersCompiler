@@ -223,6 +223,13 @@ describe('converter', () => {
         expect(converted[0]).toEqual(input);
     });
 
+    // https://github.com/AdguardTeam/FiltersCompiler/issues/260
+    it('prevents prevent-canvas scriptlet from being converted to empty string', () => {
+        const input = "aceee.org#%#//scriptlet('prevent-canvas', '2d')";
+        const converted = convertRulesToAdgSyntax([input]);
+        expect(converted[0]).toEqual(input);
+    });
+
     describe('convertRulesToAdgSyntax - non-basic modifiers', () => {
         it.each([
             {
