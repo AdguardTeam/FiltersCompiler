@@ -631,6 +631,13 @@ describe('converter', () => {
             actual = convertToUbo(['||example.com^$script,redirect=noopjs:99']);
             expected = '||example.com^$script,redirect=noop.js';
             expect(actual[0]).toBe(expected);
+
+            // https://github.com/AdguardTeam/FiltersCompiler/issues/271
+            // Ensure no duplicate 'script' modifier is added when converting regex rules with redirect
+            actual = convertToUbo([String.raw`/^https:\/\/[a-z]{8,15}\.(?:(com|net)\/(?:\d{1,3}\/)?tag\.min\.js$)/$script,third-party,redirect=noopjs`]);
+            expected = String.raw`/^https:\/\/[a-z]{8,15}\.(?:(com|net)\/(?:\d{1,3}\/)?tag\.min\.js$)/$script,3p,redirect=noop.js`;
+            expect(actual[0]).toBe(expected);
+
             // negative value for redirect priority is supported by UBO
             // but anyway it should be skipped during the conversion
             actual = convertRulesToAdgSyntax(['@@$xmlhttprequest,third-party,redirect-rule=nooptext:-1,method=head,domain=example.com']);
