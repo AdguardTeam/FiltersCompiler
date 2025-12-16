@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v3.2.4] - 2025-12-16
+
+### Changed
+
+- Updated [@adguard/agtree] to v3.4.3.
+- Updated [@adguard/scriptlets] to v2.2.14.
+- Updated [@adguard/tsurlfilter] to v3.5.2.
+
+### Fixed
+
+- Conversion of `googlesyndication.com/adsbygoogle.js` redirect.
+
+[v3.2.4]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.2.3...v3.2.4
+
 ## [v3.2.3] - 2025-12-12
 
 ### Fixed

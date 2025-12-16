@@ -1,6 +1,6 @@
 {
     "name": "@adguard/filters-compiler",
-    "version": "3.2.3",
+    "version": "3.2.4",
     "description": "AdGuard filters compiler",
     "homepage": "http://adguard.com",
     "type": "module",
@@ -28,15 +28,15 @@
         "node": ">=22"
     },
     "dependencies": {
-        "@adguard/agtree": "^3.3.1",
+        "@adguard/agtree": "^3.4.3",
         "@adguard/css-tokenizer": "^1.2.0",
         "@adguard/ecss-tree": "^2.0.1",
         "@eslint/css-tree": "3.6.6",
         "@adguard/extended-css": "^2.1.1",
         "@adguard/filters-downloader": "^2.4.0",
         "@adguard/logger": "^2.0.0",
-        "@adguard/scriptlets": "^2.2.13",
-        "@adguard/tsurlfilter": "^3.5.1",
+        "@adguard/scriptlets": "^2.2.14",
+        "@adguard/tsurlfilter": "^3.5.2",
         "ajv": "^8.17.1",
         "child_process": ">=1.0.2",
         "jsdom": "^21.1.1",

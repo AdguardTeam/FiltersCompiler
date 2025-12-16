@@ -654,6 +654,20 @@ describe('converter', () => {
             const actual = convertRulesToAdgSyntax(['intermarche.pl#%#document.cookie = "interapp_redirect=false; path=/;";']);
             expect(actual[0]).toBe('intermarche.pl#%#document.cookie = "interapp_redirect=false; path=/;";');
         });
+
+        it('converts googlesyndication.com/adsbygoogle.js redirect to AdGuard format', () => {
+            let actual = convertRulesToAdgSyntax([
+                '||example.com/adsbygoogle.js^$script,redirect-rule=googlesyndication.com/adsbygoogle.js',
+            ]);
+            let expected = '||example.com/adsbygoogle.js^$script,redirect-rule=googlesyndication-adsbygoogle';
+            expect(actual[0]).toBe(expected);
+
+            actual = convertRulesToAdgSyntax([
+                '||example.com/adsbygoogle.js$script,redirect=googlesyndication.com/adsbygoogle.js,important',
+            ]);
+            expected = '||example.com/adsbygoogle.js$script,redirect=googlesyndication-adsbygoogle,important';
+            expect(actual[0]).toBe(expected);
+        });
     });
 
     it('converts :remove() rules', () => {
