@@ -10,6 +10,7 @@ It is used in [FiltersRegistry].
 - [Filters metadata](#filters-metadata)
 - [`@include` directive and its options](#include-directive)
 - [Logging](#logging)
+- [Additional resources](#additional-resources)
 
 ## Usage
 
@@ -260,6 +261,12 @@ The logger supports the following log levels:
 ### Logger Initialization
 
 The logger is initialized during compilation when a valid `logPath` is provided.
+
+## Additional resources
+
+- [AGENTS.md](AGENTS.md) — AI agent instructions and code guidelines
+- [DEVELOPMENT.md](DEVELOPMENT.md) — Development environment setup guide
+- [CHANGELOG.md](CHANGELOG.md) — Version history
 
 [FiltersRegistry]: https://github.com/AdguardTeam/FiltersRegistry/
 [filters-metadata]: https://github.com/AdguardTeam/FiltersRegistry/blob/master/README.md#filters-metadata
