@@ -12,6 +12,11 @@ import {
 // Mock log to hide error messages
 vi.mock('../src/main/utils/log');
 
+// Mock downloadFile to avoid live HTTP calls in CI
+vi.mock('../src/main/utils/webutils', () => ({
+    downloadFile: vi.fn(() => JSON.stringify({ config: [{ filterId: 1, percent: 50 }] })),
+}));
+
 describe('optimization', () => {
     it('Test optimization', () => {
         const filtersOptimizationPercent = getFiltersOptimizationPercent();

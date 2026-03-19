@@ -95,10 +95,12 @@ class RuleValidator {
      * Validates rule node.
      *
      * @param {AnyRule} ruleNode Rule node to validate.
+     * @param {string} [ruleText] Pre-generated rule text.
+     * If not provided, generated from rule node.
      *
      * @returns {ValidationResult} Validation result.
      */
-    static validate(ruleNode) {
+    static validate(ruleNode, ruleText) {
         if (ruleNode.category === RuleCategory.Invalid) {
             return RuleValidator.createValidationResult(
                 false,
@@ -110,23 +112,23 @@ class RuleValidator {
             return RuleValidator.createValidationResult(true);
         }
 
-        const ruleText = RuleGenerator.generate(ruleNode);
+        const text = ruleText ?? RuleGenerator.generate(ruleNode);
 
         try {
             // Validate cosmetic rules
             if (ruleNode.category === RuleCategory.Cosmetic) {
                 // eslint-disable-next-line no-new
-                new CosmeticRule(ruleNode, 0);
+                new CosmeticRule(text, 0);
                 return RuleValidator.createValidationResult(true);
             }
 
             // Validate network rules
-            const rule = new NetworkRule(ruleNode, 0);
-            RuleValidator.validateRegexp(rule.getPattern(), ruleText);
+            const rule = new NetworkRule(text, 0);
+            RuleValidator.validateRegexp(rule.getPattern(), text);
         } catch (error) {
             // TODO: add getErrorMessage as a helper
             const message = error instanceof Error ? error.message : String(error);
-            const errorMessage = `Error: "${message}" in the rule: "${ruleText}"`;
+            const errorMessage = `Error: "${message}" in the rule: "${text}"`;
             return RuleValidator.createValidationResult(false, errorMessage);
         }
 
@@ -250,8 +252,9 @@ export const validateAndFilterRules = (list, excluded, invalid = [], filterName)
 
         for (let i = 0; i < convertedRuleNodes.length; i += 1) {
             const convertedRuleNode = convertedRuleNodes[i];
+            const convertedRuleText = RuleGenerator.generate(convertedRuleNode);
 
-            let validationResult = RuleValidator.validate(convertedRuleNode);
+            let validationResult = RuleValidator.validate(convertedRuleNode, convertedRuleText);
 
             // TODO: remove this checking when $header is fixed
             // https://github.com/AdguardTeam/AdguardBrowserExtension/issues/2942
@@ -274,7 +277,7 @@ export const validateAndFilterRules = (list, excluded, invalid = [], filterName)
                 return false;
             }
 
-            const rule = RuleFactory.createRule(convertedRuleNode);
+            const rule = RuleFactory.createRule(convertedRuleText);
 
             // It is impossible to bundle jsdom into tsurlfilter, so we check if rules are valid in the compiler
             if (rule instanceof CosmeticRule && rule.getType() === CosmeticRuleType.ElementHidingRule) {

@@ -15,11 +15,12 @@ example.org##.images > .private + .message
 
 
 
-example.com$$script[tag-content="12313"][max-length="262144"]
-example.com$$script[tag-content="banner"][max-length="262144"]
+example.com$$script:contains(12313)
 !
 ||www.ynet.co.il^$important,websocket,~third-party,domain=www.ynet.co.il
 @@.com/ads.js|$third-party,domain=~3ppt.com']
+example.com$$script:contains(/.advert/)
+example.com.pl$$iframe[name]:not([class]):not([id]):not([src])[style="display:none"]
 !
 
 

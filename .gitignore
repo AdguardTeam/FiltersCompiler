@@ -15,5 +15,5 @@ test/resources/filters/*/diff.txt
 test/resources/filters/*/filter.txt
 test/resources/filters/*/revision.json
 
-# SDD work-in-progress specs
+# SDD specs
 specs/.current/*

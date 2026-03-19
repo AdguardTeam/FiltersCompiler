@@ -69,6 +69,10 @@ describe('converter', () => {
 
         c = convertRulesToAdgSyntax(['']);
         expect(c[0]).toEqual('');
+
+        // HTML filtering rules with :not() and attribute selectors — ##^ converts to $$
+        c = convertRulesToAdgSyntax(['example.com.pl##^iframe[name]:not([class]):not([id]):not([src])[style="display:none"]']);
+        expect(c[0]).toBe('example.com.pl$$iframe[name]:not([class]):not([id]):not([src])[style="display:none"]');
     });
 
     // TODO: add more rules under this section
@@ -309,27 +313,21 @@ describe('converter', () => {
         expect(actual[0]).toBe(expected);
     });
 
-    it('converts ##^script:has-text to $$script[tag-contains]', () => {
+    it('converts ##^script:has-text to $$script:contains', () => {
         let actual = convertRulesToAdgSyntax(['example.com##^script:has-text(12313)']);
-        let expected = 'example.com$$script[tag-content="12313"][max-length="262144"]';
+        let expected = 'example.com$$script:contains(12313)';
         expect(actual[0]).toBe(expected);
 
+        // mixed AdGuard+uBO syntax and is rejected by agtree v4
         actual = convertRulesToAdgSyntax(['example.com##^script:contains(banner)']);
-        expected = 'example.com$$script[tag-content="banner"][max-length="262144"]';
-        expect(actual[0]).toBe(expected);
+        expect(actual[0]).toBe(undefined);
 
-        /**
-         * regexp as tag-content arg is not supported by AdGuard HTML filtering rules
-         * https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#tag-content
-         *
-         * so such rules should be discarded
-         * https://github.com/AdguardTeam/tsurlfilter/issues/55
-         */
         actual = convertRulesToAdgSyntax(['example.com##^script:contains(/.+banner/)']);
         expect(actual[0]).toBe(undefined);
 
         actual = convertRulesToAdgSyntax(['example.com##^script:has-text(/\.advert/)']);
-        expect(actual[0]).toBe(undefined);
+        expected = 'example.com$$script:contains(/.advert/)';
+        expect(actual[0]).toBe(expected);
     });
 
     describe('converts html rules with pseudo-classes', () => {

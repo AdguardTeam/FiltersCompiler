@@ -100,6 +100,16 @@ You MUST follow the following rules for EVERY task that you perform:
   Documentation-only changes (e.g., `AGENTS.md`, `DEVELOPMENT.md`, `README.md`)
   do NOT belong in the changelog.
 
+- When adding an `## [Unreleased]` section to `CHANGELOG.md`, always add the
+  corresponding link reference immediately after the section's last entry,
+  pointing to `HEAD` from the latest released version, e.g.:
+
+  ```markdown
+  [Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/vX.Y.Z...HEAD
+  ```
+
+  where `vX.Y.Z` is the latest versioned tag in the changelog.
+
 - **Never edit JSON schemas in `schemas/` manually.** Edit the generation
   scripts in `tasks/build-schemas/` and run `pnpm build-schemas` to regenerate.
 

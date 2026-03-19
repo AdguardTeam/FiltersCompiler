@@ -12,6 +12,8 @@ regularexpressionexcluded
 ||test-common-1-rule.com^$replace=
 ! Error: Unable to convert rule to AdGuard syntax: "||test.com^$replace=" due to error: Modifier value cannot be empty
 ||test.com^$replace=
+! Rule "~example.com,google.com$$div[id="ad_text"][wildcard="*teasernet*tararar*"]" converted to: "~example.com,google.com$$div[id="ad_text"]:contains(/^.*teasernet.*tararar.*$/s)"
+~example.com,google.com$$div[id="ad_text"][wildcard="*teasernet*tararar*"]
 ! ||test.com^$third-party is excluded by "||test.com^$third-party" in exclude.txt
 ||test.com^$third-party
 ! ||news.yandex.*/*/*-*-*-*-$replace=/Ya\[([0-9]{10\,15})\]\([\s\S]*\)\$/,script,important,domain=news.yandex.by|news.yandex.com|news.yandex.fr|news.yandex.kz|news.yandex.com|news.yandex.ua is excluded by "replace=" in exclude.txt

@@ -40,7 +40,7 @@ test-common-2-rule.com$xmlhttprequest
 ||test.com^
 !+ NOT_PLATFORM(test, windows)
 #%#test.com^$third-party
-~example.com,google.com$$div[id="ad_text"][wildcard="*teasernet*tararar*"]
+~example.com,google.com$$div[id="ad_text"]:contains(/^.*teasernet.*tararar.*$/s)
 !+ NOT_PLATFORM(test, windows)
 excluded_platform
 excluded_platform

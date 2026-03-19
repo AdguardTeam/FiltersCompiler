@@ -24,7 +24,7 @@ example.com##^script:contains(banner)
 ||www.ynet.co.il^$important,websocket,1p,domain=www.ynet.co.il
 @@.com/ads.js|$3p,domain=~3ppt.com']
 example.com##^script:has-text(/.advert/)
-rybnik.com.pl##^iframe[name]:not([class]):not([id]):not([src])[style="display:none"]
+example.com.pl##^iframe[name]:not([class]):not([id]):not([src])[style="display:none"]
 !
 
 

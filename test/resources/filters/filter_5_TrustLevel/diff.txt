@@ -4,18 +4,18 @@ test.com#%#AG_setConstant("ads", "false");
 ||example.com/api/v1/ad/*/json$replace=/html/abcd\,/i
 ! test.com#@%#Object.defineProperty(window, 'abcde', { get: function() { return []; } }); is excluded by "#@%#" in exclusions-high.txt
 test.com#@%#Object.defineProperty(window, 'abcde', { get: function() { return []; } });
-! Rule "example.com##^script:has-text(12313)" converted to: "example.com$$script[tag-content="12313"][max-length="262144"]"
+! Rule "example.com##^script:has-text(12313)" converted to: "example.com$$script:contains(12313)"
 example.com##^script:has-text(12313)
-! Rule "example.com##^script:contains(banner)" converted to: "example.com$$script[tag-content="banner"][max-length="262144"]"
+! Error: Unable to convert rule to AdGuard syntax: "example.com##^script:contains(banner)" due to error: Invalid HTML filtering rule: Mixed AdGuard and uBlock syntax
 example.com##^script:contains(banner)
 ! Rule "||www.ynet.co.il^$important,websocket,1p,domain=www.ynet.co.il" converted to: "||www.ynet.co.il^$important,websocket,~third-party,domain=www.ynet.co.il"
 ||www.ynet.co.il^$important,websocket,1p,domain=www.ynet.co.il
 ! Rule "@@.com/ads.js|$3p,domain=~3ppt.com']" converted to: "@@.com/ads.js|$third-party,domain=~3ppt.com']"
 @@.com/ads.js|$3p,domain=~3ppt.com']
-! Error: Unable to convert rule to AdGuard syntax: "example.com##^script:has-text(/.advert/)" due to error: Cannot convert RegExp parameter '/.advert/' from 'has-text' pseudo class, because converting RegExp patterns are not supported yet
+! Rule "example.com##^script:has-text(/.advert/)" converted to: "example.com$$script:contains(/.advert/)"
 example.com##^script:has-text(/.advert/)
-! Error: Unable to convert rule to AdGuard syntax: "rybnik.com.pl##^iframe[name]:not([class]):not([id]):not([src])[style="display:none"]" due to error: Unsupported pseudo class 'not'
-rybnik.com.pl##^iframe[name]:not([class]):not([id]):not([src])[style="display:none"]
+! Rule "example.com.pl##^iframe[name]:not([class]):not([id]):not([src])[style="display:none"]" converted to: "example.com.pl$$iframe[name]:not([class]):not([id]):not([src])[style="display:none"]"
+example.com.pl##^iframe[name]:not([class]):not([id]):not([src])[style="display:none"]
 ! Rule "test.com#$#abort-on-property-read adsShown" converted to: "test.com#%#//scriptlet('abp-abort-on-property-read', 'adsShown')"
 test.com#$#abort-on-property-read adsShown
 ! Rule "example.com#@$#abort-on-property-write adblock.check" converted to: "example.com#@%#//scriptlet('abp-abort-on-property-write', 'adblock.check')"

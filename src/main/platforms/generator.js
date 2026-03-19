@@ -24,7 +24,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const RULES_SEPARATOR = '\r\n';
 let filterIdsPool = [];
-const metadataFilterIdsPool = [];
+let metadataFilterIdsPool = [];
 
 const OPTIMIZED_PLATFORMS_LIST = ['ext_safari', 'android', 'ios'];
 
@@ -1173,4 +1173,5 @@ export const generate = async (filtersDir, platformsPath, whitelist, blacklist) 
     // reset af the end
     // TODO: find out better way to reset
     filterIdsPool = [];
+    metadataFilterIdsPool = [];
 };

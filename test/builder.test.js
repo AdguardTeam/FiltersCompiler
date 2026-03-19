@@ -49,7 +49,7 @@ disableOptimization();
 const cleanup = async () => {
     // remove platformsDir if it exists
     if (existsSync(platformsDir)) {
-        await fs.rmdir(platformsDir, { recursive: true });
+        await fs.rm(platformsDir, { recursive: true, force: true });
     }
 };
 
@@ -282,7 +282,7 @@ describe('Test builder', async () => {
         it('platforms/test filters 5.txt', async () => {
             const filterContent = await readFile(path.join(__dirname, 'resources/platforms/test', 'filters', '5.txt'));
             const filterLines = filterContent.split(/\r?\n/);
-            expect(filterLines.length).toEqual(55);
+            expect(filterLines.length).toEqual(56);
             const presentRules = [
                 '||adsnet.com/*/700x350.gif$domain=example.com',
                 'example.com##+js(set-constant, ads, false)',
@@ -296,13 +296,13 @@ describe('Test builder', async () => {
                 '||test.com^$script,redirect=noop.js',
                 '||example.com/*.mp4$media,redirect=noop-1s.mp4',
                 '||example.com^$script,redirect-rule=noop.js',
+                'example.com.pl##^iframe[name]:not([class]):not([id]):not([src])[style="display:none"]',
             ];
             presentRules.forEach((rule) => {
                 expect(filterLines.includes(rule)).toBeTruthy();
             });
 
             const absentRules = [
-                'rybnik.com.pl##^iframe[name]:not([class]):not([id]):not([src])[style="display:none"]',
                 'test.com#%#AG_setConstant("ads", "false");',
                 "test.com#@%#Object.defineProperty(window, 'abcde', { get: function() { return []; } });",
                 '||example.com/api/v1/ad/*/json$replace=/html/abcd\\,/i',
@@ -317,7 +317,7 @@ describe('Test builder', async () => {
         it('platforms/test2 filters 5.txt', async () => {
             const filterContent = await readFile(path.join(__dirname, 'resources/platforms/test2', 'filters', '5.txt'));
             const filterLines = filterContent.split(/\r?\n/);
-            expect(filterLines.length).toEqual(55);
+            expect(filterLines.length).toEqual(56);
 
             const presentRules = [
                 'test.com#%#//scriptlet(\'abp-abort-on-property-read\', \'adsShown\')',
@@ -325,7 +325,7 @@ describe('Test builder', async () => {
                 'test.com#@%#//scriptlet(\'ubo-abort-on-property-read.js\', \'some.prop\')',
                 'example.com#%#//scriptlet(\'ubo-disable-newtab-links.js\')',
                 'example.com#%#//scriptlet(\'ubo-set-constant.js\', \'ads\', \'false\')',
-                'example.com$$script[tag-content="12313"][max-length="262144"]',
+                'example.com$$script:contains(12313)',
                 '||www.ynet.co.il^$important,websocket,~third-party,domain=www.ynet.co.il',
                 '||example.com/banner$image,redirect=3x2-transparent.png',
                 '||test.com^$script,redirect=noopjs',
@@ -486,7 +486,7 @@ describe('Test builder', async () => {
                 'test-common-rule.com',
                 'test-common-1-rule.com',
                 '! some common rules could be places here',
-                '~example.com,google.com##^div[id="ad_text"][wildcard="*teasernet*tararar*"]',
+                '~example.com,google.com##^div[id="ad_text"]:has-text(/^.*teasernet.*tararar.*$/s)',
                 'excluded_platform',
                 '!+ NOT_OPTIMIZED',
                 'test-common-2-rule.com',
@@ -553,7 +553,7 @@ describe('Test builder', async () => {
                 'test-common-rule.com',
                 'test-common-1-rule.com',
                 '! some common rules could be places here',
-                '~example.com,google.com$$div[id=\"ad_text\"][wildcard=\"*teasernet*tararar*\"]',
+                '~example.com,google.com$$div[id=\"ad_text\"]:contains(/^.*teasernet.*tararar.*$/s)',
                 'excluded_platform',
                 'test_domain#%#testScript();',
             ];
@@ -988,7 +988,7 @@ describe('Test builder', async () => {
                 expect(filterContent).toBeTruthy();
 
                 const filterLines = filterContent.split(/\r?\n/);
-                expect(filterLines.length).toEqual(54);
+                expect(filterLines.length).toEqual(55);
                 expect(filterLines.includes('||example.com^$script,redirect=noopjs')).toBeTruthy();
                 expect(filterLines.includes('||example.com/banner$image,redirect=1x1-transparent.gif')).toBeTruthy();
             });
