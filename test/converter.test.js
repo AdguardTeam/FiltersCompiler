@@ -330,6 +330,24 @@ describe('converter', () => {
         expect(actual[0]).toBe(expected);
     });
 
+    it('converts html filtering rules with [min-length] and [max-length] into a single :contains() with combined quantifier', () => {
+        let actual = convertRulesToAdgSyntax(['example.com$$script[tag-content="Flags."][min-length="20000"][max-length="300000"]']);
+        let expected = 'example.com$$script:contains(Flags.):contains(/^(?=.{20000,300000}$).*/s)';
+        expect(actual[0]).toBe(expected);
+
+        actual = convertRulesToAdgSyntax(['example.com$$script[min-length="100"][max-length="500"]']);
+        expected = 'example.com$$script:contains(/^(?=.{100,500}$).*/s)';
+        expect(actual[0]).toBe(expected);
+
+        actual = convertRulesToAdgSyntax(['example.com$$script[min-length="1000"]']);
+        expected = 'example.com$$script:contains(/^(?=.{1000,}$).*/s)';
+        expect(actual[0]).toBe(expected);
+
+        actual = convertRulesToAdgSyntax(['example.com$$script[max-length="5000"]']);
+        expected = 'example.com$$script:contains(/^(?=.{0,5000}$).*/s)';
+        expect(actual[0]).toBe(expected);
+    });
+
     describe('converts html rules with pseudo-classes', () => {
         it.each([
             'example.com$$script:contains(eval(function(p,a,c,k,e,d))',
