@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v3.2.7] - 2026-03-25
+
+### Fixed
+
+- Skip conversion of `[min-length]` / `[max-length]` HTML filtering rule
+  attribute selectors to `:contains(/regex/)` to prevent CoreLibs regexp
+  quantifier overflow (PCRE2 limit of 65535).
+
+[v3.2.7]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.2.6...v3.2.7
+
 ## [v3.2.6] - 2026-03-24
 
 ### Changed

@@ -246,14 +246,31 @@ const HTML_RULES_PSEUDO_CLASS_MARKERS = [
 ];
 
 /**
+ * Markers of length attribute selectors for HTML filtering rules.
+ *
+ * When the compiler converts [min-length="N"] / [max-length="N"] into
+ * :contains() with a regexp quantifier, the quantifier value may exceed
+ * the CoreLibs PCRE2 limit of 65535 (UINT16_MAX), causing the rule to
+ * silently fail. Since CoreLibs natively supports these attribute selectors
+ * and only CoreLibs platforms consume HTML filtering rules from compiler
+ * output (all extensions strip $$ rules), we skip the conversion entirely
+ * as a temporary workaround.
+ */
+const HTML_RULES_LENGTH_ATTR_MARKERS = [
+    '[min-length=',
+    '[max-length=',
+];
+
+/**
  * Checks if the rule should be kept as is,
  * i.e. no conversion and no validation,
- * since it is not supported by the extension yet.
+ * since it is not supported by the extension yet
+ * or conversion would produce regexes incompatible with CoreLibs.
  *
  * Conditions for keeping the rule as is:
  * - rule is HTML filtering rule
  * - rule is AdGuard syntax
- * - rule contains pseudo-class marker.
+ * - rule contains a pseudo-class marker or a length attribute marker.
  *
  * Planned to be fixed:
  * https://github.com/AdguardTeam/tsurlfilter/issues/96.
@@ -265,5 +282,8 @@ const HTML_RULES_PSEUDO_CLASS_MARKERS = [
 export const shouldKeepAdgHtmlFilteringRuleAsIs = (ruleNode) => {
     return ruleNode.type === CosmeticRuleType.HtmlFilteringRule
         && ruleNode.syntax === AdblockSyntax.Adg
-        && HTML_RULES_PSEUDO_CLASS_MARKERS.some((marker) => ruleNode.body.value.includes(marker));
+        && (
+            HTML_RULES_PSEUDO_CLASS_MARKERS.some((marker) => ruleNode.body.value.includes(marker))
+            || HTML_RULES_LENGTH_ATTR_MARKERS.some((marker) => ruleNode.body.value.includes(marker))
+        );
 };
