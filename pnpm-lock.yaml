@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@adguard/agtree':
-        specifier: ^4.0.3
-        version: 4.0.3
+        specifier: ^4.0.4
+        version: 4.0.4
       '@adguard/css-tokenizer':
         specifier: ^1.2.0
         version: 1.2.0
@@ -30,8 +30,8 @@ importers:
         specifier: ^2.3.1
         version: 2.3.1
       '@adguard/tsurlfilter':
-        specifier: ^4.0.4
-        version: 4.0.4(@adguard/re2-wasm@1.2.0)
+        specifier: ^4.0.5
+        version: 4.0.5(@adguard/re2-wasm@1.2.0)
       '@eslint/css-tree':
         specifier: 3.6.6
         version: 3.6.6
@@ -87,8 +87,8 @@ importers:
 
 packages:
 
-  '@adguard/agtree@4.0.3':
-    resolution: {integrity: sha512-RnBbb4pNVSPLtgERq6klKFCR5U67YtTyWdacAbwXw3DEDViNmFoLOL/oUdL9a8iRfYTnBeOtmnm7yx0qWC5IDg==}
+  '@adguard/agtree@4.0.4':
+    resolution: {integrity: sha512-KKT6Trau8dYJCmfLSihcKCk/kTVQ5qWHVO/chhNR+eSx3pJjZGJ+qLVkp1LCPdnccWIzWCO0b8a0nz0RhdhbMg==}
     engines: {node: '>=22'}
 
   '@adguard/css-tokenizer@1.2.0':
@@ -121,8 +121,8 @@ packages:
   '@adguard/scriptlets@2.3.1':
     resolution: {integrity: sha512-E60vnKYv4GIlvtAVriyf3SYZk/u10shlfogTJFQa8ZKS2HHMuRAUTk8Msn42mycmD/Kf9P9J17l1SvgwVJ+otg==}
 
-  '@adguard/tsurlfilter@4.0.4':
-    resolution: {integrity: sha512-TZQJHYEn6ZFxxVQwkWNyS+v597gU+5fitiaJMcrA1p6+JuTC5tQbregSGfGGyolwoaGJ3KhsTb4v5zMgtQ8pHA==}
+  '@adguard/tsurlfilter@4.0.5':
+    resolution: {integrity: sha512-s/Iv86M9KUXXAfeyps/hmEbX5tismn19lAVqIkFptBujnrV6uEY2bxthzRsBWxY39Y8ZFwrjhe9nyZ3HILbU3g==}
     engines: {node: '>=22'}
     hasBin: true
     peerDependencies:
@@ -1341,8 +1341,8 @@ packages:
   loupe@3.1.4:
     resolution: {integrity: sha512-wJzkKwJrheKtknCOKNEtDK4iqg/MxmZheEMtSTYvnzRdEYaZzmgH976nenp8WdJRdx5Vc1X/9MO0Oszl6ezeXg==}
 
-  lru-cache@11.2.2:
-    resolution: {integrity: sha512-F9ODfyqML2coTIsQpSkRHnLSZMtkU8Q+mSfcaIyKwy58u+8k5nvAYeiNhsyMARvzNcXJ9QfWVrcPsC9e9rAxtg==}
+  lru-cache@11.2.7:
+    resolution: {integrity: sha512-aY/R+aEsRelme17KGQa/1ZSIpLpNYYrhcrepKTZgE+W3WM16YMCaPwOHLHsmopZHELU0Ojin1lPVxKR0MihncA==}
     engines: {node: 20 || >=22}
 
   magic-string@0.30.17:
@@ -1970,7 +1970,7 @@ packages:
 
 snapshots:
 
-  '@adguard/agtree@4.0.3':
+  '@adguard/agtree@4.0.4':
     dependencies:
       '@adguard/css-tokenizer': 1.2.0
       camelcase-keys: 7.0.2
@@ -2010,13 +2010,13 @@ snapshots:
 
   '@adguard/scriptlets@2.3.1':
     dependencies:
-      '@adguard/agtree': 4.0.3
+      '@adguard/agtree': 4.0.4
       '@types/trusted-types': 2.0.7
       js-yaml: 3.14.1
 
-  '@adguard/tsurlfilter@4.0.4(@adguard/re2-wasm@1.2.0)':
+  '@adguard/tsurlfilter@4.0.5(@adguard/re2-wasm@1.2.0)':
     dependencies:
-      '@adguard/agtree': 4.0.3
+      '@adguard/agtree': 4.0.4
       '@adguard/css-tokenizer': 1.2.0
       '@adguard/logger': 2.0.0
       '@adguard/re2-wasm': 1.2.0
@@ -2025,7 +2025,7 @@ snapshots:
       commander: 12.1.0
       is-cidr: 4.0.2
       is-ip: 3.1.0
-      lru-cache: 11.2.2
+      lru-cache: 11.2.7
       punycode: 2.3.1
       tldts: 5.7.112
       zod: 3.24.4
@@ -3311,7 +3311,7 @@ snapshots:
 
   loupe@3.1.4: {}
 
-  lru-cache@11.2.2: {}
+  lru-cache@11.2.7: {}
 
   magic-string@0.30.17:
     dependencies:

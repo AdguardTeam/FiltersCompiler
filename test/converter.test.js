@@ -347,6 +347,24 @@ describe('converter', () => {
         expect(actual[0]).toBe('example.com$$script:contains(advertisement)');
     });
 
+    describe('converts [tag-content] with escaped double quotes', () => {
+        it.each([
+            {
+                // `[tag-content]` with `""` escaped double quotes - simple case
+                actual: '$$div[tag-content="a""b"]',
+                expected: ['$$div:contains(a"b)'],
+            },
+            {
+                // `[tag-content]` with `""` escaped double quotes - multiple
+                actual: '$$script[tag-content="{""zone_id"":"""]',
+                expected: ['$$script:contains({"zone_id":")'],
+            },
+        ])('$actual', ({ actual, expected }) => {
+            const result = convertRulesToAdgSyntax([actual]);
+            expect(result).toEqual(expected);
+        });
+    });
+
     describe('converts html rules with pseudo-classes', () => {
         it.each([
             'example.com$$script:contains(eval(function(p,a,c,k,e,d))',
