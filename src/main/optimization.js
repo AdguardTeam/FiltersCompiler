@@ -1,15 +1,37 @@
 /* eslint-disable global-require */
+import fs from 'fs';
+import path from 'path';
 import { downloadFile } from './utils/webutils';
 
 // Here we can access optimizable filters and its optimization percentages
-// eslint-disable-next-line max-len
-const OPTIMIZATION_PERCENT_URL = 'https://chrome.adtidy.org/optimization_config/percent.json?key=4DDBE80A3DA94D819A00523252FB6380';
-// eslint-disable-next-line max-len
-const OPTIMIZATION_STATS_URL = 'https://chrome.adtidy.org/filters/{0}/stats.json?key=4DDBE80A3DA94D819A00523252FB6380';
+const OPTIMIZATION_KEY = '4DDBE80A3DA94D819A00523252FB6380';
+export const OPTIMIZATION_PERCENT_URL = `https://chrome.adtidy.org/optimization_config/percent.json?key=${OPTIMIZATION_KEY}`;
+
+const downloadOptimizationPercent = () => downloadFile(OPTIMIZATION_PERCENT_URL);
+
+const downloadOptimizationStats = (filterId) => {
+    const optimizationStatsUrl = `https://chrome.adtidy.org/filters/${filterId}/stats.json?key=${OPTIMIZATION_KEY}`;
+
+    return downloadFile(optimizationStatsUrl);
+};
 
 let optimizationEnabled = true;
 
 let filtersOptimizationPercent = null;
+
+let localOptimizationConfigPath = null;
+
+export const optimizationConfigLocal = {
+    setPath: (path) => {
+        localOptimizationConfigPath = path;
+    },
+    generate: async (filePath) => {
+        const percentContent = await downloadOptimizationPercent();
+
+        await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
+        await fs.promises.writeFile(filePath, percentContent, 'utf-8');
+    },
+};
 
 /**
  * Downloads and caches filters optimization percentages configuration
@@ -20,7 +42,11 @@ export const getFiltersOptimizationPercent = () => {
     }
 
     if (filtersOptimizationPercent === null) {
-        filtersOptimizationPercent = JSON.parse(downloadFile(OPTIMIZATION_PERCENT_URL));
+        const content = localOptimizationConfigPath
+            ? fs.readFileSync(localOptimizationConfigPath, 'utf-8')
+            : downloadOptimizationPercent();
+
+        filtersOptimizationPercent = JSON.parse(content);
     }
 
     if (filtersOptimizationPercent.config.length === 0) {
@@ -45,7 +71,9 @@ export const getFilterOptimizationConfig = (filterId) => {
 
     let optimizationConfig = null;
     if (optimizationEnabled && filterOptimizationPercent) {
-        optimizationConfig = JSON.parse(downloadFile(OPTIMIZATION_STATS_URL.replace('{0}', filterId)));
+        const content = downloadOptimizationStats(filterId);
+
+        optimizationConfig = JSON.parse(content);
         if (!optimizationConfig || !optimizationConfig.groups || optimizationConfig.groups.length === 0) {
             throw new Error(`Unable to retrieve optimization stats for ${filterId}`);
         }

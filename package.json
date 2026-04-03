@@ -1,6 +1,6 @@
 {
     "name": "@adguard/filters-compiler",
-    "version": "3.2.6",
+    "version": "3.2.7",
     "description": "AdGuard filters compiler",
     "homepage": "http://adguard.com",
     "type": "module",
