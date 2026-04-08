@@ -4,13 +4,12 @@ import path from 'path';
 import { downloadFile } from './utils/webutils';
 
 // Here we can access optimizable filters and its optimization percentages
-const OPTIMIZATION_KEY = '4DDBE80A3DA94D819A00523252FB6380';
-export const OPTIMIZATION_PERCENT_URL = `https://chrome.adtidy.org/optimization_config/percent.json?key=${OPTIMIZATION_KEY}`;
+export const OPTIMIZATION_PERCENT_URL = 'https://chrome.adtidy.org/optimization_config/percent.json';
 
 const downloadOptimizationPercent = () => downloadFile(OPTIMIZATION_PERCENT_URL);
 
 const downloadOptimizationStats = (filterId) => {
-    const optimizationStatsUrl = `https://chrome.adtidy.org/filters/${filterId}/stats.json?key=${OPTIMIZATION_KEY}`;
+    const optimizationStatsUrl = `https://chrome.adtidy.org/filters/${filterId}/stats.json?key=4DDBE80A3DA94D819A00523252FB6380`;
 
     return downloadFile(optimizationStatsUrl);
 };
