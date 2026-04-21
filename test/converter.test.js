@@ -311,6 +311,12 @@ describe('converter', () => {
         actual = convertToUbo(["example.org#%#//scriptlet('set-session-storage-item', 'acceptCookies', 'false')"]);
         expected = 'example.org##+js(set-session-storage-item, acceptCookies, false)';
         expect(actual[0]).toBe(expected);
+
+        // https://github.com/AdguardTeam/FiltersCompiler/issues/274
+        // google-ima3 scriptlet should be converted to uBO-compatible google-ima
+        actual = convertToUbo(["example.org#%#//scriptlet('google-ima3')"]);
+        expected = 'example.org##+js(google-ima)';
+        expect(actual[0]).toBe(expected);
     });
 
     it('converts ##^script:has-text to $$script:contains', () => {
