@@ -17,7 +17,7 @@ const downloadOptimizationStats = (filterId) => {
 
 let optimizationEnabled = true;
 
-let filtersOptimizationPercent = null;
+let optimizationPercent = null;
 
 let localOptimizationConfigPath = null;
 
@@ -36,37 +36,37 @@ export const optimizationConfigLocal = {
 /**
  * Downloads and caches filters optimization percentages configuration
  */
-export const getFiltersOptimizationPercent = () => {
+export const getOptimizationPercent = () => {
     if (!optimizationEnabled) {
         return null;
     }
 
-    if (filtersOptimizationPercent === null) {
+    if (optimizationPercent === null) {
         const content = localOptimizationConfigPath
             ? fs.readFileSync(localOptimizationConfigPath, 'utf-8')
             : downloadOptimizationPercent();
 
-        filtersOptimizationPercent = JSON.parse(content);
+        optimizationPercent = JSON.parse(content);
     }
 
-    if (filtersOptimizationPercent.config.length === 0) {
+    if (optimizationPercent.config.length === 0) {
         // eslint-disable-next-line no-throw-literal
         throw 'Invalid configuration';
     }
 
-    return filtersOptimizationPercent;
+    return optimizationPercent;
 };
 
 /**
  * Downloads filter optimization config for the filter
  */
-export const getFilterOptimizationConfig = (filterId) => {
+export const getOptimizationConfig = (filterId) => {
     if (!optimizationEnabled) {
         return null;
     }
 
     // config: [{filterId: 1, percent: 45}, ...]
-    const filterOptimizationPercent = getFiltersOptimizationPercent().config
+    const filterOptimizationPercent = getOptimizationPercent().config
         .find((config) => config.filterId === filterId);
 
     let optimizationConfig = null;
