@@ -28,8 +28,12 @@ export const optimizationConfigLocal = {
     generate: async (filePath) => {
         const percentContent = await downloadOptimizationPercent();
 
-        await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
-        await fs.promises.writeFile(filePath, percentContent, 'utf-8');
+        await fs.promises.mkdir(filePath, { recursive: true });
+        await fs.promises.writeFile(path.join(filePath, 'percent.json'), percentContent, 'utf-8');
+    },
+    reset() {
+        this.setPath(null);
+        optimizationPercent = null;
     },
 };
 
@@ -43,7 +47,7 @@ export const getOptimizationPercent = () => {
 
     if (optimizationPercent === null) {
         const content = localOptimizationConfigPath
-            ? fs.readFileSync(localOptimizationConfigPath, 'utf-8')
+            ? fs.readFileSync(path.join(localOptimizationConfigPath, 'percent.json'), 'utf-8')
             : downloadOptimizationPercent();
 
         optimizationPercent = JSON.parse(content);
