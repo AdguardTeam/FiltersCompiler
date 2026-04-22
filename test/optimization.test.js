@@ -5,7 +5,7 @@ import {
     vi,
 } from 'vitest';
 import {
-    getFiltersOptimizationPercent,
+    getOptimizationPercent,
     skipRuleWithOptimization,
 } from '../src/main/optimization';
 
@@ -19,11 +19,11 @@ vi.mock('../src/main/utils/webutils', () => ({
 
 describe('optimization', () => {
     it('Test optimization', () => {
-        const filtersOptimizationPercent = getFiltersOptimizationPercent();
+        const filtersOptimizationPercent = getOptimizationPercent();
 
         expect(filtersOptimizationPercent.config.length).toBeGreaterThan(0);
 
-        expect(getFiltersOptimizationPercent(1)).toBeDefined();
+        expect(getOptimizationPercent(1)).toBeDefined();
     });
 
     it('Test optimization skip rule', () => {
