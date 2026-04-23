@@ -13,7 +13,11 @@ module.exports = {
         'jest': true,
     },
     settings: {
+        'import/extensions': ['.js', '.ts'],
         'import/resolver': {
+            node: {
+                extensions: ['.js', '.ts'],
+            },
             exports: {},
         },
     },
@@ -32,6 +36,10 @@ module.exports = {
     rules: {
         'import/no-extraneous-dependencies': 0,
         'import/prefer-default-export': 0,
+        'import/extensions': ['error', 'ignorePackages', {
+            js: 'never',
+            ts: 'never',
+        }],
         'indent': [
             'error',
             4,
@@ -119,4 +127,31 @@ module.exports = {
             'ignoreComments': false,
         }],
     },
+    overrides: [
+        {
+            files: ['**/*.ts'],
+            parser: '@typescript-eslint/parser',
+            parserOptions: {
+                ecmaVersion: 2022,
+                sourceType: 'module',
+            },
+            plugins: ['@typescript-eslint'],
+            extends: [
+                'plugin:@typescript-eslint/recommended',
+            ],
+            rules: {
+                // Disable base rules that have TypeScript equivalents
+                'no-unused-vars': 'off',
+                '@typescript-eslint/no-unused-vars': ['error'],
+                'no-shadow': 'off',
+                '@typescript-eslint/no-shadow': ['error'],
+                'no-use-before-define': 'off',
+                '@typescript-eslint/no-use-before-define': ['error'],
+                // TypeScript handles module resolution — disable import rules
+                // that conflict with TS resolution
+                'import/no-unresolved': 'off',
+                'import/extensions': 'off',
+            },
+        },
+    ],
 };

@@ -15,7 +15,8 @@ platforms (extensions and apps).
 - **Package Manager**: pnpm 10.7
 - **Bundler**: Rollup (dual ESM + CJS output)
 - **Testing**: Vitest (node environment)
-- **Linting**: ESLint with airbnb-base config
+- **Code Linting**: ESLint with airbnb-base config
+- **Type Checking**: TypeScript (`strict` mode, new `.ts` files only)
 - **Target Platform**: Node.js (library)
 - **Project Type**: Single package
 - **Key Dependencies**:
@@ -81,7 +82,9 @@ platforms (extensions and apps).
 | `pnpm install` | Install dependencies |
 | `pnpm build` | Build the library (Rollup → `dist/`) |
 | `pnpm test` | Run all tests (Vitest) |
-| `pnpm lint` | Run ESLint |
+| `pnpm lint` | Run ESLint and TypeScript type checker |
+| `pnpm lint:code` | Run ESLint |
+| `pnpm lint:types` | Run TypeScript type checker (`tsc --noEmit`) |
 | `pnpm build-schemas` | Regenerate JSON schemas from `tasks/build-schemas/` |
 | `pnpm build-txt` | Generate `dist/build.txt` with version info |
 | `pnpm increment` | Bump patch version (`package.json`) |
@@ -134,7 +137,11 @@ conventions not covered by the linter.
 1. **ES module syntax** (`import`/`export`). The project uses
    `"type": "module"` in `package.json`.
 
-2. **ESLint airbnb-base** rules apply. Run `pnpm lint` to check.
+2. **ESLint airbnb-base** rules apply. Run `pnpm lint:code` to check.
+
+3. **TypeScript for new code.** New source files should be written in
+   TypeScript (`.ts`) under `src/`. Existing `.js` files are not migrated
+   yet. Run `pnpm lint:types` to verify type correctness.
 
 ### II. Architecture
 
@@ -150,7 +157,7 @@ conventions not covered by the linter.
 
 ### III. Testing
 
-1. **Vitest** with node environment. Test files are in `test/*.test.js`.
+1. **Vitest** with node environment. Test files are in `test/*.test.{js,ts}`.
 
 2. **Test resources** are in `test/resources/` (filter files, platform configs,
    expected outputs). Some resources are gitignored (generated during tests).

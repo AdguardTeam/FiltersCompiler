@@ -63,18 +63,57 @@ pnpm lint
 | `pnpm install` | Install dependencies |
 | `pnpm build` | Build the library (Rollup → `dist/`) |
 | `pnpm test` | Run all tests (Vitest) |
-| `pnpm lint` | Run ESLint |
+| `pnpm lint` | Run ESLint and TypeScript type checker |
+| `pnpm lint:code` | Run ESLint |
+| `pnpm lint:types` | Run TypeScript type checker (`tsc --noEmit`) |
 | `pnpm build-schemas` | Regenerate JSON schemas from `tasks/build-schemas/` |
 | `pnpm build-txt` | Generate `dist/build.txt` with version info |
 | `pnpm increment` | Bump patch version in `package.json` |
 | `pnpm tgz` | Pack release tarball (`filters-compiler.tgz`) |
+
+### TypeScript
+
+New source files should be written in TypeScript. The project uses TypeScript
+in `strict` mode for new `.ts` files while leaving existing `.js` files
+unchanged.
+
+#### Key Commands
+
+| Command | Description |
+| ------- | ----------- |
+| `pnpm lint:code` | ESLint — automatically uses the TypeScript parser for `.ts` files |
+| `pnpm lint:types` | Run the TypeScript type checker (`tsc --noEmit`) |
+| `pnpm build` | Rollup — transpiles `.ts` files via `@rollup/plugin-typescript` |
+
+#### Adding a New TypeScript Module
+
+1. Create your `.ts` file under `src/` (e.g., `src/main/utils/my-feature.ts`)
+2. Import it from existing code — both `.js → .ts` and `.ts → .js` imports work
+3. When importing a `.js` module from `.ts`, the import resolves to `any` via
+   the ambient declaration in `src/types/global.d.ts`. For better type coverage,
+   write a `.d.ts` shim alongside the `.js` file.
+4. Run `pnpm lint && pnpm test && pnpm build`
+
+#### Writing Tests in TypeScript
+
+Create test files as `test/*.test.ts`. Vitest discovers both `.test.js` and
+`.test.ts` files automatically.
+
+#### Policy
+
+- **New files**: Write in TypeScript
+- **Existing files**: Leave as JavaScript until explicitly migrated
+- **`allowJs` / `checkJs`**: Disabled — existing JS is not type-checked
+- **`strict` mode**: Enabled for all `.ts` files
+- **Naming collisions**: Do not create `foo.ts` alongside `foo.js` in the same
+  directory — rename or migrate instead
 
 ### Before Committing
 
 Run these checks before every commit:
 
 ```bash
-# 1. Lint
+# 1. Lint (includes type-checking)
 pnpm lint
 
 # 2. Run tests
@@ -194,7 +233,7 @@ pnpm test
 
 - **Framework**: Vitest with node environment
 - **Config**: `vitest.config.js`
-- **Test files**: `test/*.test.js`
+- **Test files**: `test/*.test.{js,ts}`
 
 ### Test Resources
 
