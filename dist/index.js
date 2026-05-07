@@ -1131,7 +1131,10 @@ const getOptimizationConfig = (filterId) => {
 
     let optimizationConfig = null;
     if (filterOptimizationPercent) {
-        const content = downloadOptimizationStats(filterId);
+        const statsPath = path$1.join(localOptimizationConfigPath, 'filters', filterId.toString(), 'stats.json');
+        const content = localOptimizationConfigPath
+            ? fs$1.readFileSync(statsPath, 'utf-8')
+            : downloadOptimizationStats(filterId);
 
         optimizationConfig = JSON.parse(content);
         if (!optimizationConfig || !optimizationConfig.groups || optimizationConfig.groups.length === 0) {
