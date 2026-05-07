@@ -86,7 +86,10 @@ export const getOptimizationConfig = (filterId) => {
 
     let optimizationConfig = null;
     if (optimizationEnabled && filterOptimizationPercent) {
-        const content = downloadOptimizationStats(filterId);
+        const statsPath = path.join(localOptimizationConfigPath, 'filters', filterId.toString(), 'stats.json');
+        const content = localOptimizationConfigPath
+            ? fs.readFileSync(statsPath, 'utf-8')
+            : downloadOptimizationStats(filterId);
 
         optimizationConfig = JSON.parse(content);
         if (!optimizationConfig || !optimizationConfig.groups || optimizationConfig.groups.length === 0) {
