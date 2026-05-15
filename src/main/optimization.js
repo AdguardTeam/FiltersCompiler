@@ -1,51 +1,97 @@
 /* eslint-disable global-require */
+import fs from 'fs';
+import path from 'path';
 import { downloadFile } from './utils/webutils';
 
 // Here we can access optimizable filters and its optimization percentages
-// eslint-disable-next-line max-len
-const OPTIMIZATION_PERCENT_URL = 'https://chrome.adtidy.org/optimization_config/percent.json?key=4DDBE80A3DA94D819A00523252FB6380';
-// eslint-disable-next-line max-len
-const OPTIMIZATION_STATS_URL = 'https://chrome.adtidy.org/filters/{0}/stats.json?key=4DDBE80A3DA94D819A00523252FB6380';
+const OPTIMIZATION_KEY = '4DDBE80A3DA94D819A00523252FB6380';
+export const OPTIMIZATION_PERCENT_URL = `https://chrome.adtidy.org/optimization_config/percent.json?key=${OPTIMIZATION_KEY}`;
+
+const downloadOptimizationPercent = () => downloadFile(OPTIMIZATION_PERCENT_URL);
+
+const downloadOptimizationStats = (filterId) => {
+    const optimizationStatsUrl = `https://chrome.adtidy.org/filters/${filterId}/stats.json?key=${OPTIMIZATION_KEY}`;
+
+    return downloadFile(optimizationStatsUrl);
+};
 
 let optimizationEnabled = true;
 
-let filtersOptimizationPercent = null;
+let optimizationPercent = null;
+
+let localOptimizationConfigPath = null;
+
+export const optimizationConfigLocal = {
+    setPath: (configPath) => {
+        localOptimizationConfigPath = configPath;
+    },
+    generate: async (configPath) => {
+        const percentContent = await downloadOptimizationPercent();
+
+        await fs.promises.mkdir(configPath, { recursive: true });
+        await fs.promises.writeFile(path.join(configPath, 'percent.json'), percentContent, 'utf-8');
+
+        const percent = JSON.parse(percentContent);
+        await Promise.all(
+            percent.config.map(async ({ filterId }) => {
+                const statsContent = downloadOptimizationStats(filterId);
+                const dir = path.join(configPath, 'filters', filterId.toString());
+                await fs.promises.mkdir(dir, { recursive: true });
+                await fs.promises.writeFile(path.join(dir, 'stats.json'), statsContent, 'utf-8');
+            }),
+        );
+    },
+    async reset() {
+        await fs.promises.rm(localOptimizationConfigPath, { recursive: true, force: true });
+        this.setPath(null);
+        optimizationPercent = null;
+    },
+};
 
 /**
  * Downloads and caches filters optimization percentages configuration
  */
-export const getFiltersOptimizationPercent = () => {
+export const getOptimizationPercent = () => {
     if (!optimizationEnabled) {
         return null;
     }
 
-    if (filtersOptimizationPercent === null) {
-        filtersOptimizationPercent = JSON.parse(downloadFile(OPTIMIZATION_PERCENT_URL));
+    if (optimizationPercent === null) {
+        const content = localOptimizationConfigPath
+            ? fs.readFileSync(path.join(localOptimizationConfigPath, 'percent.json'), 'utf-8')
+            : downloadOptimizationPercent();
+
+        optimizationPercent = JSON.parse(content);
     }
 
-    if (filtersOptimizationPercent.config.length === 0) {
+    if (optimizationPercent.config.length === 0) {
         // eslint-disable-next-line no-throw-literal
         throw 'Invalid configuration';
     }
 
-    return filtersOptimizationPercent;
+    return optimizationPercent;
 };
 
 /**
  * Downloads filter optimization config for the filter
  */
-export const getFilterOptimizationConfig = (filterId) => {
+export const getOptimizationConfig = (filterId) => {
     if (!optimizationEnabled) {
         return null;
     }
 
     // config: [{filterId: 1, percent: 45}, ...]
-    const filterOptimizationPercent = getFiltersOptimizationPercent().config
+    const filterOptimizationPercent = getOptimizationPercent().config
         .find((config) => config.filterId === filterId);
 
     let optimizationConfig = null;
     if (optimizationEnabled && filterOptimizationPercent) {
-        optimizationConfig = JSON.parse(downloadFile(OPTIMIZATION_STATS_URL.replace('{0}', filterId)));
+        const statsPath = path.join(localOptimizationConfigPath, 'filters', filterId.toString(), 'stats.json');
+        const content = localOptimizationConfigPath
+            ? fs.readFileSync(statsPath, 'utf-8')
+            : downloadOptimizationStats(filterId);
+
+        optimizationConfig = JSON.parse(content);
         if (!optimizationConfig || !optimizationConfig.groups || optimizationConfig.groups.length === 0) {
             throw new Error(`Unable to retrieve optimization stats for ${filterId}`);
         }
