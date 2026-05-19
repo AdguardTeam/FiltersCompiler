@@ -73,9 +73,9 @@ export const getOptimizationPercent = () => {
 };
 
 /**
- * Downloads filter optimization config for the filter
+ * Downloads filter optimization stats for the specified filter
  */
-export const getOptimizationConfig = (filterId) => {
+export const getOptimizationStats = (filterId) => {
     if (!optimizationEnabled) {
         return null;
     }
