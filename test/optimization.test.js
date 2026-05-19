@@ -55,9 +55,9 @@ describe('local optimization config', () => {
         });
     });
 
-    describe('generate', async () => {
+    describe('download the percent.json', async () => {
         const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'opt-test-'));
-        await localOptimizationConfig.generate(tmpDir);
+        await localOptimizationConfig.downloadPercentJson(tmpDir);
 
         const percent = JSON.parse(fs.readFileSync(path.join(tmpDir, 'percent.json'), 'utf-8'));
 
@@ -65,6 +65,14 @@ describe('local optimization config', () => {
             expect(percent.config).toBeDefined();
             expect(percent.config).toBeInstanceOf(Array);
         });
+    });
+
+    describe('download each filter\'s stats.json', async () => {
+        const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'opt-test-'));
+        await localOptimizationConfig.downloadPercentJson(tmpDir);
+
+        const percent = JSON.parse(fs.readFileSync(path.join(tmpDir, 'percent.json'), 'utf-8'));
+        await localOptimizationConfig.downloadStatsFromPercentJson(tmpDir);
 
         suite('it writes stats.json for each filterId in percent.json', async () => {
             percent.config.forEach(({ filterId }) => {
@@ -76,6 +84,15 @@ describe('local optimization config', () => {
                     expect(JSON.parse(statsContent).groups).toBeInstanceOf(Array);
                 });
             });
+        });
+
+        it('does not overwrite an existing stats.json', async () => {
+            const { filterId } = percent.config[0];
+            const statsPath = path.join(tmpDir, 'filters', String(filterId), 'stats.json');
+            const before = fs.readFileSync(statsPath, 'utf-8');
+            await localOptimizationConfig.downloadStatsFromPercentJson(tmpDir);
+            const after = fs.readFileSync(statsPath, 'utf-8');
+            expect(after).toBe(before);
         });
     });
 });

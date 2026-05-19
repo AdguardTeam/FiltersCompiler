@@ -19,25 +19,36 @@ let optimizationEnabled = true;
 
 let optimizationPercent = null;
 
+let optimizationStatsCache = {};
+
 let localOptimizationConfigPath = null;
 
 export const localOptimizationConfig = {
     setPath: (configPath) => {
         localOptimizationConfigPath = configPath;
     },
-    generate: async (configPath) => {
+    downloadPercentJson: async (configPath) => {
         const percentContent = await downloadOptimizationPercent();
 
         await fs.promises.mkdir(configPath, { recursive: true });
         await fs.promises.writeFile(path.join(configPath, 'percent.json'), percentContent, 'utf-8');
-
+    },
+    downloadStatsFromPercentJson: async (configPath) => {
+        const percentContent = fs.readFileSync(path.join(configPath, 'percent.json'), 'utf-8');
         const percent = JSON.parse(percentContent);
         await Promise.all(
             percent.config.map(async ({ filterId }) => {
-                const statsContent = downloadOptimizationStats(filterId);
-                const dir = path.join(configPath, 'filters', filterId.toString());
-                await fs.promises.mkdir(dir, { recursive: true });
-                await fs.promises.writeFile(path.join(dir, 'stats.json'), statsContent, 'utf-8');
+                const statsPath = path.join(configPath, 'filters', filterId.toString(), 'stats.json');
+                let content;
+                if (fs.existsSync(statsPath)) {
+                    content = fs.readFileSync(statsPath, 'utf-8');
+                } else {
+                    content = downloadOptimizationStats(filterId);
+                    const dir = path.join(configPath, 'filters', filterId.toString());
+                    fs.mkdirSync(dir, { recursive: true });
+                    fs.writeFileSync(statsPath, content, 'utf-8');
+                }
+                optimizationStatsCache[filterId] = JSON.parse(content);
             }),
         );
     },
@@ -45,6 +56,7 @@ export const localOptimizationConfig = {
         await fs.promises.rm(localOptimizationConfigPath, { recursive: true, force: true });
         this.setPath(null);
         optimizationPercent = null;
+        optimizationStatsCache = {};
     },
 };
 
@@ -86,12 +98,12 @@ export const getOptimizationStats = (filterId) => {
 
     let optimizationConfig = null;
     if (optimizationEnabled && filterOptimizationPercent) {
-        const statsPath = path.join(localOptimizationConfigPath, 'filters', filterId.toString(), 'stats.json');
-        const content = localOptimizationConfigPath
-            ? fs.readFileSync(statsPath, 'utf-8')
-            : downloadOptimizationStats(filterId);
-
-        optimizationConfig = JSON.parse(content);
+        if (localOptimizationConfigPath) {
+            optimizationConfig = optimizationStatsCache[filterId] ?? null;
+        } else {
+            const content = downloadOptimizationStats(filterId);
+            optimizationConfig = JSON.parse(content);
+        }
         if (!optimizationConfig || !optimizationConfig.groups || optimizationConfig.groups.length === 0) {
             throw new Error(`Unable to retrieve optimization stats for ${filterId}`);
         }
