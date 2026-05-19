@@ -11,7 +11,7 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import {
-    optimizationConfigLocal,
+    localOptimizationConfig,
     getOptimizationPercent,
     skipRuleWithOptimization,
 } from '../src/main/optimization';
@@ -28,15 +28,15 @@ vi.mock('../src/main/utils/webutils', () => ({
     }),
 }));
 
-describe('optimizationConfigLocal', () => {
+describe('local optimization config', () => {
     afterEach(() => {
-        optimizationConfigLocal.reset();
+        localOptimizationConfig.reset();
     });
 
     describe('getOptimizationPercent with setPath', () => {
         it('Throws when setPath is called with non-existent directory', () => {
             const nonExistentDir = path.join(os.tmpdir(), `no-such-dir-${Date.now()}`);
-            optimizationConfigLocal.setPath(nonExistentDir);
+            localOptimizationConfig.setPath(nonExistentDir);
 
             expect(() => getOptimizationPercent()).toThrowError(
                 /no such file or directory/i,
@@ -48,7 +48,7 @@ describe('optimizationConfigLocal', () => {
             const percentData = { config: [{ filterId: 99, percent: 30 }] };
             fs.writeFileSync(path.join(tmpDir, 'percent.json'), JSON.stringify(percentData), 'utf-8');
 
-            optimizationConfigLocal.setPath(tmpDir);
+            localOptimizationConfig.setPath(tmpDir);
 
             const result = getOptimizationPercent();
             expect(result.config[0].filterId).toBe(percentData.config[0].filterId);
@@ -57,7 +57,7 @@ describe('optimizationConfigLocal', () => {
 
     describe('generate', async () => {
         const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'opt-test-'));
-        await optimizationConfigLocal.generate(tmpDir);
+        await localOptimizationConfig.generate(tmpDir);
 
         const percent = JSON.parse(fs.readFileSync(path.join(tmpDir, 'percent.json'), 'utf-8'));
 
@@ -65,6 +65,7 @@ describe('optimizationConfigLocal', () => {
             expect(percent.config).toBeDefined();
             expect(percent.config).toBeInstanceOf(Array);
         });
+
         suite('it writes stats.json for each filterId in percent.json', async () => {
             percent.config.forEach(({ filterId }) => {
                 it(`writes stats.json for filterId: ${filterId}`, () => {

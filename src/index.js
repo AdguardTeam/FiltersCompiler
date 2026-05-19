@@ -10,7 +10,7 @@ import { logger } from './main/utils/log';
 // default platforms config
 import { platformsConfig } from './main/platforms-config';
 
-export { optimizationConfigLocal } from './main/optimization';
+export { localOptimizationConfig } from './main/optimization';
 
 // Sets configuration compatibility
 setConfiguration({ compatibility: CompatibilityTypes.Corelibs });

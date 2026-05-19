@@ -21,7 +21,7 @@ let optimizationPercent = null;
 
 let localOptimizationConfigPath = null;
 
-export const optimizationConfigLocal = {
+export const localOptimizationConfig = {
     setPath: (configPath) => {
         localOptimizationConfigPath = configPath;
     },
