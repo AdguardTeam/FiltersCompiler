@@ -1071,81 +1071,58 @@ const downloadOptimizationStats = (filterId) => {
     return downloadFile(optimizationStatsUrl);
 };
 
-let optimizationPercent = null;
+let optimizationStatsCache = {};
 
-let localOptimizationConfigPath = null;
-
-const optimizationConfigLocal = {
-    setPath: (configPath) => {
-        localOptimizationConfigPath = configPath;
-    },
-    generate: async (configPath) => {
+const localOptimizationConfig = {
+    downloadPercentJson: async (configPath) => {
         const percentContent = await downloadOptimizationPercent();
 
         await fs$1.promises.mkdir(configPath, { recursive: true });
         await fs$1.promises.writeFile(path$1.join(configPath, 'percent.json'), percentContent, 'utf-8');
-
+    },
+    downloadStatsFromPercentJson: async (configPath) => {
+        const percentContent = fs$1.readFileSync(path$1.join(configPath, 'percent.json'), 'utf-8');
         const percent = JSON.parse(percentContent);
         await Promise.all(
             percent.config.map(async ({ filterId }) => {
-                const statsContent = downloadOptimizationStats(filterId);
-                const dir = path$1.join(configPath, 'filters', filterId.toString());
-                await fs$1.promises.mkdir(dir, { recursive: true });
-                await fs$1.promises.writeFile(path$1.join(dir, 'stats.json'), statsContent, 'utf-8');
+                const statsPath = path$1.join(configPath, 'filters', filterId.toString(), 'stats.json');
+                let content;
+                if (fs$1.existsSync(statsPath)) {
+                    content = fs$1.readFileSync(statsPath, 'utf-8');
+                } else {
+                    content = downloadOptimizationStats(filterId);
+                    const dir = path$1.join(configPath, 'filters', filterId.toString());
+                    fs$1.mkdirSync(dir, { recursive: true });
+                    fs$1.writeFileSync(statsPath, content, 'utf-8');
+                }
+                optimizationStatsCache[filterId] = JSON.parse(content);
             }),
         );
     },
-    async reset() {
-        await fs$1.promises.rm(localOptimizationConfigPath, { recursive: true, force: true });
-        this.setPath(null);
-        optimizationPercent = null;
+    async reset(configPath) {
+        await fs$1.promises.rm(configPath, { recursive: true, force: true });
+        optimizationStatsCache = {};
     },
 };
 
 /**
- * Downloads and caches filters optimization percentages configuration
+ * Downloads filter optimization stats for the specified filter
  */
-const getOptimizationPercent = () => {
+const getOptimizationStats = (filterId) => {
 
-    if (optimizationPercent === null) {
-        const content = localOptimizationConfigPath
-            ? fs$1.readFileSync(path$1.join(localOptimizationConfigPath, 'percent.json'), 'utf-8')
-            : downloadOptimizationPercent();
+    {
+        if (optimizationStatsCache[filterId]) {
+            return optimizationStatsCache[filterId];
+        }
 
-        optimizationPercent = JSON.parse(content);
-    }
+        const content = downloadOptimizationStats(filterId);
 
-    if (optimizationPercent.config.length === 0) {
-        // eslint-disable-next-line no-throw-literal
-        throw 'Invalid configuration';
-    }
-
-    return optimizationPercent;
-};
-
-/**
- * Downloads filter optimization config for the filter
- */
-const getOptimizationConfig = (filterId) => {
-
-    // config: [{filterId: 1, percent: 45}, ...]
-    const filterOptimizationPercent = getOptimizationPercent().config
-        .find((config) => config.filterId === filterId);
-
-    let optimizationConfig = null;
-    if (filterOptimizationPercent) {
-        const statsPath = path$1.join(localOptimizationConfigPath, 'filters', filterId.toString(), 'stats.json');
-        const content = localOptimizationConfigPath
-            ? fs$1.readFileSync(statsPath, 'utf-8')
-            : downloadOptimizationStats(filterId);
-
-        optimizationConfig = JSON.parse(content);
-        if (!optimizationConfig || !optimizationConfig.groups || optimizationConfig.groups.length === 0) {
-            throw new Error(`Unable to retrieve optimization stats for ${filterId}`);
+        if (content) {
+            return JSON.parse(content);
         }
     }
 
-    return optimizationConfig;
+    throw new Error(`Unable to retrieve optimization stats for ${filterId}`);
 };
 
 /**
@@ -2438,7 +2415,7 @@ const buildFilter$1 = async (filterDir, platformsPath, whitelist, blacklist) => 
         return;
     }
 
-    const optimizationConfig = getOptimizationConfig(filterId);
+    const optimizationConfig = getOptimizationStats(filterId);
 
     // eslint-disable-next-line guard-for-in,no-restricted-syntax
     for (const platform in platformPathsConfig) {
@@ -4896,6 +4873,6 @@ const validateLocales = (localesDirPath, requiredLocales) => {
 };
 
 exports.compile = compile;
-exports.optimizationConfigLocal = optimizationConfigLocal;
+exports.localOptimizationConfig = localOptimizationConfig;
 exports.validateJSONSchema = validateJSONSchema;
 exports.validateLocales = validateLocales;
