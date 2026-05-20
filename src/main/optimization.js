@@ -17,16 +17,9 @@ const downloadOptimizationStats = (filterId) => {
 
 let optimizationEnabled = true;
 
-let optimizationPercent = null;
-
 let optimizationStatsCache = {};
 
-let localOptimizationConfigPath = null;
-
 export const localOptimizationConfig = {
-    setPath: (configPath) => {
-        localOptimizationConfigPath = configPath;
-    },
     downloadPercentJson: async (configPath) => {
         const percentContent = await downloadOptimizationPercent();
 
@@ -52,36 +45,10 @@ export const localOptimizationConfig = {
             }),
         );
     },
-    async reset() {
-        await fs.promises.rm(localOptimizationConfigPath, { recursive: true, force: true });
-        this.setPath(null);
-        optimizationPercent = null;
+    async reset(configPath) {
+        await fs.promises.rm(configPath, { recursive: true, force: true });
         optimizationStatsCache = {};
     },
-};
-
-/**
- * Downloads and caches filters optimization percentages configuration
- */
-export const getOptimizationPercent = () => {
-    if (!optimizationEnabled) {
-        return null;
-    }
-
-    if (optimizationPercent === null) {
-        const content = localOptimizationConfigPath
-            ? fs.readFileSync(path.join(localOptimizationConfigPath, 'percent.json'), 'utf-8')
-            : downloadOptimizationPercent();
-
-        optimizationPercent = JSON.parse(content);
-    }
-
-    if (optimizationPercent.config.length === 0) {
-        // eslint-disable-next-line no-throw-literal
-        throw 'Invalid configuration';
-    }
-
-    return optimizationPercent;
 };
 
 /**
@@ -92,24 +59,19 @@ export const getOptimizationStats = (filterId) => {
         return null;
     }
 
-    // config: [{filterId: 1, percent: 45}, ...]
-    const filterOptimizationPercent = getOptimizationPercent().config
-        .find((config) => config.filterId === filterId);
-
-    let optimizationConfig = null;
-    if (optimizationEnabled && filterOptimizationPercent) {
-        if (localOptimizationConfigPath) {
-            optimizationConfig = optimizationStatsCache[filterId] ?? null;
-        } else {
-            const content = downloadOptimizationStats(filterId);
-            optimizationConfig = JSON.parse(content);
+    if (optimizationEnabled) {
+        if (optimizationStatsCache[filterId]) {
+            return optimizationStatsCache[filterId];
         }
-        if (!optimizationConfig || !optimizationConfig.groups || optimizationConfig.groups.length === 0) {
-            throw new Error(`Unable to retrieve optimization stats for ${filterId}`);
+
+        const content = downloadOptimizationStats(filterId);
+
+        if (content) {
+            return JSON.parse(content);
         }
     }
 
-    return optimizationConfig;
+    throw new Error(`Unable to retrieve optimization stats for ${filterId}`);
 };
 
 /**

@@ -12,7 +12,6 @@ import path from 'path';
 import os from 'os';
 import {
     localOptimizationConfig,
-    getOptimizationPercent,
     skipRuleWithOptimization,
 } from '../src/main/optimization';
 
@@ -29,34 +28,14 @@ vi.mock('../src/main/utils/webutils', () => ({
 }));
 
 describe('local optimization config', () => {
+    let tmpDir;
+
     afterEach(() => {
-        localOptimizationConfig.reset();
-    });
-
-    describe('getOptimizationPercent with setPath', () => {
-        it('Throws when setPath is called with non-existent directory', () => {
-            const nonExistentDir = path.join(os.tmpdir(), `no-such-dir-${Date.now()}`);
-            localOptimizationConfig.setPath(nonExistentDir);
-
-            expect(() => getOptimizationPercent()).toThrowError(
-                /no such file or directory/i,
-            );
-        });
-
-        it('Reads from cacheDir when setPath is called with existing directory', () => {
-            const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'opt-test-'));
-            const percentData = { config: [{ filterId: 99, percent: 30 }] };
-            fs.writeFileSync(path.join(tmpDir, 'percent.json'), JSON.stringify(percentData), 'utf-8');
-
-            localOptimizationConfig.setPath(tmpDir);
-
-            const result = getOptimizationPercent();
-            expect(result.config[0].filterId).toBe(percentData.config[0].filterId);
-        });
+        localOptimizationConfig.reset(tmpDir);
     });
 
     describe('download the percent.json', async () => {
-        const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'opt-test-'));
+        tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'opt-test-'));
         await localOptimizationConfig.downloadPercentJson(tmpDir);
 
         const percent = JSON.parse(fs.readFileSync(path.join(tmpDir, 'percent.json'), 'utf-8'));
@@ -98,14 +77,6 @@ describe('local optimization config', () => {
 });
 
 describe('optimization', () => {
-    it('Test optimization', () => {
-        const filtersOptimizationPercent = getOptimizationPercent();
-
-        expect(filtersOptimizationPercent.config.length).toBeGreaterThan(0);
-
-        expect(getOptimizationPercent(1)).toBeDefined();
-    });
-
     it('Test optimization skip rule', () => {
         const config = {
             groups: [
