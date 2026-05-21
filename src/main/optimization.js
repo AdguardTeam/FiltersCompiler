@@ -7,6 +7,13 @@ import { downloadFile } from './utils/webutils';
 const OPTIMIZATION_KEY = '4DDBE80A3DA94D819A00523252FB6380';
 export const OPTIMIZATION_PERCENT_URL = `https://chrome.adtidy.org/optimization_config/percent.json?key=${OPTIMIZATION_KEY}`;
 
+// Path segment constants for the local config directory layout:
+//   <configPath>/percent.json
+//   <configPath>/filters/<filterId>/stats.json
+const PERCENT_JSON = 'percent.json';
+const STATS_JSON = 'stats.json';
+const FILTERS_DIR = 'filters';
+
 const downloadOptimizationPercent = () => downloadFile(OPTIMIZATION_PERCENT_URL);
 
 const downloadOptimizationStats = (filterId) => {
@@ -19,25 +26,73 @@ let optimizationEnabled = true;
 
 let optimizationStatsCache = {};
 
+/**
+ * Set of filter IDs that have optimization stats on the server.
+ * Populated lazily from percent.json (remote download) or eagerly by
+ * `downloadStatsFromPercentJson` (local cache path).
+ * `null` means not yet loaded.
+ *
+ * @type {Set<number>|null}
+ */
+let optimizableFilterIds = null;
+
+/**
+ * Manages a local on-disk cache of optimization configuration files.
+ *
+ * Expected directory layout under `configPath`:
+ * ```
+ * <configPath>/
+ *   percent.json                   — list of optimizable filter IDs and percentages
+ *   filters/
+ *     <filterId>/
+ *       stats.json                 — per-filter hit-count stats used during compilation
+ * ```
+ *
+ * Typical usage:
+ * 1. `downloadPercentJson(configPath)` — download and save `percent.json` once
+ *    so it can be inspected / edited before the build.
+ * 2. `downloadStatsFromPercentJson(configPath)` — fill in any missing
+ *    `stats.json` files and load all stats into the in-memory cache.
+ * 3. `reset(configPath)` — remove the cache directory and clear in-memory state.
+ */
 export const localOptimizationConfig = {
+    /**
+     * Downloads `percent.json` from the remote server and saves it to `configPath`.
+     * Creates `configPath` if it does not exist.
+     *
+     * @param {string} configPath - Directory where `percent.json` will be written.
+     * @returns {Promise<void>}
+     */
     downloadPercentJson: async (configPath) => {
         const percentContent = await downloadOptimizationPercent();
 
         await fs.promises.mkdir(configPath, { recursive: true });
-        await fs.promises.writeFile(path.join(configPath, 'percent.json'), percentContent, 'utf-8');
+        await fs.promises.writeFile(path.join(configPath, PERCENT_JSON), percentContent, 'utf-8');
     },
+
+    /**
+     * Reads the local `percent.json`, downloads any missing `stats.json` files
+     * for each listed filter, and loads all stats into the in-memory cache.
+     * Existing `stats.json` files are not overwritten (preserves user edits).
+     *
+     * @param {string} configPath - Directory containing `percent.json`.
+     * @returns {Promise<void>}
+     */
     downloadStatsFromPercentJson: async (configPath) => {
-        const percentContent = fs.readFileSync(path.join(configPath, 'percent.json'), 'utf-8');
+        const percentContent = fs.readFileSync(path.join(configPath, PERCENT_JSON), 'utf-8');
         const percent = JSON.parse(percentContent);
+
+        optimizableFilterIds = new Set(percent.config.map(({ filterId }) => filterId));
+
         await Promise.all(
             percent.config.map(async ({ filterId }) => {
-                const statsPath = path.join(configPath, 'filters', filterId.toString(), 'stats.json');
+                const statsPath = path.join(configPath, FILTERS_DIR, filterId.toString(), STATS_JSON);
                 let content;
                 if (fs.existsSync(statsPath)) {
                     content = fs.readFileSync(statsPath, 'utf-8');
                 } else {
-                    content = downloadOptimizationStats(filterId);
-                    const dir = path.join(configPath, 'filters', filterId.toString());
+                    content = await downloadOptimizationStats(filterId);
+                    const dir = path.join(configPath, FILTERS_DIR, filterId.toString());
                     fs.mkdirSync(dir, { recursive: true });
                     fs.writeFileSync(statsPath, content, 'utf-8');
                 }
@@ -45,33 +100,67 @@ export const localOptimizationConfig = {
             }),
         );
     },
+
+    /**
+     * Removes the cache directory and clears in-memory state.
+     *
+     * @param {string} configPath - Directory to remove.
+     * @returns {Promise<void>}
+     */
     async reset(configPath) {
         await fs.promises.rm(configPath, { recursive: true, force: true });
         optimizationStatsCache = {};
+        optimizableFilterIds = null;
     },
 };
 
 /**
- * Downloads filter optimization stats for the specified filter
+ * Returns the optimization stats for the given filter, or `null` when
+ * optimization is disabled or the filter is not listed in `percent.json`.
+ *
+ * On the first call for an uncached filter the function lazily downloads
+ * `percent.json` from the remote server to determine whether the filter
+ * participates in optimization. If the filter is listed, its `stats.json` is
+ * then downloaded, validated, and cached in memory.
+ *
+ * @param {number} filterId - Numeric filter identifier.
+ * @returns {object|null} Parsed stats object, or `null` when the filter has no
+ *   optimization stats.
+ * @throws {Error} When the downloaded stats are missing or malformed.
  */
 export const getOptimizationStats = (filterId) => {
     if (!optimizationEnabled) {
         return null;
     }
 
-    if (optimizationEnabled) {
-        if (optimizationStatsCache[filterId]) {
-            return optimizationStatsCache[filterId];
-        }
-
-        const content = downloadOptimizationStats(filterId);
-
-        if (content) {
-            return JSON.parse(content);
-        }
+    if (optimizationStatsCache[filterId] !== undefined) {
+        return optimizationStatsCache[filterId];
     }
 
-    throw new Error(`Unable to retrieve optimization stats for ${filterId}`);
+    // Lazily load the set of optimizable filter IDs from percent.json so that
+    // filters not listed there return null without hitting the stats endpoint.
+    if (optimizableFilterIds === null) {
+        const raw = downloadOptimizationPercent();
+        optimizableFilterIds = new Set(JSON.parse(raw).config.map(({ filterId: id }) => id));
+    }
+
+    if (!optimizableFilterIds.has(filterId)) {
+        return null;
+    }
+
+    const content = downloadOptimizationStats(filterId);
+
+    if (!content) {
+        throw new Error(`Unable to retrieve optimization stats for ${filterId}`);
+    }
+
+    const stats = JSON.parse(content);
+
+    if (!Array.isArray(stats.groups) || stats.groups.length === 0) {
+        throw new Error(`Invalid optimization stats for ${filterId}: missing or empty groups`);
+    }
+
+    return stats;
 };
 
 /**
