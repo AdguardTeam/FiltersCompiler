@@ -79,7 +79,7 @@ export const localOptimizationConfig = {
      * @returns {Promise<void>}
      */
     downloadStatsFromPercentJson: async (configPath) => {
-        const percentContent = fs.readFileSync(path.join(configPath, PERCENT_JSON), 'utf-8');
+        const percentContent = await fs.promises.readFile(path.join(configPath, PERCENT_JSON), 'utf-8');
         const percent = JSON.parse(percentContent);
 
         optimizableFilterIds = new Set(percent.config.map(({ filterId }) => filterId));
@@ -89,12 +89,12 @@ export const localOptimizationConfig = {
                 const statsPath = path.join(configPath, FILTERS_DIR, filterId.toString(), STATS_JSON);
                 let content;
                 if (fs.existsSync(statsPath)) {
-                    content = fs.readFileSync(statsPath, 'utf-8');
+                    content = await fs.promises.readFile(statsPath, 'utf-8');
                 } else {
                     content = await downloadOptimizationStats(filterId);
                     const dir = path.join(configPath, FILTERS_DIR, filterId.toString());
-                    fs.mkdirSync(dir, { recursive: true });
-                    fs.writeFileSync(statsPath, content, 'utf-8');
+                    await fs.promises.mkdir(dir, { recursive: true });
+                    await fs.promises.writeFile(statsPath, content, 'utf-8');
                 }
                 optimizationStatsCache[filterId] = JSON.parse(content);
             }),
