@@ -3,8 +3,9 @@ import {
     it,
     expect,
     vi,
+    beforeAll,
+    afterAll,
     afterEach,
-    suite,
 } from 'vitest';
 
 import fs from 'fs';
@@ -12,8 +13,10 @@ import path from 'path';
 import os from 'os';
 import {
     localOptimizationConfig,
+    getOptimizationStats,
     skipRuleWithOptimization,
 } from '../src/main/optimization';
+import { downloadFile } from '../src/main/utils/webutils';
 
 // Mock log to hide error messages
 vi.mock('../src/main/utils/log');
@@ -27,41 +30,49 @@ vi.mock('../src/main/utils/webutils', () => ({
     }),
 }));
 
-describe('local optimization config', () => {
-    let tmpDir;
+describe('localOptimizationConfig', () => {
+    describe('downloadPercentJson()', () => {
+        let tmpDir;
+        let percent;
 
-    afterEach(() => {
-        localOptimizationConfig.reset(tmpDir);
-    });
+        beforeAll(async () => {
+            tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'opt-test-'));
+            await localOptimizationConfig.downloadPercentJson(tmpDir);
+            percent = JSON.parse(fs.readFileSync(path.join(tmpDir, 'percent.json'), 'utf-8'));
+        });
 
-    describe('download the percent.json', async () => {
-        tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'opt-test-'));
-        await localOptimizationConfig.downloadPercentJson(tmpDir);
+        afterAll(async () => {
+            await localOptimizationConfig.reset(tmpDir);
+        });
 
-        const percent = JSON.parse(fs.readFileSync(path.join(tmpDir, 'percent.json'), 'utf-8'));
-
-        it('it writes percent.json to cacheDir', async () => {
+        it('writes percent.json to cacheDir', () => {
             expect(percent.config).toBeDefined();
             expect(percent.config).toBeInstanceOf(Array);
         });
     });
 
-    describe('download each filter\'s stats.json', async () => {
-        const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'opt-test-'));
-        await localOptimizationConfig.downloadPercentJson(tmpDir);
+    describe('downloadStatsFromPercentJson()', () => {
+        let tmpDir;
+        let percent;
 
-        const percent = JSON.parse(fs.readFileSync(path.join(tmpDir, 'percent.json'), 'utf-8'));
-        await localOptimizationConfig.downloadStatsFromPercentJson(tmpDir);
+        beforeAll(async () => {
+            tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'opt-test-'));
+            await localOptimizationConfig.downloadPercentJson(tmpDir);
+            percent = JSON.parse(fs.readFileSync(path.join(tmpDir, 'percent.json'), 'utf-8'));
+            await localOptimizationConfig.downloadStatsFromPercentJson(tmpDir);
+        });
 
-        suite('it writes stats.json for each filterId in percent.json', async () => {
+        afterAll(async () => {
+            await localOptimizationConfig.reset(tmpDir);
+        });
+
+        it('writes stats.json for each filterId in percent.json', () => {
             percent.config.forEach(({ filterId }) => {
-                it(`writes stats.json for filterId: ${filterId}`, () => {
-                    const statsPath = path.join(tmpDir, 'filters', String(filterId), 'stats.json');
-                    expect(fs.existsSync(statsPath)).toBeTruthy();
+                const statsPath = path.join(tmpDir, 'filters', String(filterId), 'stats.json');
+                expect(fs.existsSync(statsPath)).toBeTruthy();
 
-                    const statsContent = fs.readFileSync(statsPath, 'utf-8');
-                    expect(JSON.parse(statsContent).groups).toBeInstanceOf(Array);
-                });
+                const statsContent = fs.readFileSync(statsPath, 'utf-8');
+                expect(JSON.parse(statsContent).groups).toBeInstanceOf(Array);
             });
         });
 
@@ -76,8 +87,34 @@ describe('local optimization config', () => {
     });
 });
 
-describe('optimization', () => {
-    it('Test optimization skip rule', () => {
+describe('getOptimizationStats()', () => {
+    afterEach(async () => {
+        vi.clearAllMocks();
+        // clear module-level state between tests
+        const fakeDir = path.join(os.tmpdir(), `nonexistent-opt-reset-${Date.now()}`);
+        await localOptimizationConfig.reset(fakeDir).catch(() => {});
+    });
+
+    it('returns null for a filterId not listed in percent.json', () => {
+        const result = getOptimizationStats(999);
+        expect(result).toBeNull();
+
+        // stats endpoint must NOT have been called for the unlisted filter
+        const statsCallMade = vi.mocked(downloadFile).mock.calls.some(
+            ([url]) => url.includes('/filters/999/stats.json'),
+        );
+        expect(statsCallMade).toBe(false);
+    });
+
+    it('returns stats for a filterId listed in percent.json', () => {
+        const result = getOptimizationStats(1);
+        expect(result).not.toBeNull();
+        expect(Array.isArray(result.groups)).toBe(true);
+    });
+});
+
+describe('skipRuleWithOptimization()', () => {
+    it('skips rules below the hit threshold', () => {
         const config = {
             groups: [
                 {
