@@ -1000,7 +1000,7 @@ const buildFilter = async (filterDir, platformsPath, whitelist, blacklist) => {
         return;
     }
 
-    const optimizationConfig = getOptimizationStats(filterId);
+    const optimizationConfig = await getOptimizationStats(filterId);
 
     // eslint-disable-next-line guard-for-in,no-restricted-syntax
     for (const platform in platformPathsConfig) {

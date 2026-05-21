@@ -95,8 +95,8 @@ describe('getOptimizationStats()', () => {
         await localOptimizationConfig.reset(fakeDir).catch(() => {});
     });
 
-    it('returns null for a filterId not listed in percent.json', () => {
-        const result = getOptimizationStats(999);
+    it('returns null for a filterId not listed in percent.json', async () => {
+        const result = await getOptimizationStats(999);
         expect(result).toBeNull();
 
         // stats endpoint must NOT have been called for the unlisted filter
@@ -106,8 +106,8 @@ describe('getOptimizationStats()', () => {
         expect(statsCallMade).toBe(false);
     });
 
-    it('returns stats for a filterId listed in percent.json', () => {
-        const result = getOptimizationStats(1);
+    it('returns stats for a filterId listed in percent.json', async () => {
+        const result = await getOptimizationStats(1);
         expect(result).not.toBeNull();
         expect(Array.isArray(result.groups)).toBe(true);
     });

@@ -14,9 +14,9 @@ const PERCENT_JSON = 'percent.json';
 const STATS_JSON = 'stats.json';
 const FILTERS_DIR = 'filters';
 
-const downloadOptimizationPercent = () => downloadFile(OPTIMIZATION_PERCENT_URL);
+const downloadOptimizationPercent = async () => downloadFile(OPTIMIZATION_PERCENT_URL);
 
-const downloadOptimizationStats = (filterId) => {
+const downloadOptimizationStats = async (filterId) => {
     const optimizationStatsUrl = `https://chrome.adtidy.org/filters/${filterId}/stats.json?key=${OPTIMIZATION_KEY}`;
 
     return downloadFile(optimizationStatsUrl);
@@ -128,7 +128,7 @@ export const localOptimizationConfig = {
  *   optimization stats.
  * @throws {Error} When the downloaded stats are missing or malformed.
  */
-export const getOptimizationStats = (filterId) => {
+export const getOptimizationStats = async (filterId) => {
     if (!optimizationEnabled) {
         return null;
     }
@@ -140,7 +140,7 @@ export const getOptimizationStats = (filterId) => {
     // Lazily load the set of optimizable filter IDs from percent.json so that
     // filters not listed there return null without hitting the stats endpoint.
     if (optimizableFilterIds === null) {
-        const raw = downloadOptimizationPercent();
+        const raw = await downloadOptimizationPercent();
         optimizableFilterIds = new Set(JSON.parse(raw).config.map(({ filterId: id }) => id));
     }
 
@@ -148,7 +148,7 @@ export const getOptimizationStats = (filterId) => {
         return null;
     }
 
-    const content = downloadOptimizationStats(filterId);
+    const content = await downloadOptimizationStats(filterId);
 
     if (!content) {
         throw new Error(`Unable to retrieve optimization stats for ${filterId}`);
