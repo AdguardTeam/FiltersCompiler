@@ -20,6 +20,7 @@ export default {
                 // Trust-level exclusion files are required for filtering rules
                 // based on filter list trust level (low, high, full)
                 { src: 'src/main/utils/trust-levels/*', dest: 'dist/utils/trust-levels' },
+                { src: 'types/index.d.ts', dest: 'dist' },
             ],
         }),
     ],
