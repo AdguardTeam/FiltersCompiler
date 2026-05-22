@@ -1,0 +1,15 @@
+.git
+.idea
+.vscode
+.DS_Store
+.eslintcache
+*.tsbuildinfo
+build/
+output/
+node_modules/
+Dockerfile*
+*.log
+*.md
+.husky
+.github
+bamboo-specs/
