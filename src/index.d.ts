@@ -63,3 +63,16 @@ export function validateLocales(
     localesDirPath: string,
     requiredLocales: string[],
 ): void;
+
+/**
+ * Manages a local on-disk cache of optimization configuration files.
+ *
+ * Directory layout:
+ *   <configPath>/percent.json
+ *   <configPath>/filters/<filterId>/stats.json
+ */
+export const localOptimizationConfig: {
+    downloadPercentJson(configPath: string): Promise<void>;
+    downloadStatsFromPercentJson(configPath: string): Promise<void>;
+    reset(configPath: string): Promise<void>;
+};
