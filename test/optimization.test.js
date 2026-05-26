@@ -15,16 +15,21 @@ import {
     localOptimizationConfig,
     getOptimizationStats,
     skipRuleWithOptimization,
+    assertValidStats,
 } from '../src/main/optimization';
 import { downloadFile } from '../src/main/utils/webutils';
 
 // Mock log to hide error messages
 vi.mock('../src/main/utils/log');
 
+const VALID_FILTER_ID = 1;
+
 // Mock downloadFile to avoid live HTTP calls in CI
 vi.mock('../src/main/utils/webutils', () => ({
     downloadFile: vi.fn((url) => {
-        if (url.includes('percent.json')) return JSON.stringify({ config: [{ filterId: 1, percent: 50 }] });
+        if (url.includes('percent.json')) {
+            return JSON.stringify({ config: [{ filterId: VALID_FILTER_ID, percent: 50 }] });
+        }
 
         return JSON.stringify({ groups: [{ config: { hits: 1 }, rules: {} }] });
     }),
@@ -72,8 +77,8 @@ describe('localOptimizationConfig', () => {
                     const statsPath = path.join(tmpDir, 'filters', String(filterId), 'stats.json');
                     expect(fs.existsSync(statsPath)).toBeTruthy();
 
-                    const statsContent = await fs.promises.readFile(statsPath, 'utf-8');
-                    expect(JSON.parse(statsContent).groups).toBeInstanceOf(Array);
+                    const raw = await fs.promises.readFile(statsPath, 'utf-8');
+                    expect(() => assertValidStats(filterId, JSON.parse(raw))).not.toThrow();
                 }),
             );
         });
@@ -109,9 +114,27 @@ describe('getOptimizationStats()', () => {
     });
 
     it('returns stats for a filterId listed in percent.json', async () => {
-        const result = await getOptimizationStats(1);
+        const result = await getOptimizationStats(VALID_FILTER_ID);
         expect(result).not.toBeNull();
-        expect(Array.isArray(result.groups)).toBe(true);
+        expect(() => assertValidStats(VALID_FILTER_ID, result)).not.toThrow();
+    });
+});
+
+describe('assertValidStats()', () => {
+    it('throws when groups is missing', () => {
+        expect(() => assertValidStats(VALID_FILTER_ID, {})).toThrow('missing or empty groups');
+    });
+
+    it('throws when groups is an empty array', () => {
+        expect(() => assertValidStats(VALID_FILTER_ID, { groups: [] })).toThrow('missing or empty groups');
+    });
+
+    it('throws when groups is not an array', () => {
+        expect(() => assertValidStats(VALID_FILTER_ID, { groups: null })).toThrow('missing or empty groups');
+    });
+
+    it('does not throw for valid stats', () => {
+        expect(() => assertValidStats(VALID_FILTER_ID, { groups: [{ config: { hits: 1 }, rules: {} }] })).not.toThrow();
     });
 });
 

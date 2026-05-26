@@ -37,6 +37,17 @@ let optimizationStatsCache = {};
 let optimizableFilterIds = null;
 
 /**
+ * @param {number} filterId
+ * @param {object} stats
+ * @throws {Error} if stats.groups is missing or empty
+ */
+export const assertValidStats = (filterId, stats) => {
+    if (!Array.isArray(stats.groups) || stats.groups.length === 0) {
+        throw new Error(`Invalid optimization stats for ${filterId}: missing or empty groups`);
+    }
+};
+
+/**
  * Manages a local on-disk cache of optimization configuration files.
  *
  * Expected directory layout under `configPath`:
@@ -96,7 +107,9 @@ export const localOptimizationConfig = {
                     await fs.promises.mkdir(dir, { recursive: true });
                     await fs.promises.writeFile(statsPath, content, 'utf-8');
                 }
-                optimizationStatsCache[filterId] = JSON.parse(content);
+                const stats = JSON.parse(content);
+                assertValidStats(filterId, stats);
+                optimizationStatsCache[filterId] = stats;
             }),
         );
     },
@@ -156,9 +169,7 @@ export const getOptimizationStats = async (filterId) => {
 
     const stats = JSON.parse(content);
 
-    if (!Array.isArray(stats.groups) || stats.groups.length === 0) {
-        throw new Error(`Invalid optimization stats for ${filterId}: missing or empty groups`);
-    }
+    assertValidStats(filterId, stats);
 
     return stats;
 };
