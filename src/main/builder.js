@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 import md5 from 'md5';
 
 import { FiltersDownloader } from '@adguard/filters-downloader';
-import { version } from './utils/version';
+import { Version } from './utils/version';
 import { convertRulesToAdgSyntax } from './converter';
 import { validateAndFilterRules, checkAffinityDirectives } from './validator';
 import { init, generate } from './platforms/generator';
@@ -626,7 +626,7 @@ const makeRevision = function (path, hash) {
             }
 
             if (!currentRevision.hash || currentRevision.hash !== result.hash) {
-                result.version = version.increment(currentRevision.version);
+                result.version = Version.increment(currentRevision.version);
                 result.timeUpdated = new Date().getTime();
             }
         }

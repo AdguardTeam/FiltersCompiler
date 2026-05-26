@@ -311,6 +311,12 @@ describe('converter', () => {
         actual = convertToUbo(["example.org#%#//scriptlet('set-session-storage-item', 'acceptCookies', 'false')"]);
         expected = 'example.org##+js(set-session-storage-item, acceptCookies, false)';
         expect(actual[0]).toBe(expected);
+
+        // https://github.com/AdguardTeam/FiltersCompiler/issues/274
+        // google-ima3 scriptlet should be converted to uBO-compatible google-ima
+        actual = convertToUbo(["example.org#%#//scriptlet('google-ima3')"]);
+        expected = 'example.org##+js(google-ima)';
+        expect(actual[0]).toBe(expected);
     });
 
     it('converts ##^script:has-text to $$script:contains', () => {
@@ -330,22 +336,39 @@ describe('converter', () => {
         expect(actual[0]).toBe(expected);
     });
 
-    it('converts html filtering rules with [min-length] and [max-length] into a single :contains() with combined quantifier', () => {
-        let actual = convertRulesToAdgSyntax(['example.com$$script[tag-content="Flags."][min-length="20000"][max-length="300000"]']);
-        let expected = 'example.com$$script:contains(Flags.):contains(/^(?=.{20000,300000}$).*/s)';
-        expect(actual[0]).toBe(expected);
+    describe('keeps html filtering rules with [min-length] and [max-length] as is', () => {
+        it.each([
+            'example.com$$script[tag-content="Flags."][min-length="20000"][max-length="300000"]',
+            'example.com$$script[min-length="100"][max-length="500"]',
+            'example.com$$script[min-length="1000"]',
+            'example.com$$script[max-length="5000"]',
+        ])('%s', (rule) => {
+            const actual = convertRulesToAdgSyntax([rule]);
+            expect(actual[0]).toBe(rule);
+        });
+    });
 
-        actual = convertRulesToAdgSyntax(['example.com$$script[min-length="100"][max-length="500"]']);
-        expected = 'example.com$$script:contains(/^(?=.{100,500}$).*/s)';
-        expect(actual[0]).toBe(expected);
+    it('still converts html filtering rules with [tag-content] but no length attributes', () => {
+        const actual = convertRulesToAdgSyntax(['example.com$$script[tag-content="advertisement"]']);
+        expect(actual[0]).toBe('example.com$$script:contains(advertisement)');
+    });
 
-        actual = convertRulesToAdgSyntax(['example.com$$script[min-length="1000"]']);
-        expected = 'example.com$$script:contains(/^(?=.{1000,}$).*/s)';
-        expect(actual[0]).toBe(expected);
-
-        actual = convertRulesToAdgSyntax(['example.com$$script[max-length="5000"]']);
-        expected = 'example.com$$script:contains(/^(?=.{0,5000}$).*/s)';
-        expect(actual[0]).toBe(expected);
+    describe('converts [tag-content] with escaped double quotes', () => {
+        it.each([
+            {
+                // `[tag-content]` with `""` escaped double quotes - simple case
+                actual: '$$div[tag-content="a""b"]',
+                expected: ['$$div:contains(a"b)'],
+            },
+            {
+                // `[tag-content]` with `""` escaped double quotes - multiple
+                actual: '$$script[tag-content="{""zone_id"":"""]',
+                expected: ['$$script:contains({"zone_id":")'],
+            },
+        ])('$actual', ({ actual, expected }) => {
+            const result = convertRulesToAdgSyntax([actual]);
+            expect(result).toEqual(expected);
+        });
     });
 
     describe('converts html rules with pseudo-classes', () => {
