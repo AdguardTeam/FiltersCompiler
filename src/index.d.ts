@@ -37,8 +37,8 @@ export function compile(
     logPath: string | undefined,
     reportFile: string | undefined,
     platformsPath: string,
-    whitelist: number[],
-    blacklist: number[],
+    whitelist?: number[] | null,
+    blacklist?: number[] | null,
     customPlatformsConfig?: CustomPlatformsConfig,
 ): Promise<void>;
 
