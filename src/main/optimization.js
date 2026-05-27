@@ -10,9 +10,9 @@ export const OPTIMIZATION_PERCENT_URL = `https://chrome.adtidy.org/optimization_
 // Path segment constants for the local config directory layout:
 //   <configPath>/percent.json
 //   <configPath>/filters/<filterId>/stats.json
-const PERCENT_JSON = 'percent.json';
-const STATS_JSON = 'stats.json';
-const FILTERS_DIR = 'filters';
+export const PERCENT_JSON = 'percent.json';
+export const STATS_JSON = 'stats.json';
+export const FILTERS_DIR = 'filters';
 
 const downloadOptimizationPercent = async () => downloadFile(OPTIMIZATION_PERCENT_URL);
 

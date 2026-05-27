@@ -16,6 +16,9 @@ import {
     getOptimizationStats,
     skipRuleWithOptimization,
     assertValidStats,
+    PERCENT_JSON,
+    STATS_JSON,
+    FILTERS_DIR,
 } from '../src/main/optimization';
 import { downloadFile } from '../src/main/utils/webutils';
 
@@ -29,7 +32,7 @@ const INVALID_FILTER_ID = 9999;
 // Mock downloadFile to avoid live HTTP calls in CI
 vi.mock('../src/main/utils/webutils', () => ({
     downloadFile: vi.fn((url) => {
-        if (url.includes('percent.json')) {
+        if (url.includes(PERCENT_JSON)) {
             return JSON.stringify({ config: [{ filterId: VALID_FILTER_ID, percent: 50 }] });
         }
 
@@ -45,7 +48,7 @@ describe('localOptimizationConfig', () => {
         beforeAll(async () => {
             tmpDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'opt-test-'));
             await localOptimizationConfig.downloadPercentJson(tmpDir);
-            percent = JSON.parse(await fs.promises.readFile(path.join(tmpDir, 'percent.json'), 'utf-8'));
+            percent = JSON.parse(await fs.promises.readFile(path.join(tmpDir, PERCENT_JSON), 'utf-8'));
         });
 
         afterAll(async () => {
@@ -65,7 +68,7 @@ describe('localOptimizationConfig', () => {
         beforeAll(async () => {
             tmpDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'opt-test-'));
             await localOptimizationConfig.downloadPercentJson(tmpDir);
-            percent = JSON.parse(await fs.promises.readFile(path.join(tmpDir, 'percent.json'), 'utf-8'));
+            percent = JSON.parse(await fs.promises.readFile(path.join(tmpDir, PERCENT_JSON), 'utf-8'));
             await localOptimizationConfig.downloadStatsFromPercentJson(tmpDir, EMPTY_FILTER_IDS);
         });
 
@@ -76,7 +79,7 @@ describe('localOptimizationConfig', () => {
         it('writes stats.json for each filterId in percent.json', async () => {
             await Promise.all(
                 percent.config.map(async ({ filterId }) => {
-                    const statsPath = path.join(tmpDir, 'filters', String(filterId), 'stats.json');
+                    const statsPath = path.join(tmpDir, FILTERS_DIR, String(filterId), STATS_JSON);
                     expect(fs.existsSync(statsPath)).toBeTruthy();
 
                     const raw = await fs.promises.readFile(statsPath, 'utf-8');
@@ -87,7 +90,7 @@ describe('localOptimizationConfig', () => {
 
         it('does not overwrite an existing stats.json', async () => {
             const { filterId } = percent.config[0];
-            const statsPath = path.join(tmpDir, 'filters', String(filterId), 'stats.json');
+            const statsPath = path.join(tmpDir, FILTERS_DIR, String(filterId), STATS_JSON);
             const before = await fs.promises.readFile(statsPath, 'utf-8');
             await localOptimizationConfig.downloadStatsFromPercentJson(tmpDir, EMPTY_FILTER_IDS);
             const after = await fs.promises.readFile(statsPath, 'utf-8');
@@ -111,14 +114,13 @@ describe('localOptimizationConfig', () => {
             });
 
             it('downloads stats only for the specified filter', () => {
-                const statsCalls = vi.mocked(downloadFile).mock.calls
-                    .filter(([url]) => url.includes('/stats.json'));
+                const statsCalls = vi.mocked(downloadFile).mock.calls.filter(([url]) => url.includes('/stats.json'));
                 expect(statsCalls).toHaveLength(1);
                 expect(statsCalls[0][0]).toContain(`/filters/${VALID_FILTER_ID}/stats.json`);
             });
 
             it('writes stats.json for the specified filter', () => {
-                const statsPath = path.join(tmpDir, 'filters', String(VALID_FILTER_ID), 'stats.json');
+                const statsPath = path.join(tmpDir, FILTERS_DIR, String(VALID_FILTER_ID), STATS_JSON);
                 expect(fs.existsSync(statsPath)).toBeTruthy();
             });
         });
@@ -138,8 +140,7 @@ describe('localOptimizationConfig', () => {
             });
 
             it('downloads no stats', () => {
-                const statsCalls = vi.mocked(downloadFile).mock.calls
-                    .filter(([url]) => url.includes('/stats.json'));
+                const statsCalls = vi.mocked(downloadFile).mock.calls.filter(([url]) => url.includes(`/${STATS_JSON}`));
                 expect(statsCalls).toHaveLength(0);
             });
         });
@@ -159,9 +160,9 @@ describe('getOptimizationStats()', () => {
         expect(result).toBeNull();
 
         // stats endpoint must NOT have been called for the unlisted filter
-        const statsCallMade = vi.mocked(downloadFile).mock.calls.some(
-            ([url]) => url.includes(`/filters/${INVALID_FILTER_ID}/stats.json`),
-        );
+        const statsCallMade = vi
+            .mocked(downloadFile)
+            .mock.calls.some(([url]) => url.includes(`/${FILTERS_DIR}/${INVALID_FILTER_ID}/${STATS_JSON}`));
         expect(statsCallMade).toBe(false);
     });
 
@@ -179,15 +180,15 @@ describe('useLocalConfig()', () => {
         tmpDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'opt-local-'));
 
         await fs.promises.writeFile(
-            path.join(tmpDir, 'percent.json'),
+            path.join(tmpDir, PERCENT_JSON),
             JSON.stringify({ config: [{ filterId: VALID_FILTER_ID, percent: 50 }] }),
             'utf-8',
         );
 
-        const statsDir = path.join(tmpDir, 'filters', String(VALID_FILTER_ID));
+        const statsDir = path.join(tmpDir, FILTERS_DIR, String(VALID_FILTER_ID));
         await fs.promises.mkdir(statsDir, { recursive: true });
         await fs.promises.writeFile(
-            path.join(statsDir, 'stats.json'),
+            path.join(statsDir, STATS_JSON),
             JSON.stringify({ groups: [{ config: { hits: 1 }, rules: {} }] }),
             'utf-8',
         );
@@ -208,11 +209,11 @@ describe('useLocalConfig()', () => {
         expect(result).not.toBeNull();
         expect(() => assertValidStats(VALID_FILTER_ID, result)).not.toThrow();
 
-        const remoteCallMade = vi.mocked(downloadFile).mock.calls.some(([url]) => url.includes('/stats.json'));
+        const remoteCallMade = vi.mocked(downloadFile).mock.calls.some(([url]) => url.includes(`/${PERCENT_JSON}`));
         expect(remoteCallMade).toBe(false);
     });
 
-    it('returns null for filter not listed in local percent.json', async () => {
+    it(`returns null for filter not listed in local ${PERCENT_JSON}`, async () => {
         const result = await getOptimizationStats(INVALID_FILTER_ID);
         expect(result).toBeNull();
     });
