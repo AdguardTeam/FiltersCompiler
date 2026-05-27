@@ -20,57 +20,47 @@ import { parse as parse$1 } from 'tldts';
 import Ajv from 'ajv';
 
 /**
- * Version utility functions
+ * Version utility class.
  */
-const version = {
+class Version {
     /**
-     * Parses version from string
+     * Parses version from string.
      *
-     * @param v version string
-     * @returns {Array}
+     * @param v Version string.
+     * @returns Array of numeric version parts.
      */
-    parse(v) {
-        const version = [];
-        const parts = String(v || '').split('.');
-
+    static parse(v) {
+        const parts = String(v ?? '').split('.');
         const parseVersionPart = (part) => {
-            if (Number.isNaN(part)) {
+            const n = Number(part);
+            if (Number.isNaN(n)) {
                 return 0;
             }
-            return Math.max(part - 0, 0);
+            return Math.max(n, 0);
         };
-
-        // eslint-disable-next-line no-restricted-syntax
-        for (const part of parts) {
-            version.push(parseVersionPart(part));
-        }
-
-        return version;
-    },
-
+        return parts.map(parseVersionPart);
+    }
     /**
-     * Increments build part of version '0.0.0.0'
+     * Increments the build (last) part of a version string `'0.0.0.0'`.
+     * Carries over when a part reaches 100.
      *
-     * @param v version string
-     * @returns {string}
+     * @param v Version string.
+     * @returns Incremented version string.
      */
-    increment(v) {
-        const version = this.parse(v);
-
-        if (version.length > 0) {
-            version[version.length - 1] = version[version.length - 1] + 1;
+    static increment(v) {
+        const parts = Version.parse(v);
+        if (parts.length > 0) {
+            parts[parts.length - 1] += 1;
         }
-
-        for (let i = version.length; i > 0; i -= 1) {
-            if (version[i] === 100) {
-                version[i] = 0;
-                version[i - 1] += 1;
+        for (let i = parts.length; i > 0; i -= 1) {
+            if (parts[i] === 100) {
+                parts[i] = 0;
+                parts[i - 1] += 1;
             }
         }
-
-        return version.join('.');
-    },
-};
+        return parts.join('.');
+    }
+}
 
 /**
  * Extend logger implementation
@@ -418,14 +408,31 @@ const HTML_RULES_PSEUDO_CLASS_MARKERS = [
 ];
 
 /**
+ * Markers of length attribute selectors for HTML filtering rules.
+ *
+ * When the compiler converts [min-length="N"] / [max-length="N"] into
+ * :contains() with a regexp quantifier, the quantifier value may exceed
+ * the CoreLibs PCRE2 limit of 65535 (UINT16_MAX), causing the rule to
+ * silently fail. Since CoreLibs natively supports these attribute selectors
+ * and only CoreLibs platforms consume HTML filtering rules from compiler
+ * output (all extensions strip $$ rules), we skip the conversion entirely
+ * as a temporary workaround.
+ */
+const HTML_RULES_LENGTH_ATTR_MARKERS = [
+    '[min-length=',
+    '[max-length=',
+];
+
+/**
  * Checks if the rule should be kept as is,
  * i.e. no conversion and no validation,
- * since it is not supported by the extension yet.
+ * since it is not supported by the extension yet
+ * or conversion would produce regexes incompatible with CoreLibs.
  *
  * Conditions for keeping the rule as is:
  * - rule is HTML filtering rule
  * - rule is AdGuard syntax
- * - rule contains pseudo-class marker.
+ * - rule contains a pseudo-class marker or a length attribute marker.
  *
  * Planned to be fixed:
  * https://github.com/AdguardTeam/tsurlfilter/issues/96.
@@ -437,7 +444,10 @@ const HTML_RULES_PSEUDO_CLASS_MARKERS = [
 const shouldKeepAdgHtmlFilteringRuleAsIs = (ruleNode) => {
     return ruleNode.type === CosmeticRuleType.HtmlFilteringRule
         && ruleNode.syntax === AdblockSyntax.Adg
-        && HTML_RULES_PSEUDO_CLASS_MARKERS.some((marker) => ruleNode.body.value.includes(marker));
+        && (
+            HTML_RULES_PSEUDO_CLASS_MARKERS.some((marker) => ruleNode.body.value.includes(marker))
+            || HTML_RULES_LENGTH_ATTR_MARKERS.some((marker) => ruleNode.body.value.includes(marker))
+        );
 };
 
 /**
@@ -1075,17 +1085,33 @@ const downloadOptimizationStats = async (filterId) => {
     return downloadFile(optimizationStatsUrl);
 };
 
-let optimizationStatsCache = {};
-
 /**
  * Set of filter IDs that have optimization stats on the server.
- * Populated lazily from percent.json (remote download) or eagerly by
- * `downloadStatsFromPercentJson` (local cache path).
+ * Populated lazily from percent.json (remote download or local file).
  * `null` means not yet loaded.
  *
  * @type {Set<number>|null}
  */
 let optimizableFilterIds = null;
+
+/**
+ * When set, `getOptimizationStats` reads stats from local files under this
+ * directory instead of fetching from the remote server.
+ *
+ * @type {string|null}
+ */
+let localConfigPath = null;
+
+/**
+ * @param {number} filterId
+ * @param {object} stats
+ * @throws {Error} if stats.groups is missing or empty
+ */
+const assertValidStats = (filterId, stats) => {
+    if (!Array.isArray(stats.groups) || stats.groups.length === 0) {
+        throw new Error(`Invalid optimization stats for ${filterId}: missing or empty groups`);
+    }
+};
 
 /**
  * Manages a local on-disk cache of optimization configuration files.
@@ -1099,11 +1125,16 @@ let optimizableFilterIds = null;
  *       stats.json                 — per-filter hit-count stats used during compilation
  * ```
  *
- * Typical usage:
+ * Typical usage (--generate-cache / --generate-stats-from-cached-percent-json):
  * 1. `downloadPercentJson(configPath)` — download and save `percent.json` once
  *    so it can be inspected / edited before the build.
- * 2. `downloadStatsFromPercentJson(configPath)` — fill in any missing
- *    `stats.json` files and load all stats into the in-memory cache.
+ * 2. `downloadStatsFromPercentJson(configPath, filterIds)` — fill in any missing
+ *    `stats.json` files for the listed filters.
+ *
+ * Typical usage (--use-cache):
+ * 1. `useLocalConfig(configPath)` — tells `getOptimizationStats` to read stats
+ *    from local files lazily during compilation instead of fetching remotely.
+ *
  * 3. `reset(configPath)` — remove the cache directory and clear in-memory state.
  */
 const localOptimizationConfig = {
@@ -1123,33 +1154,47 @@ const localOptimizationConfig = {
 
     /**
      * Reads the local `percent.json`, downloads any missing `stats.json` files
-     * for each listed filter, and loads all stats into the in-memory cache.
+     * for each listed filter, and saves them to disk.
      * Existing `stats.json` files are not overwritten (preserves user edits).
      *
+     * When `filterIds` is a non-empty array only those filters are processed;
+     * pass an empty array to process all filters listed in `percent.json`.
+     *
      * @param {string} configPath - Directory containing `percent.json`.
+     * @param {number[]} filterIds - Filter IDs to process; empty array processes all.
      * @returns {Promise<void>}
      */
-    downloadStatsFromPercentJson: async (configPath) => {
+    downloadStatsFromPercentJson: async (configPath, filterIds) => {
         const percentContent = await fs$1.promises.readFile(path$1.join(configPath, PERCENT_JSON), 'utf-8');
         const percent = JSON.parse(percentContent);
 
-        optimizableFilterIds = new Set(percent.config.map(({ filterId }) => filterId));
+        const configs = filterIds.length > 0
+            ? percent.config.filter(({ filterId }) => filterIds.includes(filterId))
+            : percent.config;
 
         await Promise.all(
-            percent.config.map(async ({ filterId }) => {
+            configs.map(async ({ filterId }) => {
                 const statsPath = path$1.join(configPath, FILTERS_DIR, filterId.toString(), STATS_JSON);
-                let content;
-                if (fs$1.existsSync(statsPath)) {
-                    content = await fs$1.promises.readFile(statsPath, 'utf-8');
-                } else {
-                    content = await downloadOptimizationStats(filterId);
+                if (!fs$1.existsSync(statsPath)) {
+                    const content = await downloadOptimizationStats(filterId);
                     const dir = path$1.join(configPath, FILTERS_DIR, filterId.toString());
                     await fs$1.promises.mkdir(dir, { recursive: true });
                     await fs$1.promises.writeFile(statsPath, content, 'utf-8');
                 }
-                optimizationStatsCache[filterId] = JSON.parse(content);
             }),
         );
+    },
+
+    /**
+     * Configures `getOptimizationStats` to read stats from local files under
+     * `configPath` instead of fetching from the remote server.
+     * Stats are loaded lazily on demand during compilation.
+     *
+     * @param {string} configPath - Directory containing `percent.json` and
+     *   `filters/<filterId>/stats.json`.
+     */
+    useLocalConfig(configPath) {
+        localConfigPath = configPath;
     },
 
     /**
@@ -1160,7 +1205,7 @@ const localOptimizationConfig = {
      */
     async reset(configPath) {
         await fs$1.promises.rm(configPath, { recursive: true, force: true });
-        optimizationStatsCache = {};
+        localConfigPath = null;
         optimizableFilterIds = null;
     },
 };
@@ -1169,34 +1214,31 @@ const localOptimizationConfig = {
  * Returns the optimization stats for the given filter, or `null` when
  * optimization is disabled or the filter is not listed in `percent.json`.
  *
- * On the first call for an uncached filter the function lazily downloads
- * `percent.json` from the remote server to determine whether the filter
- * participates in optimization. If the filter is listed, its `stats.json` is
- * then downloaded, validated, and cached in memory.
+ * When `localOptimizationConfig.useLocalConfig(path)` has been called, stats
+ * are read lazily from local files. Otherwise stats are fetched from the
+ * remote server.
  *
  * @param {number} filterId - Numeric filter identifier.
  * @returns {object|null} Parsed stats object, or `null` when the filter has no
  *   optimization stats.
- * @throws {Error} When the downloaded stats are missing or malformed.
+ * @throws {Error} When the stats are missing or malformed.
  */
 const getOptimizationStats = async (filterId) => {
 
-    if (optimizationStatsCache[filterId] !== undefined) {
-        return optimizationStatsCache[filterId];
-    }
-
-    // Lazily load the set of optimizable filter IDs from percent.json so that
-    // filters not listed there return null without hitting the stats endpoint.
     if (optimizableFilterIds === null) {
-        const raw = await downloadOptimizationPercent();
-        optimizableFilterIds = new Set(JSON.parse(raw).config.map(({ filterId: id }) => id));
+        const content = localConfigPath !== null
+            ? await fs$1.promises.readFile(path$1.join(localConfigPath, PERCENT_JSON), 'utf-8')
+            : await downloadOptimizationPercent();
+        optimizableFilterIds = new Set(JSON.parse(content).config.map(({ filterId: id }) => id));
     }
 
     if (!optimizableFilterIds.has(filterId)) {
         return null;
     }
 
-    const content = await downloadOptimizationStats(filterId);
+    const content = localConfigPath !== null
+        ? await fs$1.promises.readFile(path$1.join(localConfigPath, FILTERS_DIR, String(filterId), STATS_JSON), 'utf-8')
+        : await downloadOptimizationStats(filterId);
 
     if (!content) {
         throw new Error(`Unable to retrieve optimization stats for ${filterId}`);
@@ -1204,9 +1246,7 @@ const getOptimizationStats = async (filterId) => {
 
     const stats = JSON.parse(content);
 
-    if (!Array.isArray(stats.groups) || stats.groups.length === 0) {
-        throw new Error(`Invalid optimization stats for ${filterId}: missing or empty groups`);
-    }
+    assertValidStats(filterId, stats);
 
     return stats;
 };
@@ -3500,7 +3540,7 @@ const makeRevision = function (path, hash) {
             }
 
             if (!currentRevision.hash || currentRevision.hash !== result.hash) {
-                result.version = version.increment(currentRevision.version);
+                result.version = Version.increment(currentRevision.version);
                 result.timeUpdated = new Date().getTime();
             }
         }
