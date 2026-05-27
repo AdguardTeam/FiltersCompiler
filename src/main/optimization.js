@@ -25,14 +25,12 @@ const downloadOptimizationStats = async (filterId) => {
 let optimizationEnabled = true;
 
 /**
- * Set of filter IDs that have optimization stats on the server.
- * Populated lazily from percent.json (remote download or local file).
- * `null` means not yet loaded.
+ * Resolves to the set of filter IDs that have optimization stats on the server.
+ * Populated lazily on the first `getOptimizationStats` call.
+ * Shared across concurrent callers to avoid redundant percent.json fetches.
  *
- * @type {Set<number>|null}
+ * @type {Promise<Set<number>>|null}
  */
-let optimizableFilterIds = null;
-
 /**
  * When set, `getOptimizationStats` reads stats from local files under this
  * directory instead of fetching from the remote server.
@@ -40,6 +38,27 @@ let optimizableFilterIds = null;
  * @type {string|null}
  */
 let localConfigPath = null;
+
+/**
+ * Resolves to the set of filter IDs that have optimization stats on the server.
+ * Populated lazily on the first `getOptimizationStats` call.
+ * Shared across concurrent callers to avoid redundant percent.json fetches.
+ *
+ * @type {Promise<Set<number>>|null}
+ */
+let optimizableFilterIdsPromise = null;
+
+const getOptimizableFilterIds = () => {
+    if (optimizableFilterIdsPromise === null) {
+        const source = localConfigPath !== null
+            ? fs.promises.readFile(path.join(localConfigPath, PERCENT_JSON), 'utf-8')
+            : downloadOptimizationPercent();
+        optimizableFilterIdsPromise = source.then(
+            (raw) => new Set(JSON.parse(raw).config.map(({ filterId: id }) => id)),
+        );
+    }
+    return optimizableFilterIdsPromise;
+};
 
 /**
  * @param {number} filterId
@@ -145,7 +164,6 @@ export const localOptimizationConfig = {
     async reset(configPath) {
         await fs.promises.rm(configPath, { recursive: true, force: true });
         localConfigPath = null;
-        optimizableFilterIds = null;
     },
 };
 
@@ -167,12 +185,7 @@ export const getOptimizationStats = async (filterId) => {
         return null;
     }
 
-    if (optimizableFilterIds === null) {
-        const content = localConfigPath !== null
-            ? await fs.promises.readFile(path.join(localConfigPath, PERCENT_JSON), 'utf-8')
-            : await downloadOptimizationPercent();
-        optimizableFilterIds = new Set(JSON.parse(content).config.map(({ filterId: id }) => id));
-    }
+    const optimizableFilterIds = await getOptimizableFilterIds();
 
     if (!optimizableFilterIds.has(filterId)) {
         return null;
