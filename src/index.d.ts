@@ -73,6 +73,8 @@ export function validateLocales(
  */
 export const localOptimizationConfig: {
     downloadPercentJson(configPath: string): Promise<void>;
-    downloadStatsFromPercentJson(configPath: string): Promise<void>;
+    downloadStatsFromPercentJson(configPath: string, filterIds: number[]): Promise<void>;
+    /** Configures `getOptimizationStats` to read stats from local files lazily during compilation. */
+    useLocalConfig(configPath: string): void;
     reset(configPath: string): Promise<void>;
 };

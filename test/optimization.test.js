@@ -22,7 +22,9 @@ import { downloadFile } from '../src/main/utils/webutils';
 // Mock log to hide error messages
 vi.mock('../src/main/utils/log');
 
+const EMPTY_FILTER_IDS = Object.freeze([]);
 const VALID_FILTER_ID = 1;
+const INVALID_FILTER_ID = 9999;
 
 // Mock downloadFile to avoid live HTTP calls in CI
 vi.mock('../src/main/utils/webutils', () => ({
@@ -64,7 +66,7 @@ describe('localOptimizationConfig', () => {
             tmpDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'opt-test-'));
             await localOptimizationConfig.downloadPercentJson(tmpDir);
             percent = JSON.parse(await fs.promises.readFile(path.join(tmpDir, 'percent.json'), 'utf-8'));
-            await localOptimizationConfig.downloadStatsFromPercentJson(tmpDir);
+            await localOptimizationConfig.downloadStatsFromPercentJson(tmpDir, EMPTY_FILTER_IDS);
         });
 
         afterAll(async () => {
@@ -87,9 +89,59 @@ describe('localOptimizationConfig', () => {
             const { filterId } = percent.config[0];
             const statsPath = path.join(tmpDir, 'filters', String(filterId), 'stats.json');
             const before = await fs.promises.readFile(statsPath, 'utf-8');
-            await localOptimizationConfig.downloadStatsFromPercentJson(tmpDir);
+            await localOptimizationConfig.downloadStatsFromPercentJson(tmpDir, EMPTY_FILTER_IDS);
             const after = await fs.promises.readFile(statsPath, 'utf-8');
             expect(after).toBe(before);
+        });
+    });
+
+    describe('downloadStatsFromPercentJson() with filterIds', () => {
+        describe('filterIds matches a listed filter', () => {
+            let tmpDir;
+
+            beforeAll(async () => {
+                tmpDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'opt-test-'));
+                await localOptimizationConfig.downloadPercentJson(tmpDir);
+                vi.clearAllMocks();
+                await localOptimizationConfig.downloadStatsFromPercentJson(tmpDir, [VALID_FILTER_ID]);
+            });
+
+            afterAll(async () => {
+                await localOptimizationConfig.reset(tmpDir);
+            });
+
+            it('downloads stats only for the specified filter', () => {
+                const statsCalls = vi.mocked(downloadFile).mock.calls
+                    .filter(([url]) => url.includes('/stats.json'));
+                expect(statsCalls).toHaveLength(1);
+                expect(statsCalls[0][0]).toContain(`/filters/${VALID_FILTER_ID}/stats.json`);
+            });
+
+            it('writes stats.json for the specified filter', () => {
+                const statsPath = path.join(tmpDir, 'filters', String(VALID_FILTER_ID), 'stats.json');
+                expect(fs.existsSync(statsPath)).toBeTruthy();
+            });
+        });
+
+        describe('filterIds contains no filter listed in percent.json', () => {
+            let tmpDir;
+
+            beforeAll(async () => {
+                tmpDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'opt-test-'));
+                await localOptimizationConfig.downloadPercentJson(tmpDir);
+                vi.clearAllMocks();
+                await localOptimizationConfig.downloadStatsFromPercentJson(tmpDir, [INVALID_FILTER_ID]);
+            });
+
+            afterAll(async () => {
+                await localOptimizationConfig.reset(tmpDir);
+            });
+
+            it('downloads no stats', () => {
+                const statsCalls = vi.mocked(downloadFile).mock.calls
+                    .filter(([url]) => url.includes('/stats.json'));
+                expect(statsCalls).toHaveLength(0);
+            });
         });
     });
 });
@@ -103,12 +155,12 @@ describe('getOptimizationStats()', () => {
     });
 
     it('returns null for a filterId not listed in percent.json', async () => {
-        const result = await getOptimizationStats(999);
+        const result = await getOptimizationStats(INVALID_FILTER_ID);
         expect(result).toBeNull();
 
         // stats endpoint must NOT have been called for the unlisted filter
         const statsCallMade = vi.mocked(downloadFile).mock.calls.some(
-            ([url]) => url.includes('/filters/999/stats.json'),
+            ([url]) => url.includes(`/filters/${INVALID_FILTER_ID}/stats.json`),
         );
         expect(statsCallMade).toBe(false);
     });
@@ -117,6 +169,52 @@ describe('getOptimizationStats()', () => {
         const result = await getOptimizationStats(VALID_FILTER_ID);
         expect(result).not.toBeNull();
         expect(() => assertValidStats(VALID_FILTER_ID, result)).not.toThrow();
+    });
+});
+
+describe('useLocalConfig()', () => {
+    let tmpDir;
+
+    beforeAll(async () => {
+        tmpDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'opt-local-'));
+
+        await fs.promises.writeFile(
+            path.join(tmpDir, 'percent.json'),
+            JSON.stringify({ config: [{ filterId: VALID_FILTER_ID, percent: 50 }] }),
+            'utf-8',
+        );
+
+        const statsDir = path.join(tmpDir, 'filters', String(VALID_FILTER_ID));
+        await fs.promises.mkdir(statsDir, { recursive: true });
+        await fs.promises.writeFile(
+            path.join(statsDir, 'stats.json'),
+            JSON.stringify({ groups: [{ config: { hits: 1 }, rules: {} }] }),
+            'utf-8',
+        );
+
+        localOptimizationConfig.useLocalConfig(tmpDir);
+    });
+
+    afterAll(async () => {
+        await localOptimizationConfig.reset(tmpDir);
+    });
+
+    afterEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it('reads stats from local file without remote calls', async () => {
+        const result = await getOptimizationStats(VALID_FILTER_ID);
+        expect(result).not.toBeNull();
+        expect(() => assertValidStats(VALID_FILTER_ID, result)).not.toThrow();
+
+        const remoteCallMade = vi.mocked(downloadFile).mock.calls.some(([url]) => url.includes('/stats.json'));
+        expect(remoteCallMade).toBe(false);
+    });
+
+    it('returns null for filter not listed in local percent.json', async () => {
+        const result = await getOptimizationStats(INVALID_FILTER_ID);
+        expect(result).toBeNull();
     });
 });
 
