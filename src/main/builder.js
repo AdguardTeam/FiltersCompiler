@@ -639,8 +639,8 @@ const makeRevision = function (path, hash) {
  * Builds filter txt file from directory contents
  *
  * @param {string} filterDir - The path to the directory containing filters.
- * @param {Array<number>} whitelist - An array whitelist filters IDs.
- * @param {Array<number>} blacklist - An array blacklist filters IDs.
+ * @param {Array<number>|null} [whitelist] - An array whitelist filters IDs.
+ * @param {Array<number>|null} [blacklist] - An array blacklist filters IDs.
  * @returns {Promise<void>} A promise that resolves when all filters and its subdirectories have been processed.
  */
 const buildFilter = async function (filterDir, whitelist, blacklist) {
@@ -708,8 +708,8 @@ const buildFilter = async function (filterDir, whitelist, blacklist) {
  * Asynchronously parses a directory and processes filters based on the provided whitelist and blacklist.
  *
  * @param {string} filtersDir - The path to the directory containing filters.
- * @param {Array<number>} whitelist - An array whitelist filters IDs.
- * @param {Array<number>} blacklist - An array blacklist filters IDs.
+ * @param {Array<number>|null} [whitelist] - An array whitelist filters IDs.
+ * @param {Array<number>|null} [blacklist] - An array blacklist filters IDs.
  * @returns {Promise<void>} A promise that resolves when all filters and its subdirectories have been processed.
  */
 const parseDirectory = async function (filtersDir, whitelist, blacklist) {
@@ -744,8 +744,8 @@ const parseDirectory = async function (filtersDir, whitelist, blacklist) {
  * @param {string} reportFile - The path to the report file to be created.
  * @param {string} platformsPath - The path where platform data will be generated.
  * @param {Object} platformsConfig - The configuration object for platforms.
- * @param {Array<number>} whitelist - A list of filter file names to include in processing.
- * @param {Array<number>} blacklist - A list of filter file names to exclude from processing.
+ * @param {Array<number>|null} [whitelist] - A list of filter file names to include in processing.
+ * @param {Array<number>|null} [blacklist] - A list of filter file names to exclude from processing.
  * @returns {Promise<void>} A promise that resolves when the build process is complete.
  */
 export const build = async (
