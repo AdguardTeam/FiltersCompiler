@@ -152,8 +152,9 @@ conventions not covered by the linter.
 2. **Schemas are copied to `dist/`.** Rollup copies `schemas/*` and
    `src/main/utils/trust-levels/*` into `dist/` at build time.
 
-3. **Three public API functions** are exported from `src/index.js`:
-   `compile`, `validateJSONSchema`, `validateLocales`.
+3. **Public API** is exported from `src/index.js`:
+   `compile`, `validateJSONSchema`, `validateLocales`, and `localOptimizationConfig`
+   (local cache management for optimization stats).
 
 ### III. Testing
 

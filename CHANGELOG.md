@@ -9,13 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `localOptimizationConfig` export for managing a local optimization config
-  cache: download `percent.json`, pre-fetch per-filter `stats.json`, and reset
-  cached state. Intended for offline / reproducible local filter builds.
+- `localOptimizationConfig` exported from the public API (`src/index.js`).
+  Provides four methods for managing a local on-disk optimization cache:
+  - `downloadPercentJson(configPath)` — downloads the `percent.json` optimization
+    config (filter IDs and their optimization percentages) to `configPath`.
+  - `downloadStatsFromPercentJson(configPath, filterIds)` — reads `percent.json`
+    from `configPath` and downloads missing per-filter `stats.json` files there.
+    Pass an empty `filterIds` array to process all optimizable
+    filters; pass a non-empty array to limit downloads to specific filter IDs.
+  - `useLocalConfig(configPath)` — directs the compiler to load optimization
+    stats from local files at `configPath` instead of fetching them remotely.
+  - `reset(configPath)` — clears in-memory cached state so the next call
+    re-reads from disk or re-downloads.
 - TypeScript toolchain for incremental adoption.
 
 ### Changed
 
+- `compile()` type declaration: `whitelist` and `blacklist` are now typed as
+  `number[] | null | undefined` instead of `number[]`. Callers that pass `null`
+  or omit these parameters no longer need to cast.
+- `getOptimizationStats`: `optimizableFilterIds` is now loaded via a promise
+  singleton so concurrent callers share one in-flight `percent.json` fetch
+  instead of each issuing a separate download.
 - Updated [@adguard/filters-downloader] to v2.4.4.
 
 [Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.2.9...HEAD
@@ -309,8 +324,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Required properties for groups:
-    - `groupDescription` in `filters` schema;
-    - `description` in `filters_i18n` schema.
+  - `groupDescription` in `filters` schema;
+  - `description` in `filters_i18n` schema.
 
 ### Changed
 
@@ -482,7 +497,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Updated [@adguard/tsurlfilter] to v2.2.19:
-    - validation of `$header` modifier
+  - validation of `$header` modifier
 
 ### Fixed
 
@@ -742,7 +757,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Updated [@adguard/tsurlfilter] to v1.0.68:
-    - validation of `$hls` modifier
+  - validation of `$hls` modifier
 
 [v1.1.73]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.72...v1.1.73
 
@@ -751,7 +766,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Updated [@adguard/tsurlfilter] to v1.0.67:
-    - validation of `$jsonprune` modifier
+  - validation of `$jsonprune` modifier
 
 [v1.1.72]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.71...v1.1.72
 
@@ -760,9 +775,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Updated [@adguard/extended-css] to v2.0.33:
-    - `:not()` and `:is()` pseudo-classes with no extended selector arg
-      are considered as standard — top DOM node limitation [[1]] [[2]]
-    - validation of CSS selectors due to related third-party bugs [nwsapi#55] and [nwsapi#71]
+  - `:not()` and `:is()` pseudo-classes with no extended selector arg
+    are considered as standard — top DOM node limitation [[1]] [[2]]
+  - validation of CSS selectors due to related third-party bugs [nwsapi#55] and [nwsapi#71]
 - Updated [@adguard/scriptlets] to v1.7.19
 - Updated [@adguard/tsurlfilter] to 1.0.66
 
@@ -845,7 +860,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated [@adguard/scriptlets] to v1.7.3
 
 [v1.1.63]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.61...v1.1.63
-
 [@adguard/agtree]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/agtree/CHANGELOG.md
 [@adguard/ecss-tree]: https://github.com/AdguardTeam/ecsstree/blob/master/CHANGELOG.md
 [@adguard/extended-css]: https://github.com/AdguardTeam/ExtendedCss/blob/master/CHANGELOG.md
