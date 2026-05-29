@@ -58,12 +58,12 @@ let optimizableFilterIdsPromise = null;
  */
 const getOptimizableFilterIds = () => {
     if (optimizableFilterIdsPromise === null) {
-        const source = localConfigPath !== null
-            ? fs.promises.readFile(path.join(localConfigPath, PERCENT_JSON), 'utf-8')
-            : downloadOptimizationPercent();
-        optimizableFilterIdsPromise = source.then(
-            (raw) => new Set(JSON.parse(raw).config.map(({ filterId: id }) => id)),
-        );
+        optimizableFilterIdsPromise = (async () => {
+            const raw = localConfigPath !== null
+                ? await fs.promises.readFile(path.join(localConfigPath, PERCENT_JSON), 'utf-8')
+                : await downloadOptimizationPercent();
+            return new Set(JSON.parse(raw).config.map(({ filterId: id }) => id));
+        })();
     }
     return optimizableFilterIdsPromise;
 };
