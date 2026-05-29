@@ -244,15 +244,15 @@ describe('shouldSkipRule()', () => {
                 {
                     config: { hits: 2 },
                     rules: {
-                        'low_hits1': 1,
-                        'enough_hits1': 2,
+                        low_hits1: 1,
+                        enough_hits1: 2,
                     },
                 },
                 {
                     config: { hits: 4 },
                     rules: {
-                        'low_hits2': 1,
-                        'enough_hits2': 5,
+                        low_hits2: 1,
+                        enough_hits2: 5,
                     },
                 },
             ],

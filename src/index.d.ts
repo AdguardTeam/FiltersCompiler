@@ -48,10 +48,7 @@ export function compile(
  * @param platformsPath Path to the built platform output.
  * @param requiredFiltersAmount Minimum number of filters expected.
  */
-export function validateJSONSchema(
-    platformsPath: string,
-    requiredFiltersAmount: number,
-): void;
+export function validateJSONSchema(platformsPath: string, requiredFiltersAmount: number): void;
 
 /**
  * Validates locale translation files.
@@ -59,10 +56,7 @@ export function validateJSONSchema(
  * @param localesDirPath Path to the locales directory.
  * @param requiredLocales List of required locale codes.
  */
-export function validateLocales(
-    localesDirPath: string,
-    requiredLocales: string[],
-): void;
+export function validateLocales(localesDirPath: string, requiredLocales: string[]): void;
 
 /** Manages a local on-disk cache of optimization configuration files. */
 export const localOptimizationConfig: {
