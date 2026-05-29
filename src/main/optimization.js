@@ -15,6 +15,12 @@ export const FILTERS_DIR = 'filters';
 
 const downloadOptimizationPercent = async () => downloadFile(OPTIMIZATION_PERCENT_URL);
 
+/**
+ * Downloads optimization stats for a single filter from the remote server.
+ *
+ * @param {number} filterId - Numeric filter identifier.
+ * @returns {Promise<string>} Raw JSON string of the stats file.
+ */
 const downloadOptimizationStats = async (filterId) => {
     const optimizationStatsUrl = `https://chrome.adtidy.org/filters/${filterId}/stats.json?key=${OPTIMIZATION_KEY}`;
 
