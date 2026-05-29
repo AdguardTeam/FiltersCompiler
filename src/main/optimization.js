@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'fs/promises';
 import path from 'path';
 import { downloadFile } from './utils/webutils';
 
@@ -60,7 +60,7 @@ const getOptimizableFilterIds = () => {
     if (optimizableFilterIdsPromise === null) {
         optimizableFilterIdsPromise = (async () => {
             const raw = localConfigPath !== null
-                ? await fs.promises.readFile(path.join(localConfigPath, PERCENT_JSON), 'utf-8')
+                ? await fs.readFile(path.join(localConfigPath, PERCENT_JSON), 'utf-8')
                 : await downloadOptimizationPercent();
             return new Set(JSON.parse(raw).config.map(({ filterId: id }) => id));
         })();
@@ -116,8 +116,8 @@ export const localOptimizationConfig = {
     downloadPercentJson: async (configPath) => {
         const percentContent = await downloadOptimizationPercent();
 
-        await fs.promises.mkdir(configPath, { recursive: true });
-        await fs.promises.writeFile(path.join(configPath, PERCENT_JSON), percentContent, 'utf-8');
+        await fs.mkdir(configPath, { recursive: true });
+        await fs.writeFile(path.join(configPath, PERCENT_JSON), percentContent, 'utf-8');
     },
 
     /**
@@ -133,7 +133,7 @@ export const localOptimizationConfig = {
      * @returns {Promise<void>}
      */
     downloadStatsFromPercentJson: async (configPath, filterIds) => {
-        const percentContent = await fs.promises.readFile(path.join(configPath, PERCENT_JSON), 'utf-8');
+        const percentContent = await fs.readFile(path.join(configPath, PERCENT_JSON), 'utf-8');
         const percent = JSON.parse(percentContent);
 
         const configs = filterIds.length > 0
@@ -145,11 +145,11 @@ export const localOptimizationConfig = {
                 const dir = path.join(configPath, FILTERS_DIR, filterId.toString());
                 const statsPath = path.join(dir, STATS_JSON);
                 try {
-                    await fs.promises.access(statsPath);
+                    await fs.access(statsPath);
                 } catch {
                     const content = await downloadOptimizationStats(filterId);
-                    await fs.promises.mkdir(dir, { recursive: true });
-                    await fs.promises.writeFile(statsPath, content, 'utf-8');
+                    await fs.mkdir(dir, { recursive: true });
+                    await fs.writeFile(statsPath, content, 'utf-8');
                 }
             }),
         );
@@ -174,7 +174,7 @@ export const localOptimizationConfig = {
      * @returns {Promise<void>}
      */
     async reset(configPath) {
-        await fs.promises.rm(configPath, { recursive: true, force: true });
+        await fs.rm(configPath, { recursive: true, force: true });
         localConfigPath = null;
     },
 };
@@ -204,7 +204,7 @@ export const getOptimizationStats = async (filterId) => {
     }
 
     const content = localConfigPath !== null
-        ? await fs.promises.readFile(path.join(localConfigPath, FILTERS_DIR, String(filterId), STATS_JSON), 'utf-8')
+        ? await fs.readFile(path.join(localConfigPath, FILTERS_DIR, String(filterId), STATS_JSON), 'utf-8')
         : await downloadOptimizationStats(filterId);
 
     if (!content) {

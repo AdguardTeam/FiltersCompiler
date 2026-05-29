@@ -8,7 +8,8 @@ import {
     afterEach,
 } from 'vitest';
 
-import fs from 'fs';
+import fs from 'fs/promises';
+import { existsSync } from 'fs';
 import path from 'path';
 import os from 'os';
 import {
@@ -46,9 +47,9 @@ describe('localOptimizationConfig', () => {
         let percent;
 
         beforeAll(async () => {
-            tmpDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'opt-test-'));
+            tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'opt-test-'));
             await localOptimizationConfig.downloadPercentJson(tmpDir);
-            percent = JSON.parse(await fs.promises.readFile(path.join(tmpDir, PERCENT_JSON), 'utf-8'));
+            percent = JSON.parse(await fs.readFile(path.join(tmpDir, PERCENT_JSON), 'utf-8'));
         });
 
         afterAll(async () => {
@@ -66,9 +67,9 @@ describe('localOptimizationConfig', () => {
         let percent;
 
         beforeAll(async () => {
-            tmpDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'opt-test-'));
+            tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'opt-test-'));
             await localOptimizationConfig.downloadPercentJson(tmpDir);
-            percent = JSON.parse(await fs.promises.readFile(path.join(tmpDir, PERCENT_JSON), 'utf-8'));
+            percent = JSON.parse(await fs.readFile(path.join(tmpDir, PERCENT_JSON), 'utf-8'));
             await localOptimizationConfig.downloadStatsFromPercentJson(tmpDir, EMPTY_FILTER_IDS);
         });
 
@@ -80,9 +81,9 @@ describe('localOptimizationConfig', () => {
             await Promise.all(
                 percent.config.map(async ({ filterId }) => {
                     const statsPath = path.join(tmpDir, FILTERS_DIR, String(filterId), STATS_JSON);
-                    expect(fs.existsSync(statsPath)).toBeTruthy();
+                    expect(existsSync(statsPath)).toBeTruthy();
 
-                    const raw = await fs.promises.readFile(statsPath, 'utf-8');
+                    const raw = await fs.readFile(statsPath, 'utf-8');
                     expect(() => assertValidStats(filterId, JSON.parse(raw))).not.toThrow();
                 }),
             );
@@ -91,9 +92,9 @@ describe('localOptimizationConfig', () => {
         it('does not overwrite an existing stats.json', async () => {
             const { filterId } = percent.config[0];
             const statsPath = path.join(tmpDir, FILTERS_DIR, String(filterId), STATS_JSON);
-            const before = await fs.promises.readFile(statsPath, 'utf-8');
+            const before = await fs.readFile(statsPath, 'utf-8');
             await localOptimizationConfig.downloadStatsFromPercentJson(tmpDir, EMPTY_FILTER_IDS);
-            const after = await fs.promises.readFile(statsPath, 'utf-8');
+            const after = await fs.readFile(statsPath, 'utf-8');
             expect(after).toBe(before);
         });
     });
@@ -103,7 +104,7 @@ describe('localOptimizationConfig', () => {
             let tmpDir;
 
             beforeAll(async () => {
-                tmpDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'opt-test-'));
+                tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'opt-test-'));
                 await localOptimizationConfig.downloadPercentJson(tmpDir);
                 vi.clearAllMocks();
                 await localOptimizationConfig.downloadStatsFromPercentJson(tmpDir, [VALID_FILTER_ID]);
@@ -121,7 +122,7 @@ describe('localOptimizationConfig', () => {
 
             it('writes stats.json for the specified filter', () => {
                 const statsPath = path.join(tmpDir, FILTERS_DIR, String(VALID_FILTER_ID), STATS_JSON);
-                expect(fs.existsSync(statsPath)).toBeTruthy();
+                expect(existsSync(statsPath)).toBeTruthy();
             });
         });
 
@@ -129,7 +130,7 @@ describe('localOptimizationConfig', () => {
             let tmpDir;
 
             beforeAll(async () => {
-                tmpDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'opt-test-'));
+                tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'opt-test-'));
                 await localOptimizationConfig.downloadPercentJson(tmpDir);
                 vi.clearAllMocks();
                 await localOptimizationConfig.downloadStatsFromPercentJson(tmpDir, [INVALID_FILTER_ID]);
@@ -177,17 +178,17 @@ describe('useLocalConfig()', () => {
     let tmpDir;
 
     beforeAll(async () => {
-        tmpDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'opt-local-'));
+        tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'opt-local-'));
 
-        await fs.promises.writeFile(
+        await fs.writeFile(
             path.join(tmpDir, PERCENT_JSON),
             JSON.stringify({ config: [{ filterId: VALID_FILTER_ID, percent: 50 }] }),
             'utf-8',
         );
 
         const statsDir = path.join(tmpDir, FILTERS_DIR, String(VALID_FILTER_ID));
-        await fs.promises.mkdir(statsDir, { recursive: true });
-        await fs.promises.writeFile(
+        await fs.mkdir(statsDir, { recursive: true });
+        await fs.writeFile(
             path.join(statsDir, STATS_JSON),
             JSON.stringify({ groups: [{ config: { hits: 1 }, rules: {} }] }),
             'utf-8',
