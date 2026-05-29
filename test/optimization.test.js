@@ -14,7 +14,7 @@ import os from 'os';
 import {
     localOptimizationConfig,
     getOptimizationStats,
-    skipRuleWithOptimization,
+    shouldSkipRule,
     assertValidStats,
     PERCENT_JSON,
     STATS_JSON,
@@ -237,7 +237,7 @@ describe('assertValidStats()', () => {
     });
 });
 
-describe('skipRuleWithOptimization()', () => {
+describe('shouldSkipRule()', () => {
     it('skips rules below the hit threshold', () => {
         const config = {
             groups: [
@@ -258,10 +258,10 @@ describe('skipRuleWithOptimization()', () => {
             ],
         };
 
-        expect(skipRuleWithOptimization('low_hits1', config)).toBeTruthy();
-        expect(skipRuleWithOptimization('low_hits1', config)).toBeTruthy();
-        expect(skipRuleWithOptimization('enough_hits1', config)).toBeFalsy();
-        expect(skipRuleWithOptimization('enough_hits2', config)).toBeFalsy();
-        expect(skipRuleWithOptimization('unknown_rule', config)).toBeFalsy();
+        expect(shouldSkipRule('low_hits1', config)).toBeTruthy();
+        expect(shouldSkipRule('low_hits1', config)).toBeTruthy();
+        expect(shouldSkipRule('enough_hits1', config)).toBeFalsy();
+        expect(shouldSkipRule('enough_hits2', config)).toBeFalsy();
+        expect(shouldSkipRule('unknown_rule', config)).toBeFalsy();
     });
 });

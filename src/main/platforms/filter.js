@@ -12,7 +12,7 @@
 import { logger } from '../utils/log';
 import { overrideRule } from '../utils/workaround';
 import { RuleMasks } from '../rule/rule-masks';
-import { skipRuleWithOptimization } from '../optimization';
+import { shouldSkipRule } from '../optimization';
 
 const HINT_MASK = `${RuleMasks.MASK_HINT} `;
 const COMMENT_REGEXP = '^\\!($|[^#])';
@@ -194,7 +194,7 @@ const shouldOmitRuleWithOptimization = function (ruleLine, optimizationConfig) {
         return false;
     }
 
-    return skipRuleWithOptimization(ruleText, optimizationConfig);
+    return shouldSkipRule(ruleText, optimizationConfig);
 };
 
 /**

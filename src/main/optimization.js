@@ -222,9 +222,9 @@ export const getOptimizationStats = async (filterId) => {
  * Checks if rule should be skipped, because optimization is enabled for this filter
  * and hits of this rule is lower than some value
  * @param ruleText Rule text
- * @param optimizationConfig Optimization config for this filter (retrieved with getFilterOptimizationConfig)
+ * @param optimizationConfig Optimization config for this filter (retrieved with getOptimizationStats)
  */
-export const skipRuleWithOptimization = (ruleText, optimizationConfig) => {
+export const shouldSkipRule = (ruleText, optimizationConfig) => {
     if (!optimizationConfig) {
         return false;
     }
