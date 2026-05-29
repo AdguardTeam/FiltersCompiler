@@ -2,7 +2,7 @@
  * Type declarations for the public API of @adguard/filters-compiler.
  *
  * These declarations provide TypeScript consumers with typed signatures for
- * the three exported functions. They are hand-written because the entry point
+ * the four exports. They are hand-written because the entry point
  * (src/index.js) is JavaScript and is not processed by the TypeScript compiler.
  *
  * When src/index.js is eventually migrated to TypeScript, this file should be
@@ -64,13 +64,7 @@ export function validateLocales(
     requiredLocales: string[],
 ): void;
 
-/**
- * Manages a local on-disk cache of optimization configuration files.
- *
- * Directory layout:
- *   <configPath>/percent.json
- *   <configPath>/filters/<filterId>/stats.json
- */
+/** Manages a local on-disk cache of optimization configuration files. */
 export const localOptimizationConfig: {
     downloadPercentJson(configPath: string): Promise<void>;
     downloadStatsFromPercentJson(configPath: string, filterIds: number[]): Promise<void>;
