@@ -29,7 +29,7 @@ platforms (extensions and apps).
 
 ```text
 ├── src/
-│   ├── index.js                  # Library entry point (compile, validateJSONSchema, validateLocales)
+│   ├── index.js                  # Library entry point (compile, validateJSONSchema, validateLocales, localOptimizationConfig)
 │   └── main/
 │       ├── builder.js            # Core filter compilation logic
 │       ├── converter.js          # Rule format conversion
