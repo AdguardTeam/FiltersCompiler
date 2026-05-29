@@ -142,10 +142,12 @@ export const localOptimizationConfig = {
 
         await Promise.all(
             configs.map(async ({ filterId }) => {
-                const statsPath = path.join(configPath, FILTERS_DIR, filterId.toString(), STATS_JSON);
-                if (!fs.existsSync(statsPath)) {
+                const dir = path.join(configPath, FILTERS_DIR, filterId.toString());
+                const statsPath = path.join(dir, STATS_JSON);
+                try {
+                    await fs.promises.access(statsPath);
+                } catch {
                     const content = await downloadOptimizationStats(filterId);
-                    const dir = path.join(configPath, FILTERS_DIR, filterId.toString());
                     await fs.promises.mkdir(dir, { recursive: true });
                     await fs.promises.writeFile(statsPath, content, 'utf-8');
                 }
