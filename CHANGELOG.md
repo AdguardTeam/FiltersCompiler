@@ -9,28 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `localOptimizationConfig` exported from the public API (`src/index.js`).
-  Provides four methods for managing a local on-disk optimization cache:
-  - `downloadPercentJson(configPath)` — downloads the `percent.json` optimization
-    config (filter IDs and their optimization percentages) to `configPath`.
-  - `downloadStatsFromPercentJson(configPath, filterIds)` — reads `percent.json`
-    from `configPath` and downloads missing per-filter `stats.json` files there.
-    Pass an empty `filterIds` array to process all optimizable
-    filters; pass a non-empty array to limit downloads to specific filter IDs.
-  - `useLocalConfig(configPath)` — directs the compiler to load optimization
-    stats from local files at `configPath` instead of fetching them remotely.
-  - `reset(configPath)` — clears in-memory cached state so the next call
-    re-reads from disk or re-downloads.
+- Ability to compile filters using local optimization cache (`localOptimizationConfig`).
 - TypeScript toolchain for incremental adoption.
 
 ### Changed
 
-- `compile()` type declaration: `whitelist` and `blacklist` are now typed as
-  `number[] | null | undefined` instead of `number[]`. Callers that pass `null`
-  or omit these parameters no longer need to cast.
-- `getOptimizationStats`: `optimizableFilterIds` is now loaded via a promise
-  singleton so concurrent callers share one in-flight `percent.json` fetch
-  instead of each issuing a separate download.
+- `compile()` type declaration: `whitelist`/`blacklist` now accept `null`/`undefined`.
+- `getOptimizationStats` deduplicates concurrent `percent.json` fetches via promise singleton.
 - Updated [@adguard/filters-downloader] to v2.4.4.
 
 [Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.2.9...HEAD
