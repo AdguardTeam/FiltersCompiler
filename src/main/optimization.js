@@ -1,4 +1,3 @@
-/* eslint-disable global-require */
 import fs from 'fs';
 import path from 'path';
 import { downloadFile } from './utils/webutils';
