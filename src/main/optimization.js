@@ -46,6 +46,16 @@ let localConfigPath = null;
  */
 let optimizableFilterIdsPromise = null;
 
+/**
+ * Returns a promise that resolves to the set of optimizable filter IDs.
+ *
+ * Lazily initializes a shared promise singleton on first call so that
+ * concurrent callers (e.g. via `Promise.all`) share one in-flight fetch of
+ * `percent.json` instead of each issuing a separate download.
+ * When `useLocalConfig` has been called the IDs are read from the local file.
+ *
+ * @returns {Promise<Set<number>>}
+ */
 const getOptimizableFilterIds = () => {
     if (optimizableFilterIdsPromise === null) {
         const source = localConfigPath !== null
