@@ -69,6 +69,8 @@ const getOptimizableFilterIds = () => {
 };
 
 /**
+ * Validates that stats have non-empty groups.
+ *
  * @param {number} filterId
  * @param {object} stats
  * @throws {Error} if stats.groups is missing or empty
