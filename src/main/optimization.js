@@ -30,13 +30,6 @@ const downloadOptimizationStats = async (filterId) => {
 let optimizationEnabled = true;
 
 /**
- * Resolves to the set of filter IDs that have optimization stats on the server.
- * Populated lazily on the first `getOptimizationStats` call.
- * Shared across concurrent callers to avoid redundant percent.json fetches.
- *
- * @type {Promise<Set<number>>|null}
- */
-/**
  * When set, `getOptimizationStats` reads stats from local files under this
  * directory instead of fetching from the remote server.
  *
