@@ -58,7 +58,9 @@ export function validateJSONSchema(platformsPath: string, requiredFiltersAmount:
  */
 export function validateLocales(localesDirPath: string, requiredLocales: string[]): void;
 
-/** Manages a local on-disk cache of optimization configuration files. */
+/**
+ * Manages a local on-disk cache of optimization configuration files.
+ */
 export const localOptimizationConfig: {
     downloadPercentJson(configPath: string): Promise<void>;
     downloadStatsFromPercentJson(configPath: string, filterIds: number[]): Promise<void>;
