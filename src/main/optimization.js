@@ -56,14 +56,12 @@ let optimizableFilterIdsPromise = null;
  *
  * @returns {Promise<Set<number>>}
  */
-const getOptimizableFilterIds = () => {
+const getOptimizableFilterIds = async () => {
     if (optimizableFilterIdsPromise === null) {
-        optimizableFilterIdsPromise = (async () => {
-            const raw = localConfigPath !== null
-                ? await fs.readFile(path.join(localConfigPath, PERCENT_JSON), 'utf-8')
-                : await downloadOptimizationPercent();
-            return new Set(JSON.parse(raw).config.map(({ filterId: id }) => id));
-        })();
+        const raw = localConfigPath !== null
+            ? await fs.readFile(path.join(localConfigPath, PERCENT_JSON), 'utf-8')
+            : await downloadOptimizationPercent();
+        optimizableFilterIdsPromise = new Set(JSON.parse(raw).config.map(({ filterId: id }) => id));
     }
     return optimizableFilterIdsPromise;
 };
