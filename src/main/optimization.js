@@ -82,22 +82,13 @@ export const assertValidStats = (filterId, stats) => {
 /**
  * Manages a local on-disk cache of optimization configuration files.
  *
- * Expected directory layout under `configPath`:
- * ```
- * <configPath>/
- *   percent.json                   — list of optimizable filter IDs and percentages
- *   filters/
- *     <filterId>/
- *       stats.json                 — per-filter hit-count stats used during compilation
- * ```
- *
- * Typical usage (--generate-cache / --generate-stats-from-cached-percent-json):
+ * Typical usage for generating the cache:
  * 1. `downloadPercentJson(configPath)` — download and save `percent.json` once
  *    so it can be inspected / edited before the build.
  * 2. `downloadStatsFromPercentJson(configPath, filterIds)` — fill in any missing
  *    `stats.json` files for the listed filters.
  *
- * Typical usage (--use-cache):
+ * Typical usage for using the cache:
  * 1. `useLocalConfig(configPath)` — tells `getOptimizationStats` to read stats
  *    from local files lazily during compilation instead of fetching remotely.
  *
