@@ -30,7 +30,7 @@ const downloadOptimizationStats = async (filterId) => {
 let optimizationEnabled = true;
 
 /**
- * When set, `getOptimizationStats` reads stats from local files under this
+ * When set, `getFilterOptimizationConfig` reads stats from local files under this
  * directory instead of fetching from the remote server.
  *
  * @type {string|null}
@@ -39,7 +39,7 @@ let localConfigPath = null;
 
 /**
  * Resolves to the set of filter IDs that have optimization stats on the server.
- * Populated lazily on the first `getOptimizationStats` call.
+ * Populated lazily on the first `getFilterOptimizationConfig` call.
  * Shared across concurrent callers to avoid redundant percent.json fetches.
  *
  * @type {Promise<Set<number>>|null}
@@ -89,7 +89,7 @@ export const assertValidStats = (filterId, stats) => {
  *    `stats.json` files for the listed filters.
  *
  * Typical usage for using the cache:
- * 1. `useLocalConfig(configPath)` — tells `getOptimizationStats` to read stats
+ * 1. `useLocalConfig(configPath)` — tells `getFilterOptimizationConfig` to read stats
  *    from local files lazily during compilation instead of fetching remotely.
  *
  * 3. `reset(configPath)` — remove the cache directory and clear in-memory state.
@@ -145,7 +145,7 @@ export const localOptimizationConfig = {
     },
 
     /**
-     * Configures `getOptimizationStats` to read stats from local files under
+     * Configures `getFilterOptimizationConfig` to read stats from local files under
      * `configPath` instead of fetching from the remote server.
      * Stats are loaded lazily on demand during compilation.
      *
@@ -181,7 +181,7 @@ export const localOptimizationConfig = {
  *   optimization stats.
  * @throws {Error} When the stats are missing or malformed.
  */
-export const getOptimizationStats = async (filterId) => {
+export const getFilterOptimizationConfig = async (filterId) => {
     if (!optimizationEnabled) {
         return null;
     }
@@ -211,9 +211,9 @@ export const getOptimizationStats = async (filterId) => {
  * Checks if rule should be skipped, because optimization is enabled for this filter
  * and hits of this rule is lower than some value
  * @param ruleText Rule text
- * @param optimizationConfig Optimization config for this filter (retrieved with getOptimizationStats)
+ * @param optimizationConfig Optimization config for this filter (retrieved with getFilterOptimizationConfig)
  */
-export const shouldSkipRule = (ruleText, optimizationConfig) => {
+export const skipRuleWithOptimization = (ruleText, optimizationConfig) => {
     if (!optimizationConfig) {
         return false;
     }

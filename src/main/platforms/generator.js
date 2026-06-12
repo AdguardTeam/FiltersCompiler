@@ -17,7 +17,7 @@ import {
     modifyBaseFilterHeader,
 } from '../utils/workaround';
 import { convertToUbo } from '../converter';
-import { getOptimizationStats } from '../optimization';
+import { getFilterOptimizationConfig } from '../optimization';
 import { RuleMasks } from '../rule/rule-masks';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -1000,7 +1000,7 @@ const buildFilter = async (filterDir, platformsPath, whitelist, blacklist) => {
         return;
     }
 
-    const optimizationConfig = await getOptimizationStats(filterId);
+    const optimizationConfig = await getFilterOptimizationConfig(filterId);
 
     // eslint-disable-next-line guard-for-in,no-restricted-syntax
     for (const platform in platformPathsConfig) {

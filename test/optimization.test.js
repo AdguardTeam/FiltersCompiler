@@ -14,8 +14,8 @@ import path from 'path';
 import os from 'os';
 import {
     localOptimizationConfig,
-    getOptimizationStats,
-    shouldSkipRule,
+    getFilterOptimizationConfig,
+    skipRuleWithOptimization,
     assertValidStats,
     PERCENT_JSON,
     STATS_JSON,
@@ -148,7 +148,7 @@ describe('localOptimizationConfig', () => {
     });
 });
 
-describe('getOptimizationStats()', () => {
+describe('getFilterOptimizationConfig()', () => {
     afterEach(async () => {
         vi.clearAllMocks();
         // clear module-level state between tests
@@ -157,7 +157,7 @@ describe('getOptimizationStats()', () => {
     });
 
     it('returns null for a filterId not listed in percent.json', async () => {
-        const result = await getOptimizationStats(INVALID_FILTER_ID);
+        const result = await getFilterOptimizationConfig(INVALID_FILTER_ID);
         expect(result).toBeNull();
 
         // stats endpoint must NOT have been called for the unlisted filter
@@ -168,7 +168,7 @@ describe('getOptimizationStats()', () => {
     });
 
     it('returns stats for a filterId listed in percent.json', async () => {
-        const result = await getOptimizationStats(VALID_FILTER_ID);
+        const result = await getFilterOptimizationConfig(VALID_FILTER_ID);
         expect(result).not.toBeNull();
         expect(() => assertValidStats(VALID_FILTER_ID, result)).not.toThrow();
     });
@@ -206,7 +206,7 @@ describe('useLocalConfig()', () => {
     });
 
     it('reads stats from local file without remote calls', async () => {
-        const result = await getOptimizationStats(VALID_FILTER_ID);
+        const result = await getFilterOptimizationConfig(VALID_FILTER_ID);
         expect(result).not.toBeNull();
         expect(() => assertValidStats(VALID_FILTER_ID, result)).not.toThrow();
 
@@ -215,7 +215,7 @@ describe('useLocalConfig()', () => {
     });
 
     it(`returns null for filter not listed in local ${PERCENT_JSON}`, async () => {
-        const result = await getOptimizationStats(INVALID_FILTER_ID);
+        const result = await getFilterOptimizationConfig(INVALID_FILTER_ID);
         expect(result).toBeNull();
     });
 });
@@ -238,7 +238,7 @@ describe('assertValidStats()', () => {
     });
 });
 
-describe('shouldSkipRule()', () => {
+describe('skipRuleWithOptimization()', () => {
     it('skips rules below the hit threshold', () => {
         const config = {
             groups: [
@@ -259,10 +259,10 @@ describe('shouldSkipRule()', () => {
             ],
         };
 
-        expect(shouldSkipRule('low_hits1', config)).toBeTruthy();
-        expect(shouldSkipRule('low_hits1', config)).toBeTruthy();
-        expect(shouldSkipRule('enough_hits1', config)).toBeFalsy();
-        expect(shouldSkipRule('enough_hits2', config)).toBeFalsy();
-        expect(shouldSkipRule('unknown_rule', config)).toBeFalsy();
+        expect(skipRuleWithOptimization('low_hits1', config)).toBeTruthy();
+        expect(skipRuleWithOptimization('low_hits1', config)).toBeTruthy();
+        expect(skipRuleWithOptimization('enough_hits1', config)).toBeFalsy();
+        expect(skipRuleWithOptimization('enough_hits2', config)).toBeFalsy();
+        expect(skipRuleWithOptimization('unknown_rule', config)).toBeFalsy();
     });
 });
