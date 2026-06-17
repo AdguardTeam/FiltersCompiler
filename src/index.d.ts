@@ -68,9 +68,38 @@ export function validateLocales(
  * Manages a local on-disk cache of optimization configuration files.
  */
 export const localOptimizationConfig: {
+    /**
+     * Downloads `percent.json` from the remote server and saves it to `configPath`.
+     * Creates `configPath` if it does not exist.
+     *
+     * @param configPath - Directory where `percent.json` will be written.
+     */
     downloadPercentJson(configPath: string): Promise<void>;
+    /**
+     * Reads the local `percent.json`, downloads any missing `stats.json` files
+     * for each listed filter, and saves them to disk.
+     * Existing `stats.json` files are not overwritten (preserves user edits).
+     *
+     * When `filterIds` is a non-empty array only those filters are processed;
+     * pass an empty array to process all filters listed in `percent.json`.
+     *
+     * @param {string} configPath - Directory containing `percent.json`.
+     * @param {number[]} filterIds - Filter IDs to process; empty array processes all.
+     */
     downloadStatsFromPercentJson(configPath: string, filterIds: number[]): Promise<void>;
-    /** Configures `getFilterOptimizationConfig` to read stats from local files lazily during compilation. */
+    /**
+     * Configures `getFilterOptimizationConfig` to read stats from local files under
+     * `configPath` instead of fetching from the remote server.
+     * Stats are loaded lazily on demand during compilation.
+     *
+     * @param {string} configPath - Directory containing `percent.json` and
+     *   `filters/<filterId>/stats.json`.
+     */
     useLocalConfig(configPath: string): void;
+    /**
+     * Removes the cache directory and clears in-memory state.
+     *
+     * @param configPath - Directory to remove.
+     */
     reset(configPath: string): Promise<void>;
 };
