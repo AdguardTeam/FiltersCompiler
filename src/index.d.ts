@@ -2,7 +2,7 @@
  * Type declarations for the public API of @adguard/filters-compiler.
  *
  * These declarations provide TypeScript consumers with typed signatures for
- * the four exports. They are hand-written because the entry point
+ * the exported functions. They are hand-written because the entry point
  * (src/index.js) is JavaScript and is not processed by the TypeScript compiler.
  *
  * When src/index.js is eventually migrated to TypeScript, this file should be
