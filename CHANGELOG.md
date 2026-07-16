@@ -15,7 +15,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Updated [@adguard/filters-downloader] to v2.4.4.
 
-[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.2.9...HEAD
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
 
 ## [v3.2.9] - 2026-04-21
 
@@ -428,7 +434,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Return the rules in their original order after applying the `@include` directive option `/optimizeDomainBlockingRules` [#217]
+- Return the rules in their original order after applying the `@include`
+  directive option `/optimizeDomainBlockingRules` [#217]
 
 [v1.1.138]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.136...v1.1.138
 
@@ -850,3 +857,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [@adguard/scriptlets]: https://github.com/AdguardTeam/Scriptlets/blob/master/CHANGELOG.md
 [@adguard/tsurlfilter]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/tsurlfilter/CHANGELOG.md
 [@adguard/logger]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/logger/CHANGELOG.md
+
+[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.2.9...HEAD
