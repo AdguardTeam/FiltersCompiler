@@ -2,9 +2,6 @@
 
 - [Deployment Summary](#deployment-summary)
 - [Release Pipeline](#release-pipeline)
-    - [Prepare Release](#prepare-release)
-    - [Publish Release](#publish-release)
-    - [Mirror to Public Repository](#mirror-to-public-repository)
 - [CI/CD](#cicd)
 - [Environment Variables](#environment-variables)
 - [Infrastructure Dependencies](#infrastructure-dependencies)
@@ -26,62 +23,20 @@
 
 ## Release Pipeline
 
-Releases follow the shared [ext-shared-actions][ext-shared-actions] pipeline
-documented in
+Releases follow the shared [ext-shared-actions][ext-shared-actions] pipeline.
+For the full step-by-step documentation, see
 [publish-release.md](https://github.com/AdGuardSoftwareLimited/ext-shared-actions/blob/master/docs/publish-release.md).
 
-### Prepare Release
+In short:
 
-The `prepare-release.yml` workflow is triggered manually by a maintainer
-with a target tag (e.g. `v3.3.0`). It calls
-`AdGuardSoftwareLimited/actions/.github/workflows/create-release-pr.yml@master`
-to:
-
-1. Move `[Unreleased]` changelog entries under a new version heading.
-2. Create a fresh empty `[Unreleased]` section.
-3. Open a release-bump PR against `master`.
-
-After the release-bump PR is reviewed and merged, the publish workflow
-takes over automatically.
-
-### Publish Release
-
-The `publish-release.yml` workflow fires when the release-bump PR is merged
-into `master`, or can be re-triggered manually via `workflow_dispatch` with
-a specific ref.
-
-It calls
-`AdGuardSoftwareLimited/ext-shared-actions/.github/workflows/publish-release.yml@master`
-to:
-
-1. **Determine the version** — extracted from `CHANGELOG.md` by the shared
-   `tag-from-changelog` action. The version is NOT stored in `package.json`;
-   it is injected at build time.
-2. **Tag the release commit** with the extracted version.
-3. **Build and test** inside Docker (`test-output` and `build-output` stages).
-4. **Publish to npm** via OIDC trusted publishing (no token required).
-   The publish job requires approval from the `npm` GitHub environment.
-5. **Mirror** the release tag to the public `AdguardTeam/FiltersCompiler` repo.
-6. **Create a draft GitHub Release** with the changelog entries.
-7. **Notify Slack** (`#adguard-extension-vcs`) about the new release.
-
-**Permissions required:**
-
-- `contents: write` — create tag and GitHub Release.
-- `id-token: write` — OIDC trusted publishing to npm, and Octopass for mirroring.
-- `actions: write` — disable/enable workflows in the public mirror repo.
-
-### Mirror to Public Repository
-
-The `mirror.yml` workflow runs on every push to `master` and mirrors all
-commits to `git@github.com:AdguardTeam/FiltersCompiler.git` via the shared
-`AdGuardSoftwareLimited/actions/.github/workflows/mirror.yml@master` workflow.
-
-**Permissions required:**
-
-- `contents: read` — checkout the source repo.
-- `actions: write` — disable workflows in the public mirror.
-- `id-token: write` — Octopass OIDC token for pushing to the public repo.
+1. A maintainer runs `prepare-release.yml` manually with a target tag
+   (e.g. `v3.3.0`) to open a release-bump PR that finalizes `CHANGELOG.md`.
+2. Merging the release-bump PR triggers `publish-release.yml`, which tags
+   the release commit, builds and tests in Docker, publishes to npm via OIDC
+   trusted publishing (gated by the `npm` GitHub environment), mirrors the
+   tag to `AdguardTeam/FiltersCompiler`, creates a GitHub Release with the
+   changelog entries (published immediately, not a draft), and notifies
+   Slack (`#adguard-extension-vcs`).
 
 ## CI/CD
 

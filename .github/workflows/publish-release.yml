@@ -2,7 +2,7 @@ name: Publish release
 
 description: >-
   Tags the release commit, builds, tests, publishes to npm,
-  mirrors to the public repo, drafts a GitHub Release, and notifies Slack.
+  mirrors to the public repo, creates a GitHub Release, and notifies Slack.
 
 on:
   pull_request:
