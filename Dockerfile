@@ -35,10 +35,12 @@ FROM deps AS source
 COPY . /compiler
 
 # ============================================================================
-# Stage: test
-# Runs lint, builds the library, and runs vitest unit tests
+# Stage: test-output
+# Runs lint, builds the library, and runs vitest unit tests.
+# Used as the CI validation target: `docker build --target test-output .`
+# fails if lint, build, or tests fail.
 # ============================================================================
-FROM source AS test
+FROM source AS test-output
 
 ARG BUILD_RUN_ID=""
 
@@ -46,12 +48,7 @@ RUN --mount=type=cache,target=/pnpm-store,id=compiler-pnpm \
     echo "${BUILD_RUN_ID}" > /tmp/.build-run-id && \
     pnpm lint && \
     pnpm build && \
-    pnpm test && \
-    mkdir -p /out && \
-    touch /out/test-passed.txt
-
-FROM scratch AS test-output
-COPY --from=test /out/ /
+    pnpm test
 
 # ============================================================================
 # Stage: build

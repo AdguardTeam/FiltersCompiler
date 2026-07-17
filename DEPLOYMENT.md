@@ -144,7 +144,7 @@ The `Dockerfile` uses multi-stage builds based on `adguard/node-ssh:22.22--0`:
 | `base`                   | Shared foundation | Node.js 22, pnpm 10.33.4 (from base image)                                   |
 | `deps`                   | Dependency cache  | `pnpm install --frozen-lockfile --ignore-scripts`                            |
 | `source`                 | Full source       | Copies project files over `deps`                                             |
-| `test` / `test-output`   | CI validation     | `pnpm lint && pnpm build && pnpm test`; outputs `/out/test-passed.txt`       |
+| `test-output`            | CI validation     | `pnpm lint && pnpm build && pnpm test`                                       |
 | `build` / `build-output` | Artifact creation | `pnpm build && pnpm pack --out filters-compiler.tgz`; outputs `.tgz` at root |
 
 The dependency stage is cached by `package.json` and `pnpm-lock.yaml`.
