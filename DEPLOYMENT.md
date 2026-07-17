@@ -47,7 +47,8 @@ In short:
 | `publish-release.yml` | PR merged to `master` or manual re-run | Tag, build, publish to npm, mirror, create GitHub Release, notify Slack |
 | `mirror.yml`          | Push to `master`                       | Mirror commits to `AdguardTeam/FiltersCompiler`                         |
 
-All workflows run on the `team-extensions` runner label and reuse the
+Self-hosted jobs run on the `team-extensions` runner label; the npm publish
+job (`deploy-to-npm`) runs on `ubuntu-latest`. All workflows reuse the
 shared pipeline definitions from
 [AdGuardSoftwareLimited/ext-shared-actions][ext-shared-actions] and
 [AdGuardSoftwareLimited/actions][actions].
