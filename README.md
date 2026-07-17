@@ -4,6 +4,9 @@
 > ad-blocking filter lists into platform-specific formats for AdGuard
 > products across all supported platforms.
 
+> **Note:** This package is developed in [AdGuardSoftwareLimited/ext-compiler].
+> The [AdguardTeam/FiltersCompiler] repository is a public mirror.
+
 ## Description
 
 **AdGuard Filters Compiler** is a library for developers who maintain
@@ -411,3 +414,5 @@ Each writes its output to a subdirectory under `platformsPath`.
 
 [FiltersRegistry]: https://github.com/AdguardTeam/FiltersRegistry/
 [filters-metadata]: https://github.com/AdguardTeam/FiltersRegistry/blob/master/README.md#filters-metadata
+[AdGuardSoftwareLimited/ext-compiler]: https://github.com/AdGuardSoftwareLimited/ext-compiler
+[AdguardTeam/FiltersCompiler]: https://github.com/AdguardTeam/FiltersCompiler
