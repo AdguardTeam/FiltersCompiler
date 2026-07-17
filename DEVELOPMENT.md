@@ -296,16 +296,27 @@ pnpm build-schemas
 
 **Problem**: `pnpm: command not found`
 
-**Solution**: Install pnpm using corepack (recommended) or npm:
+**Solution**: Install pnpm globally via npm (recommended) or via corepack:
 
 ```bash
-# Recommended: use corepack (ships with Node.js)
-corepack enable
-corepack prepare pnpm@10 --activate
+# Recommended: install globally via npm
+npm install -g pnpm@10.33.4
 
-# Alternative: install globally via npm
-npm install -g pnpm
+# Alternative: use corepack (ships with Node.js)
+corepack enable
+corepack prepare pnpm@10.33.4 --activate
 ```
+
+> **Note**: With corepack, disable auto-pinning — otherwise corepack adds a
+> `packageManager` field (pinned to an exact version with a hash) to
+> `package.json` on the first run, which this project intentionally does not
+> use (the pnpm version is constrained by the `engines` field instead):
+>
+> ```bash
+> export COREPACK_ENABLE_AUTO_PIN=0
+> ```
+>
+> If the field was already added, revert it with `git checkout package.json`.
 
 ### Build or Type Errors After Adding a New File
 
