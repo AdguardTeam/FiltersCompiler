@@ -372,7 +372,7 @@ const customPlatformsConfig = {
             removeRulePatterns: [   // regexes of rules to drop
                 '^\\/.*',
             ],
-            replacements: [        // literal text replacements applied to rules
+            replacements: [        // regex replacements applied to rules
                 { from: 'regex', to: 'repl' },
             ],
         },
@@ -383,6 +383,10 @@ const customPlatformsConfig = {
     },
 };
 ```
+
+`replacements[].from` is treated as a regular-expression pattern (it is
+passed to `new RegExp(from, 'g')`), not as literal text. Escape regex
+metacharacters in `from` when a literal match is intended.
 
 ### Logging
 
