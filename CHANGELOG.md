@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Corrected the public type declarations for validation function return values.
+
 ### Security
 
 ## [v3.2.9] - 2026-04-21

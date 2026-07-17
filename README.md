@@ -126,7 +126,7 @@ writes the results to `platformsPath`.
 function validateJSONSchema(
     platformsPath: string,
     requiredFiltersAmount: number,
-): void;
+): boolean;
 ```
 
 Recursively validates the built JSON files in `platformsPath` against
@@ -134,18 +134,33 @@ the schemas bundled with the library (`filters.schema.json` and
 `filters_i18n.schema.json`). `requiredFiltersAmount` is the minimum
 number of filters expected in each platform's `filters.json`.
 
+Returns `true` when all files are valid. On validation failure it logs
+the errors and returns `false` instead of throwing, so callers must
+check the return value.
+
 ### `validateLocales(...)`
 
 ```ts
 function validateLocales(
     localesDirPath: string,
     requiredLocales: string[],
-): void;
+): ValidateLocalesResult;
+
+interface ValidateLocalesResult {
+    ok: boolean;
+    data?: unknown[]; // per-locale warning details, present when warnings exist
+    log?: string;     // formatted warnings log, present when warnings exist
+}
 ```
 
 Validates that the locale files in `localesDirPath` are complete — that
 every filter, group, and tag has a translated name and description for
 all locales listed in `requiredLocales`.
+
+Returns `{ ok: true }` when no problems are found. When warnings are
+found, `data` and `log` contain the per-locale details and `ok` is
+`false` only if at least one warning is critical. Throws when the
+locales directory is missing or empty.
 
 ## Usage Examples
 
@@ -212,7 +227,10 @@ After compiling, validate the built output against the bundled schemas:
 import { validateJSONSchema } from '@adguard/filters-compiler';
 
 // Each platform build must contain at least 50 filters
-validateJSONSchema('./platforms', 50);
+const valid = validateJSONSchema('./platforms', 50);
+if (!valid) {
+    throw new Error('Schema validation failed, see log for details');
+}
 ```
 
 ### Validating locale translations
@@ -220,7 +238,10 @@ validateJSONSchema('./platforms', 50);
 ```js
 import { validateLocales } from '@adguard/filters-compiler';
 
-validateLocales('./locales', ['en', 'fr', 'ko']);
+const result = validateLocales('./locales', ['en', 'fr', 'ko']);
+if (!result.ok) {
+    console.error(result.log);
+}
 ```
 
 ## <a name="include-directive"></a> `@include` directive and its options
