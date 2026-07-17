@@ -15,6 +15,12 @@ on:
         required: false
         type: string
 
+# Serialize release runs: a manual dispatch must not race the automatic
+# post-merge run during tagging, publishing, and mirroring.
+concurrency:
+  group: publish-release
+  cancel-in-progress: false
+
 jobs:
   publish:
     uses: AdGuardSoftwareLimited/ext-shared-actions/.github/workflows/publish-release.yml@master

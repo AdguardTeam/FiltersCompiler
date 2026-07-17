@@ -56,6 +56,8 @@ shared pipeline definitions from
 **Concurrency**: `ci.yml` uses a concurrency group
 `ci-ext-compiler-${{ github.ref }}` with `cancel-in-progress: true` to
 prevent redundant CI runs when a new push arrives for the same ref.
+`publish-release.yml` uses a `publish-release` group with
+`cancel-in-progress: false` to serialize release runs.
 
 ## Environment Variables
 
