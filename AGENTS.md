@@ -119,6 +119,11 @@ and `validateLocales`.
 | `pnpm build-schemas` | Regenerate JSON schemas from `tasks/build-schemas/`   |
 | `pnpm tgz`           | Pack release tarball (`filters-compiler.tgz`)         |
 
+`pnpm tgz` requires a `version` field in `package.json`, which is
+intentionally absent — set a temporary one first
+(`npm pkg set version=0.0.0-dev`, revert with `git checkout package.json`)
+or use the Docker build with the `VERSION` build arg (see DEPLOYMENT.md).
+
 ## Contribution Instructions
 
 - You MUST verify your changes with the linter, formatter, and type checker

@@ -157,9 +157,14 @@ The build cache (pnpm store) is mounted at `/pnpm-store` with id `compiler-pnpm`
 docker build --target test-output .
 
 # Produce the release artifact
-docker build --target build-output --output ./artifacts .
+docker build --platform linux/amd64 --target build-output \
+   --build-arg VERSION=0.0.0-dev --output ./artifacts .
 # → ./artifacts/filters-compiler.tgz
 ```
+
+`package.json` intentionally has no `version` field — CI injects the release
+version before building the image, and `pnpm pack` requires one. Pass a
+placeholder via the `VERSION` build arg for local packaging.
 
 [ext-shared-actions]: https://github.com/AdGuardSoftwareLimited/ext-shared-actions
 [actions]: https://github.com/AdGuardSoftwareLimited/actions

@@ -107,6 +107,19 @@ pnpm lint
 | `pnpm build-schemas` | Regenerate JSON schemas from `tasks/build-schemas/`   |
 | `pnpm tgz`           | Pack release tarball (`filters-compiler.tgz`)         |
 
+> **Note**: `pnpm tgz` requires a `version` field in `package.json`, which
+> this project intentionally omits (the version is injected at release time).
+> To pack locally, set a temporary version first and revert it afterwards:
+>
+> ```bash
+> npm pkg set version=0.0.0-dev
+> pnpm tgz
+> git checkout package.json
+> ```
+>
+> Alternatively, use the Docker build which accepts a `VERSION` build arg —
+> see [DEPLOYMENT.md](DEPLOYMENT.md#docker-build).
+
 ### TypeScript
 
 New source files should be written in TypeScript. The project uses TypeScript

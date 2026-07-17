@@ -58,8 +58,14 @@ FROM source AS build
 
 ARG BUILD_RUN_ID=""
 
+# Optional package version for local builds. CI injects the release version
+# into package.json before building the image; locally this arg is required
+# because package.json has no version field and pnpm pack needs one.
+ARG VERSION=""
+
 RUN --mount=type=cache,target=/pnpm-store,id=compiler-pnpm \
     echo "${BUILD_RUN_ID}" > /tmp/.build-run-id && \
+    if [ -n "${VERSION}" ]; then npm pkg set version="${VERSION}"; fi && \
     pnpm build && \
     pnpm pack --out filters-compiler.tgz && \
     mkdir -p /out/artifacts && \
