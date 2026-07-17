@@ -341,10 +341,10 @@ rules. For example, when `||sub.example.com^` is already covered by
 ||test.com^$script
 ```
 
-Include a remote file (the `!@include` form) with comment stripping:
+Include a remote file with comment stripping:
 
 ```adblock
-!@include "https://easylist.github.io/easylist/easylist.txt" /stripComments
+@include "https://easylist.github.io/easylist/easylist.txt" /stripComments
 ```
 
 Skip the trust-level check for a same-origin included file:
