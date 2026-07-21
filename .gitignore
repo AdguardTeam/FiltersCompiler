@@ -1,7 +1,7 @@
-dist
-node_modules
+dist/
+node_modules/
 .idea
-.vscode
+.vscode/
 .eslintcache
 *.iml
 pnpm-error.log
@@ -16,5 +16,6 @@ test/resources/filters/*/filter.txt
 test/resources/filters/*/revision.json
 
 # SDD specs
-specs/.current/*
+.sdd/
+
 output/

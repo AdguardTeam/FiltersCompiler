@@ -5,9 +5,6 @@
 FROM adguard/node-ssh:22.22--0 AS base
 SHELL ["/bin/bash", "-lc"]
 
-# Install specific pnpm version for deterministic builds
-RUN npm install -g pnpm@10.7.1
-
 WORKDIR /compiler
 
 # pnpm store directory — set once here, no need for pnpm config set in every RUN
@@ -38,56 +35,41 @@ FROM deps AS source
 COPY . /compiler
 
 # ============================================================================
-# Stage: lint
-# Runs all linting (eslint + tsc)
+# Stage: test-output
+# Runs lint, builds the library, and runs vitest unit tests.
+# Used as the CI validation target: `docker build --target test-output .`
+# fails if lint, build, or tests fail.
 # ============================================================================
-FROM source AS lint
+FROM source AS test-output
 
 ARG BUILD_RUN_ID=""
 
 RUN --mount=type=cache,target=/pnpm-store,id=compiler-pnpm \
     echo "${BUILD_RUN_ID}" > /tmp/.build-run-id && \
     pnpm lint && \
-    mkdir -p /out && \
-    touch /out/lint.txt
-
-FROM scratch AS lint-output
-COPY --from=lint /out/ /
+    pnpm build && \
+    pnpm test
 
 # ============================================================================
-# Stage: test
-# Builds the package and runs vitest unit tests
+# Stage: build
+# Builds the library and creates the npm package tarball for publishing
 # ============================================================================
-FROM source AS test
+FROM source AS build
 
 ARG BUILD_RUN_ID=""
 
-RUN --mount=type=cache,target=/pnpm-store,id=compiler-pnpm \
-    echo "${BUILD_RUN_ID}" > /tmp/.build-run-id && \
-    pnpm build && \
-    pnpm test && \
-    mkdir -p /out && \
-    touch /out/test.txt
-
-FROM scratch AS test-output
-COPY --from=test /out/ /
-
-# ============================================================================
-# Stage: full-build
-# Builds the library, generates build.txt, and creates the npm package tarball
-# ============================================================================
-FROM source AS full-build
-
-ARG BUILD_RUN_ID=""
+# Optional package version for local builds. CI injects the release version
+# into package.json before building the image; locally this arg is required
+# because package.json has no version field and pnpm pack needs one.
+ARG VERSION=""
 
 RUN --mount=type=cache,target=/pnpm-store,id=compiler-pnpm \
     echo "${BUILD_RUN_ID}" > /tmp/.build-run-id && \
+    if [ -n "${VERSION}" ]; then npm pkg set version="${VERSION}"; fi && \
     pnpm build && \
-    pnpm build-txt && \
     pnpm pack --out filters-compiler.tgz && \
     mkdir -p /out/artifacts && \
-    mv filters-compiler.tgz /out/artifacts/ && \
-    cp dist/build.txt /out/artifacts/
+    mv filters-compiler.tgz /out/artifacts/
 
-FROM scratch AS full-build-output
-COPY --from=full-build /out/ /
+FROM scratch AS build-output
+COPY --from=build /out/artifacts/ /

@@ -45,21 +45,40 @@ export function compile(
 /**
  * Validates built filter files against JSON schemas.
  *
+ * Validation failures are logged, not thrown — check the return value.
+ *
  * @param platformsPath Path to the built platform output.
  * @param requiredFiltersAmount Minimum number of filters expected.
+ * @returns `true` when all files are valid, `false` on validation failure.
  */
 export function validateJSONSchema(
     platformsPath: string,
     requiredFiltersAmount: number,
-): void;
+): boolean;
+
+/**
+ * Result of locale validation.
+ */
+export interface ValidateLocalesResult {
+    /** `false` when at least one critical warning was found. */
+    ok: boolean;
+    /** Per-locale warning details. Present when warnings exist. */
+    data?: unknown[];
+    /** Formatted warnings log. Present when warnings exist. */
+    log?: string;
+}
 
 /**
  * Validates locale translation files.
  *
  * @param localesDirPath Path to the locales directory.
  * @param requiredLocales List of required locale codes.
+ * @returns `{ ok: true }` when no problems are found; when warnings exist,
+ * the result includes `data` and `log`, and `ok` is `false` only for
+ * critical warnings.
+ * @throws Error when the locales directory is missing or empty.
  */
 export function validateLocales(
     localesDirPath: string,
     requiredLocales: string[],
-): void;
+): ValidateLocalesResult;

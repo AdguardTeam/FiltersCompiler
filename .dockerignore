@@ -9,7 +9,8 @@ output/
 node_modules/
 Dockerfile*
 *.log
-*.md
 .husky
-.github
-bamboo-specs/
+
+.github/
+
+.sdd/
