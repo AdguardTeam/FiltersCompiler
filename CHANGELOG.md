@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [3.2.10] - 2026-07-21
+
 ## [3.2.10-beta.0] - 2026-07-21
 
 ### Added
@@ -868,5 +870,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [@adguard/tsurlfilter]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/tsurlfilter/CHANGELOG.md
 [@adguard/logger]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/logger/CHANGELOG.md
 
-[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.2.10-beta.0...HEAD
+[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.2.10...HEAD
+[3.2.10]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.2.10-beta.0...v3.2.10
 [3.2.10-beta.0]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.2.9...v3.2.10-beta.0
