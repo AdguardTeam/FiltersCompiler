@@ -502,6 +502,17 @@ describe('converter', () => {
         expected = "test.com#%#//scriptlet('ubo-json-prune.js')";
         expect(actual[0]).toBe(expected);
 
+        // uBO json-prune-fetch-response uses propsToMatch as a key/value vararg;
+        // the value must land in the AdGuard positional propsToMatch slot.
+        // https://github.com/AdguardTeam/FiltersCompiler/issues/250
+        actual = convertRulesToAdgSyntax(['philo.com##+js(json-prune-fetch-response, periods.[-].eventStreams.0.id, , propsToMatch, /manifestv2)']);
+        expected = "philo.com#%#//scriptlet('json-prune-fetch-response', 'periods.[-].eventStreams.0.id', '', '/manifestv2')";
+        expect(actual[0]).toBe(expected);
+
+        actual = convertRulesToAdgSyntax(['philo.com##+js(json-prune-xhr-response, periods.[-].eventStreams.0.id, , propsToMatch, /manifestv2)']);
+        expected = "philo.com#%#//scriptlet('json-prune-xhr-response', 'periods.[-].eventStreams.0.id', '', '/manifestv2')";
+        expect(actual[0]).toBe(expected);
+
         actual = convertRulesToAdgSyntax(['test.com#@#script:inject(abort-on-property-read.js, some.prop)']);
         expected = "test.com#@%#//scriptlet('ubo-abort-on-property-read.js', 'some.prop')";
         expect(actual[0]).toBe(expected);
