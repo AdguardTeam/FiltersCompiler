@@ -31,8 +31,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `json-prune-xhr-response` scriptlets with UBO's `propsToMatch`
   and `stackToMatch` key/value args syntax [#250].
 
-### Security
-
 [#250]: https://github.com/AdguardTeam/FiltersCompiler/issues/250
 
 ## [3.2.10] - 2026-07-21
