@@ -34,7 +34,6 @@ const tryDownloadFile = async function (url: string, retryNum = 0) {
 };
 
 /**
-/**
  * Number of times to retry downloading after the first failed attempt for `downloadFile` function.
  */
 export const RETRY_NUM = 5;

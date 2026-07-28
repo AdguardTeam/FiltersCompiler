@@ -114,6 +114,11 @@ const getOptimizableFilterIds = async () => {
             const percent = JSON.parse(await downloadOptimizationPercent()) as PercentJson;
             return new Set(percent.config.map(({ filterId: id }) => id));
         })();
+        // Clear the singleton on rejection so a transient network error
+        // doesn't poison the cache for all subsequent callers.
+        optimizableFilterIdsPromise.catch(() => {
+            optimizableFilterIdsPromise = null;
+        });
     }
     return optimizableFilterIdsPromise;
 };

@@ -31,7 +31,7 @@ vi.mock('module', async (importOriginal) => {
     };
 });
 
-describe('downloadFile', async () => {
+describe('downloadFile', () => {
     const EXPECT_CONTENT = 'raw content';
     let result: string;
 
