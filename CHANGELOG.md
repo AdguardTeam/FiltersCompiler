@@ -9,7 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Ability to compile filters using local optimization statistics (`localOptimizationStatistics`).
+
 ### Changed
+
+- `compile()` type declaration: `whitelist`/`blacklist` now accept `null`/`undefined`.
+- `getOptimizationStatistics` deduplicates concurrent `percent.json` fetches via promise singleton.
 
 ### Deprecated
 

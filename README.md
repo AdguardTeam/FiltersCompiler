@@ -89,13 +89,14 @@ timestamped log to `logPath`.
 
 ## API Overview
 
-The library exports three functions:
+The library exports four functions:
 
-| Function                  | Purpose                                              |
-| ------------------------- | ---------------------------------------------------- |
-| `compile(...)`            | Compiles filter lists into platform-specific output  |
-| `validateJSONSchema(...)` | Validates built platform output against JSON schemas |
-| `validateLocales(...)`    | Validates locale translation files for completeness  |
+| Function                      | Purpose                                              |
+| ----------------------------- | ---------------------------------------------------- |
+| `compile(...)`                | Compiles filter lists into platform-specific output  |
+| `validateJSONSchema(...)`     | Validates built platform output against JSON schemas |
+| `validateLocales(...)`        | Validates locale translation files for completeness  |
+| `localOptimizationStatistics` | Caches optimization statistics for local compilation |
 
 ### `compile(...)`
 
@@ -161,6 +162,21 @@ Returns `{ ok: true }` when no problems are found. When warnings are
 found, `data` and `log` contain the per-locale details and `ok` is
 `false` only if at least one warning is critical. Throws when the
 locales directory is missing or empty.
+
+### `localOptimizationStatistics`
+
+A namespace for caching optimization statistics locally so that
+`compile()` reads each filter's `stats.json` from disk instead of
+fetching it from the remote server. `percent.json` (which determines
+which filters are optimizable) is always fetched remotely, even when
+using the local cache.
+
+It exposes `download`, `use`, and `reset` methods and throws
+`OptimizationStatsError` (an `Error` subclass carrying `filterId` and
+`sourcePath` fields) when stats for a filter cannot be retrieved.
+
+See [Local Optimization Statistics](#local-optimization-statistics)
+for a complete workflow.
 
 ## Usage Examples
 
@@ -386,7 +402,7 @@ const customPlatformsConfig = {
 
 `replacements[].from` is treated as a regular-expression pattern (it is
 passed to `new RegExp(from, 'g')`), not as literal text. Escape regex
-metacharacters in `from` when a literal match is intended.
+meta characters in `from` when a literal match is intended.
 
 ### Logging
 
@@ -429,6 +445,53 @@ Each writes its output to a subdirectory under `platformsPath`.
 | `EXTENSION_SAFARI`                  | `extension/safari`                  | AdGuard Browser Extension (Safari)        |
 | `EXTENSION_ANDROID_CONTENT_BLOCKER` | `extension/android-content-blocker` | AdGuard content blocker (Android)         |
 | `EXTENSION_UBLOCK`                  | `extension/ublock`                  | uBlock Origin-compatible output           |
+
+## Local Optimization Statistics
+
+`localOptimizationStatistics` provides a workflow for caching optimization statistics
+locally so that `compile()` reads each filter's `stats.json` from disk instead of fetching it
+from the remote server. `percent.json` (which determines which filters are optimizable) is
+always fetched remotely, even when using the local cache.
+
+### Directory layout
+
+```text
+<basePath>/
+  filters/
+    <filterId>/
+      stats.json                 # per-filter hit counts (STATS_JSON)
+```
+
+### Workflow
+
+1. Call `download(basePath, includedFilterIds, excludedFilterIds)` to save
+   `stats.json` for filters listed in the remote `percent.json`.
+   `includedFilterIds` limits processing to those IDs (default `[]` = all).
+   `excludedFilterIds` skips those IDs (default `[]` = none). The two cannot use both.
+2. Call `use(basePath)` before `compile()` to tell
+   `getOptimizationStatistics` to read stats from local files under
+   `basePath` instead of fetching from the remote server.
+3. Call `reset(basePath)` when done to remove the cache directory and clear
+   in-memory state.
+
+If stats for a filter can't be retrieved (missing local file, or a failed remote
+fetch), `getOptimizationStatistics` throws `OptimizationStatsError` — an `Error`
+subclass carrying `filterId` and `sourcePath` fields, so callers can build their
+own actionable message instead of matching on `error.message`.
+
+```js
+import { localOptimizationStatistics } from '@adguard/filters-compiler';
+
+// 1. Download stats for all optimizable filters to ./stats-cache
+await localOptimizationStatistics.download('./stats-cache');
+
+// 2. Tell compile() to read stats from the local cache
+localOptimizationStatistics.use('./stats-cache');
+await compile('./filters', undefined, undefined, './platforms', [], []);
+
+// 3. Clean up when done
+await localOptimizationStatistics.reset('./stats-cache');
+```
 
 ## Documentation
 

@@ -10,21 +10,19 @@ class CompilerLogger extends Logger {
     /**
      * File descriptor
      *
-     * @type {number | null}
-     *
      * @private
      */
-    #fd = null;
+    #fd: number | null = null;
+
+    /**
+     * Log file path, set after successful initialization.
+     */
+    logFile: string | undefined;
 
     /**
      * Helper to append message to log file
-     *
-     * @param {string} message
-     * @param {'INFO'|'WARN'|'ERROR'} level
-     *
-     * @private
      */
-    #append(message, level) {
+    #append(message: unknown, level: 'INFO' | 'WARN' | 'ERROR'): void {
         if (this.#fd == null) {
             return;
         }
@@ -36,19 +34,19 @@ class CompilerLogger extends Logger {
     }
 
     /** @inheritdoc */
-    info(message) {
+    info(message: unknown): void {
         super.info(message);
         this.#append(message, 'INFO');
     }
 
     /** @inheritdoc */
-    error(message) {
+    error(message: unknown): void {
         super.error(message);
         this.#append(message, 'ERROR');
     }
 
     /** @inheritdoc */
-    warn(message) {
+    warn(message: unknown): void {
         super.warn(message);
         this.#append(message, 'WARN');
     }
@@ -56,11 +54,11 @@ class CompilerLogger extends Logger {
     /**
      * Initializes logger
      *
-     * @param {string} logFilePath - log file path
+     * @param logFilePath - log file path
      *
      * The log file is opened with 'w' (truncate/create). Subsequent writes are appended.
      */
-    initialize(logFilePath) {
+    initialize(logFilePath: string | undefined): void {
         if (!logFilePath) {
             /* eslint-disable no-console */
             console.warn('Log file is not specified');
@@ -81,7 +79,7 @@ class CompilerLogger extends Logger {
             this.#fd = null;
         }
 
-        // Open (truncate) now; we’ll append to the same fd later.
+        // Open (truncate) now; we'll append to the same fd later.
         this.#fd = fs.openSync(logFilePath, 'w');
         this.logFile = logFilePath;
     }
@@ -89,7 +87,7 @@ class CompilerLogger extends Logger {
     /**
      * Optional: call to close the file descriptor when done (e.g., on shutdown)
      */
-    close() {
+    close(): void {
         if (this.#fd != null) {
             try {
                 fs.closeSync(this.#fd);

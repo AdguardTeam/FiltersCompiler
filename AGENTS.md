@@ -23,8 +23,8 @@ lists into platform-specific formats. It is consumed by [FiltersRegistry]
 to produce production filter builds for AdGuard products across all supported
 platforms (extensions and apps).
 
-The library exposes three public API functions: `compile`, `validateJSONSchema`,
-and `validateLocales`.
+The library exposes four public API functions: `compile`, `validateJSONSchema`,
+`validateLocales`, and `localOptimizationStatistics`.
 
 ## Technical Context
 
@@ -53,13 +53,13 @@ and `validateLocales`.
 
 ```text
 ├── src/
-│   ├── index.js                       # Public API entry point (3 exports)
+│   ├── index.js                       # Public API entry point (4 exports)
 │   ├── index.d.ts                     # Hand-written type declarations
 │   └── main/
 │       ├── builder.js                 # Core compilation pipeline orchestrator
 │       ├── converter.js               # Rule format conversion (AGF ↔ uBO)
 │       ├── validator.js               # Filter rule validation
-│       ├── optimization.js            # Hit-count-based rule optimization
+│       ├── optimization.ts            # Hit-count-based rule optimization
 │       ├── platforms-config.js        # Platform definitions and configuration
 │       ├── json-validator.js          # JSON schema validation for built filters
 │       ├── locales-validator.js       # Locale files completeness validation
@@ -69,12 +69,13 @@ and `validateLocales`.
 │       ├── rule/
 │       │   └── rule-masks.js          # Rule mask string constants
 │       └── utils/
-│           ├── log.js                 # CompilerLogger (wraps @adguard/logger)
+│           ├── log.ts                 # CompilerLogger (wraps @adguard/logger)
 │           ├── report.js              # Compilation report builder
 │           ├── builder-utils.js       # Helper functions (domain optimization)
 │           ├── extended-css-validator.js  # CSS selector validation
+│           ├── concurrent.ts          # Bounded-concurrency task runner
 │           ├── version.ts             # Version parsing and incrementing
-│           ├── webutils.js            # HTTP download via curl
+│           ├── webutils.ts            # HTTP download via curl
 │           ├── workaround.js          # Platform-specific hacks and workarounds
 │           ├── utils.js               # General utility functions
 │           └── trust-levels/          # Filter-list trust-level exclusion files
@@ -215,7 +216,7 @@ The following universal principles apply to the codebase:
 - **Dependency Direction** — dependencies point inward / downward; never from
   lower layers to higher ones.
 - **Explicit Boundaries** — module interfaces are intentional; no reaching into
-  internals. The public API surface is explicitly limited to 3 functions.
+  internals. The public API surface is explicitly limited to 4 functions.
 - **Data Flow Clarity** — data moves through the system in a predictable,
   traceable path (template → compiled rules → platform output).
 - **Minimize Coupling, Maximize Cohesion** — modules are self-contained and
@@ -247,7 +248,7 @@ src/index.js (Public API)
      ↓
 src/main/builder.js (Core Compilation Pipeline)
      ↓           ↓           ↓           ↓
-converter.js  validator.js  optimization.js  platforms/generator.js
+converter.js  validator.js  optimization.ts  platforms/generator.js
      ↓           ↓                             ↓
   workaround  extended-css                  platforms/filter.js
   rule-masks  validator                     workaround

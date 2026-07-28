@@ -22,7 +22,7 @@ module.exports = {
         },
     },
     plugins: [
-        'import',
+        'import', 'jsdoc',
     ],
     extends: [
         'airbnb-base',
@@ -39,6 +39,11 @@ module.exports = {
         'import/extensions': ['error', 'ignorePackages', {
             js: 'never',
             ts: 'never',
+        }],
+        'jsdoc/lines-before-block': ['warn', {
+            'lines': 1,
+            'ignoreSingleLines': true,
+            'ignoreSameLine': true,
         }],
         'indent': [
             'error',
@@ -151,6 +156,10 @@ module.exports = {
                 // that conflict with TS resolution
                 'import/no-unresolved': 'off',
                 'import/extensions': 'off',
+                // Legacy .js files predate this convention; scoped to .ts to avoid
+                // flagging pre-existing debt while still migrating.
+                'jsdoc/require-returns': 'error',
+                'jsdoc/require-returns-check': 'error',
             },
         },
     ],

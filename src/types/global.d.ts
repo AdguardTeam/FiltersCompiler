@@ -13,11 +13,6 @@
  * Remove this file once all source modules have been migrated to TypeScript.
  */
 
-declare module '*/utils/log.js' {
-    export const logger: {
-        initialize(logFilePath: string): void;
-        info(message: string): void;
-        error(message: string): void;
-        warn(message: string): void;
-    };
+declare module '*/rule/rule-masks.js' {
+    export const RuleMasks: Record<string, string>;
 }

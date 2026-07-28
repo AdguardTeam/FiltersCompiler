@@ -370,7 +370,7 @@ export const include = async (filterDir, directiveLine, excluded) => {
     const externalInclude = url.includes(':');
 
     const included = externalInclude
-        ? downloadFile(url)
+        ? await downloadFile(url)
         : readFile(path.join(filterDir, url));
 
     if (included) {
