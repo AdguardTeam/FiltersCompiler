@@ -1,7 +1,8 @@
 dist/
 node_modules/
 .idea
-.vscode/
+.vscode/*
+!.vscode/extensions.json
 .eslintcache
 *.iml
 pnpm-error.log

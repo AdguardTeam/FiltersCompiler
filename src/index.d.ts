@@ -2,7 +2,7 @@
  * Type declarations for the public API of @adguard/filters-compiler.
  *
  * These declarations provide TypeScript consumers with typed signatures for
- * the three exported functions. They are hand-written because the entry point
+ * the exported functions. They are hand-written because the entry point
  * (src/index.js) is JavaScript and is not processed by the TypeScript compiler.
  *
  * When src/index.js is eventually migrated to TypeScript, this file should be
@@ -31,14 +31,15 @@ export type CustomPlatformsConfig = Record<string, PlatformConfig>;
  * @param whitelist Whitelisted filter IDs.
  * @param blacklist Blacklisted filter IDs.
  * @param customPlatformsConfig Optional custom platform configurations.
+ * @returns Promise that resolves when compilation is complete.
  */
 export function compile(
     path: string,
     logPath: string | undefined,
     reportFile: string | undefined,
-    platformsPath: string,
-    whitelist: number[],
-    blacklist: number[],
+    platformsPath: string | null,
+    whitelist?: number[] | null,
+    blacklist?: number[] | null,
     customPlatformsConfig?: CustomPlatformsConfig,
 ): Promise<void>;
 
@@ -82,3 +83,12 @@ export function validateLocales(
     localesDirPath: string,
     requiredLocales: string[],
 ): ValidateLocalesResult;
+
+/**
+ * TS2834: Unable to resolve './main/optimization' on the consumer side.
+ * An explicit file extension is required to prevent this error.
+ * The mapping from `.js` to `.d.ts` is part of the specification;
+ * however, resolving a `.ts` file to a `.d.ts` file is not guaranteed.
+ * @see https://www.typescriptlang.org/docs/handbook/modules/reference.html#file-extension-substitution
+ */
+export { localOptimizationStatistics, OptimizationStatsError } from './main/optimization.js';

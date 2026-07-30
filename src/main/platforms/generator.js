@@ -17,7 +17,7 @@ import {
     modifyBaseFilterHeader,
 } from '../utils/workaround';
 import { convertToUbo } from '../converter';
-import { getFilterOptimizationConfig } from '../optimization';
+import { getOptimizationStatistics } from '../optimization';
 import { RuleMasks } from '../rule/rule-masks';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -1000,7 +1000,7 @@ const buildFilter = async (filterDir, platformsPath, whitelist, blacklist) => {
         return;
     }
 
-    const optimizationConfig = getFilterOptimizationConfig(filterId);
+    const optimizationConfig = await getOptimizationStatistics(filterId);
 
     // eslint-disable-next-line guard-for-in,no-restricted-syntax
     for (const platform in platformPathsConfig) {
@@ -1142,12 +1142,11 @@ export const parseDirectory = async (
  *
  * @async
  * @param {string} filtersDir - The directory containing filter files to be processed.
- * @param {string} platformsPath - The output path where the generated platform files will be stored.
+ * @param {string|null} platformsPath - The path where platform data will be generated; `null` skips platform output.
  * @param {Array<number>} whitelist - A list of whitelist filter IDs.
- * @param {Array<number>} blacklist - A list of blacklist filter IDs.
+ * @param {Array<number>|null} [whitelist] - A list of whitelist filter IDs.
+ * @param {Array<number>|null} [blacklist] - A list of blacklist filter IDs.
  * @returns {Promise<void>} Resolves when the generation process is complete.
- *
- * @throws {Error} If `platformsPath` or `platformPathsConfig` is not specified.
  */
 export const generate = async (filtersDir, platformsPath, whitelist, blacklist) => {
     if (!platformsPath) {

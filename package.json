@@ -4,8 +4,10 @@
     "homepage": "http://adguard.com",
     "type": "module",
     "main": "dist/index.js",
+    "types": "dist/index.d.ts",
     "files": [
-        "dist"
+        "dist",
+        "types"
     ],
     "exports": {
         ".": {
@@ -57,6 +59,7 @@
         "eslint-config-airbnb-base": "15.0.0",
         "eslint-import-resolver-exports": "1.0.0-beta.5",
         "eslint-plugin-import": "2.31.0",
+        "eslint-plugin-jsdoc": "63.2.0",
         "husky": "8.0.2",
         "markdownlint": "0.40.0",
         "markdownlint-cli": "0.48.0",

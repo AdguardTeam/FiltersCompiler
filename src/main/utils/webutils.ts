@@ -1,5 +1,6 @@
 /* eslint-disable global-require */
 import { createRequire } from 'module';
+
 import { logger } from './log';
 
 const require = createRequire(import.meta.url);
@@ -11,44 +12,48 @@ const USER_AGENT = 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) Apple
     + 'Chrome/63.0.3239.132 Mobile Safari/537.36';
 
 /**
- * Sync downloads file from url
+ * Downloads file from url
  *
  * @param url
- * @param {number} [retryNum=0] number of times to retry downloading, defaults to 0
- * @returns {*}
+ * @param retryNum number of times to retry downloading, defaults to 0
+ * @returns raw content of the file
  */
-const tryDownloadFile = function (url, retryNum = 0) {
+const tryDownloadFile = async function (url: string, retryNum = 0) {
     let args = ['--fail', '--silent', '--user-agent', USER_AGENT, '-L', url];
     if (retryNum) {
         args.push('--retry');
-        args.push(retryNum);
+        args.push(String(retryNum));
     }
-    const options = { encoding: 'utf8', maxBuffer: Infinity };
+    const options = { encoding: 'utf8' as const, maxBuffer: Infinity };
     const tlsCheck = process.env.TLS;
     if (tlsCheck === 'insecure') {
         args = ['--insecure'].concat(args);
     }
     return require('child_process')
-        .execFileSync('curl', args, options);
+        .execFileSync('curl', args, options) as string;
 };
 
 /**
- * Sync downloads file from url with two attempts
+ * Number of times to retry downloading after the first failed attempt for `downloadFile` function.
+ */
+export const RETRY_NUM = 5;
+
+/**
+ * Downloads file from url with two attempts
  *
  * @param url
- * @returns {*}
+ * @returns raw content of the file
  */
-export const downloadFile = (url) => {
+export const downloadFile = async (url: string) => {
     logger.info(`Downloading: ${url}`);
 
     // 5 times to retry after first fail attempt:
     // 1 sec for first time, double for every forthcoming attempts
     // so it will take: 1 + 2 + 4 + 8 + 16 = 31 seconds
     // https://curl.se/docs/manpage.html#--retry
-    const RETRY_NUM = 5;
 
     try {
-        return tryDownloadFile(url);
+        return await tryDownloadFile(url);
     } catch (e) {
         logger.warn(e);
         logger.warn(`Retry downloading: ${url}`);
