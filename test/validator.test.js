@@ -722,6 +722,35 @@ describe('validator', () => {
         });
     });
 
+    describe('validate urltransform modifier', () => {
+        describe('valid', () => {
+            const validRules = [
+                '||example.com^$urltransform=/firstpath/secondpath/',
+                '||example.com^$urltransform=/Has some text here/and here after slash/',
+                '||example.com^$urltransform=/a/b/i',
+                '||example.com^$third-party,urltransform=/foo/bar/',
+                '||example.com^$urltransform',
+                '@@||example.com^$urltransform',
+            ];
+            test.each(validRules)('%s', (rule) => {
+                expect(validateAndFilterRules([rule])).toHaveLength(1);
+            });
+        });
+
+        describe('invalid', () => {
+            const invalidRules = [
+                // value must use slash-delimited replace syntax
+                '||example.com^$urltransform=invalid',
+                '||example.com^$urltransform=/',
+                // urltransform is not negatable
+                '||example.com^$~urltransform=/a/b/',
+            ];
+            test.each(invalidRules)('%s', (rule) => {
+                expect(validateAndFilterRules([rule])).toHaveLength(0);
+            });
+        });
+    });
+
     it('safari_cb_affinity directive test', () => {
         let rules = [
             '||test1.com',

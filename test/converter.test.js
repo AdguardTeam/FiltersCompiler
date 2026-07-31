@@ -120,6 +120,12 @@ describe('converter', () => {
         c = convertRulesToAdgSyntax([String.raw`||example.org/*/*/$replace=/<item type=\"banner\">.{280\,400}.*<\/background><\/item>//`]);
         expect(c[0]).toBe(String.raw`||example.org/*/*/$replace=/<item type=\"banner\">.{280\,400}.*<\/background><\/item>//`);
 
+        c = convertRulesToAdgSyntax(['||example.com^$urltransform=/firstpath/secondpath/']);
+        expect(c[0]).toBe('||example.com^$urltransform=/firstpath/secondpath/');
+
+        c = convertRulesToAdgSyntax(['||example.com^$urltransform=/Has some text here/and here after slash/']);
+        expect(c[0]).toBe('||example.com^$urltransform=/Has some text here/and here after slash/');
+
         c = convertRulesToAdgSyntax(['||example.org^$permissions=geolocation=()']);
         expect(c[0]).toBe('||example.org^$permissions=geolocation=()');
 

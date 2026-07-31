@@ -5,6 +5,7 @@
 ! ##+js
 ! #$#
 ! $replace
+! $urltransform
 ! #%#
 ! #@%#
 !

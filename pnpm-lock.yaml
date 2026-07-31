@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@adguard/agtree':
-        specifier: 4.1.2
-        version: 4.1.2
+        specifier: 4.2.0
+        version: 4.2.0
       '@adguard/css-tokenizer':
         specifier: 1.2.0
         version: 1.2.0
@@ -18,8 +18,8 @@ importers:
         specifier: 2.0.1
         version: 2.0.1
       '@adguard/extended-css':
-        specifier: 2.1.1
-        version: 2.1.1
+        specifier: 2.2.0
+        version: 2.2.0
       '@adguard/filters-downloader':
         specifier: 2.4.4
         version: 2.4.4
@@ -27,11 +27,11 @@ importers:
         specifier: 2.0.0
         version: 2.0.0
       '@adguard/scriptlets':
-        specifier: 2.3.1
-        version: 2.3.1
+        specifier: 2.5.0
+        version: 2.5.0
       '@adguard/tsurlfilter':
-        specifier: 4.0.5
-        version: 4.0.5(@adguard/re2-wasm@1.2.0)
+        specifier: 6.0.2
+        version: 6.0.2
       '@eslint/css-tree':
         specifier: 3.6.6
         version: 3.6.6
@@ -114,8 +114,8 @@ importers:
 
 packages:
 
-  '@adguard/agtree@4.1.2':
-    resolution: {integrity: sha512-h4uUbO2esZiLhqJf0pXyvuGxRcu1U2EmIZ7NiovNjfB57kWHO3f0HuB6eRReWLoCFzLksJfiow61IMjH3WRxPA==}
+  '@adguard/agtree@4.2.0':
+    resolution: {integrity: sha512-rpdSH2oRESO2d0OhhLrvUPAh4nsX3uSCEz+1bNevUkGKtysGG404ZevSlSZEFEDNAuOPmyaCKA5dbQ5T2G20BA==}
     engines: {node: '>=22'}
 
   '@adguard/css-tokenizer@1.2.0':
@@ -129,8 +129,8 @@ packages:
   '@adguard/ecss-tree@2.0.1':
     resolution: {integrity: sha512-GvVz3rLQqcZkNVpUbdowimokhPxNL6pODwmZbiWTUfa3bEAT7XI+4ydxVZmtK2WS2u7qu/IISmI69PSFXE0ucw==}
 
-  '@adguard/extended-css@2.1.1':
-    resolution: {integrity: sha512-TsHZ20oUWhbtrzQ4w70B96oHkGBIUZg2FdMfkq4StGfLmXQb+kI7fQb6BtXP2D0bvraIHMq6/mtKExglDJ9vsg==}
+  '@adguard/extended-css@2.2.0':
+    resolution: {integrity: sha512-LCSQDGV1yvtbehNsFmv0nMFHxLtYAzu8by9QJd9zmS07ZsgL6n5YQ3TZzqaUdLvBIuTIuG4Lfn73xwuRk5J9Og==}
     engines: {node: '>=16'}
 
   '@adguard/filters-downloader@2.4.4':
@@ -141,19 +141,13 @@ packages:
     resolution: {integrity: sha512-jOiL0gy+uhrezJwI5j1mzpXyta1AFOhpEgKrqRlLN6puArFmHDmLH06civQs12tFWjtUCX+uGgUd1i4x/PCU1g==}
     engines: {node: '>=22'}
 
-  '@adguard/re2-wasm@1.2.0':
-    resolution: {integrity: sha512-yMtEJfThxN9rEYm2Zg3X8jUKaPYq5wByc90JbMspSWJo7MXw664gTvLD7/wijl6y79VSuAs77bXUIgBXutMp7A==}
-    engines: {node: '>=10'}
+  '@adguard/scriptlets@2.5.0':
+    resolution: {integrity: sha512-1DISQycmS1+KkYYvn9bl6PQIV84MdykM/Jyyu+iI8h3xpWJCudH0KR/b5g4qDYmKGBoGg6LclMsyLxzPdeje0A==}
+    engines: {pnpm: '>=10.33.4 <11'}
 
-  '@adguard/scriptlets@2.3.1':
-    resolution: {integrity: sha512-E60vnKYv4GIlvtAVriyf3SYZk/u10shlfogTJFQa8ZKS2HHMuRAUTk8Msn42mycmD/Kf9P9J17l1SvgwVJ+otg==}
-
-  '@adguard/tsurlfilter@4.0.5':
-    resolution: {integrity: sha512-s/Iv86M9KUXXAfeyps/hmEbX5tismn19lAVqIkFptBujnrV6uEY2bxthzRsBWxY39Y8ZFwrjhe9nyZ3HILbU3g==}
+  '@adguard/tsurlfilter@6.0.2':
+    resolution: {integrity: sha512-AAf0FLA0ySAJq31WMad/AluBr1OFaFX/XAwwfDb1Kg/Sq0nAAERyogfwYw2gOzZ5agcvNpDZoziSspxDIOMZ3g==}
     engines: {node: '>=22'}
-    hasBin: true
-    peerDependencies:
-      '@adguard/re2-wasm': 1.2.0
 
   '@es-joy/jsdoccomment@0.88.0':
     resolution: {integrity: sha512-GK/HL/claLLNo5KG705auIlZMwEtmn88ofSGuLsmVZwKBqMPJhW9DiznYNq07QEqz9BPtA3LBfYImtZmhVvRAw==}
@@ -870,10 +864,6 @@ packages:
   commander@11.1.0:
     resolution: {integrity: sha512-yPVavfyCcRhmorC7rWlkHn15b4wDVgVmBA7kV4QVBsF7kv/9TKJAbAXVTxvTnwP8HHKjRCJDClKbciiYS7p0DQ==}
     engines: {node: '>=16'}
-
-  commander@12.1.0:
-    resolution: {integrity: sha512-Vw8qHK3bZM9y/P10u3Vib8o/DdkvA2OtPtZvD871QKjy74Wj1WSKFILMPRPSdUSx5RFK1arlJzEtA4PkFgnbuA==}
-    engines: {node: '>=18'}
 
   commander@14.0.3:
     resolution: {integrity: sha512-H+y0Jo/T1RZ9qPP4Eh1pkcQcLRglraJaSLoyOtHxu6AapkjWVCy2Sit1QQ4x3Dng8qDlSsZEet7g5Pq06MvTgw==}
@@ -2477,7 +2467,7 @@ packages:
 
 snapshots:
 
-  '@adguard/agtree@4.1.2':
+  '@adguard/agtree@4.2.0':
     dependencies:
       '@adguard/css-tokenizer': 1.2.0
       camelcase-keys: 7.0.2
@@ -2501,7 +2491,7 @@ snapshots:
       '@adguard/css-tokenizer': 1.2.0
       '@eslint/css-tree': 3.6.6
 
-  '@adguard/extended-css@2.1.1': {}
+  '@adguard/extended-css@2.2.0': {}
 
   '@adguard/filters-downloader@2.4.4':
     dependencies:
@@ -2513,23 +2503,19 @@ snapshots:
 
   '@adguard/logger@2.0.0': {}
 
-  '@adguard/re2-wasm@1.2.0': {}
-
-  '@adguard/scriptlets@2.3.1':
+  '@adguard/scriptlets@2.5.0':
     dependencies:
-      '@adguard/agtree': 4.1.2
+      '@adguard/agtree': 4.2.0
       '@types/trusted-types': 2.0.7
       js-yaml: 3.14.1
 
-  '@adguard/tsurlfilter@4.0.5(@adguard/re2-wasm@1.2.0)':
+  '@adguard/tsurlfilter@6.0.2':
     dependencies:
-      '@adguard/agtree': 4.1.2
+      '@adguard/agtree': 4.2.0
       '@adguard/css-tokenizer': 1.2.0
       '@adguard/logger': 2.0.0
-      '@adguard/re2-wasm': 1.2.0
-      '@adguard/scriptlets': 2.3.1
+      '@adguard/scriptlets': 2.5.0
       cidr-tools: 6.4.2
-      commander: 12.1.0
       is-cidr: 4.0.2
       is-ip: 3.1.0
       lru-cache: 11.2.7
@@ -3184,8 +3170,6 @@ snapshots:
       delayed-stream: 1.0.0
 
   commander@11.1.0: {}
-
-  commander@12.1.0: {}
 
   commander@14.0.3: {}
 

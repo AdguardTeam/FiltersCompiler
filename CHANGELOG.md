@@ -45,10 +45,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - TypeScript toolchain for incremental adoption.
+- Support and tests for the `$urltransform` modifier.
 
 ### Changed
 
 - Updated [@adguard/filters-downloader] to v2.4.4.
+- Updated [@adguard/agtree] to v4.2.0.
+- Updated [@adguard/extended-css] to v2.2.0.
+- Updated [@adguard/scriptlets] to v2.5.0.
+- Updated [@adguard/tsurlfilter] to v6.0.2
 
 ### Fixed
 

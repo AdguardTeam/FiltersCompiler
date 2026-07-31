@@ -9,5 +9,6 @@
 #%#//scriptlet('trusted-
 #%#//scriptlet("trusted-
 $replace
+$urltransform
 #%#
 #@%#

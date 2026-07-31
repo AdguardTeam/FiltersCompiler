@@ -33,14 +33,14 @@
         "pnpm": ">=10.33.4 <11"
     },
     "dependencies": {
-        "@adguard/agtree": "4.1.2",
+        "@adguard/agtree": "4.2.0",
         "@adguard/css-tokenizer": "1.2.0",
         "@adguard/ecss-tree": "2.0.1",
-        "@adguard/extended-css": "2.1.1",
+        "@adguard/extended-css": "2.2.0",
         "@adguard/filters-downloader": "2.4.4",
         "@adguard/logger": "2.0.0",
-        "@adguard/scriptlets": "2.3.1",
-        "@adguard/tsurlfilter": "4.0.5",
+        "@adguard/scriptlets": "2.5.0",
+        "@adguard/tsurlfilter": "6.0.2",
         "@eslint/css-tree": "3.6.6",
         "ajv": "8.17.1",
         "child_process": "1.0.2",
