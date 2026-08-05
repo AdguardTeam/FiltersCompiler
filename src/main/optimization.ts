@@ -161,7 +161,7 @@ export const localOptimizationStatistics = {
      *
      * @param basePath - Directory to save `filters/<filterId>/stats.json` into.
      * @param includedFilterIds - Filter IDs to process; empty (default) processes all.
-     * @param excludedFilterIds - Filter IDs to skip; empty (default) skips none.
+     * @param excludedFilterIds - Filter IDs to exclude; empty (default) excludes none.
      * @throws {Error} When both `includedFilterIds` and `excludedFilterIds` are non-empty.
      */
     download: async (basePath: string, includedFilterIds: number[] = [], excludedFilterIds: number[] = []) => {

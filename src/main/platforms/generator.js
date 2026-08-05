@@ -824,12 +824,12 @@ export const writeLocalScriptRules = function (platformsPath) {
  * Loads and processes filter metadata from the specified directory.
  *
  * @param {string} filterDir - The directory containing the filter metadata and revision files.
- * @param {number[]} [whitelist] - An optional array of whitelist filter IDs.
- * @param {number[]} [blacklist] - An optional array of blacklist filter IDs.
+ * @param {number[]} [includedFilterIds] - An optional array of filter IDs to include.
+ * @param {number[]} [excludedFilterIds] - An optional array of filter IDs to exclude.
  * @returns {Object} The processed filter metadata.
  * @throws {Error} If the metadata or revision file cannot be read.
  */
-const loadFilterMetadata = function (filterDir, whitelist, blacklist) {
+const loadFilterMetadata = function (filterDir, includedFilterIds, excludedFilterIds) {
     const metadataFilePath = path.join(filterDir, metadataFile);
     const metadataString = readFile(metadataFilePath);
     if (!metadataString) {
@@ -852,8 +852,8 @@ const loadFilterMetadata = function (filterDir, whitelist, blacklist) {
 
     const { filterId } = result;
     if (
-        (whitelist && whitelist.includes(filterId))
-        || (blacklist && !blacklist.includes(filterId))
+        (includedFilterIds && includedFilterIds.includes(filterId))
+        || (excludedFilterIds && !excludedFilterIds.includes(filterId))
     ) {
         checkFilterId(metadataFilterIdsPool, filterId);
     }
@@ -977,10 +977,10 @@ const removeRuleDuplicates = function (list) {
  *
  * @param filterDir - Path to filter directory
  * @param platformsPath - Path to platforms folder
- * @param whitelist - Array of filter ids to whitelist
- * @param blacklist - Array of filter ids to blacklist
+ * @param includedFilterIds - Array of filter ids to include
+ * @param excludedFilterIds - Array of filter ids to exclude
  */
-const buildFilter = async (filterDir, platformsPath, whitelist, blacklist) => {
+const buildFilter = async (filterDir, platformsPath, includedFilterIds, excludedFilterIds) => {
     const originalRules = readFile(path.join(filterDir, filterFile)).split('\r\n');
 
     const metadataFilePath = path.join(filterDir, metadataFile);
@@ -990,13 +990,13 @@ const buildFilter = async (filterDir, platformsPath, whitelist, blacklist) => {
     const { filterId } = metadata;
     checkFilterId(filterIdsPool, filterId);
 
-    if (whitelist && whitelist.length > 0 && whitelist.indexOf(filterId) < 0) {
-        logger.info(`Filter ${filterId} skipped with whitelist`);
+    if (includedFilterIds && includedFilterIds.length > 0 && includedFilterIds.indexOf(filterId) < 0) {
+        logger.info(`Filter ${filterId} skipped due to '--include' option`);
         return;
     }
 
-    if (blacklist && blacklist.length > 0 && blacklist.indexOf(filterId) >= 0) {
-        logger.info(`Filter ${filterId} skipped with blacklist`);
+    if (excludedFilterIds && excludedFilterIds.length > 0 && excludedFilterIds.indexOf(filterId) >= 0) {
+        logger.info(`Filter ${filterId} skipped due to '--skip' option`);
         return;
     }
 
@@ -1094,16 +1094,16 @@ const isObsoleteFilter = (metadata) => metadata.tags && metadata.tags.some((tag)
  * @param filtersDir
  * @param filtersMetadata
  * @param platformsPath
- * @param whitelist
- * @param blacklist
+ * @param includedFilterIds
+ * @param excludedFilterIds
  * @param obsoleteFiltersMetadata
  */
 export const parseDirectory = async (
     filtersDir,
     filtersMetadata,
     platformsPath,
-    whitelist,
-    blacklist,
+    includedFilterIds,
+    excludedFilterIds,
     obsoleteFiltersMetadata,
 ) => {
     const items = fs.readdirSync(filtersDir);
@@ -1115,9 +1115,9 @@ export const parseDirectory = async (
             if (fs.existsSync(metadataFilePath)) {
                 logger.info(`Building filter platforms: ${directory}`);
                 // eslint-disable-next-line no-await-in-loop
-                await buildFilter(filterDir, platformsPath, whitelist, blacklist);
+                await buildFilter(filterDir, platformsPath, includedFilterIds, excludedFilterIds);
                 logger.info(`Building filter platforms: ${directory} done`);
-                const filterMetadata = loadFilterMetadata(filterDir, whitelist, blacklist);
+                const filterMetadata = loadFilterMetadata(filterDir, includedFilterIds, excludedFilterIds);
                 filtersMetadata.push(filterMetadata);
                 if (isObsoleteFilter(filterMetadata)) {
                     obsoleteFiltersMetadata.push(filterMetadata);
@@ -1128,8 +1128,8 @@ export const parseDirectory = async (
                     filterDir,
                     filtersMetadata,
                     platformsPath,
-                    whitelist,
-                    blacklist,
+                    includedFilterIds,
+                    excludedFilterIds,
                     obsoleteFiltersMetadata,
                 );
             }
@@ -1143,12 +1143,11 @@ export const parseDirectory = async (
  * @async
  * @param {string} filtersDir - The directory containing filter files to be processed.
  * @param {string|null} platformsPath - The path where platform data will be generated; `null` skips platform output.
- * @param {Array<number>} whitelist - A list of whitelist filter IDs.
- * @param {Array<number>|null} [whitelist] - A list of whitelist filter IDs.
- * @param {Array<number>|null} [blacklist] - A list of blacklist filter IDs.
+ * @param {Array<number>|null} [includedFilterIds] - A list of filter IDs to include.
+ * @param {Array<number>|null} [excludedFilterIds] - A list of filter IDs to exclude.
  * @returns {Promise<void>} Resolves when the generation process is complete.
  */
-export const generate = async (filtersDir, platformsPath, whitelist, blacklist) => {
+export const generate = async (filtersDir, platformsPath, includedFilterIds, excludedFilterIds) => {
     if (!platformsPath) {
         logger.warn('Platforms build output path is not specified');
         return;
@@ -1164,7 +1163,14 @@ export const generate = async (filtersDir, platformsPath, whitelist, blacklist) 
     const filtersMetadata = [];
     const obsoleteFiltersMetadata = [];
 
-    await parseDirectory(filtersDir, filtersMetadata, platformsPath, whitelist, blacklist, obsoleteFiltersMetadata);
+    await parseDirectory(
+        filtersDir,
+        filtersMetadata,
+        platformsPath,
+        includedFilterIds,
+        excludedFilterIds,
+        obsoleteFiltersMetadata,
+    );
 
     writeFiltersMetadata(platformsPath, filtersDir, filtersMetadata, obsoleteFiltersMetadata);
     writeLocalScriptRules(platformsPath);

@@ -105,9 +105,9 @@ function compile(
     path: string,
     logPath: string | undefined,
     reportFile: string | undefined,
-    platformsPath: string,
-    whitelist: number[],
-    blacklist: number[],
+    platformsPath: string | null,
+    includedFilterIds?: number[] | null,
+    excludedFilterIds?: number[] | null,
     customPlatformsConfig?: CustomPlatformsConfig,
 ): Promise<void>;
 ```
@@ -115,9 +115,9 @@ function compile(
 Compiles the filter lists in `path` for all configured platforms and
 writes the results to `platformsPath`.
 
-- `whitelist` — compile only the filter IDs listed here (empty array
+- `includedFilterIds` — compile only the filter IDs listed here (empty array
   compiles all filters).
-- `blacklist` — exclude the filter IDs listed here.
+- `excludedFilterIds` — exclude the filter IDs listed here.
 - `customPlatformsConfig` — overrides or extends the built-in platform
   definitions (see [Custom platforms](#custom-platforms)).
 
@@ -192,8 +192,8 @@ await compile(
     './log.txt',      // log file (omit to disable logging)
     './report.txt',   // compilation report
     './platforms',    // platform output directory
-    [],               // whitelist (empty = compile all)
-    [],               // blacklist (empty = exclude none)
+    [],               // includedFilterIds (empty = compile all)
+    [],               // excludedFilterIds (empty = exclude none)
 );
 ```
 
