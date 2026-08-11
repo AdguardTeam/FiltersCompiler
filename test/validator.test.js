@@ -408,6 +408,21 @@ describe('validator', () => {
         expect(validateAndFilterRules(rules)).toHaveLength(validRules.length);
     });
 
+    it('validate redirect-rule with googletagmanager redirect', () => {
+        // https://github.com/AdguardTeam/FiltersCompiler/issues/159
+        const rules = [
+            '||googletagmanager.com/gtag/js$script,redirect-rule=googletagmanager_gtm.js:5',
+            '||googletagmanager.com/gtag/js$script,redirect-rule=googletagmanager-gtm',
+            '||googletagmanager.com/gtag/js$script,redirect=googletagmanager-gtm',
+        ];
+
+        const validateRules = validateAndFilterRules(rules);
+        expect(validateRules).toHaveLength(rules.length);
+        expect(validateRules).toContain(rules[0]);
+        expect(validateRules).toContain(rules[1]);
+        expect(validateRules).toContain(rules[2]);
+    });
+
     describe('Test validation - incorrect domain option', () => {
         const invalidRules = [
             '|http*$domain=',

@@ -597,6 +597,12 @@ describe('converter', () => {
             expected = '||googletagservices.com/test.js$domain=test.com,redirect=googletagservices-gpt';
             expect(actual[0]).toBe(expected);
 
+            // priority suffix and uBO resource name are stripped during conversion
+            // https://github.com/AdguardTeam/FiltersCompiler/issues/159
+            actual = convertRulesToAdgSyntax(['||googletagmanager.com/gtag/js$script,redirect-rule=googletagmanager_gtm.js:5']);
+            expected = '||googletagmanager.com/gtag/js$script,redirect-rule=google-analytics';
+            expect(actual[0]).toBe(expected);
+
             actual = convertRulesToAdgSyntax(['||delivery.tf1.fr/pub$media,rewrite=abp-resource:blank-mp3,domain=tf1.fr']);
             expected = '||delivery.tf1.fr/pub$media,redirect=noopmp3-0.1s,domain=tf1.fr';
             expect(actual[0]).toBe(expected);
