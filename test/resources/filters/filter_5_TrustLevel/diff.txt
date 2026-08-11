@@ -2,6 +2,8 @@
 test.com#%#AG_setConstant("ads", "false");
 ! ||example.com/api/v1/ad/*/json$replace=/html/abcd\,/i is excluded by "$replace" in exclusions-high.txt
 ||example.com/api/v1/ad/*/json$replace=/html/abcd\,/i
+! ||example.com^$urltransform=/firstpath/secondpath/ is excluded by "$urltransform" in exclusions-high.txt
+||example.com^$urltransform=/firstpath/secondpath/
 ! test.com#@%#Object.defineProperty(window, 'abcde', { get: function() { return []; } }); is excluded by "#@%#" in exclusions-high.txt
 test.com#@%#Object.defineProperty(window, 'abcde', { get: function() { return []; } });
 ! Rule "example.com##^script:has-text(12313)" converted to: "example.com$$script:contains(12313)"

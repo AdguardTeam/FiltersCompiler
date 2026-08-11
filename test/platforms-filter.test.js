@@ -188,6 +188,46 @@ describe('platforms filter', () => {
         expect(after).toEqual(notMatchRules);
     });
 
+    it('Test remove urltransform modifier patterns', () => {
+        const config = {
+            'platform': 'test',
+            'path': 'hints',
+            'configuration': {
+                'removeRulePatterns': [
+                    '\\$(?!#|(path|domain)=.*]|.*removeparam=).*urltransform(,|=|$)',
+                ],
+                'ignoreRuleHints': false,
+            },
+        };
+
+        const notMatchRules = [
+            '! Comment',
+            'example.com',
+            'example.com,content-examples.com###ad3',
+            'example.com##.sidebar_list > .widget_text:has(a[title = "urltransform"])',
+            '@@||example.com^$elemhide,content,jsinject',
+            '||example.com/link/urltransform/path^',
+            '||example.com^$domain=example.com',
+            // `$removeparam=urltransform` should not be treated as `$urltransform`
+            '||example.com^$removeparam=urltransform',
+        ];
+        const matchRules = [
+            '||example.com^$urltransform=/firstpath/secondpath/',
+            '@@||example.com^$urltransform=/firstpath/secondpath/',
+            '||example.com^$third-party,urltransform=/firstpath/secondpath/',
+        ];
+
+        const before = [
+            ...notMatchRules,
+            ...matchRules,
+        ];
+
+        const after = cleanupRules(before, config, 0);
+
+        expect(after).toBeDefined();
+        expect(after).toEqual(notMatchRules);
+    });
+
     it('Test remove generic CSS rule patterns', () => {
         const config = {
             'platform': 'test',

@@ -51,7 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - TypeScript toolchain for incremental adoption.
-- Support and tests for the `$urltransform` modifier.
+- Support of `$urltransform` modifier [tsurlfilter#111].
 
 ### Changed
 
@@ -64,6 +64,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Corrected the public type declarations for validation function return values.
+
+[tsurlfilter#111]: https://github.com/AdguardTeam/tsurlfilter/issues/111
 
 ## [3.2.9] - 2026-04-21
 

@@ -729,7 +729,7 @@ describe('validator', () => {
                 '||example.com^$urltransform=/Has some text here/and here after slash/',
                 '||example.com^$urltransform=/a/b/i',
                 '||example.com^$third-party,urltransform=/foo/bar/',
-                '||example.com^$urltransform',
+                // valueless urltransform is allowed only in exception rules
                 '@@||example.com^$urltransform',
             ];
             test.each(validRules)('%s', (rule) => {
@@ -742,6 +742,9 @@ describe('validator', () => {
                 // value must use slash-delimited replace syntax
                 '||example.com^$urltransform=invalid',
                 '||example.com^$urltransform=/',
+                // valueless urltransform is not allowed in blocking rules
+                '||example.com^$urltransform',
+                '||example.com^$urltransform=',
                 // urltransform is not negatable
                 '||example.com^$~urltransform=/a/b/',
             ];

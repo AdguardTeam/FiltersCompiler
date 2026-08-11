@@ -92,6 +92,37 @@ class RuleValidator {
     }
 
     /**
+     * Validates that the `$urltransform` modifier has a value.
+     *
+     * Per the spec, a `$urltransform` rule finds and replaces an url part,
+     * so the value is required in blocking rules. It can be empty only in
+     * exception (allowlist) rules that disable all `$urltransform` rules.
+     *
+     * @param {AnyRule} ruleNode Network rule node.
+     * @param {string} ruleText Rule text for error messages.
+     *
+     * @returns {string|null} Error message, or null if the rule is valid.
+     */
+    static validateUrltransformModifier(ruleNode, ruleText) {
+        // empty value is allowed only for exception rules
+        if (ruleNode.exception) {
+            return null;
+        }
+
+        const modifiers = ruleNode.modifiers?.children ?? [];
+        const hasValuelessUrltransform = modifiers.some(
+            (modifier) => modifier.name.value === 'urltransform' && !modifier.value?.value,
+        );
+
+        if (hasValuelessUrltransform) {
+            // eslint-disable-next-line max-len
+            return `Error: "$urltransform modifier requires a value in blocking rules" in the rule: "${ruleText}"`;
+        }
+
+        return null;
+    }
+
+    /**
      * Validates rule node.
      *
      * @param {AnyRule} ruleNode Rule node to validate.
@@ -120,6 +151,12 @@ class RuleValidator {
                 // eslint-disable-next-line no-new
                 new CosmeticRule(text, 0);
                 return RuleValidator.createValidationResult(true);
+            }
+
+            // `$urltransform` value is required in blocking rules
+            const urltransformError = RuleValidator.validateUrltransformModifier(ruleNode, text);
+            if (urltransformError) {
+                return RuleValidator.createValidationResult(false, urltransformError);
             }
 
             // Validate network rules
