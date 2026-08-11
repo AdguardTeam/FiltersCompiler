@@ -28,8 +28,8 @@ export type CustomPlatformsConfig = Record<string, PlatformConfig>;
  * @param logPath Path for the compilation log file (logging disabled if omitted).
  * @param reportFile Path for the compilation report file.
  * @param platformsPath Path for platform-specific output.
- * @param whitelist Whitelisted filter IDs.
- * @param blacklist Blacklisted filter IDs.
+ * @param includedFilterIds Filter IDs to include; empty (default) processes all.
+ * @param excludedFilterIds Filter IDs to exclude; empty (default) excludes none.
  * @param customPlatformsConfig Optional custom platform configurations.
  * @returns Promise that resolves when compilation is complete.
  */
@@ -38,8 +38,8 @@ export function compile(
     logPath: string | undefined,
     reportFile: string | undefined,
     platformsPath: string | null,
-    whitelist?: number[] | null,
-    blacklist?: number[] | null,
+    includedFilterIds?: number[] | null,
+    excludedFilterIds?: number[] | null,
     customPlatformsConfig?: CustomPlatformsConfig,
 ): Promise<void>;
 

@@ -639,11 +639,11 @@ const makeRevision = function (path, hash) {
  * Builds filter txt file from directory contents
  *
  * @param {string} filterDir - The path to the directory containing filters.
- * @param {Array<number>|null} [whitelist] - An array whitelist filters IDs.
- * @param {Array<number>|null} [blacklist] - An array blacklist filters IDs.
+ * @param {Array<number>|null} [includedFilterIds] - An array of filter IDs to include.
+ * @param {Array<number>|null} [excludedFilterIds] - An array of filter IDs to exclude.
  * @returns {Promise<void>} A promise that resolves when all filters and its subdirectories have been processed.
  */
-const buildFilter = async function (filterDir, whitelist, blacklist) {
+const buildFilter = async function (filterDir, includedFilterIds, excludedFilterIds) {
     const templateContent = readFile(path.join(filterDir, TEMPLATE_FILE));
     if (!templateContent) {
         throw new Error('Invalid template');
@@ -660,12 +660,12 @@ const buildFilter = async function (filterDir, whitelist, blacklist) {
         return;
     }
 
-    if (whitelist && whitelist.length > 0 && whitelist.indexOf(filterId) < 0) {
+    if (includedFilterIds && includedFilterIds.length > 0 && includedFilterIds.indexOf(filterId) < 0) {
         logger.info(`Filter ${filterId} skipped due to '--include' option`);
         return;
     }
 
-    if (blacklist && blacklist.length > 0 && blacklist.indexOf(filterId) >= 0) {
+    if (excludedFilterIds && excludedFilterIds.length > 0 && excludedFilterIds.indexOf(filterId) >= 0) {
         logger.info(`Filter ${filterId} skipped due to '--skip' option`);
         return;
     }
@@ -705,14 +705,14 @@ const buildFilter = async function (filterDir, whitelist, blacklist) {
 };
 
 /**
- * Asynchronously parses a directory and processes filters based on the provided whitelist and blacklist.
+ * Asynchronously parses a directory and processes filters based on the provided included/excluded filter IDs.
  *
  * @param {string} filtersDir - The path to the directory containing filters.
- * @param {Array<number>|null} [whitelist] - An array whitelist filters IDs.
- * @param {Array<number>|null} [blacklist] - An array blacklist filters IDs.
+ * @param {Array<number>|null} [includedFilterIds] - An array of filter IDs to include.
+ * @param {Array<number>|null} [excludedFilterIds] - An array of filter IDs to exclude.
  * @returns {Promise<void>} A promise that resolves when all filters and its subdirectories have been processed.
  */
-const parseDirectory = async function (filtersDir, whitelist, blacklist) {
+const parseDirectory = async function (filtersDir, includedFilterIds, excludedFilterIds) {
     const items = fs.readdirSync(filtersDir)
         .sort((a, b) => getFilterIdFromDirName(a) - getFilterIdFromDirName(b));
 
@@ -724,11 +724,11 @@ const parseDirectory = async function (filtersDir, whitelist, blacklist) {
             if (fs.existsSync(template)) {
                 logger.info(`Building filter ${directory}...`);
                 // eslint-disable-next-line no-await-in-loop
-                await buildFilter(filterDir, whitelist, blacklist);
+                await buildFilter(filterDir, includedFilterIds, excludedFilterIds);
                 logger.info(`Filter ${directory} ok`);
             } else {
                 // eslint-disable-next-line no-await-in-loop
-                await parseDirectory(filterDir, whitelist, blacklist);
+                await parseDirectory(filterDir, includedFilterIds, excludedFilterIds);
             }
         }
     }
@@ -744,8 +744,8 @@ const parseDirectory = async function (filtersDir, whitelist, blacklist) {
  * @param {string} reportFile - The path to the report file to be created.
  * @param {string|null} platformsPath - The path where platform data will be generated; `null` skips platform output.
  * @param {Object} platformsConfig - The configuration object for platforms.
- * @param {Array<number>|null} [whitelist] - A list of filter file names to include in processing.
- * @param {Array<number>|null} [blacklist] - A list of filter file names to exclude from processing.
+ * @param {Array<number>|null} [includedFilterIds] - A list of filter IDs to include in processing.
+ * @param {Array<number>|null} [excludedFilterIds] - A list of filter IDs to exclude from processing.
  * @returns {Promise<void>} A promise that resolves when the build process is complete.
  */
 export const build = async (
@@ -754,16 +754,16 @@ export const build = async (
     reportFile,
     platformsPath,
     platformsConfig,
-    whitelist,
-    blacklist,
+    includedFilterIds,
+    excludedFilterIds,
 ) => {
     logger.initialize(logFile);
     init(FILTER_FILE, METADATA_FILE, REVISION_FILE, platformsConfig, ADGUARD_FILTERS_SERVER_URL);
 
-    await parseDirectory(filtersDir, whitelist, blacklist);
+    await parseDirectory(filtersDir, includedFilterIds, excludedFilterIds);
 
     logger.info('Generating platforms');
-    await generate(filtersDir, platformsPath, whitelist, blacklist);
+    await generate(filtersDir, platformsPath, includedFilterIds, excludedFilterIds);
     logger.info('Generating platforms done');
     create(reportFile);
 };

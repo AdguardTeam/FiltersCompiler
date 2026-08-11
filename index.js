@@ -20,7 +20,15 @@ process.on('unhandledRejection', (error) => {
     throw error;
 });
 
-export const compile = (path, logPath, reportFile, platformsPath, whitelist, blacklist, customPlatformsConfig) => {
+export const compile = (
+    path,
+    logPath,
+    reportFile,
+    platformsPath,
+    includedFilterIds,
+    excludedFilterIds,
+    customPlatformsConfig,
+) => {
     if (customPlatformsConfig) {
         logger.info('Using custom platforms configuration');
         // eslint-disable-next-line no-restricted-syntax, guard-for-in
@@ -36,8 +44,8 @@ export const compile = (path, logPath, reportFile, platformsPath, whitelist, bla
         reportFile,
         platformsPath,
         platformsConfig,
-        whitelist,
-        blacklist,
+        includedFilterIds,
+        excludedFilterIds,
     );
 };
 
