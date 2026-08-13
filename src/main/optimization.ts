@@ -155,7 +155,7 @@ export const localOptimizationStatistics = {
     /**
      * Downloads `stats.json` files for filters listed in the remote
      * `percent.json` and saves them to disk.
-     * Existing `stats.json` files will be overwritten.
+     * Clear the `basePath` directory before downloading statistics.
      *
      * `includedFilterIds` and `excludedFilterIds` cannot both be non-empty.
      *
@@ -168,6 +168,8 @@ export const localOptimizationStatistics = {
         if (includedFilterIds.length > 0 && excludedFilterIds.length > 0) {
             throw new Error('includedFilterIds and excludedFilterIds cannot both be non-empty');
         }
+
+        await fs.rm(basePath, { recursive: true, force: true });
 
         const percent = JSON.parse(await downloadOptimizationPercent()) as PercentJson;
 
