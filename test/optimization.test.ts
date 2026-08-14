@@ -105,7 +105,7 @@ describe('localOptimizationStatistics', () => {
             await localOptimizationStatistics.reset(tmpDir);
         });
 
-        it('downloads stats only for the included filter excluding those in excludedFilterIds', () => {
+        it('downloads stats only for included filters not excluded', () => {
             const statsCalls = downloadFile.mock.calls.filter(([url]) => url.includes(`/${STATS_JSON}`));
             expect(statsCalls).toHaveLength(1);
             expect(statsCalls[0][0]).toContain(`/${FILTERS_DIR_NAME}/${INCLUDED_FILTER_ID}/${STATS_JSON}`);
