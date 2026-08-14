@@ -154,8 +154,9 @@ export function assertValidStats(filterId: number, stats: unknown): asserts stat
 export const localOptimizationStatistics = {
     /**
      * Downloads `stats.json` files for filters listed in the remote
-     * `percent.json` and saves them to disk.
-     * Clear the `basePath` directory before downloading statistics.
+     * `percent.json` and saves them to disk. Downloads into a staged
+     * directory first and swaps it in only after all downloads succeed,
+     * so a failed refresh leaves any previously cached stats intact.
      *
      * `includedFilterIds` and `excludedFilterIds` cannot both be non-empty.
      *
@@ -168,8 +169,6 @@ export const localOptimizationStatistics = {
         if (includedFilterIds.length > 0 && excludedFilterIds.length > 0) {
             throw new Error('includedFilterIds and excludedFilterIds cannot both be non-empty');
         }
-
-        await fs.rm(basePath, { recursive: true, force: true });
 
         const percent = JSON.parse(await downloadOptimizationPercent()) as PercentJson;
 
@@ -184,6 +183,8 @@ export const localOptimizationStatistics = {
         });
 
         const FILTERS_PATH = path.join(basePath, FILTERS_DIR_NAME);
+        const STAGED_PREFIX = `${process.pid}_${Date.now()}`;
+        const STAGED_FILTERS_PATH = path.join(basePath, `${STAGED_PREFIX}_${FILTERS_DIR_NAME}`);
 
         /**
          * Bounds concurrency so a large `percent.json` cannot fan out into unbounded
@@ -191,13 +192,26 @@ export const localOptimizationStatistics = {
          */
         const DOWNLOAD_CONCURRENCY = 8;
 
-        await mapWithConcurrency(configs, DOWNLOAD_CONCURRENCY, async ({ filterId }) => {
-            const dir = path.join(FILTERS_PATH, String(filterId));
-            const statsPath = path.join(dir, STATS_JSON);
-            const content = await downloadOptimizationStats(filterId);
-            await fs.mkdir(dir, { recursive: true });
-            await fs.writeFile(statsPath, content, 'utf-8');
-        });
+        try {
+            await fs.mkdir(STAGED_FILTERS_PATH, { recursive: true });
+            await mapWithConcurrency(configs, DOWNLOAD_CONCURRENCY, async ({ filterId }) => {
+                const dir = path.join(STAGED_FILTERS_PATH, String(filterId));
+                const statsPath = path.join(dir, STATS_JSON);
+                const content = await downloadOptimizationStats(filterId);
+                await fs.mkdir(dir, { recursive: true });
+                await fs.writeFile(statsPath, content, 'utf-8');
+            });
+        } catch (error) {
+            // Downloads incomplete: staged dir is garbage, safe to discard.
+            await fs.rm(STAGED_FILTERS_PATH, { recursive: true, force: true });
+            throw error;
+        }
+
+        // Swap only after every fetch succeeded. From here on, staged dir is
+        // a complete cache — never rm it on failure, that'd destroy the only
+        // remaining valid copy once the old FILTERS_PATH is gone.
+        await fs.rm(FILTERS_PATH, { recursive: true, force: true });
+        await fs.rename(STAGED_FILTERS_PATH, FILTERS_PATH);
     },
 
     /**
