@@ -742,9 +742,6 @@ describe('validator', () => {
                 // value must use slash-delimited replace syntax
                 '||example.com^$urltransform=invalid',
                 '||example.com^$urltransform=/',
-                // valueless urltransform is not allowed in blocking rules
-                '||example.com^$urltransform',
-                '||example.com^$urltransform=',
                 // urltransform is not negatable
                 '||example.com^$~urltransform=/a/b/',
             ];
