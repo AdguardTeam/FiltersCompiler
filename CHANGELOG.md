@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `localOptimizationStatistics.download(basePath: string, includedFilterIds, excludedFilterIds)`:
   Allow both `includedFilterIds` and `excludedFilterIds` to be used at once.
+- `localOptimizationStatistics.download(basePath)`: Clear the `basePath` directory before downloading statistics.
 
 ### Deprecated
 
