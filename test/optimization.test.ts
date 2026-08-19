@@ -198,6 +198,57 @@ describe('localOptimizationStatistics', () => {
             });
         });
     });
+
+    describe('download() preserves existing cache when a later refresh fails', () => {
+        let tmpDir: string;
+        let originalStats: string;
+        let downloadError: unknown;
+
+        const defaultImpl = downloadFile.getMockImplementation()!;
+        const NETWORK_FAILURE_MESSAGE = 'network failure';
+
+        beforeAll(async () => {
+            tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'opt-test-'));
+            vi.clearAllMocks();
+
+            // Seed a valid cache first.
+            await localOptimizationStatistics.download(tmpDir);
+            originalStats = await fs.readFile(
+                path.join(tmpDir, FILTERS_DIR_NAME, String(VALID_FILTER_ID), STATS_JSON),
+                'utf-8',
+            );
+
+            // percent.json still resolves, but every stats.json fetch now fails,
+            // simulating a network error partway through a refresh.
+            downloadFile.mockImplementation((url: string) => {
+                if (url.includes(PERCENT_JSON)) {
+                    return JSON.stringify(MOCK_PERCENT_JSON);
+                }
+                throw new Error(NETWORK_FAILURE_MESSAGE);
+            });
+
+            downloadError = await localOptimizationStatistics.download(tmpDir).catch((e: unknown) => e);
+        });
+
+        afterAll(async () => {
+            downloadFile.mockImplementation(defaultImpl);
+            await localOptimizationStatistics.reset(tmpDir);
+        });
+
+        it('rejects instead of silently keeping stale data, and does not leave a staged directory behind', async () => {
+            expect(downloadError).toBeInstanceOf(Error);
+            expect((downloadError as Error).message).toBe(NETWORK_FAILURE_MESSAGE);
+
+            const entries = await fs.readdir(tmpDir);
+            expect(entries).toEqual([FILTERS_DIR_NAME]);
+        });
+
+        it('keeps the previously cached stats.json intact', async () => {
+            const statsPath = path.join(tmpDir, FILTERS_DIR_NAME, String(VALID_FILTER_ID), STATS_JSON);
+            const currentStats = await fs.readFile(statsPath, 'utf-8');
+            expect(currentStats).toBe(originalStats);
+        });
+    });
 });
 
 describe('getOptimizationStatistics()', () => {
