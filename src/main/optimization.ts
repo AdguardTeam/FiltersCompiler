@@ -158,29 +158,21 @@ export const localOptimizationStatistics = {
      * directory first and swaps it in only after all downloads succeed,
      * so a failed refresh leaves any previously cached stats intact.
      *
-     * `includedFilterIds` and `excludedFilterIds` cannot both be non-empty.
+     * When both `includedFilterIds` and `excludedFilterIds` are non-empty,
+     * a filter is processed only if it is in `includedFilterIds` and not in
+     * `excludedFilterIds`.
      *
      * @param basePath - Directory to save `filters/<filterId>/stats.json` into.
      * @param includedFilterIds - Filter IDs to process; empty (default) processes all.
      * @param excludedFilterIds - Filter IDs to exclude; empty (default) excludes none.
-     * @throws {Error} When both `includedFilterIds` and `excludedFilterIds` are non-empty.
      */
     download: async (basePath: string, includedFilterIds: number[] = [], excludedFilterIds: number[] = []) => {
-        if (includedFilterIds.length > 0 && excludedFilterIds.length > 0) {
-            throw new Error('includedFilterIds and excludedFilterIds cannot both be non-empty');
-        }
-
         const percent = JSON.parse(await downloadOptimizationPercent()) as PercentJson;
 
-        const configs = percent.config.filter(({ filterId }) => {
-            if (includedFilterIds.length > 0) {
-                return includedFilterIds.includes(filterId);
-            }
-            if (excludedFilterIds.length > 0) {
-                return !excludedFilterIds.includes(filterId);
-            }
-            return true;
-        });
+        const configs = percent.config.filter(
+            ({ filterId }) => (includedFilterIds.length === 0 || includedFilterIds.includes(filterId))
+            && (excludedFilterIds.length === 0 || !excludedFilterIds.includes(filterId)),
+        );
 
         const FILTERS_PATH = path.join(basePath, FILTERS_DIR_NAME);
         const STAGED_PREFIX = `${process.pid}_${Date.now()}`;

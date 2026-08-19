@@ -87,12 +87,28 @@ describe('localOptimizationStatistics', () => {
     });
 
     describe('download() with both includedFilterIds and excludedFilterIds non-empty', () => {
-        it('throws', async () => {
-            const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'opt-test-'));
-            await expect(
-                localOptimizationStatistics.download(tmpDir, [VALID_FILTER_IDS[0]], [VALID_FILTER_IDS[1]]),
-            ).rejects.toThrow('includedFilterIds and excludedFilterIds cannot both be non-empty');
+        let tmpDir: string;
+
+        const [INCLUDED_FILTER_ID, EXCLUDED_FILTER_ID] = VALID_FILTER_IDS;
+
+        beforeAll(async () => {
+            tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'opt-test-'));
+            vi.clearAllMocks();
+            await localOptimizationStatistics.download(
+                tmpDir,
+                [INCLUDED_FILTER_ID, EXCLUDED_FILTER_ID],
+                [EXCLUDED_FILTER_ID],
+            );
+        });
+
+        afterAll(async () => {
             await localOptimizationStatistics.reset(tmpDir);
+        });
+
+        it('downloads stats only for included filters not excluded', () => {
+            const statsCalls = downloadFile.mock.calls.filter(([url]) => url.includes(`/${STATS_JSON}`));
+            expect(statsCalls).toHaveLength(1);
+            expect(statsCalls[0][0]).toContain(`/${FILTERS_DIR_NAME}/${INCLUDED_FILTER_ID}/${STATS_JSON}`);
         });
     });
 
