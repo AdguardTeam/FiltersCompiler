@@ -11,10 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- `localOptimizationStatistics.download(basePath: string, includedFilterIds, excludedFilterIds)`:
-  Allow both `includedFilterIds` and `excludedFilterIds` to be used at once.
-- `localOptimizationStatistics.download(basePath)`: Clear the `basePath` directory before downloading statistics.
-
 ### Deprecated
 
 ### Removed
@@ -22,6 +18,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 ### Security
+
+## [3.3.0-beta.1] - 2026-08-20
+
+### Changed
+
+- `localOptimizationStatistics.download(basePath: string, includedFilterIds, excludedFilterIds)`:
+  Allow both `includedFilterIds` and `excludedFilterIds` to be used at once.
+- `localOptimizationStatistics.download(basePath)`: Clear the `basePath` directory before downloading statistics.
 
 ## [3.2.12] - 2026-08-10
 
@@ -899,7 +903,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [@adguard/tsurlfilter]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/tsurlfilter/CHANGELOG.md
 [@adguard/logger]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/logger/CHANGELOG.md
 
-[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.2.12...HEAD
+[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.3.0-beta.1...HEAD
+[3.3.0-beta.1]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.2.12...v3.3.0-beta.1
 [3.2.12]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.2.11...v3.2.12
 [3.2.11]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.2.10...v3.2.11
 [3.2.10]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.2.10-beta.0...v3.2.10
