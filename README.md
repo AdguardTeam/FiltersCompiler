@@ -467,7 +467,8 @@ always fetched remotely, even when using the local cache.
 1. Call `download(basePath, includedFilterIds, excludedFilterIds)` to save
    `stats.json` for filters listed in the remote `percent.json`.
    `includedFilterIds` limits processing to those IDs (default `[]` = all).
-   `excludedFilterIds` skips those IDs (default `[]` = none). The two cannot use both.
+   `excludedFilterIds` skips those IDs (default `[]` = none). When both are
+   given, a filter is processed only if it is included and not excluded.
 2. Call `use(basePath)` before `compile()` to tell
    `getOptimizationStatistics` to read stats from local files under
    `basePath` instead of fetching from the remote server.

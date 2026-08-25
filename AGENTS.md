@@ -266,7 +266,7 @@ Public API layer.
   compilation logic (header rewriting, EasyList filtering, rule filtering).
   Violates Single Responsibility Principle.
 - Global mutable state in `src/main/platforms/generator.js` and
-  `src/main/optimization.js` — module-level variables set by `init()` make the
+  `src/main/optimization.ts` — module-level variables set by `init()` make the
   code non-reentrant-safe. The TODO in `generator.js` confirms this is known.
 - Synchronous I/O throughout (`readFileSync`, `writeFileSync`,
   `execFileSync`) — acceptable for a build tool, but prevents use in
