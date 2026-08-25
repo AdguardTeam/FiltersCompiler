@@ -3,7 +3,8 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import crypto from 'crypto';
-import moment from 'moment';
+import { format } from 'date-fns';
+import { utc } from '@date-fns/utc';
 
 import { FiltersDownloader } from '@adguard/filters-downloader';
 import { logger } from '../utils/log';
@@ -103,7 +104,7 @@ const readFile = function (path) {
  * @param platformsJsonExpires
  * @returns {[*,*,*,*,string]}
  */
-const makeHeader = function (metadataFile, revisionFile, platformsJsonExpires) {
+export const makeHeader = function (metadataFile, revisionFile, platformsJsonExpires) {
     const metadataString = readFile(metadataFile);
     if (!metadataString) {
         throw new Error('Error reading metadata');
@@ -126,7 +127,7 @@ const makeHeader = function (metadataFile, revisionFile, platformsJsonExpires) {
         `! Title: ${metadata.name}`,
         `! Description: ${metadata.description}`,
         `! Version: ${revision.version}`,
-        `! TimeUpdated: ${moment(revision.timeUpdated).format()}`,
+        `! TimeUpdated: ${format(revision.timeUpdated, 'yyyy-MM-dd\'T\'HH:mm:ssxxx', { in: utc })}`,
         `! Expires: ${expires} (update frequency)`,
     ];
 };
@@ -829,7 +830,7 @@ export const writeLocalScriptRules = function (platformsPath) {
  * @returns {Object} The processed filter metadata.
  * @throws {Error} If the metadata or revision file cannot be read.
  */
-const loadFilterMetadata = function (filterDir, includedFilterIds, excludedFilterIds) {
+export const loadFilterMetadata = function (filterDir, includedFilterIds, excludedFilterIds) {
     const metadataFilePath = path.join(filterDir, metadataFile);
     const metadataString = readFile(metadataFilePath);
     if (!metadataString) {
@@ -846,8 +847,8 @@ const loadFilterMetadata = function (filterDir, includedFilterIds, excludedFilte
 
     const result = JSON.parse(metadataString);
     result.version = revision.version;
-    result.timeUpdated = moment(revision.timeUpdated).format('YYYY-MM-DDTHH:mm:ssZZ');
-    result.timeAdded = moment(result.timeAdded).format('YYYY-MM-DDTHH:mm:ssZZ');
+    result.timeUpdated = format(revision.timeUpdated, 'yyyy-MM-dd\'T\'HH:mm:ssxx', { in: utc });
+    result.timeAdded = format(result.timeAdded, 'yyyy-MM-dd\'T\'HH:mm:ssxx', { in: utc });
     delete result.disabled;
 
     const { filterId } = result;

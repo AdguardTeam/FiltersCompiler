@@ -1,10 +1,21 @@
+import fs from 'fs/promises';
+import os from 'os';
+import path from 'path';
 import {
     describe,
     it,
     expect,
     test,
+    beforeEach,
+    afterEach,
 } from 'vitest';
-import { sortMetadataFilters, shouldBuildFilterForPlatform } from '../src/main/platforms/generator';
+import {
+    sortMetadataFilters,
+    shouldBuildFilterForPlatform,
+    makeHeader,
+    loadFilterMetadata,
+    init,
+} from '../src/main/platforms/generator';
 
 describe('generator', () => {
     it('sortMetadataFilters', () => {
@@ -151,6 +162,83 @@ describe('generator', () => {
             }).toThrow(
                 'Both platformsIncluded and platformsExcluded cannot be defined simultaneously for filter 1',
             );
+        });
+    });
+
+    describe('date fields stay in UTC regardless of local time zone', () => {
+        const TIMEZONE_TESTS = [
+            'America/New_York',
+            'Asia/Tokyo',
+            'UTC',
+        ];
+
+        let originalTz;
+        let tmpDir;
+
+        beforeEach(async () => {
+            originalTz = process.env.TZ;
+            tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'generator-test-'));
+        });
+
+        afterEach(async () => {
+            if (originalTz === undefined) {
+                delete process.env.TZ;
+            } else {
+                process.env.TZ = originalTz;
+            }
+            await fs.rm(tmpDir, { recursive: true, force: true });
+        });
+
+        /* eslint-disable-next-line max-len */
+        test.each(TIMEZONE_TESTS)('makeHeader keeps TimeUpdated in UTC under local time zone %s', async (tz) => {
+            const UTC_TIME_UPDATED = '2024-01-15T10:00:00.000Z';
+            const EXPECTED_TIME_UPDATED = '2024-01-15T10:00:00+00:00';
+
+            process.env.TZ = tz;
+
+            const metadataPath = path.join(tmpDir, 'metadata.json');
+            const revisionPath = path.join(tmpDir, 'revision.json');
+            await fs.writeFile(metadataPath, JSON.stringify({
+                name: 'Test filter',
+                description: 'Test description',
+                expires: '1 days',
+            }));
+            await fs.writeFile(revisionPath, JSON.stringify({
+                version: '1.0.0.0',
+                timeUpdated: UTC_TIME_UPDATED,
+            }));
+
+            const header = makeHeader(metadataPath, revisionPath);
+
+            expect(header).toContain(`! TimeUpdated: ${EXPECTED_TIME_UPDATED}`);
+        });
+
+        /* eslint-disable-next-line max-len */
+        test.each(TIMEZONE_TESTS)('loadFilterMetadata keeps timeUpdated/timeAdded in UTC under local time zone %s', async (tz) => {
+            const UTC_TIME_UPDATED = '2024-01-15T10:00:00.000Z';
+            const UTC_TIME_ADDED = '2024-02-20T22:30:00.000Z';
+            const EXPECTED_TIME_ADDED = '2024-02-20T22:30:00+0000';
+            const EXPECTED_TIME_UPDATED = '2024-01-15T10:00:00+0000';
+
+            process.env.TZ = tz;
+
+            init('filters.js', 'metadata.json', 'revision.json', {}, 'https://filters.adtidy.org');
+
+            await fs.writeFile(path.join(tmpDir, 'metadata.json'), JSON.stringify({
+                filterId: 999999,
+                name: 'Test filter',
+                timeAdded: UTC_TIME_ADDED,
+                disabled: false,
+            }));
+            await fs.writeFile(path.join(tmpDir, 'revision.json'), JSON.stringify({
+                version: '1.0.0.0',
+                timeUpdated: UTC_TIME_UPDATED,
+            }));
+
+            const result = loadFilterMetadata(tmpDir);
+
+            expect(result.timeUpdated).toBe(EXPECTED_TIME_UPDATED);
+            expect(result.timeAdded).toBe(EXPECTED_TIME_ADDED);
         });
     });
 });

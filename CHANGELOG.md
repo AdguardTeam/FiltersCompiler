@@ -11,11 +11,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Replaced to `date-fns` from `moment` for date formatting, since `moment` is in
+  maintenance mode and no longer recommended for new code.
+
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+
+- `timeUpdated`/`timeAdded` metadata fields and the `! TimeUpdated:` filter header
+  now stay in UTC instead of shifting to the local time zone during local builds.
 
 ### Security
 

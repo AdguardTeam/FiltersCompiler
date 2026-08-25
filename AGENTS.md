@@ -343,8 +343,6 @@ supply chain risks, and long-term maintenance costs.
   Should be removed.
 - `md5` (2.3.0) — Node.js `crypto` module provides MD5 hashing. Should be
   replaced.
-- `moment` (2.30.1) — large date library. Could be replaced with built-in
-  `Date` or a smaller alternative.
 - `jsdom` (21.1.2) — heavy dependency for CSS selector validation. Keep for
   now but evaluate lighter alternatives.
 
