@@ -742,6 +742,10 @@ describe('validator', () => {
                 // value must use slash-delimited replace syntax
                 '||example.com^$urltransform=invalid',
                 '||example.com^$urltransform=/',
+                // valueless urltransform is not allowed in blocking rules,
+                // it is valid only in exception rules
+                '||example.com^$urltransform',
+                '||example.com^$urltransform=',
                 // urltransform is not negatable
                 '||example.com^$~urltransform=/a/b/',
             ];
@@ -749,6 +753,40 @@ describe('validator', () => {
                 expect(validateAndFilterRules([rule])).toHaveLength(0);
             });
         });
+    });
+
+    describe('validate modifiers with value optional only in exception rules', () => {
+        // These modifiers may be used without a value only in allowlist (exception)
+        // rules, e.g. '@@||example.com^$urltransform' disables matching rules,
+        // while blocking rules must specify a value.
+        //
+        // Note: $replace is intentionally not included here — unlike the agtree
+        // ModifierValidator, tsurlfilter does not enforce a value for it yet.
+        // @see https://adguard.com/kb/general/ad-filtering/create-own-filters/
+        const exceptionOnlyOptionalValueModifiers = [
+            'csp',
+            'permissions',
+            'redirect',
+            'redirect-rule',
+            'removeheader',
+            'urltransform',
+        ];
+
+        test.each(exceptionOnlyOptionalValueModifiers)(
+            'valueless $%s is invalid in blocking rules',
+            (modifier) => {
+                const rule = `||example.com^$${modifier}`;
+                expect(validateAndFilterRules([rule])).toHaveLength(0);
+            },
+        );
+
+        test.each(exceptionOnlyOptionalValueModifiers)(
+            'valueless $%s is valid in exception rules',
+            (modifier) => {
+                const rule = `@@||example.com^$${modifier}`;
+                expect(validateAndFilterRules([rule])).toHaveLength(1);
+            },
+        );
     });
 
     it('safari_cb_affinity directive test', () => {
