@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.3.0] - 2026-08-26
+
+### Added
+
 - Support of `$urltransform` modifier [tsurlfilter#111].
 
 ### Changed
@@ -19,10 +33,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated [@adguard/extended-css] to v2.2.0.
 - Updated [@adguard/scriptlets] to v2.5.1.
 - Updated [@adguard/tsurlfilter] to v6.0.3
-
-### Deprecated
-
-### Removed
 
 ### Fixed
 
@@ -919,7 +929,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [@adguard/tsurlfilter]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/tsurlfilter/CHANGELOG.md
 [@adguard/logger]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/logger/CHANGELOG.md
 
-[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.3.0-beta.1...HEAD
+[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.3.0...HEAD
+[3.3.0]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.3.0-beta.1...v3.3.0
 [3.3.0-beta.1]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.2.12...v3.3.0-beta.1
 [3.2.12]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.2.11...v3.2.12
 [3.2.11]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.2.10...v3.2.11
