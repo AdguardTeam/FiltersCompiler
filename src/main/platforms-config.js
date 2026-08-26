@@ -242,6 +242,25 @@ const REPLACE_MODIFIER_PATTERNS = [
     '\\$(?!#|(path|domain)=.*]|.*removeparam=).*replace(,|=|$)',
 ];
 
+/**
+ * Pattern to check if rule contains `$urltransform` modifier
+ * and does not contain non-basic modifiers like `$domain` or `$path`.
+ *
+ * Pattern parts:
+ * - `\\$` — modifiers divider
+ * - `(?!#|(path|domain)=.*]|.*removeparam=).*` — negative lookahead to exclude CSS rules (#$#) and rules like
+ *   `[$path=...]##.textad,[urltransform="ads"]` and rules with `$removeparam` modifier like `$removeparam=urltransform`
+ * - `.*urltransform` — urltransform modifier itself
+ * - `(,|=|$)` — end of line or modifiers divider, as `$urltransform` can be followed by other modifiers (`,`),
+ *   it may have a value (`=`), or it may be the last modifier in the rule (`$`).
+ *
+ * @example
+ * ```||example.com^$urltransform=/firstpath/secondpath/```
+ */
+const URLTRANSFORM_MODIFIER_PATTERNS = [
+    '\\$(?!#|(path|domain)=.*]|.*removeparam=).*urltransform(,|=|$)',
+];
+
 /* eslint-disable max-len */
 
 /**
@@ -520,6 +539,7 @@ const SAFARI_BASED_EXTENSION_PATTERNS = [
     ...REMOVEHEADER_MODIFIER_PATTERNS,
     ...MP4_MODIFIER_PATTERNS,
     ...REPLACE_MODIFIER_PATTERNS,
+    ...URLTRANSFORM_MODIFIER_PATTERNS,
     ...STEALTH_MODIFIER_PATTERNS,
     ...COOKIE_MODIFIER_PATTERNS,
     ...APP_MODIFIER_PATTERNS,
@@ -783,6 +803,7 @@ export const platformsConfig = {
                 ...CSS_RULES_PATTERNS,
                 ...MP4_MODIFIER_PATTERNS,
                 ...REPLACE_MODIFIER_PATTERNS,
+                ...URLTRANSFORM_MODIFIER_PATTERNS,
                 ...STEALTH_MODIFIER_PATTERNS,
                 ...COOKIE_MODIFIER_PATTERNS,
                 ...EMPTY_MODIFIER_PATTERNS,
@@ -816,6 +837,7 @@ export const platformsConfig = {
                 ...HTML_FILTERING_MODIFIER_PATTERNS,
                 ...MP4_MODIFIER_PATTERNS,
                 ...REPLACE_MODIFIER_PATTERNS,
+                ...URLTRANSFORM_MODIFIER_PATTERNS,
                 ...STEALTH_MODIFIER_PATTERNS,
                 ...COOKIE_MODIFIER_PATTERNS,
                 ...APP_MODIFIER_PATTERNS,

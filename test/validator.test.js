@@ -408,6 +408,21 @@ describe('validator', () => {
         expect(validateAndFilterRules(rules)).toHaveLength(validRules.length);
     });
 
+    it('validate redirect-rule with googletagmanager redirect', () => {
+        // https://github.com/AdguardTeam/FiltersCompiler/issues/159
+        const rules = [
+            '||googletagmanager.com/gtag/js$script,redirect-rule=googletagmanager_gtm.js:5',
+            '||googletagmanager.com/gtag/js$script,redirect-rule=googletagmanager-gtm',
+            '||googletagmanager.com/gtag/js$script,redirect=googletagmanager-gtm',
+        ];
+
+        const validateRules = validateAndFilterRules(rules);
+        expect(validateRules).toHaveLength(rules.length);
+        expect(validateRules).toContain(rules[0]);
+        expect(validateRules).toContain(rules[1]);
+        expect(validateRules).toContain(rules[2]);
+    });
+
     describe('Test validation - incorrect domain option', () => {
         const invalidRules = [
             '|http*$domain=',
@@ -720,6 +735,73 @@ describe('validator', () => {
         test.each(validRules)('%s', (rule) => {
             expect(validateAndFilterRules([rule])).toHaveLength(1);
         });
+    });
+
+    describe('validate urltransform modifier', () => {
+        describe('valid', () => {
+            const validRules = [
+                '||example.com^$urltransform=/firstpath/secondpath/',
+                '||example.com^$urltransform=/Has some text here/and here after slash/',
+                '||example.com^$urltransform=/a/b/i',
+                '||example.com^$third-party,urltransform=/foo/bar/',
+                // valueless urltransform is allowed only in exception rules
+                '@@||example.com^$urltransform',
+            ];
+            test.each(validRules)('%s', (rule) => {
+                expect(validateAndFilterRules([rule])).toHaveLength(1);
+            });
+        });
+
+        describe('invalid', () => {
+            const invalidRules = [
+                // value must use slash-delimited replace syntax
+                '||example.com^$urltransform=invalid',
+                '||example.com^$urltransform=/',
+                // valueless urltransform is not allowed in blocking rules,
+                // it is valid only in exception rules
+                '||example.com^$urltransform',
+                '||example.com^$urltransform=',
+                // urltransform is not negatable
+                '||example.com^$~urltransform=/a/b/',
+            ];
+            test.each(invalidRules)('%s', (rule) => {
+                expect(validateAndFilterRules([rule])).toHaveLength(0);
+            });
+        });
+    });
+
+    describe('validate modifiers with value optional only in exception rules', () => {
+        // These modifiers may be used without a value only in allowlist (exception)
+        // rules, e.g. '@@||example.com^$urltransform' disables matching rules,
+        // while blocking rules must specify a value.
+        //
+        // Note: $replace is intentionally not included here — unlike the agtree
+        // ModifierValidator, tsurlfilter does not enforce a value for it yet.
+        // @see https://adguard.com/kb/general/ad-filtering/create-own-filters/
+        const exceptionOnlyOptionalValueModifiers = [
+            'csp',
+            'permissions',
+            'redirect',
+            'redirect-rule',
+            'removeheader',
+            'urltransform',
+        ];
+
+        test.each(exceptionOnlyOptionalValueModifiers)(
+            'valueless $%s is invalid in blocking rules',
+            (modifier) => {
+                const rule = `||example.com^$${modifier}`;
+                expect(validateAndFilterRules([rule])).toHaveLength(0);
+            },
+        );
+
+        test.each(exceptionOnlyOptionalValueModifiers)(
+            'valueless $%s is valid in exception rules',
+            (modifier) => {
+                const rule = `@@||example.com^$${modifier}`;
+                expect(validateAndFilterRules([rule])).toHaveLength(1);
+            },
+        );
     });
 
     it('safari_cb_affinity directive test', () => {

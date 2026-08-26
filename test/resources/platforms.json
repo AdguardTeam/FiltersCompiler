@@ -32,6 +32,8 @@
                 "\\$\\$|\\$\\@\\$",
                 "\\$(.*,)?mp4",
                 "\\$(.*,)?replace=",
+                "\\$(.*,)?urltransform=",
+                ",urltransform=",
                 "\\$stealth",
                 ",stealth",
                 "\\$cookie",

@@ -9,10 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Support of `$urltransform` modifier [tsurlfilter#111].
+
 ### Changed
 
 - Replaced to `date-fns` from `moment` for date formatting, since `moment` is in
   maintenance mode and no longer recommended for new code.
+- Updated [@adguard/agtree] to v4.2.1.
+- Updated [@adguard/extended-css] to v2.2.0.
+- Updated [@adguard/scriptlets] to v2.5.1.
+- Updated [@adguard/tsurlfilter] to v6.0.3
 
 ### Deprecated
 
@@ -22,8 +28,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `timeUpdated`/`timeAdded` metadata fields and the `! TimeUpdated:` filter header
   now stay in UTC instead of shifting to the local time zone during local builds.
+- Conversion of `redirect-rule` modifier rule with `googletagmanager-gtm` [#159].
 
 ### Security
+
+[#159]: https://github.com/AdguardTeam/FiltersCompiler/issues/159
+[tsurlfilter#111]: https://github.com/AdguardTeam/tsurlfilter/issues/111
 
 ## [3.3.0-beta.1] - 2026-08-20
 

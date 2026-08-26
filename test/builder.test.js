@@ -306,6 +306,8 @@ describe('Test builder', async () => {
                 'test.com#%#AG_setConstant("ads", "false");',
                 "test.com#@%#Object.defineProperty(window, 'abcde', { get: function() { return []; } });",
                 '||example.com/api/v1/ad/*/json$replace=/html/abcd\\,/i',
+                // $urltransform is excluded for non-full trust levels
+                '||example.com^$urltransform=/firstpath/secondpath/',
                 'example.com#%#//scriptlet(\'trusted-set-local-storage-item\', \'iName\', \'iValue\')',
                 'example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")',
             ];
@@ -477,7 +479,7 @@ describe('Test builder', async () => {
 
             it('check content lines', () => {
                 expect(filterContent).toBeTruthy();
-                expect(filterLines.length).toEqual(50);
+                expect(filterLines.length).toEqual(51);
                 expect(filterLines[2]).toEqual('! Title: AdGuard Base filter + EasyList');
             });
 
@@ -520,7 +522,7 @@ describe('Test builder', async () => {
             expect(filterContent).toBeTruthy();
 
             const filterLines = filterContent.split(/\r?\n/);
-            expect(filterLines.length).toEqual(34);
+            expect(filterLines.length).toEqual(35);
             expect(filterLines[2]).toEqual('! Title: AdGuard Base filter + EasyList (Optimized)');
 
             // $webrtc is deprecated
@@ -547,7 +549,7 @@ describe('Test builder', async () => {
             expect(filterContent).toBeTruthy();
 
             const filterLines = filterContent.split(/\r?\n/);
-            expect(filterLines.length).toEqual(53);
+            expect(filterLines.length).toEqual(54);
 
             const presentLines = [
                 'test-common-rule.com',
@@ -600,6 +602,8 @@ describe('Test builder', async () => {
                 '@@||example.com^$stealth',
                 '||example.com^$webrtc,domain=example.org',
                 '||example.org^$csp=frame-src \'none\'',
+                // $urltransform is not supported for safari-based platforms
+                '||example.com^$urltransform=/firstpath/secondpath/',
             ];
             absentLines.forEach((rule) => {
                 expect(filterLines.includes(rule)).toBeFalsy();
@@ -617,7 +621,7 @@ describe('Test builder', async () => {
 
             it('check content', () => {
                 expect(filterContent).toBeTruthy();
-                expect(filterLines.length).toEqual(57);
+                expect(filterLines.length).toEqual(58);
                 // expires value in set from the filters metadata
                 // if there is no 'expires' property in platform.json for the platform
                 expect(filterLines.includes('! Expires: 2 days (update frequency)')).toBeTruthy();
@@ -637,6 +641,9 @@ describe('Test builder', async () => {
                 "example.com#%#//scriptlet('trusted-set-local-storage-item', 'iName', 'iValue')",
                 'example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")',
                 String.raw`example.com#%#//scriptlet('trusted-replace-argument', 'Math.round', '0', '121', '/^(\d\d?|1[0-2]\d)\.\d+$/')`,
+                // $urltransform should be included in full trust level filters
+                // + for supported platforms, i.e. adguard only
+                '||example.com^$urltransform=/firstpath/secondpath/',
             ];
             it.each(presentLines)('chromium-mv3 present line: %s', (rule) => {
                 expect(filterLines.includes(rule)).toBeTruthy();

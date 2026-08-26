@@ -120,6 +120,12 @@ describe('converter', () => {
         c = convertRulesToAdgSyntax([String.raw`||example.org/*/*/$replace=/<item type=\"banner\">.{280\,400}.*<\/background><\/item>//`]);
         expect(c[0]).toBe(String.raw`||example.org/*/*/$replace=/<item type=\"banner\">.{280\,400}.*<\/background><\/item>//`);
 
+        c = convertRulesToAdgSyntax(['||example.com^$urltransform=/firstpath/secondpath/']);
+        expect(c[0]).toBe('||example.com^$urltransform=/firstpath/secondpath/');
+
+        c = convertRulesToAdgSyntax(['||example.com^$urltransform=/Has some text here/and here after slash/']);
+        expect(c[0]).toBe('||example.com^$urltransform=/Has some text here/and here after slash/');
+
         c = convertRulesToAdgSyntax(['||example.org^$permissions=geolocation=()']);
         expect(c[0]).toBe('||example.org^$permissions=geolocation=()');
 
@@ -595,6 +601,12 @@ describe('converter', () => {
 
             actual = convertRulesToAdgSyntax(['||googletagservices.com/test.js$domain=test.com,redirect=googletagservices_gpt.js']);
             expected = '||googletagservices.com/test.js$domain=test.com,redirect=googletagservices-gpt';
+            expect(actual[0]).toBe(expected);
+
+            // priority suffix and uBO resource name are stripped during conversion
+            // https://github.com/AdguardTeam/FiltersCompiler/issues/159
+            actual = convertRulesToAdgSyntax(['||googletagmanager.com/gtag/js$script,redirect-rule=googletagmanager_gtm.js:5']);
+            expected = '||googletagmanager.com/gtag/js$script,redirect-rule=google-analytics';
             expect(actual[0]).toBe(expected);
 
             actual = convertRulesToAdgSyntax(['||delivery.tf1.fr/pub$media,rewrite=abp-resource:blank-mp3,domain=tf1.fr']);
