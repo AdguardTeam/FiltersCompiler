@@ -128,14 +128,24 @@ const getOptimizableFilterIds = async () => {
  *
  * @param filterId - Numeric filter identifier.
  * @param stats - Parsed optimization stats object.
- * @throws {Error} if stats is not an object, or if stats.groups is missing or empty.
+ * @throws {OptimizationStatsError} if stats is not an object, or if stats.groups is missing or empty.
  */
-export function assertValidStats(filterId: number, stats: unknown): asserts stats is OptimizationStats {
+// eslint-disable-next-line max-len
+export function assertValidStats(filterId: number, sourcePath: string, stats: unknown): asserts stats is OptimizationStats {
     if (stats === null || typeof stats !== 'object') {
-        throw new Error(`Invalid optimization stats for ${filterId}: expected an object`);
+        throw new OptimizationStatsError(filterId, sourcePath, {
+            cause: new TypeError(
+                `Optimization stats for ${filterId} must be a non-null object, but got ${JSON.stringify(stats)}`,
+            ),
+        });
     }
     if (!('groups' in stats) || !Array.isArray(stats.groups) || stats.groups.length === 0) {
-        throw new Error(`Invalid optimization stats for ${filterId}: missing or empty groups`);
+        throw new OptimizationStatsError(filterId, sourcePath, {
+            cause: new TypeError(
+                `Optimization stats for ${filterId}: groups is missing, not an array, or empty`,
+                { cause: { groups: (stats as { groups?: unknown }).groups } },
+            ),
+        });
     }
 }
 
@@ -256,20 +266,20 @@ export const getOptimizationStatistics = async (filterId: number) => {
 
     let stats: unknown;
 
+    const statsPath = localStatsPath === null
+        ? getOptimizationStatsUrl(filterId)
+        : `${localStatsPath}/filters/${filterId}/stats.json`;
+
     try {
         const content = localStatsPath !== null
             ? await fs.readFile(path.join(localStatsPath, FILTERS_DIR_NAME, String(filterId), STATS_JSON), 'utf-8')
             : await downloadOptimizationStats(filterId);
         stats = JSON.parse(content);
     } catch (originalError) {
-        const statsPath = localStatsPath === null
-            ? getOptimizationStatsUrl(filterId)
-            : `${localStatsPath}/filters/${filterId}/stats.json`;
-
         throw new OptimizationStatsError(filterId, statsPath, { cause: originalError });
     }
 
-    assertValidStats(filterId, stats);
+    assertValidStats(filterId, statsPath, stats);
 
     return stats;
 };
