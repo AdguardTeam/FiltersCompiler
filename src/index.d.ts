@@ -70,10 +70,17 @@ export interface ValidateLocalesResult {
 }
 
 /**
+ * Log format for the warnings log returned by `validateLocales`.
+ */
+export type LocalesLogFormat = 'text' | 'markdown';
+
+/**
  * Validates locale translation files.
  *
  * @param localesDirPath Path to the locales directory.
  * @param requiredLocales List of required locale codes.
+ * @param logFormat Format of the returned `log` field: `'text'` (default)
+ * or `'markdown'`.
  * @returns `{ ok: true }` when no problems are found; when warnings exist,
  * the result includes `data` and `log`, and `ok` is `false` only for
  * critical warnings.
@@ -82,6 +89,7 @@ export interface ValidateLocalesResult {
 export function validateLocales(
     localesDirPath: string,
     requiredLocales: string[],
+    logFormat?: LocalesLogFormat,
 ): ValidateLocalesResult;
 
 /**

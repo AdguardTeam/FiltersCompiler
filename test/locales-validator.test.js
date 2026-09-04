@@ -88,4 +88,25 @@ describe('locales validator', () => {
         expect(actualResult.ok).toBeFalsy();
         expect(actualResult.data).toMatchObject(expectedResultData);
     });
+
+    it('Generates a markdown log when logFormat is markdown', async () => {
+        const LOCALES_DIR_PATH = './resources/locales';
+        const TEST_REQUIRED_LOCALES = [
+            'en',
+            'ru',
+        ];
+
+        const localesDirPath = path.join(__dirname, LOCALES_DIR_PATH);
+
+        const actualResult = localesValidator.validate(localesDirPath, TEST_REQUIRED_LOCALES, 'markdown');
+
+        expect(actualResult.ok).toBeFalsy();
+        expect(actualResult.log).toContain('## Locales validation issues');
+        expect(actualResult.log).toContain('### `ko`');
+        expect(actualResult.log).toContain('- `low` priority — **empty file or no messages in file**:');
+        expect(actualResult.log).toContain('  - `groups.json`');
+        expect(actualResult.log).toContain('- `critical` priority — **invalid or absent message key/value**:');
+        expect(actualResult.log).toContain('  - `"tag.1.description": "Blocks ads"`');
+        expect(actualResult.log).toContain('### `ru`');
+    });
 });

@@ -146,9 +146,29 @@ const prepareWarnings = (warnings) => warnings.map(([type, reason, details]) => 
 /**
  * Logs collected results of locales validation
  * @param {Result[]} results
+ * @param {string} format - output format: 'text' (default) or 'markdown'
  * @returns {string}
  */
-const createLog = (results) => {
+const createLog = (results, format = 'text') => {
+    if (format === 'markdown') {
+        const log = ['## Locales validation issues', ''];
+        results.forEach((res) => {
+            log.push(`### \`${res.locale}\``, '');
+            res.warnings.forEach((warning) => {
+                log.push(`- \`${warning.type}\` priority — **${warning.reason}**:`);
+                warning.details.forEach((detail) => {
+                    log.push(`  - \`${detail}\``);
+                });
+                log.push('');
+            });
+        });
+        // drop the trailing blank line
+        while (log[log.length - 1] === '') {
+            log.pop();
+        }
+        return log.join('\n');
+    }
+
     const log = [];
     log.push('There are issues with:');
     results.forEach((res) => {
@@ -173,9 +193,11 @@ const createLog = (results) => {
 /**
  * Validates locales messages
  * @param {string} dirPath relative path to locales directory
+ * @param {string[]} requiredLocales locales required to be complete
+ * @param {string} [logFormat] format of the returned log: 'text' (default) or 'markdown'
  * @returns {ValidationResult}
  */
-const validate = (dirPath, requiredLocales) => {
+const validate = (dirPath, requiredLocales, logFormat = 'text') => {
     logger.info('Validating locales...');
     const results = [];
     let locales;
@@ -277,7 +299,7 @@ const validate = (dirPath, requiredLocales) => {
                 .some((warning) => warning.type === WARNING_TYPES.CRITICAL);
             return isCriticalWarning;
         });
-    const resultsLog = createLog(results);
+    const resultsLog = createLog(results, logFormat);
     if (isOK) {
         logger.warn(resultsLog);
     } else {

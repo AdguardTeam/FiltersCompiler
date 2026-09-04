@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `validateLocales` accepts an optional `logFormat` argument (`'text'` or
+  `'markdown'`) that controls the format of the returned `log` field, so the
+  validation report can be embedded into GitHub issues or PR comments as
+  markdown.
+
 ### Changed
 
 ### Deprecated
