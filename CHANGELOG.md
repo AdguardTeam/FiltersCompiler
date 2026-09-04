@@ -22,6 +22,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Escape backticks and newlines in locale translation content and skip empty
+  detail sub-lists in the markdown log, so the `validateLocales` markdown
+  report cannot break out of inline-code spans or produce dangling list
+  items.
+
 ### Security
 
 ## [3.3.0] - 2026-08-26

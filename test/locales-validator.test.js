@@ -109,4 +109,41 @@ describe('locales validator', () => {
         expect(actualResult.log).toContain('  - `"tag.1.description": "Blocks ads"`');
         expect(actualResult.log).toContain('### `ru`');
     });
+
+    it('Escapes markdown metacharacters in the markdown log', async () => {
+        const LOCALES_DIR_PATH = './resources/locales_markdown';
+        const TEST_REQUIRED_LOCALES = [
+            'en',
+        ];
+
+        const localesDirPath = path.join(__dirname, LOCALES_DIR_PATH);
+
+        const actualResult = localesValidator.validate(localesDirPath, TEST_REQUIRED_LOCALES, 'markdown');
+
+        expect(actualResult.ok).toBeFalsy();
+        // backticks/newlines in translation content are escaped so they
+        // cannot break out of an inline-code span
+        expect(actualResult.log).toContain(
+            '  - `"filter.1.name": "value with \\`backtick\\` and newline"`',
+        );
+    });
+
+    it('Does not emit a dangling empty list item for a warning without details', async () => {
+        const LOCALES_DIR_PATH = './resources/locales_markdown';
+        const TEST_REQUIRED_LOCALES = [
+            'en',
+        ];
+
+        const localesDirPath = path.join(__dirname, LOCALES_DIR_PATH);
+
+        const actualResult = localesValidator.validate(localesDirPath, TEST_REQUIRED_LOCALES, 'markdown');
+
+        expect(actualResult.ok).toBeFalsy();
+        // the empty `{}` object produces a warning with no details, which
+        // must be followed directly by the next line without a dangling
+        // blank line / empty sub-list item
+        expect(actualResult.log).toContain(
+            '**invalid or absent message key/value**:\n- `low` priority — **empty file or no messages in file**:',
+        );
+    });
 });

@@ -144,42 +144,75 @@ const prepareWarnings = (warnings) => warnings.map(([type, reason, details]) => 
  */
 
 /**
+ * Escapes markdown metacharacters inside inline-code spans so translation
+ * content cannot break out of the generated markdown. Backticks are escaped
+ * and newlines are collapsed to a single space.
+ * @param {string} value
+ * @returns {string}
+ */
+const escapeMarkdown = (value) => value.replace(/`/g, '\\`').replace(/\r?\n/g, ' ');
+
+/**
+ * Renders an indented detail line for the given format.
+ * @param {string} detail
+ * @param {boolean} isMarkdown
+ * @returns {string}
+ */
+const formatDetail = (detail, isMarkdown) => (isMarkdown
+    ? `  - \`${escapeMarkdown(detail)}\``
+    : `      ${detail}`);
+
+/**
+ * Renders the header (locale) line for the given format.
+ * @param {string} locale
+ * @param {boolean} isMarkdown
+ * @returns {string}
+ */
+const formatLocale = (locale, isMarkdown) => (isMarkdown
+    ? `### \`${locale}\``
+    : `- ${locale}:`);
+
+/**
  * Logs collected results of locales validation
  * @param {Result[]} results
  * @param {string} format - output format: 'text' (default) or 'markdown'
  * @returns {string}
  */
 const createLog = (results, format = 'text') => {
-    if (format === 'markdown') {
-        const log = ['## Locales validation issues', ''];
-        results.forEach((res) => {
-            log.push(`### \`${res.locale}\``, '');
-            res.warnings.forEach((warning) => {
-                log.push(`- \`${warning.type}\` priority — **${warning.reason}**:`);
-                warning.details.forEach((detail) => {
-                    log.push(`  - \`${detail}\``);
-                });
-                log.push('');
-            });
-        });
-        // drop the trailing blank line
-        while (log[log.length - 1] === '') {
-            log.pop();
-        }
-        return log.join('\n');
-    }
+    const isMarkdown = format === 'markdown';
 
     const log = [];
-    log.push('There are issues with:');
+    log.push(isMarkdown ? '## Locales validation issues' : 'There are issues with:');
+    if (isMarkdown) {
+        log.push('');
+    }
+
     results.forEach((res) => {
-        log.push(`- ${res.locale}:`);
+        log.push(formatLocale(res.locale, isMarkdown));
+        if (isMarkdown) {
+            log.push('');
+        }
         res.warnings.forEach((warning) => {
-            log.push(`  - ${warning.type} priority - ${warning.reason}:`);
+            log.push(isMarkdown
+                ? `- \`${escapeMarkdown(warning.type)}\` priority — **${escapeMarkdown(warning.reason)}**:`
+                : `  - ${warning.type} priority - ${warning.reason}:`);
             warning.details.forEach((detail) => {
-                log.push(`      ${detail}`);
+                log.push(formatDetail(detail, isMarkdown));
             });
+            // a warning without details would otherwise leave a dangling list
+            // marker followed by a blank line, which GitHub renders as a
+            // separate empty list item
+            if (isMarkdown && warning.details.length > 0) {
+                log.push('');
+            }
         });
     });
+
+    // drop the trailing blank line
+    while (log[log.length - 1] === '') {
+        log.pop();
+    }
+
     return log.join('\n');
 };
 
