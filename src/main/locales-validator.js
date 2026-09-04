@@ -147,16 +147,16 @@ const prepareWarnings = (warnings) => warnings.map(([type, reason, details]) => 
  * Escapes markdown metacharacters inside inline-code spans so translation
  * content cannot break out of the generated markdown. Backticks are escaped
  * and newlines are collapsed to a single space.
- * @param {string} value
- * @returns {string}
+ * @param {string} value - the raw text to escape
+ * @returns {string} the escaped text safe to embed in an inline-code span
  */
 const escapeMarkdown = (value) => value.replace(/`/g, '\\`').replace(/\r?\n/g, ' ');
 
 /**
  * Renders an indented detail line for the given format.
- * @param {string} detail
- * @param {boolean} isMarkdown
- * @returns {string}
+ * @param {string} detail - the detail text to render
+ * @param {boolean} isMarkdown - whether to render markdown (true) or plain-text (false) markup
+ * @returns {string} the formatted detail line
  */
 const formatDetail = (detail, isMarkdown) => (isMarkdown
     ? `  - \`${escapeMarkdown(detail)}\``
@@ -164,9 +164,9 @@ const formatDetail = (detail, isMarkdown) => (isMarkdown
 
 /**
  * Renders the header (locale) line for the given format.
- * @param {string} locale
- * @param {boolean} isMarkdown
- * @returns {string}
+ * @param {string} locale - the locale identifier to render
+ * @param {boolean} isMarkdown - whether to render markdown (true) or plain-text (false) markup
+ * @returns {string} the formatted locale header line
  */
 const formatLocale = (locale, isMarkdown) => (isMarkdown
     ? `### \`${locale}\``
@@ -176,7 +176,7 @@ const formatLocale = (locale, isMarkdown) => (isMarkdown
  * Logs collected results of locales validation
  * @param {Result[]} results
  * @param {string} format - output format: 'text' (default) or 'markdown'
- * @returns {string}
+ * @returns {string} the rendered validation log
  */
 const createLog = (results, format = 'text') => {
     const isMarkdown = format === 'markdown';

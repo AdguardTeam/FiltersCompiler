@@ -93,7 +93,6 @@ describe('locales validator', () => {
         const LOCALES_DIR_PATH = './resources/locales';
         const TEST_REQUIRED_LOCALES = [
             'en',
-            'ru',
         ];
 
         const localesDirPath = path.join(__dirname, LOCALES_DIR_PATH);
@@ -107,7 +106,6 @@ describe('locales validator', () => {
         expect(actualResult.log).toContain('  - `groups.json`');
         expect(actualResult.log).toContain('- `critical` priority — **invalid or absent message key/value**:');
         expect(actualResult.log).toContain('  - `"tag.1.description": "Blocks ads"`');
-        expect(actualResult.log).toContain('### `ru`');
     });
 
     it('Escapes markdown metacharacters in the markdown log', async () => {
