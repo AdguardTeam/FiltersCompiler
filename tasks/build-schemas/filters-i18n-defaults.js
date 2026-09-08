@@ -182,8 +182,8 @@ export const TAGS_DEFAULT_DATA = {
         [DESCRIPTION_KEY]: 'Has references to the EasyList filter',
     },
     10: {
-        [NAME_KEY]: 'AdGuard recommendation',
-        [DESCRIPTION_KEY]: 'Recommended to use with AdGuard ad blocker',
+        [NAME_KEY]: 'Recommended',
+        [DESCRIPTION_KEY]: 'Approved for use by the AdGuard team',
     },
     11: {
         [NAME_KEY]: 'AdGuard Base filter reference',
