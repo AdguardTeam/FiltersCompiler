@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `extension/android-content-blocker` platform metadata (`filters.json` /
+  `filters.js`) now references optimized filter builds (`_optimized.txt`)
+  instead of the full builds.
+
 ### Deprecated
 
 ### Removed

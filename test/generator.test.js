@@ -15,6 +15,7 @@ import {
     makeHeader,
     loadFilterMetadata,
     init,
+    postProcessUrls,
 } from '../src/main/platforms/generator';
 
 describe('generator', () => {
@@ -239,6 +240,76 @@ describe('generator', () => {
 
             expect(result.timeUpdated).toBe(EXPECTED_TIME_UPDATED);
             expect(result.timeAdded).toBe(EXPECTED_TIME_ADDED);
+        });
+    });
+
+    describe('postProcessUrls', () => {
+        const SERVER_URL = 'https://filters.adtidy.org/';
+
+        beforeEach(() => {
+            init('filters.js', 'metadata.json', 'revision.json', {}, SERVER_URL);
+        });
+
+        const metadata = {
+            groups: [{ groupId: 1 }],
+            tags: [{ tagId: 1 }],
+            filters: [
+                {
+                    filterId: 1,
+                    name: 'Test filter',
+                    subscriptionUrl: `${SERVER_URL}extension/android-content-blocker/filters/1.txt`,
+                },
+            ],
+        };
+
+        it.each([
+            ['ext_safari', 'extension/safari'],
+            ['android', 'android'],
+            ['ios', 'ios'],
+            ['ext_android_cb', 'extension/android-content-blocker'],
+        ])(
+            'uses optimized urls for platform %s',
+            (platform, platformPath) => {
+                const config = { platform, path: platformPath };
+
+                const result = postProcessUrls(metadata, config);
+
+                expect(result.filters[0].downloadUrl)
+                    .toBe(`${SERVER_URL}${platformPath}/filters/1_optimized.txt`);
+                expect(result.filters[0].subscriptionUrl)
+                    .toBe(`${SERVER_URL}${platformPath}/filters/1_optimized.txt`);
+            },
+        );
+
+        it('uses regular urls for a non-optimized platform', () => {
+            const config = { platform: 'ext_chromium', path: 'extension/chromium' };
+
+            const result = postProcessUrls(metadata, config);
+
+            expect(result.filters[0].downloadUrl)
+                .toBe(`${SERVER_URL}extension/chromium/filters/1.txt`);
+            expect(result.filters[0].subscriptionUrl)
+                .toBe(`${SERVER_URL}extension/chromium/filters/1.txt`);
+        });
+
+        it('does not touch subscription urls hosted elsewhere', () => {
+            const config = { platform: 'ext_android_cb', path: 'extension/android-content-blocker' };
+            const customMetadata = {
+                ...metadata,
+                filters: [
+                    {
+                        ...metadata.filters[0],
+                        subscriptionUrl: 'https://example.org/custom/filter.txt',
+                    },
+                ],
+            };
+
+            const result = postProcessUrls(customMetadata, config);
+
+            expect(result.filters[0].downloadUrl)
+                .toBe(`${SERVER_URL}extension/android-content-blocker/filters/1_optimized.txt`);
+            expect(result.filters[0].subscriptionUrl)
+                .toBe('https://example.org/custom/filter.txt');
         });
     });
 });
