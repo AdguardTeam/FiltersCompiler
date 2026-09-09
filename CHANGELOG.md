@@ -11,10 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- `extension/android-content-blocker` platform metadata (`filters.json` /
-  `filters.js`) now references optimized filter builds (`_optimized.txt`)
-  instead of the full builds.
-
 ### Deprecated
 
 ### Removed
@@ -22,6 +18,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 ### Security
+
+## [3.3.1] - 2026-09-09
+
+### Changed
+
+- `extension/android-content-blocker` platform metadata (`filters.json` /
+  `filters.js`) now references optimized filter builds (`_optimized.txt`)
+  instead of the full builds.
 
 ## [3.3.0] - 2026-08-26
 
@@ -933,7 +937,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [@adguard/tsurlfilter]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/tsurlfilter/CHANGELOG.md
 [@adguard/logger]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/logger/CHANGELOG.md
 
-[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.3.0...HEAD
+[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.3.1...HEAD
+[3.3.1]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.3.0...v3.3.1
 [3.3.0]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.3.0-beta.1...v3.3.0
 [3.3.0-beta.1]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.2.12...v3.3.0-beta.1
 [3.2.12]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.2.11...v3.2.12
