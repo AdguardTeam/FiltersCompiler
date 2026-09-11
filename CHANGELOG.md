@@ -11,13 +11,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- HTML filtering rules with deprecated special attribute selectors
+  `[min-length]` / `[max-length]` are now converted to the `:contains()`
+  pseudo-class during AdGuard syntax conversion [tsurlfilter#96].
+- Removed the temporary workaround that kept HTML filtering rules with
+  pseudo-classes as-is.
+
 ### Deprecated
 
 ### Removed
 
 ### Fixed
 
+- HTML filtering rules with `[min-length]` / `[max-length]` values exceeding
+  `65535` are kept as-is with a warning in `diff.txt`, because the converted
+  `:contains()` regexp quantifier would silently fail in CoreLibs apps
+  as not supported.
+
 ### Security
+
+[tsurlfilter#96]: https://github.com/AdguardTeam/tsurlfilter/issues/96
 
 ## [3.3.0] - 2026-08-26
 
