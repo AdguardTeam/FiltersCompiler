@@ -21,7 +21,6 @@ import { getErrorMessage } from '@adguard/logger';
 import { RuleMasks } from './rule/rule-masks';
 import { logger } from './utils/log';
 import { validateCssSelector } from './utils/extended-css-validator';
-import { shouldKeepAdgHtmlFilteringRuleAsIs } from './utils/workaround';
 
 /**
  * @typedef {import('@adguard/agtree').AnyRule} AnyRule
@@ -117,8 +116,21 @@ class RuleValidator {
         try {
             // Validate cosmetic rules
             if (ruleNode.category === RuleCategory.Cosmetic) {
-                // eslint-disable-next-line no-new
-                new CosmeticRule(text, 0);
+                try {
+                    // eslint-disable-next-line no-new
+                    new CosmeticRule(text, 0);
+                } catch (error) {
+                    // HTML filtering rules with unparseable bodies (e.g. `:contains()`
+                    // with an unbalanced parenthesis or an unterminated string in the
+                    // argument) are kept as-is by the AGTree identity fallback during
+                    // conversion. tsurlfilter's CosmeticRule parses the rule body as a
+                    // CSS selector list and throws for such rules, but they are valid
+                    // in CoreLibs apps (the only consumers of HTML filtering rules),
+                    // so we skip the tsurlfilter validation for them.
+                    if (ruleNode.type !== CosmeticRuleType.HtmlFilteringRule) {
+                        throw error;
+                    }
+                }
                 return RuleValidator.createValidationResult(true);
             }
 
@@ -202,12 +214,6 @@ export const validateAndFilterRules = (list, excluded, invalid = [], filterName)
                 parseAbpSpecificRules: false,
                 parseUboSpecificRules: false,
             });
-
-            // temporary workaround for AdGuard's HTML filtering rules with pseudo-classes.
-            // TODO: remove during AG-24662 resolving
-            if (shouldKeepAdgHtmlFilteringRuleAsIs(ruleNode)) {
-                return true;
-            }
 
             const conversionResult = RuleConverter.convertToAdg(ruleNode);
             convertedRuleNodes = conversionResult.result;
