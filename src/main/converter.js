@@ -8,7 +8,7 @@ import { getErrorMessage } from '@adguard/logger';
 
 import { logger } from './utils/log';
 import { RuleMasks } from './rule/rule-masks';
-import { shouldKeepAdgHtmlFilteringRuleAsIs } from './utils/workaround';
+import { shouldKeepHtmlRuleWithOversizedLengths } from './utils/workaround';
 
 /**
  * Excludes rule
@@ -40,11 +40,16 @@ export const convertRulesToAdgSyntax = (rulesList, excluded = [], invalidRules =
         try {
             const ruleNode = RuleParser.parse(rule);
 
-            // temporary workaround for AdGuard's HTML filtering rules with pseudo-classes.
-            // TODO: remove during AG-24662 resolving
-            if (shouldKeepAdgHtmlFilteringRuleAsIs(ruleNode)) {
-                const message = `Keeping HTML filtering rule with pseudo-classes as is: "${rule}"`;
+            // HTML filtering rules with [min-length]/[max-length] attribute values
+            // exceeding the CoreLibs PCRE2 quantifier limit (65535) are kept as-is,
+            // because converting them to `:contains()` with a regexp quantifier
+            // would make them silently fail in CoreLibs apps,
+            // while the old syntax works there natively.
+            if (shouldKeepHtmlRuleWithOversizedLengths(ruleNode)) {
+                const message = 'Warning: HTML filtering rule with [min-length] or [max-length] value exceeding 65535 '
+                    + `is kept as-is, because conversion to :contains() would not work in CoreLibs apps: "${rule}"`;
                 logger.warn(message);
+                excludeRule(rule, excluded, message);
                 result.push(rule);
                 continue;
             }

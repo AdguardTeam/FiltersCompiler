@@ -230,60 +230,39 @@ export const rewriteMetadataForOldMacV2 = function (metadata) {
 };
 
 /**
- * Markers of pseudo-classes for HTML filtering rules.
+ * CoreLibs PCRE2 quantifier limit (UINT16_MAX).
  *
- * Already supported by the AdGuard apps, but not implemented for the extension yet.
- * TODO: AG-24662.
- *
- * @see {@link https://adgkb.service.agrd.dev/kb/general/ad-filtering/create-own-filters/#html-filtering-rules--pseudo-classes}
+ * Regexp quantifiers with values exceeding this limit silently fail in
+ * CoreLibs apps.
  */
-const HTML_RULES_PSEUDO_CLASS_MARKERS = [
-    // AdGuard-specific pseudo-classes
-    ':contains(',
-    // aliases
-    ':-abp-contains(',
-    ':has-text(',
-];
+const CORE_LIBS_PCRE2_QUANTIFIER_LIMIT = 65535;
 
 /**
- * Markers of length attribute selectors for HTML filtering rules.
- *
- * When the compiler converts [min-length="N"] / [max-length="N"] into
- * :contains() with a regexp quantifier, the quantifier value may exceed
- * the CoreLibs PCRE2 limit of 65535 (UINT16_MAX), causing the rule to
- * silently fail. Since CoreLibs natively supports these attribute selectors
- * and only CoreLibs platforms consume HTML filtering rules from compiler
- * output (all extensions strip $$ rules), we skip the conversion entirely
- * as a temporary workaround.
+ * Pattern to extract `[min-length="N"]` / `[max-length="N"]` values
+ * from HTML filtering rule body.
  */
-const HTML_RULES_LENGTH_ATTR_MARKERS = [
-    '[min-length=',
-    '[max-length=',
-];
+const HTML_RULES_LENGTH_ATTR_VALUE_PATTERN = /\[(?:min|max)-length="(\d+)"\]/g;
 
 /**
- * Checks if the rule should be kept as is,
- * i.e. no conversion and no validation,
- * since it is not supported by the extension yet
- * or conversion would produce regexes incompatible with CoreLibs.
+ * Checks if the AdGuard HTML filtering rule has `[min-length]` or
+ * `[max-length]` attribute values exceeding the CoreLibs PCRE2 quantifier
+ * limit (65535).
  *
- * Conditions for keeping the rule as is:
- * - rule is HTML filtering rule
- * - rule is AdGuard syntax
- * - rule contains a pseudo-class marker or a length attribute marker.
- *
- * Planned to be fixed:
- * https://github.com/AdguardTeam/tsurlfilter/issues/96.
+ * Such rules are kept as-is, because converting them to `:contains()` with a
+ * regexp quantifier would make them silently fail in CoreLibs apps, while
+ * the old syntax works there natively.
  *
  * @param {import('@adguard/agtree').AnyRule} ruleNode Rule node to check.
  *
- * @returns {boolean} True if the rule should be kept as is, otherwise false.
+ * @returns {boolean} True if the rule should be kept as-is due to oversized length values.
  */
-export const shouldKeepAdgHtmlFilteringRuleAsIs = (ruleNode) => {
-    return ruleNode.type === CosmeticRuleType.HtmlFilteringRule
-        && ruleNode.syntax === AdblockSyntax.Adg
-        && (
-            HTML_RULES_PSEUDO_CLASS_MARKERS.some((marker) => ruleNode.body.value.includes(marker))
-            || HTML_RULES_LENGTH_ATTR_MARKERS.some((marker) => ruleNode.body.value.includes(marker))
-        );
+export const shouldKeepHtmlRuleWithOversizedLengths = (ruleNode) => {
+    if (ruleNode.type !== CosmeticRuleType.HtmlFilteringRule || ruleNode.syntax !== AdblockSyntax.Adg) {
+        return false;
+    }
+
+    const lengthValues = [...ruleNode.body.value.matchAll(HTML_RULES_LENGTH_ATTR_VALUE_PATTERN)]
+        .map((match) => Number(match[1]));
+
+    return lengthValues.some((value) => value > CORE_LIBS_PCRE2_QUANTIFIER_LIMIT);
 };

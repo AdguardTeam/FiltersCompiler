@@ -1523,8 +1523,11 @@ describe('Invalid rules collection in report', () => {
         expect(diffContent.length).toBeGreaterThan(0);
 
         const diffLines = diffContent.split('\n');
-        expect(diffLines.length).toBe(2);
-        expect(diffLines[0]).toContain('Error: Unable to convert rule to AdGuard syntax');
-        expect(diffLines[1]).toContain('filter14.example.com#$#selector:style()');
+        expect(diffLines.length).toBe(4);
+        // the unbalanced :contains() rule is normalized to a quoted argument
+        expect(diffLines[0]).toContain('converted to: "filter14.example.com$$script:contains("eval(function(p,a,c,k,e,d)")');
+        expect(diffLines[1]).toContain('filter14.example.com$$script:contains(eval(function(p,a,c,k,e,d))');
+        expect(diffLines[2]).toContain('Error: Unable to convert rule to AdGuard syntax');
+        expect(diffLines[3]).toContain('filter14.example.com#$#selector:style()');
     });
 });

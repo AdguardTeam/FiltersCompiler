@@ -342,15 +342,43 @@ describe('converter', () => {
         expect(actual[0]).toBe(expected);
     });
 
-    describe('keeps html filtering rules with [min-length] and [max-length] as is', () => {
+    describe('converts html filtering rules with [min-length] and [max-length]', () => {
+        it.each([
+            {
+                rule: 'example.com$$script[min-length="100"][max-length="500"]',
+                expected: 'example.com$$script:contains(/^(?=.{100,500}$).*/s)',
+            },
+            {
+                rule: 'example.com$$script[min-length="1000"]',
+                expected: 'example.com$$script:contains(/^(?=.{1000,}$).*/s)',
+            },
+            {
+                rule: 'example.com$$script[max-length="5000"]',
+                expected: 'example.com$$script:contains(/^(?=.{0,5000}$).*/s)',
+            },
+            {
+                rule: 'example.com$$script[tag-content="Flags."][min-length="20000"][max-length="30000"]',
+                expected: 'example.com$$script:contains(Flags.):contains(/^(?=.{20000,30000}$).*/s)',
+            },
+        ])('$rule', ({ rule, expected }) => {
+            const actual = convertRulesToAdgSyntax([rule]);
+            expect(actual[0]).toBe(expected);
+        });
+    });
+
+    describe('keeps html filtering rules with [min-length]/[max-length] values exceeding 65535 as is', () => {
         it.each([
             'example.com$$script[tag-content="Flags."][min-length="20000"][max-length="300000"]',
-            'example.com$$script[min-length="100"][max-length="500"]',
-            'example.com$$script[min-length="1000"]',
-            'example.com$$script[max-length="5000"]',
+            'example.com$$script[min-length="100000"]',
+            'example.com$$script[max-length="70000"]',
         ])('%s', (rule) => {
-            const actual = convertRulesToAdgSyntax([rule]);
+            const excluded = [];
+            const actual = convertRulesToAdgSyntax([rule], excluded);
+            // rule is kept unchanged
             expect(actual[0]).toBe(rule);
+            // warning is written to the excluded list (diff.txt)
+            expect(excluded.join('\n')).toContain('Warning');
+            expect(excluded.join('\n')).toContain(rule);
         });
     });
 
@@ -377,17 +405,33 @@ describe('converter', () => {
         });
     });
 
-    describe('converts html rules with pseudo-classes', () => {
+    describe('normalizes html rules with unbalanced pseudo-class arguments to a quoted form', () => {
         it.each([
-            'example.com$$script:contains(eval(function(p,a,c,k,e,d))',
-            'example.com$$script:contains((function(_0x)',
-            'example.com$$script:contains(Array.from(document.querySelectorAll)',
-            "example.com$$script:contains(document.addEventListener('click')",
-        ])('$input', (input) => {
+            [
+                'example.com$$script:contains(eval(function(p,a,c,k,e,d))',
+                'example.com$$script:contains("eval(function(p,a,c,k,e,d)")',
+            ],
+            [
+                'example.com$$script:contains((function(_0x)',
+                'example.com$$script:contains("(function(_0x")',
+            ],
+            [
+                'example.com$$script:contains(Array.from(document.querySelectorAll)',
+                'example.com$$script:contains("Array.from(document.querySelectorAll")',
+            ],
+            [
+                "example.com$$script:contains(document.addEventListener('click')",
+                "example.com$$script:contains(\"document.addEventListener('click'\")",
+            ],
+        ])('%s', (input, expected) => {
             const actual = convertRulesToAdgSyntax([input]);
-            // keep the rule as is. TODO: check while AG-24662 resolving
-            expect(actual[0]).toBe(input);
+            expect(actual[0]).toBe(expected);
         });
+    });
+
+    it('converts html rules with :has-text to :contains', () => {
+        const actual = convertRulesToAdgSyntax(['example.com$$script:has-text(ad)']);
+        expect(actual[0]).toBe('example.com$$script:contains(ad)');
     });
 
     it('converts $1p to $~third-party and $3p to $third-party', () => {
