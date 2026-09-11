@@ -33,7 +33,7 @@
         "pnpm": ">=10.33.4 <11"
     },
     "dependencies": {
-        "@adguard/agtree": "4.2.1",
+        "@adguard/agtree": "file:/tmp/agtree-4.3.0.tgz",
         "@adguard/css-tokenizer": "1.2.0",
         "@adguard/ecss-tree": "2.0.1",
         "@adguard/extended-css": "2.2.0",
@@ -70,5 +70,6 @@
         "tslib": "2.8.1",
         "typescript": "6.0.3",
         "vitest": "3.0.5"
-    }
+    },
+    "packageManager": "pnpm@10.33.4+sha512.1c67b3b359b2d408119ba1ed289f34b8fc3c6873412bec6fd264fbdc82489e510fcbecb9ce9d22dae7f3b76269d8441046014bdca53b9979cd7a561ad631b800"
 }
