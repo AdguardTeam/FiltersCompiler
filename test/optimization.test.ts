@@ -417,7 +417,7 @@ describe('assertValidStats()', () => {
 
             expect(error).toBeInstanceOf(TypeError);
             expect(error.message).toBe(
-                `Optimization stats for ${VALID_FILTER_ID} must be a non-null object, but got ${printed}`,
+                `Optimization stats for ${VALID_FILTER_ID}: must be a non-null object, but got ${printed}`,
             );
         });
     });
@@ -451,15 +451,14 @@ describe('assertValidStats()', () => {
             { label: 'a group that is null', group: null },
             { label: 'a group that is a primitive', group: 'oops' },
             { label: 'a group that is an array', group: [] },
-        ])('throws a TypeError carrying the offending group when $label', ({ group }) => {
+        ])('throws a TypeError naming the offending group when $label', ({ group }) => {
             const error = getStatsValidationError({ groups: [group] });
 
             expect(error).toBeInstanceOf(TypeError);
             expect(error.message).toBe(
                 `Optimization stats for ${VALID_FILTER_ID}: groups[0] must have a "rules" object `
-                + 'and a numeric "config.hits"',
+                + `and a numeric "config.hits", but got ${JSON.stringify(group)}`,
             );
-            expect(error.cause).toStrictEqual({ group });
         });
 
         it('reports the index of the first malformed group among otherwise-valid ones', () => {

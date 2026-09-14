@@ -170,17 +170,20 @@ const describeInvalidStats = (stats: unknown): string => {
  * array, or empty, or if any group lacks a `rules` object or a numeric `config.hits`.
  */
 export function assertValidStats(filterId: number, stats: unknown): asserts stats is OptimizationStats {
+    /**
+     * @param defect - What's wrong, e.g. `"groups must be a non-empty array"`.
+     * @param value - The offending value, folded into the message via `describeInvalidStats`.
+     * @returns The `TypeError` to throw.
+     */
+    const invalidStatsError = (defect: string, value: unknown): TypeError => (
+        new TypeError(`Optimization stats for ${filterId}: ${defect}, but got ${describeInvalidStats(value)}`)
+    );
+
     if (stats === null || typeof stats !== 'object') {
-        throw new TypeError(
-            `Optimization stats for ${filterId} must be a non-null object, but got ${describeInvalidStats(stats)}`,
-        );
+        throw invalidStatsError('must be a non-null object', stats);
     }
     if (!('groups' in stats) || !Array.isArray(stats.groups) || stats.groups.length === 0) {
-        const { groups } = stats as { groups?: unknown };
-        throw new TypeError(
-            `Optimization stats for ${filterId}: groups must be a non-empty array, `
-            + `but got ${describeInvalidStats(groups)}`,
-        );
+        throw invalidStatsError('groups must be a non-empty array', (stats as { groups?: unknown }).groups);
     }
 
     /**
@@ -208,10 +211,9 @@ export function assertValidStats(filterId: number, stats: unknown): asserts stat
     const { groups } = stats;
     const invalidGroupIndex = groups.findIndex((group) => !isValidOptimizationGroup(group));
     if (invalidGroupIndex !== -1) {
-        throw new TypeError(
-            `Optimization stats for ${filterId}: groups[${invalidGroupIndex}] must have a "rules" object `
-            + 'and a numeric "config.hits"',
-            { cause: { group: groups[invalidGroupIndex] } },
+        throw invalidStatsError(
+            `groups[${invalidGroupIndex}] must have a "rules" object and a numeric "config.hits"`,
+            groups[invalidGroupIndex],
         );
     }
 }

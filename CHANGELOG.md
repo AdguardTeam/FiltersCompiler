@@ -25,6 +25,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   into its own message (`groups must be a non-empty array, but got ...`)
   instead of an untyped `{ groups }` payload nested two levels deep in
   `error.cause.cause`, which no consumer could safely read.
+- All `assertValidStats()` failures now build their `TypeError` through a
+  single shared helper (consistent `"Optimization stats for <id>: <defect>,
+  but got <value>"` shape), including the malformed-group-entry check, which
+  previously buried the offending group the same untyped-`cause` way the
+  "missing groups" check did.
 
 ### Deprecated
 
