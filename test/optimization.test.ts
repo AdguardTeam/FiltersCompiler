@@ -298,6 +298,24 @@ describe('getOptimizationStatistics()', () => {
         });
     });
 
+    it('throws when stats contents is valid JSON but fails structural validation', async () => {
+        downloadFile.mockImplementation((url: string) => {
+            if (url.includes(PERCENT_JSON)) {
+                return JSON.stringify(MOCK_PERCENT_JSON);
+            }
+            return JSON.stringify({ groups: [] });
+        });
+
+        const error = await getOptimizationStatistics(VALID_FILTER_ID).catch((e: unknown) => e);
+
+        expect(error).toBeInstanceOf(OptimizationStatsError);
+        expect(error).toMatchObject({
+            filterId: VALID_FILTER_ID,
+            sourcePath: expect.stringContaining(`/${FILTERS_DIR_NAME}/${VALID_FILTER_ID}/${STATS_JSON}`),
+            code: 'OPTIMIZATION_STATS_INVALID',
+        });
+    });
+
     it(`returns null for a filterId not listed in remote ${PERCENT_JSON}`, async () => {
         const result = await getOptimizationStatistics(INVALID_FILTER_ID);
         expect(result).toBeNull();
