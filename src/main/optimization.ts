@@ -176,9 +176,10 @@ export function assertValidStats(filterId: number, stats: unknown): asserts stat
         );
     }
     if (!('groups' in stats) || !Array.isArray(stats.groups) || stats.groups.length === 0) {
+        const { groups } = stats as { groups?: unknown };
         throw new TypeError(
-            `Optimization stats for ${filterId}: groups is missing, not an array, or empty`,
-            { cause: { groups: (stats as { groups?: unknown }).groups } },
+            `Optimization stats for ${filterId}: groups must be a non-empty array, `
+            + `but got ${describeInvalidStats(groups)}`,
         );
     }
 

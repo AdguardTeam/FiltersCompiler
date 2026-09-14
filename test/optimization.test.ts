@@ -424,18 +424,17 @@ describe('assertValidStats()', () => {
 
     describe('rejects invalid groups', () => {
         it.each([
-            { label: 'groups is missing', value: {}, groups: undefined },
-            { label: 'groups is an empty array', value: { groups: [] }, groups: [] },
-            { label: 'groups is null', value: { groups: null }, groups: null },
-            { label: 'groups is not an array', value: { groups: 'nope' }, groups: 'nope' },
-        ])('throws a TypeError carrying the offending groups when $label', ({ value, groups }) => {
+            { label: 'groups is missing', value: {}, printed: 'undefined' },
+            { label: 'groups is an empty array', value: { groups: [] }, printed: '[]' },
+            { label: 'groups is null', value: { groups: null }, printed: 'null' },
+            { label: 'groups is not an array', value: { groups: 'nope' }, printed: '"nope"' },
+        ])('throws a TypeError naming the offending groups value when $label', ({ value, printed }) => {
             const error = getStatsValidationError(value);
 
             expect(error).toBeInstanceOf(TypeError);
             expect(error.message).toBe(
-                `Optimization stats for ${VALID_FILTER_ID}: groups is missing, not an array, or empty`,
+                `Optimization stats for ${VALID_FILTER_ID}: groups must be a non-empty array, but got ${printed}`,
             );
-            expect(error.cause).toStrictEqual({ groups });
         });
     });
 

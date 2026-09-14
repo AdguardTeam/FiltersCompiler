@@ -21,6 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `OptimizationStatsError`'s `message` now folds in `cause.message` when the
   cause is an `Error`, so the specific reason survives for callers that log
   only `error.message` and never walk the `cause` chain.
+- The "missing groups" `TypeError` now folds the offending `groups` value
+  into its own message (`groups must be a non-empty array, but got ...`)
+  instead of an untyped `{ groups }` payload nested two levels deep in
+  `error.cause.cause`, which no consumer could safely read.
 
 ### Deprecated
 
