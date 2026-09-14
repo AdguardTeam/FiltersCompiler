@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `assertValidStats()` now throws `OptimizationStatsError` (previously a bare
+  `Error`) carrying `filterId`, `sourcePath`, and a `reason: 'retrieval' |
+  'validation'` discriminator. `code` is `OPTIMIZATION_STATS_INVALID` for
+  validation failures and `OPTIMIZATION_STATS_UNAVAILABLE` for retrieval
+  failures.
+
 ### Deprecated
 
 ### Removed

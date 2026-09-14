@@ -294,6 +294,7 @@ describe('getOptimizationStatistics()', () => {
         expect(error).toMatchObject({
             filterId: VALID_FILTER_ID,
             sourcePath: expect.stringContaining(`/${FILTERS_DIR_NAME}/${VALID_FILTER_ID}/${STATS_JSON}`),
+            code: 'OPTIMIZATION_STATS_UNAVAILABLE',
         });
     });
 
@@ -375,6 +376,7 @@ describe('assertValidStats()', () => {
             expect(error).toBeInstanceOf(OptimizationStatsError);
             expect(error.filterId).toBe(VALID_FILTER_ID);
             expect(error.sourcePath).toBe(SOURCE_PATH);
+            expect(error.code).toBe('OPTIMIZATION_STATS_INVALID');
             expect(error.cause).toBeInstanceOf(TypeError);
             expect((error.cause as Error).message).toBe(
                 `Optimization stats for ${VALID_FILTER_ID} must be a non-null object, but got ${printed}`,
@@ -394,6 +396,7 @@ describe('assertValidStats()', () => {
             expect(error).toBeInstanceOf(OptimizationStatsError);
             expect(error.filterId).toBe(VALID_FILTER_ID);
             expect(error.sourcePath).toBe(SOURCE_PATH);
+            expect(error.code).toBe('OPTIMIZATION_STATS_INVALID');
             expect(error.cause).toBeInstanceOf(TypeError);
             expect((error.cause as Error).message).toBe(
                 `Optimization stats for ${VALID_FILTER_ID}: groups is missing, not an array, or empty`,

@@ -45,25 +45,31 @@ export interface OptimizationStats {
 }
 
 /**
- * Thrown by `getOptimizationStatistics` when a filter's stats cannot be
- * retrieved, from either a local file or the remote server.
+ * Thrown by `getOptimizationStatistics` when a filter's stats are unusable,
+ * either because they could not be retrieved (local file or remote server)
+ * or because retrieved stats failed structural validation.
  *
  * Carries `filterId` and `sourcePath` as structured fields so callers can
- * build their own actionable message instead of matching on `error.message`.
+ * build their own actionable message, and a `code` so callers can branch on
+ * the failure kind, instead of matching on `error.message`.
  */
 export class OptimizationStatsError extends Error {
-    code = 'OPTIMIZATION_STATS_UNAVAILABLE' as const;
+    code: 'OPTIMIZATION_STATS_UNAVAILABLE' | 'OPTIMIZATION_STATS_INVALID';
 
     constructor(
         public filterId: number,
         public sourcePath: string,
+        reason: 'retrieval' | 'validation',
         options?: ErrorOptions,
     ) {
         super(
-            `Unable to retrieve optimization stats for ${filterId}, at ${sourcePath}. `
-            + 'Please ensure the stats file exists and is accessible.',
+            reason === 'validation'
+                ? `Invalid optimization stats for ${filterId}, at ${sourcePath}.`
+                : `Unable to retrieve optimization stats for ${filterId}, at ${sourcePath}. `
+                    + 'Please ensure the stats file exists and is accessible.',
             options,
         );
+        this.code = reason === 'validation' ? 'OPTIMIZATION_STATS_INVALID' : 'OPTIMIZATION_STATS_UNAVAILABLE';
         this.name = 'OptimizationStatsError';
     }
 }
@@ -127,20 +133,21 @@ const getOptimizableFilterIds = async () => {
  * Validates that stats have non-empty groups.
  *
  * @param filterId - Numeric filter identifier.
+ * @param sourcePath - Path or URL the stats were read from, for the thrown error.
  * @param stats - Parsed optimization stats object.
  * @throws {OptimizationStatsError} if stats is not an object, or if stats.groups is missing or empty.
  */
 // eslint-disable-next-line max-len
 export function assertValidStats(filterId: number, sourcePath: string, stats: unknown): asserts stats is OptimizationStats {
     if (stats === null || typeof stats !== 'object') {
-        throw new OptimizationStatsError(filterId, sourcePath, {
+        throw new OptimizationStatsError(filterId, sourcePath, 'validation', {
             cause: new TypeError(
                 `Optimization stats for ${filterId} must be a non-null object, but got ${JSON.stringify(stats)}`,
             ),
         });
     }
     if (!('groups' in stats) || !Array.isArray(stats.groups) || stats.groups.length === 0) {
-        throw new OptimizationStatsError(filterId, sourcePath, {
+        throw new OptimizationStatsError(filterId, sourcePath, 'validation', {
             cause: new TypeError(
                 `Optimization stats for ${filterId}: groups is missing, not an array, or empty`,
                 { cause: { groups: (stats as { groups?: unknown }).groups } },
@@ -251,7 +258,7 @@ export const localOptimizationStatistics = {
  *
  * @param filterId - Numeric filter identifier.
  * @returns Parsed stats object, or `null` when the filter has no optimization stats.
- * @throws {Error} When the stats are missing or malformed.
+ * @throws {OptimizationStatsError} When the stats are missing or malformed.
  */
 export const getOptimizationStatistics = async (filterId: number) => {
     if (!optimizationEnabled) {
@@ -276,7 +283,7 @@ export const getOptimizationStatistics = async (filterId: number) => {
             : await downloadOptimizationStats(filterId);
         stats = JSON.parse(content);
     } catch (originalError) {
-        throw new OptimizationStatsError(filterId, statsPath, { cause: originalError });
+        throw new OptimizationStatsError(filterId, statsPath, 'retrieval', { cause: originalError });
     }
 
     assertValidStats(filterId, statsPath, stats);
