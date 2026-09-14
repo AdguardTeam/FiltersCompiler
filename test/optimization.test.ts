@@ -409,6 +409,9 @@ describe('assertValidStats()', () => {
             { label: 'a number', value: 5, printed: '5' },
             { label: 'a string', value: 'oops', printed: '"oops"' },
             { label: 'a BigInt', value: BigInt(10), printed: '10' },
+            { label: 'a NaN', value: NaN, printed: 'NaN' },
+            { label: 'a Infinity', value: Infinity, printed: 'Infinity' },
+            { label: 'a -Infinity', value: -Infinity, printed: '-Infinity' },
         ])('throws a TypeError for $label', ({ value, printed }) => {
             const error = getStatsValidationError(value);
 

@@ -144,6 +144,9 @@ const getOptimizableFilterIds = async () => {
  * @returns A printable representation of `stats`.
  */
 const describeInvalidStats = (stats: unknown): string => {
+    if (typeof stats === 'number' && !Number.isFinite(stats)) {
+        return String(stats);
+    }
     let printed: string;
     try {
         const json = JSON.stringify(stats);
