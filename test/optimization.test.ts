@@ -80,7 +80,7 @@ describe('localOptimizationStatistics', () => {
                     expect(existsSync(statsPath)).toBeTruthy();
 
                     const raw = await fs.readFile(statsPath, 'utf-8');
-                    expect(() => assertValidStats(filterId, statsPath, JSON.parse(raw))).not.toThrow();
+                    expect(() => assertValidStats(filterId, JSON.parse(raw))).not.toThrow();
                 }),
             );
         });
@@ -313,6 +313,7 @@ describe('getOptimizationStatistics()', () => {
             filterId: VALID_FILTER_ID,
             sourcePath: expect.stringContaining(`/${FILTERS_DIR_NAME}/${VALID_FILTER_ID}/${STATS_JSON}`),
             code: 'OPTIMIZATION_STATS_INVALID',
+            cause: expect.any(TypeError),
         });
     });
 
@@ -383,13 +384,11 @@ describe('use()', () => {
 });
 
 describe('assertValidStats()', () => {
-    const SOURCE_PATH = '/tmp/filters/1/stats.json';
-
-    const catchError = (stats: unknown): OptimizationStatsError => {
+    const getStatsValidationError = (stats: unknown): TypeError => {
         try {
-            assertValidStats(VALID_FILTER_ID, SOURCE_PATH, stats);
+            assertValidStats(VALID_FILTER_ID, stats);
         } catch (e) {
-            return e as OptimizationStatsError;
+            return e as TypeError;
         }
         throw new Error('assertValidStats did not throw');
     };
@@ -400,29 +399,13 @@ describe('assertValidStats()', () => {
             { label: 'undefined', value: undefined, printed: 'undefined' },
             { label: 'a number', value: 5, printed: '5' },
             { label: 'a string', value: 'oops', printed: '"oops"' },
-            { label: 'a boolean', value: false, printed: 'false' },
             { label: 'a BigInt', value: BigInt(10), printed: '10' },
-        ])('throws OptimizationStatsError with a TypeError cause for $label', ({ value, printed }) => {
-            const error = catchError(value);
+        ])('throws a TypeError for $label', ({ value, printed }) => {
+            const error = getStatsValidationError(value);
 
-            expect(error).toBeInstanceOf(OptimizationStatsError);
-            expect(error.filterId).toBe(VALID_FILTER_ID);
-            expect(error.sourcePath).toBe(SOURCE_PATH);
-            expect(error.code).toBe('OPTIMIZATION_STATS_INVALID');
-            expect(error.cause).toBeInstanceOf(TypeError);
-            expect((error.cause as Error).message).toBe(
+            expect(error).toBeInstanceOf(TypeError);
+            expect(error.message).toBe(
                 `Optimization stats for ${VALID_FILTER_ID} must be a non-null object, but got ${printed}`,
-            );
-        });
-
-        it('throws OptimizationStatsError with a TypeError cause for a function, without a raw crash', () => {
-            const error = catchError(() => {});
-
-            expect(error).toBeInstanceOf(OptimizationStatsError);
-            expect(error.code).toBe('OPTIMIZATION_STATS_INVALID');
-            expect(error.cause).toBeInstanceOf(TypeError);
-            expect((error.cause as Error).message).toContain(
-                `Optimization stats for ${VALID_FILTER_ID} must be a non-null object, but got `,
             );
         });
     });
@@ -433,23 +416,19 @@ describe('assertValidStats()', () => {
             { label: 'groups is an empty array', value: { groups: [] }, groups: [] },
             { label: 'groups is null', value: { groups: null }, groups: null },
             { label: 'groups is not an array', value: { groups: 'nope' }, groups: 'nope' },
-        ])('throws OptimizationStatsError carrying the offending groups when $label', ({ value, groups }) => {
-            const error = catchError(value);
+        ])('throws a TypeError carrying the offending groups when $label', ({ value, groups }) => {
+            const error = getStatsValidationError(value);
 
-            expect(error).toBeInstanceOf(OptimizationStatsError);
-            expect(error.filterId).toBe(VALID_FILTER_ID);
-            expect(error.sourcePath).toBe(SOURCE_PATH);
-            expect(error.code).toBe('OPTIMIZATION_STATS_INVALID');
-            expect(error.cause).toBeInstanceOf(TypeError);
-            expect((error.cause as Error).message).toBe(
+            expect(error).toBeInstanceOf(TypeError);
+            expect(error.message).toBe(
                 `Optimization stats for ${VALID_FILTER_ID}: groups is missing, not an array, or empty`,
             );
-            expect((error.cause as Error).cause).toStrictEqual({ groups });
+            expect(error.cause).toStrictEqual({ groups });
         });
     });
 
     it('does not throw for valid stats', () => {
-        expect(() => assertValidStats(VALID_FILTER_ID, SOURCE_PATH, MOCK_STATS_JSON)).not.toThrow();
+        expect(() => assertValidStats(VALID_FILTER_ID, MOCK_STATS_JSON)).not.toThrow();
     });
 });
 

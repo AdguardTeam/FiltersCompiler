@@ -130,50 +130,44 @@ const getOptimizableFilterIds = async () => {
 };
 
 /**
- * Validates that stats have non-empty groups.
+ * `JSON.stringify` with a safe fallback for values it can't represent: it
+ * throws on `BigInt`, and returns `undefined` (not a string) for
+ * `symbol`/`function`, which would otherwise print as the misleading
+ * literal text "undefined".
+ *
+ * @param stats - Value to describe for an error message.
+ * @returns A printable representation of `stats`.
+ */
+const describeInvalidStats = (stats: unknown): string => {
+    try {
+        const json = JSON.stringify(stats);
+        return json === undefined ? String(stats) : json;
+    } catch {
+        return String(stats);
+    }
+};
+
+/**
+ * Validates that stats have non-empty groups. Only validates — does not
+ * know where `stats` came from, so it throws a plain `TypeError`; the
+ * caller (`getOptimizationStatistics`) decorates it with `filterId` and
+ * `sourcePath` as an `OptimizationStatsError`.
  *
  * @param filterId - Numeric filter identifier.
- * @param sourcePath - Path or URL the stats were read from, for the thrown error.
  * @param stats - Parsed optimization stats object.
- * @throws {OptimizationStatsError} if stats is not an object, or if stats.groups is missing or empty.
+ * @throws {TypeError} if stats is not an object, or if stats.groups is missing or empty.
  */
-export function assertValidStats(
-    filterId: number,
-    sourcePath: string,
-    stats: unknown,
-): asserts stats is OptimizationStats {
-    /**
-     * `JSON.stringify` with a safe fallback for values it can't represent:
-     * it throws on `BigInt`, and returns `undefined` (not a string) for
-     * `symbol`/`function`, which would otherwise print as the misleading
-     * literal text "undefined".
-     *
-     * @param data - Value to describe for an error message.
-     * @returns A printable representation of `stats`.
-     */
-    const describeInvalidStats = (data: unknown): string => {
-        try {
-            const json = JSON.stringify(data);
-            return json === undefined ? String(data) : json;
-        } catch {
-            return String(data);
-        }
-    };
-
+export function assertValidStats(filterId: number, stats: unknown): asserts stats is OptimizationStats {
     if (stats === null || typeof stats !== 'object') {
-        throw new OptimizationStatsError(filterId, sourcePath, 'validation', {
-            cause: new TypeError(
-                `Optimization stats for ${filterId} must be a non-null object, but got ${describeInvalidStats(stats)}`,
-            ),
-        });
+        throw new TypeError(
+            `Optimization stats for ${filterId} must be a non-null object, but got ${describeInvalidStats(stats)}`,
+        );
     }
     if (!('groups' in stats) || !Array.isArray(stats.groups) || stats.groups.length === 0) {
-        throw new OptimizationStatsError(filterId, sourcePath, 'validation', {
-            cause: new TypeError(
-                `Optimization stats for ${filterId}: groups is missing, not an array, or empty`,
-                { cause: { groups: (stats as { groups?: unknown }).groups } },
-            ),
-        });
+        throw new TypeError(
+            `Optimization stats for ${filterId}: groups is missing, not an array, or empty`,
+            { cause: { groups: (stats as { groups?: unknown }).groups } },
+        );
     }
 }
 
@@ -307,7 +301,11 @@ export const getOptimizationStatistics = async (filterId: number) => {
         throw new OptimizationStatsError(filterId, statsPath, 'retrieval', { cause: originalError });
     }
 
-    assertValidStats(filterId, statsPath, stats);
+    try {
+        assertValidStats(filterId, stats);
+    } catch (originalError) {
+        throw new OptimizationStatsError(filterId, statsPath, 'validation', { cause: originalError });
+    }
 
     return stats;
 };
