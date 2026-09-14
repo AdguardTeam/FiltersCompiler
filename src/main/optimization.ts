@@ -137,8 +137,11 @@ const getOptimizableFilterIds = async () => {
  * @param stats - Parsed optimization stats object.
  * @throws {OptimizationStatsError} if stats is not an object, or if stats.groups is missing or empty.
  */
-// eslint-disable-next-line max-len
-export function assertValidStats(filterId: number, sourcePath: string, stats: unknown): asserts stats is OptimizationStats {
+export function assertValidStats(
+    filterId: number,
+    sourcePath: string,
+    stats: unknown,
+): asserts stats is OptimizationStats {
     /**
      * `JSON.stringify` with a safe fallback for values it can't represent:
      * it throws on `BigInt`, and returns `undefined` (not a string) for
