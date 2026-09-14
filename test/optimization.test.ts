@@ -427,6 +427,40 @@ describe('assertValidStats()', () => {
         });
     });
 
+    describe('rejects malformed group entries', () => {
+        it.each([
+            { label: 'a group missing rules', group: { config: { hits: 1 } } },
+            { label: 'a group missing config', group: { rules: {} } },
+            { label: 'a group with rules as an array', group: { config: { hits: 1 }, rules: [] } },
+            { label: 'a group with rules as null', group: { config: { hits: 1 }, rules: null } },
+            { label: 'a group with rules as a primitive', group: { config: { hits: 1 }, rules: 'oops' } },
+            { label: 'a group with config as null', group: { rules: {}, config: null } },
+            { label: 'a group with config as a primitive', group: { rules: {}, config: 'oops' } },
+            { label: 'a group with a non-numeric config.hits', group: { config: { hits: '1' }, rules: {} } },
+            { label: 'a group that is null', group: null },
+            { label: 'a group that is a primitive', group: 'oops' },
+            { label: 'a group that is an array', group: [] },
+        ])('throws a TypeError carrying the offending group when $label', ({ group }) => {
+            const error = getStatsValidationError({ groups: [group] });
+
+            expect(error).toBeInstanceOf(TypeError);
+            expect(error.message).toBe(
+                `Optimization stats for ${VALID_FILTER_ID}: groups[0] must have a "rules" object `
+                + 'and a numeric "config.hits"',
+            );
+            expect(error.cause).toStrictEqual({ group });
+        });
+
+        it('reports the index of the first malformed group among otherwise-valid ones', () => {
+            const validGroup = { config: { hits: 1 }, rules: {} };
+            const malformedGroup = { config: { hits: 1 } };
+
+            const error = getStatsValidationError({ groups: [validGroup, malformedGroup] });
+
+            expect(error.message).toContain('groups[1]');
+        });
+    });
+
     it('does not throw for valid stats', () => {
         expect(() => assertValidStats(VALID_FILTER_ID, MOCK_STATS_JSON)).not.toThrow();
     });

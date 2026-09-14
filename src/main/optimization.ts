@@ -148,14 +148,16 @@ const describeInvalidStats = (stats: unknown): string => {
 };
 
 /**
- * Validates that stats have non-empty groups. Only validates — does not
+ * Validates that stats have non-empty groups, and that every group has the
+ * shape `skipRuleWithOptimization` relies on. Only validates — does not
  * know where `stats` came from, so it throws a plain `TypeError`; the
  * caller (`getOptimizationStatistics`) decorates it with `filterId` and
  * `sourcePath` as an `OptimizationStatsError`.
  *
  * @param filterId - Numeric filter identifier.
  * @param stats - Parsed optimization stats object.
- * @throws {TypeError} if stats is not an object, or if stats.groups is missing or empty.
+ * @throws {TypeError} if stats is not an object, if stats.groups is missing, not an
+ * array, or empty, or if any group lacks a `rules` object or a numeric `config.hits`.
  */
 export function assertValidStats(filterId: number, stats: unknown): asserts stats is OptimizationStats {
     if (stats === null || typeof stats !== 'object') {
@@ -167,6 +169,38 @@ export function assertValidStats(filterId: number, stats: unknown): asserts stat
         throw new TypeError(
             `Optimization stats for ${filterId}: groups is missing, not an array, or empty`,
             { cause: { groups: (stats as { groups?: unknown }).groups } },
+        );
+    }
+
+    /**
+     * Checks that a single group has the shape `skipRuleWithOptimization` relies
+     * on: a `rules` object to index into, and a numeric `config.hits` to compare
+     * against.
+     *
+     * @param group - Value to check.
+     * @returns Whether `group` has a valid shape.
+     */
+    const isValidOptimizationGroup = (group: unknown): boolean => {
+        if (group === null || typeof group !== 'object') {
+            return false;
+        }
+        const { rules, config } = group as { rules?: unknown; config?: unknown };
+        if (rules === null || typeof rules !== 'object' || Array.isArray(rules)) {
+            return false;
+        }
+        if (config === null || typeof config !== 'object') {
+            return false;
+        }
+        return typeof (config as { hits?: unknown }).hits === 'number';
+    };
+
+    const { groups } = stats;
+    const invalidGroupIndex = groups.findIndex((group) => !isValidOptimizationGroup(group));
+    if (invalidGroupIndex !== -1) {
+        throw new TypeError(
+            `Optimization stats for ${filterId}: groups[${invalidGroupIndex}] must have a "rules" object `
+            + 'and a numeric "config.hits"',
+            { cause: { group: groups[invalidGroupIndex] } },
         );
     }
 }
