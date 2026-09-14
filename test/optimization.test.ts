@@ -444,7 +444,7 @@ describe('assertValidStats()', () => {
             expect((error.cause as Error).message).toBe(
                 `Optimization stats for ${VALID_FILTER_ID}: groups is missing, not an array, or empty`,
             );
-            expect((error.cause as Error).cause).toEqual({ groups });
+            expect((error.cause as Error).cause).toStrictEqual({ groups });
         });
     });
 
