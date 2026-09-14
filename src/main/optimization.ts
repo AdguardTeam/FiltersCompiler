@@ -139,10 +139,28 @@ const getOptimizableFilterIds = async () => {
  */
 // eslint-disable-next-line max-len
 export function assertValidStats(filterId: number, sourcePath: string, stats: unknown): asserts stats is OptimizationStats {
+    /**
+     * `JSON.stringify` with a safe fallback for values it can't represent:
+     * it throws on `BigInt`, and returns `undefined` (not a string) for
+     * `symbol`/`function`, which would otherwise print as the misleading
+     * literal text "undefined".
+     *
+     * @param data - Value to describe for an error message.
+     * @returns A printable representation of `stats`.
+     */
+    const describeInvalidStats = (data: unknown): string => {
+        try {
+            const json = JSON.stringify(data);
+            return json === undefined ? String(data) : json;
+        } catch {
+            return String(data);
+        }
+    };
+
     if (stats === null || typeof stats !== 'object') {
         throw new OptimizationStatsError(filterId, sourcePath, 'validation', {
             cause: new TypeError(
-                `Optimization stats for ${filterId} must be a non-null object, but got ${JSON.stringify(stats)}`,
+                `Optimization stats for ${filterId} must be a non-null object, but got ${describeInvalidStats(stats)}`,
             ),
         });
     }

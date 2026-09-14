@@ -401,6 +401,7 @@ describe('assertValidStats()', () => {
             { label: 'a number', value: 5, printed: '5' },
             { label: 'a string', value: 'oops', printed: '"oops"' },
             { label: 'a boolean', value: false, printed: 'false' },
+            { label: 'a BigInt', value: BigInt(10), printed: '10' },
         ])('throws OptimizationStatsError with a TypeError cause for $label', ({ value, printed }) => {
             const error = catchError(value);
 
@@ -411,6 +412,17 @@ describe('assertValidStats()', () => {
             expect(error.cause).toBeInstanceOf(TypeError);
             expect((error.cause as Error).message).toBe(
                 `Optimization stats for ${VALID_FILTER_ID} must be a non-null object, but got ${printed}`,
+            );
+        });
+
+        it('throws OptimizationStatsError with a TypeError cause for a function, without a raw crash', () => {
+            const error = catchError(() => {});
+
+            expect(error).toBeInstanceOf(OptimizationStatsError);
+            expect(error.code).toBe('OPTIMIZATION_STATS_INVALID');
+            expect(error.cause).toBeInstanceOf(TypeError);
+            expect((error.cause as Error).message).toContain(
+                `Optimization stats for ${VALID_FILTER_ID} must be a non-null object, but got `,
             );
         });
     });
