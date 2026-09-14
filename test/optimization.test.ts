@@ -288,14 +288,19 @@ describe('getOptimizationStatistics()', () => {
             return EMPTY_STRING;
         });
 
-        const error = await getOptimizationStatistics(VALID_FILTER_ID).catch((e: unknown) => e);
+        const error = await getOptimizationStatistics(VALID_FILTER_ID)
+            .catch((e: unknown) => e) as OptimizationStatsError;
 
         expect(error).toBeInstanceOf(OptimizationStatsError);
         expect(error).toMatchObject({
             filterId: VALID_FILTER_ID,
             sourcePath: expect.stringContaining(`/${FILTERS_DIR_NAME}/${VALID_FILTER_ID}/${STATS_JSON}`),
             code: 'OPTIMIZATION_STATS_UNAVAILABLE',
+            cause: expect.any(Error),
         });
+        // User should be able to see the specific cause message in the error log.
+        const causeMessage = (error.cause as Error)?.message;
+        expect(error.message).toContain(causeMessage);
     });
 
     it('throws when stats contents is valid JSON but fails structural validation', async () => {
@@ -306,7 +311,8 @@ describe('getOptimizationStatistics()', () => {
             return JSON.stringify({ groups: [] });
         });
 
-        const error = await getOptimizationStatistics(VALID_FILTER_ID).catch((e: unknown) => e);
+        const error = await getOptimizationStatistics(VALID_FILTER_ID)
+            .catch((e: unknown) => e) as OptimizationStatsError;
 
         expect(error).toBeInstanceOf(OptimizationStatsError);
         expect(error).toMatchObject({
@@ -315,6 +321,9 @@ describe('getOptimizationStatistics()', () => {
             code: 'OPTIMIZATION_STATS_INVALID',
             cause: expect.any(TypeError),
         });
+        // User should be able to see the specific cause message in the error log.
+        const causeMessage = (error.cause as TypeError).message;
+        expect((error).message).toContain(causeMessage);
     });
 
     it(`returns null for a filterId not listed in remote ${PERCENT_JSON}`, async () => {

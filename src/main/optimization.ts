@@ -51,7 +51,10 @@ export interface OptimizationStats {
  *
  * Carries `filterId` and `sourcePath` as structured fields so callers can
  * build their own actionable message, and a `code` so callers can branch on
- * the failure kind, instead of matching on `error.message`.
+ * the failure kind, instead of matching on `error.message`. When `options.cause`
+ * is an `Error`, its message is folded into this error's own `message` too, so
+ * the specific reason survives even for callers that only log `error.message`
+ * and never walk the `cause` chain.
  */
 export class OptimizationStatsError extends Error {
     code: 'OPTIMIZATION_STATS_UNAVAILABLE' | 'OPTIMIZATION_STATS_INVALID';
@@ -62,11 +65,13 @@ export class OptimizationStatsError extends Error {
         reason: 'retrieval' | 'validation',
         options?: ErrorOptions,
     ) {
+        const causeMessage = options?.cause instanceof Error ? options.cause.message : undefined;
+        const detail = causeMessage !== undefined ? ` ${causeMessage}` : '';
         super(
             reason === 'validation'
-                ? `Invalid optimization stats for ${filterId}, at ${sourcePath}.`
+                ? `Invalid optimization stats for ${filterId}, at ${sourcePath}.${detail}`
                 : `Unable to retrieve optimization stats for ${filterId}, at ${sourcePath}. `
-                    + 'Please ensure the stats file exists and is accessible.',
+                    + `Please ensure the stats file exists and is accessible.${detail}`,
             options,
         );
         this.code = reason === 'validation' ? 'OPTIMIZATION_STATS_INVALID' : 'OPTIMIZATION_STATS_UNAVAILABLE';

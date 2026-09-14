@@ -11,17 +11,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- `assertValidStats()` now throws `OptimizationStatsError` (previously a bare
-  `Error`) carrying `filterId`, `sourcePath`, and a `reason: 'retrieval' |
-  'validation'` discriminator. `code` is `OPTIMIZATION_STATS_INVALID` for
+- `assertValidStats()` now throws a `TypeError` (previously a bare `Error`)
+  describing the specific validation failure.
+- `getOptimizationStatistics()` now throws `OptimizationStatsError` for
+  validation failures too, not only retrieval failures, carrying `filterId`
+  and `sourcePath` either way. Its `code` is `OPTIMIZATION_STATS_INVALID` for
   validation failures and `OPTIMIZATION_STATS_UNAVAILABLE` for retrieval
-  failures.
+  failures, so callers can branch on the failure kind.
+- `OptimizationStatsError`'s `message` now folds in `cause.message` when the
+  cause is an `Error`, so the specific reason survives for callers that log
+  only `error.message` and never walk the `cause` chain.
 
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+
+- `assertValidStats()` now also rejects a `groups` entry that is missing a
+  `rules` object or a numeric `config.hits`, instead of letting it through to
+  crash `skipRuleWithOptimization()` later with an undecorated `TypeError`
+  that `instanceof OptimizationStatsError` can't catch.
 
 ### Security
 
