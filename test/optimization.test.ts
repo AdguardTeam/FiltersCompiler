@@ -402,7 +402,7 @@ describe('assertValidStats()', () => {
         throw new Error('assertValidStats did not throw');
     };
 
-    describe('rejects non-object stats', () => {
+    describe('throws non-object stats', () => {
         it.each([
             { label: 'null', value: null, printed: 'null' },
             { label: 'undefined', value: undefined, printed: 'undefined' },
@@ -422,7 +422,7 @@ describe('assertValidStats()', () => {
         });
     });
 
-    describe('rejects invalid groups', () => {
+    describe('throws on invalid groups', () => {
         it.each([
             { label: 'groups is missing', value: {}, printed: 'undefined' },
             { label: 'groups is an empty array', value: { groups: [] }, printed: '[]' },
@@ -438,7 +438,7 @@ describe('assertValidStats()', () => {
         });
     });
 
-    describe('rejects malformed group entries', () => {
+    describe('throws on malformed group entries', () => {
         it.each([
             { label: 'a group missing rules', group: { config: { hits: 1 } } },
             { label: 'a group missing config', group: { rules: {} } },
