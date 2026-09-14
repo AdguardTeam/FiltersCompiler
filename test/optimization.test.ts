@@ -468,6 +468,17 @@ describe('assertValidStats()', () => {
 
             expect(error.message).toContain('groups[1]');
         });
+
+        it('truncates a large but validly-serializable offending group instead of embedding it whole', () => {
+            const manyRules = Object.fromEntries(
+                Array.from({ length: 1000 }, (_, i) => [`rule-${i}`, i]),
+            );
+            const malformedGroup = { rules: manyRules };
+
+            const error = getStatsValidationError({ groups: [malformedGroup] });
+
+            expect(error.message.length).toBeLessThan(400);
+        });
     });
 
     it('does not throw for valid stats', () => {

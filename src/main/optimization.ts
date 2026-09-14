@@ -144,12 +144,14 @@ const getOptimizableFilterIds = async () => {
  * @returns A printable representation of `stats`.
  */
 const describeInvalidStats = (stats: unknown): string => {
+    let printed: string;
     try {
         const json = JSON.stringify(stats);
-        return json === undefined ? String(stats) : json;
+        printed = json === undefined ? String(stats) : json;
     } catch {
-        return String(stats);
+        printed = String(stats);
     }
+    return printed.slice(0, 200);
 };
 
 /**
