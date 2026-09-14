@@ -275,11 +275,11 @@ export const getOptimizationStatistics = async (filterId: number) => {
 
     const statsPath = localStatsPath === null
         ? getOptimizationStatsUrl(filterId)
-        : `${localStatsPath}/filters/${filterId}/stats.json`;
+        : path.join(localStatsPath, FILTERS_DIR_NAME, String(filterId), STATS_JSON);
 
     try {
         const content = localStatsPath !== null
-            ? await fs.readFile(path.join(localStatsPath, FILTERS_DIR_NAME, String(filterId), STATS_JSON), 'utf-8')
+            ? await fs.readFile(statsPath, 'utf-8')
             : await downloadOptimizationStats(filterId);
         stats = JSON.parse(content);
     } catch (originalError) {

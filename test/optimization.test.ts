@@ -349,6 +349,19 @@ describe('use()', () => {
         const result = await getOptimizationStatistics(INVALID_FILTER_ID);
         expect(result).toBeNull();
     });
+
+    it('throws with the local file path when the listed filter has no local stats.json', async () => {
+        const [, FILTER_ID_WITHOUT_LOCAL_STATS] = VALID_FILTER_IDS;
+
+        const error = await getOptimizationStatistics(FILTER_ID_WITHOUT_LOCAL_STATS).catch((e: unknown) => e);
+
+        expect(error).toBeInstanceOf(OptimizationStatsError);
+        expect(error).toMatchObject({
+            filterId: FILTER_ID_WITHOUT_LOCAL_STATS,
+            sourcePath: path.join(tmpDir, FILTERS_DIR_NAME, String(FILTER_ID_WITHOUT_LOCAL_STATS), STATS_JSON),
+            code: 'OPTIMIZATION_STATS_UNAVAILABLE',
+        });
+    });
 });
 
 describe('assertValidStats()', () => {
