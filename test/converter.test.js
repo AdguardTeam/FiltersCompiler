@@ -371,6 +371,11 @@ describe('converter', () => {
             'example.com$$script[tag-content="Flags."][min-length="20000"][max-length="300000"]',
             'example.com$$script[min-length="100000"]',
             'example.com$$script[max-length="70000"]',
+            // single-quoted values are also converted to :contains() by AGTree,
+            // so they must be kept as-is as well
+            "example.com$$script[min-length='100000']",
+            "example.com$$script[max-length='70000']",
+            "example.com$$script[min-length='20000'][max-length='300000']",
         ])('%s', (rule) => {
             const excluded = [];
             const actual = convertRulesToAdgSyntax([rule], excluded);

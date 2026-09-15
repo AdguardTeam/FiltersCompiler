@@ -240,8 +240,12 @@ const CORE_LIBS_PCRE2_QUANTIFIER_LIMIT = 65535;
 /**
  * Pattern to extract `[min-length="N"]` / `[max-length="N"]` values
  * from HTML filtering rule body.
+ *
+ * Matches both double-quoted (`[min-length="100"]`) and single-quoted
+ * (`[min-length='100']`) attribute values — both are valid CSS and are
+ * converted to `:contains()` by AGTree the same way.
  */
-const HTML_RULES_LENGTH_ATTR_VALUE_PATTERN = /\[(?:min|max)-length="(\d+)"\]/g;
+const HTML_RULES_LENGTH_ATTR_VALUE_PATTERN = /\[(?:min|max)-length=['"](\d+)['"]\]/g;
 
 /**
  * Checks if the AdGuard HTML filtering rule has `[min-length]` or
