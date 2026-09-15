@@ -326,6 +326,45 @@ describe('getOptimizationStatistics()', () => {
         expect((error).message).toContain(causeMessage);
     });
 
+    describe('with a local cache: validation failures', () => {
+        // The test above only exercises the remote path; this needs its own use() setup.
+        let tmpDir: string;
+
+        beforeAll(async () => {
+            tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'opt-local-invalid-'));
+
+            const statsDir = path.join(tmpDir, FILTERS_DIR_NAME, String(VALID_FILTER_ID));
+            await fs.mkdir(statsDir, { recursive: true });
+            await fs.writeFile(
+                path.join(statsDir, STATS_JSON),
+                JSON.stringify({ groups: [] }),
+                'utf-8',
+            );
+
+            localOptimizationStatistics.use(tmpDir);
+        });
+
+        afterAll(async () => {
+            await localOptimizationStatistics.reset(tmpDir);
+        });
+
+        it('throws with the local sourcePath and validation code, not the remote URL', async () => {
+            const error = await getOptimizationStatistics(VALID_FILTER_ID)
+                .catch((e: unknown) => e) as OptimizationStatsError;
+
+            expect(error).toBeInstanceOf(OptimizationStatsError);
+            expect(error).toMatchObject({
+                filterId: VALID_FILTER_ID,
+                sourcePath: path.join(tmpDir, FILTERS_DIR_NAME, String(VALID_FILTER_ID), STATS_JSON),
+                code: 'OPTIMIZATION_STATS_INVALID',
+                cause: expect.any(TypeError),
+            });
+            expect(error.message).toContain(
+                (error.cause as Error).message,
+            );
+        });
+    });
+
     it(`returns null for a filterId not listed in remote ${PERCENT_JSON}`, async () => {
         const result = await getOptimizationStatistics(INVALID_FILTER_ID);
         expect(result).toBeNull();
