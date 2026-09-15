@@ -34,6 +34,7 @@ running tests, and contributing code to the AdGuard Filters Compiler.
     - [Build or Type Errors After Adding a New File](#build-or-type-errors-after-adding-a-new-file)
     - [Lint Failures on Unrelated Files](#lint-failures-on-unrelated-files)
     - [Test Failures Due to Missing Test Resources](#test-failures-due-to-missing-test-resources)
+    - [Checkout Fails on Windows (`error: invalid path`)](#checkout-fails-on-windows-error-invalid-path)
 - [Additional Resources](#additional-resources)
 
 ## Prerequisites
@@ -47,7 +48,9 @@ running tests, and contributing code to the AdGuard Filters Compiler.
 | [Git](https://git-scm.com/)    | Latest             | Version control              |
 
 > **Note**: Development is tested on macOS and Linux. Windows users should use
-> WSL or a virtual machine.
+> WSL or a virtual machine. The repository must still be checkable out on
+> native Windows, so do not commit paths that Git for Windows rejects — see
+> [Checkout Fails on Windows](#checkout-fails-on-windows-error-invalid-path).
 
 [nvm]: https://github.com/nvm-sh/nvm
 
@@ -107,18 +110,11 @@ pnpm lint
 | `pnpm build-schemas` | Regenerate JSON schemas from `tasks/build-schemas/`   |
 | `pnpm tgz`           | Pack release tarball (`filters-compiler.tgz`)         |
 
-> **Note**: `pnpm tgz` requires a `version` field in `package.json`, which
-> this project intentionally omits (the version is injected at release time).
-> To pack locally, set a temporary version first and revert it afterwards:
->
-> ```bash
-> npm pkg set version=0.0.0-dev
-> pnpm tgz
-> git checkout package.json
-> ```
->
-> Alternatively, use the Docker build which accepts a `VERSION` build arg —
-> see [DEPLOYMENT.md](DEPLOYMENT.md#docker-build).
+> **Note**: `pnpm tgz` requires a temporary `version` field in
+> `package.json` — the workaround is documented in
+> [AGENTS.md](AGENTS.md#build-and-test-commands). As an alternative, the Docker
+> build accepts a `VERSION` build arg — see
+> [DEPLOYMENT.md](DEPLOYMENT.md#docker-build).
 
 ### TypeScript
 
@@ -260,6 +256,20 @@ Test fixtures are in `test/resources/`:
 - Expected output files for comparison
 - Some resources are gitignored (generated during test runs)
 
+Fixture names must be checkable out on native Windows. When a fixture needs a
+name that cannot be committed (see the **Portable file names** guideline in
+[AGENTS.md](AGENTS.md#testing)), create it at runtime in a temp directory, as
+`withTempLocale` does in `test/locales-validator.test.js`:
+
+```js
+const tempDirPath = fs.mkdtempSync(path.join(os.tmpdir(), 'locales-validator-'));
+try {
+    // create the fixture and run the assertions
+} finally {
+    fs.rmSync(tempDirPath, { recursive: true, force: true });
+}
+```
+
 ## Troubleshooting
 
 ### Node.js Version Issues
@@ -355,6 +365,28 @@ re-running:
 ```bash
 git checkout test/resources/
 pnpm test
+```
+
+### Checkout Fails on Windows (`error: invalid path`)
+
+**Problem**: `git clone` or `git checkout` fails on Windows with
+`error: invalid path`, or a directory that exists in the repository is missing
+after checkout.
+
+**Solution**: Rename the offending path, or create that name at runtime in a
+temp directory when a test needs it (see [Test Resources](#test-resources)).
+The exact name restrictions are listed in the **Portable file names** guideline
+in [AGENTS.md](AGENTS.md#testing).
+
+List offending paths in the current revision, one command per rule case:
+
+```bash
+# Components ending with a space or a dot, or containing \ < > : " | ? *
+git ls-files | grep -E '(^|/)[^/]*[ .](/|$)|[<>:"|?*\\]'
+# Reserved device names: CON, PRN, AUX, NUL, COM1-COM9, LPT1-LPT9
+git ls-files | grep -iE '(^|/)(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(\.|/|$)'
+# Paths that differ only by case
+git ls-files | tr '[:upper:]' '[:lower:]' | sort | uniq -d
 ```
 
 ## Additional Resources

@@ -305,6 +305,16 @@ Public API layer.
 - **Test resources**: Place test fixtures in `test/resources/` (filter files,
   platform configs, expected outputs). Some resources are gitignored (generated
   during tests).
+- **Portable file names**: Never commit a path that native Windows cannot
+  check out — a component that ends with a space or a dot, contains any of
+  `\ < > : " | ? *`, or matches a reserved device name (`CON`, `PRN`, `AUX`,
+  `NUL`, `COM1`–`COM9`, `LPT1`–`LPT9`). Such paths break `git clone` and
+  `git checkout` there with `error: invalid path`, so a Windows contributor
+  cannot even get a working copy. Do not rely on paths that differ only by
+  case either, because Windows and macOS file systems are case-insensitive.
+  Create such names at runtime instead — see
+  [Test Resources](DEVELOPMENT.md#test-resources) for the temp-directory
+  pattern used by `withTempLocale` in `test/locales-validator.test.js`.
 - **Coverage**: Not currently enforced by CI. Tests must cover changed code.
 - **Mocking**: External network requests are mocked or use local fixtures. The
   `@adguard/filters-downloader` dependency is tested with local filter data.

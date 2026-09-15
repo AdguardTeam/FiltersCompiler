@@ -144,22 +144,106 @@ const prepareWarnings = (warnings) => warnings.map(([type, reason, details]) => 
  */
 
 /**
+ * Wraps a value in an inline-code span so it can be embedded in the generated
+ * markdown safely. CRLF, CR and LF line endings are collapsed to a single
+ * space, and the backtick delimiter run is one character longer than the
+ * longest backtick run inside the value (backslash-escaping backticks does not
+ * work: code span delimiters are matched literally), so translation content
+ * cannot break out of the span.
+ *
+ * The value is padded with a space on each side only when needed:
+ * - it starts or ends with a backtick, which could otherwise merge with the
+ *   delimiter into a longer run;
+ * - it starts and ends with a space while not consisting of spaces only,
+ *   because CommonMark strips one leading and trailing space from code span
+ *   content in that case.
+ *
+ * CommonMark strips at most one leading and trailing space, so the padding
+ * never appears in the rendered output.
+ * @param {string} value - the raw text to wrap into a code span
+ * @returns {string} the inline-code span, safe to embed in the generated markdown
+ */
+const toCodeSpan = (value) => {
+    const normalized = value.replace(/\r\n|\r|\n/g, ' ');
+    const startsOrEndsWithBacktick = normalized.startsWith('`') || normalized.endsWith('`');
+    const consistsOfSpacesOnly = normalized.replace(/ /g, '') === '';
+    const startsAndEndsWithSpace = normalized.startsWith(' ')
+        && normalized.endsWith(' ')
+        && !consistsOfSpacesOnly;
+    const needsPadding = startsOrEndsWithBacktick || startsAndEndsWithSpace;
+    const padded = needsPadding ? ` ${normalized} ` : normalized;
+    const backtickRuns = padded.match(/`+/g);
+    const longestRun = backtickRuns
+        ? backtickRuns.reduce((max, run) => Math.max(max, run.length), 0)
+        : 0;
+    const delimiter = '`'.repeat(longestRun + 1);
+    return `${delimiter}${padded}${delimiter}`;
+};
+
+/**
+ * Renders an indented detail line for the given format.
+ * @param {string} detail - the detail text to render
+ * @param {boolean} isMarkdown - whether to render markdown (true) or plain-text (false) markup
+ * @returns {string} the formatted detail line
+ */
+const formatDetail = (detail, isMarkdown) => (isMarkdown
+    ? `  - ${toCodeSpan(detail)}`
+    : `      ${detail}`);
+
+/**
+ * Renders the header (locale) line for the given format.
+ * @param {string} locale - the locale identifier to render
+ * @param {boolean} isMarkdown - whether to render markdown (true) or plain-text (false) markup
+ * @returns {string} the formatted locale header line
+ */
+const formatLocale = (locale, isMarkdown) => (isMarkdown
+    ? `### ${toCodeSpan(locale)}`
+    : `- ${locale}:`);
+
+/**
  * Logs collected results of locales validation
  * @param {Result[]} results
- * @returns {string}
+ * @param {'text' | 'markdown'} format - output format: 'text' or 'markdown'
+ * @returns {string} the rendered validation log
  */
-const createLog = (results) => {
+const createLog = (results, format) => {
+    const isMarkdown = format === 'markdown';
+
     const log = [];
-    log.push('There are issues with:');
+    log.push(isMarkdown ? '## Locales validation issues' : 'There are issues with:');
+    if (isMarkdown) {
+        log.push('');
+    }
+
     results.forEach((res) => {
-        log.push(`- ${res.locale}:`);
+        log.push(formatLocale(res.locale, isMarkdown));
+        if (isMarkdown) {
+            log.push('');
+        }
         res.warnings.forEach((warning) => {
-            log.push(`  - ${warning.type} priority - ${warning.reason}:`);
+            // warning type and reason are fixed constants, only the details
+            // come from translation content, so only the type is wrapped in a
+            // code span and the reason stays plain bold text
+            log.push(isMarkdown
+                ? `- ${toCodeSpan(warning.type)} priority — **${warning.reason}**:`
+                : `  - ${warning.type} priority - ${warning.reason}:`);
             warning.details.forEach((detail) => {
-                log.push(`      ${detail}`);
+                log.push(formatDetail(detail, isMarkdown));
             });
+            // insert a blank line after each warning to visually separate
+            // markdown list entries; warnings without details are followed
+            // directly by the next entry, keeping the list compact
+            if (isMarkdown && warning.details.length > 0) {
+                log.push('');
+            }
         });
     });
+
+    // drop the trailing blank line
+    while (log[log.length - 1] === '') {
+        log.pop();
+    }
+
     return log.join('\n');
 };
 
@@ -173,9 +257,11 @@ const createLog = (results) => {
 /**
  * Validates locales messages
  * @param {string} dirPath relative path to locales directory
+ * @param {string[]} requiredLocales locales required to be complete
+ * @param {'text' | 'markdown'} [logFormat] format of the returned log: 'text' (default) or 'markdown'
  * @returns {ValidationResult}
  */
-const validate = (dirPath, requiredLocales) => {
+const validate = (dirPath, requiredLocales, logFormat = 'text') => {
     logger.info('Validating locales...');
     const results = [];
     let locales;
@@ -277,7 +363,7 @@ const validate = (dirPath, requiredLocales) => {
                 .some((warning) => warning.type === WARNING_TYPES.CRITICAL);
             return isCriticalWarning;
         });
-    const resultsLog = createLog(results);
+    const resultsLog = createLog(results, logFormat);
     if (isOK) {
         logger.warn(resultsLog);
     } else {
