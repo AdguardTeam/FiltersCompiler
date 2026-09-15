@@ -145,6 +145,7 @@ check the return value.
 function validateLocales(
     localesDirPath: string,
     requiredLocales: string[],
+    logFormat?: 'text' | 'markdown',
 ): ValidateLocalesResult;
 
 interface ValidateLocalesResult {
@@ -162,6 +163,11 @@ Returns `{ ok: true }` when no problems are found. When warnings are
 found, `data` and `log` contain the per-locale details and `ok` is
 `false` only if at least one warning is critical. Throws when the
 locales directory is missing or empty.
+
+`logFormat` controls the format of the returned `log` field: `'text'`
+(the default) produces the plain indented list, `'markdown'` produces a
+markdown document suitable for embedding in a GitHub issue or PR
+comment.
 
 ### `localOptimizationStatistics`
 
@@ -254,7 +260,7 @@ if (!valid) {
 ```js
 import { validateLocales } from '@adguard/filters-compiler';
 
-const result = validateLocales('./locales', ['en', 'fr', 'ko']);
+const result = validateLocales('./locales', ['en', 'fr', 'ko'], 'markdown');
 if (!result.ok) {
     console.error(result.log);
 }

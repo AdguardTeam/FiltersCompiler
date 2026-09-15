@@ -1,0 +1,5 @@
+[
+	{
+		"filter.1.name": "value with `backtick` and``run and\nnewline before\r# Injected heading [demo](https://example.invalid)"
+	}
+]
