@@ -205,7 +205,7 @@ export function assertValidStats(filterId: number, stats: unknown): asserts stat
         if (config === null || typeof config !== 'object') {
             return false;
         }
-        return typeof (config as { hits?: unknown }).hits === 'number';
+        return Number.isFinite((config as { hits?: unknown }).hits);
     };
 
     const { groups } = stats;
