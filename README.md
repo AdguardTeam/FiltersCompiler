@@ -172,8 +172,9 @@ which filters are optimizable) is always fetched remotely, even when
 using the local cache.
 
 It exposes `download`, `use`, and `reset` methods and throws
-`OptimizationStatsError` (an `Error` subclass carrying `filterId` and
-`sourcePath` fields) when stats for a filter cannot be retrieved.
+`OptimizationStatsError` (an `Error` subclass carrying `filterId`,
+`sourcePath`, and `code` fields) when stats for a filter cannot be
+retrieved or fail structural validation.
 
 See [Local Optimization Statistics](#local-optimization-statistics)
 for a complete workflow.
@@ -476,9 +477,13 @@ always fetched remotely, even when using the local cache.
    in-memory state.
 
 If stats for a filter can't be retrieved (missing local file, or a failed remote
-fetch), `getOptimizationStatistics` throws `OptimizationStatsError` — an `Error`
-subclass carrying `filterId` and `sourcePath` fields, so callers can build their
-own actionable message instead of matching on `error.message`.
+fetch) or fail structural validation, `getOptimizationStatistics` throws
+`OptimizationStatsError` — an `Error` subclass carrying `filterId` and
+`sourcePath` fields, and a `code` (`OPTIMIZATION_STATS_UNAVAILABLE` for
+retrieval failures, `OPTIMIZATION_STATS_INVALID` for validation failures) so
+callers can branch on the failure kind instead of matching on `error.message`.
+Its constructor takes a `reason: 'retrieval' | 'validation'` argument after
+`sourcePath`.
 
 ```js
 import { localOptimizationStatistics } from '@adguard/filters-compiler';
