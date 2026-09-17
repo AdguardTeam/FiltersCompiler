@@ -30,16 +30,24 @@ describe('json validator', () => {
         const filtersDir = path.join(__dirname, './resources/filters');
         const logFile = path.join(__dirname, './resources/log.txt');
         const reportFile = path.join(__dirname, './resources/report.txt');
-        // Use a dedicated platforms directory to avoid racing with builder.test.js,
-        // which removes and rebuilds `test/resources/platforms` in parallel
-        const platformsPath = path.join(os.tmpdir(), 'filters-compiler-json-validator-platforms');
-        const platformsConfigFile = path.join(__dirname, './resources/platforms.json');
-        await fs.promises.rm(platformsPath, { recursive: true, force: true });
-        const platformsConfig = JSON.parse(fs.readFileSync(platformsConfigFile, { encoding: 'utf-8' }));
-        await build(filtersDir, logFile, reportFile, platformsPath, platformsConfig);
 
-        // Test validation
-        const jsonSchemasConfigDir = path.join(__dirname, './resources/schemas');
-        expect(schemaValidator.validate(platformsPath, jsonSchemasConfigDir, 2)).toBeTruthy();
+        // Use a unique temp platforms directory to avoid racing with builder.test.js,
+        // which removes and rebuilds `test/resources/platforms` in parallel, and
+        // with other local runs sharing the same fixed os.tmpdir() path
+        const platformsPath = await fs.promises.mkdtemp(
+            path.join(os.tmpdir(), 'filters-compiler-json-validator-platforms-'),
+        );
+        const platformsConfigFile = path.join(__dirname, './resources/platforms.json');
+
+        try {
+            const platformsConfig = JSON.parse(fs.readFileSync(platformsConfigFile, { encoding: 'utf-8' }));
+            await build(filtersDir, logFile, reportFile, platformsPath, platformsConfig);
+
+            // Test validation
+            const jsonSchemasConfigDir = path.join(__dirname, './resources/schemas');
+            expect(schemaValidator.validate(platformsPath, jsonSchemasConfigDir, 2)).toBeTruthy();
+        } finally {
+            await fs.promises.rm(platformsPath, { recursive: true, force: true });
+        }
     }, 120000);
 });

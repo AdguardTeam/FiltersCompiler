@@ -1,4 +1,10 @@
-import { AdblockSyntax, ADG_SCRIPTLET_MASK, CosmeticRuleType } from '@adguard/agtree';
+import {
+    AdblockSyntax,
+    ADG_SCRIPTLET_MASK,
+    CosmeticRuleType,
+    RuleParser,
+} from '@adguard/agtree';
+import { defaultParserOptions } from '@adguard/agtree/parser';
 
 import { RuleMasks } from '../rule/rule-masks';
 
@@ -235,17 +241,13 @@ export const rewriteMetadataForOldMacV2 = function (metadata) {
  * Regexp quantifiers with values exceeding this limit silently fail in
  * CoreLibs apps.
  */
-const CORE_LIBS_PCRE2_QUANTIFIER_LIMIT = 65535;
+export const CORE_LIBS_PCRE2_QUANTIFIER_LIMIT = 65535;
 
 /**
- * Pattern to extract `[min-length="N"]` / `[max-length="N"]` values
- * from HTML filtering rule body.
- *
- * Matches both double-quoted (`[min-length="100"]`) and single-quoted
- * (`[min-length='100']`) attribute values — both are valid CSS and are
- * converted to `:contains()` by AGTree the same way.
+ * Names of the special length attribute selectors converted to `:contains()`
+ * regexp quantifiers by AGTree.
  */
-const HTML_RULES_LENGTH_ATTR_VALUE_PATTERN = /\[(?:min|max)-length=['"](\d+)['"]\]/g;
+const LENGTH_ATTRIBUTE_NAMES = ['min-length', 'max-length'];
 
 /**
  * Checks if the AdGuard HTML filtering rule has `[min-length]` or
@@ -256,17 +258,40 @@ const HTML_RULES_LENGTH_ATTR_VALUE_PATTERN = /\[(?:min|max)-length=['"](\d+)['"]
  * regexp quantifier would make them silently fail in CoreLibs apps, while
  * the old syntax works there natively.
  *
- * @param {import('@adguard/agtree').AnyRule} ruleNode Rule node to check.
+ * @param {string} ruleText Rule text to check.
  *
  * @returns {boolean} True if the rule should be kept as-is due to oversized length values.
  */
-export const shouldKeepHtmlRuleWithOversizedLengths = (ruleNode) => {
+export const shouldKeepHtmlRuleWithOversizedLengths = (ruleText) => {
+    // Parse the rule the same way the conversion does, so that only real
+    // length attributes are checked — e.g. a `[min-length='100000']`
+    // substring inside a quoted `:contains()` argument must not count.
+    // Attribute whitespace (`[min-length = "100000" ]`) and numeric
+    // spellings (`"1e5"`) are covered by the parser and the `Number()`
+    // conversion, exactly matching the conversion behavior.
+    let ruleNode;
+    try {
+        ruleNode = RuleParser.parse(ruleText, {
+            ...defaultParserOptions,
+            isLocIncluded: false,
+            parseHtmlFilteringRuleBodies: true,
+        });
+    } catch {
+        // Unparseable bodies are handled by the converter's tolerant fallback
+        // (kept as-is or rejected) — no length conversion happens for them
+        return false;
+    }
+
     if (ruleNode.type !== CosmeticRuleType.HtmlFilteringRule || ruleNode.syntax !== AdblockSyntax.Adg) {
         return false;
     }
 
-    const lengthValues = [...ruleNode.body.value.matchAll(HTML_RULES_LENGTH_ATTR_VALUE_PATTERN)]
-        .map((match) => Number(match[1]));
-
-    return lengthValues.some((value) => value > CORE_LIBS_PCRE2_QUANTIFIER_LIMIT);
+    return ruleNode.body.selectorList.children.some(
+        (complexSelector) => complexSelector.children.some(
+            (selector) => selector.type === 'AttributeSelector'
+                && LENGTH_ATTRIBUTE_NAMES.includes(selector.name.value)
+                && 'value' in selector
+                && Number(selector.value.value) > CORE_LIBS_PCRE2_QUANTIFIER_LIMIT,
+        ),
+    );
 };

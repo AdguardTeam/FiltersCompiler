@@ -26,7 +26,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - HTML filtering rules with `[min-length]` / `[max-length]` values exceeding
   `65535` are kept as-is with a warning in `diff.txt`, because the converted
   `:contains()` regexp quantifier would silently fail in CoreLibs apps
-  as not supported.
+  as not supported. The oversized-value detection is AST-based, so it covers
+  whitespace and non-decimal integer spellings in attribute selectors and
+  does not misfire on `[min-length]`-like substrings inside quoted
+  `:contains()` arguments.
+- HTML filtering rules kept as-is by the converter are now forgiven by the
+  validator only for body syntax errors (`AdblockSyntaxError`) — other
+  validation errors (e.g. invalid domains) still discard the rule. A warning
+  is logged for each forgiven rule.
 
 ### Security
 

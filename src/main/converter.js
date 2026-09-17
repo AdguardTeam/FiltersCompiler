@@ -8,7 +8,10 @@ import { getErrorMessage } from '@adguard/logger';
 
 import { logger } from './utils/log';
 import { RuleMasks } from './rule/rule-masks';
-import { shouldKeepHtmlRuleWithOversizedLengths } from './utils/workaround';
+import {
+    CORE_LIBS_PCRE2_QUANTIFIER_LIMIT,
+    shouldKeepHtmlRuleWithOversizedLengths,
+} from './utils/workaround';
 
 /**
  * Excludes rule
@@ -45,8 +48,9 @@ export const convertRulesToAdgSyntax = (rulesList, excluded = [], invalidRules =
             // because converting them to `:contains()` with a regexp quantifier
             // would make them silently fail in CoreLibs apps,
             // while the old syntax works there natively.
-            if (shouldKeepHtmlRuleWithOversizedLengths(ruleNode)) {
-                const message = 'Warning: HTML filtering rule with [min-length] or [max-length] value exceeding 65535 '
+            if (shouldKeepHtmlRuleWithOversizedLengths(rule)) {
+                // eslint-disable-next-line max-len
+                const message = `Warning: HTML filtering rule with [min-length] or [max-length] value exceeding ${CORE_LIBS_PCRE2_QUANTIFIER_LIMIT} `
                     + `is kept as-is, because conversion to :contains() would not work in CoreLibs apps: "${rule}"`;
                 logger.warn(message);
                 excludeRule(rule, excluded, message);

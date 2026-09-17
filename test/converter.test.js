@@ -16,6 +16,7 @@ import {
     convertRulesToAdgSyntax,
     convertToUbo,
 } from '../src/main/converter';
+import { CORE_LIBS_PCRE2_QUANTIFIER_LIMIT } from '../src/main/utils/workaround';
 
 // Mock log to hide error messages
 vi.mock('../src/main/utils/log');
@@ -376,14 +377,44 @@ describe('converter', () => {
             "example.com$$script[min-length='100000']",
             "example.com$$script[max-length='70000']",
             "example.com$$script[min-length='20000'][max-length='300000']",
+            // whitespace inside the attribute selector is normalized by the parser,
+            // so such rules must be kept as-is as well
+            'example.com$$script[min-length="100000" ]',
+            'example.com$$script[min-length = "100000"]',
+            // non-decimal integer spellings are covered by the Number() conversion,
+            // matching the conversion semantics
+            'example.com$$script[min-length="1e5"]',
+            // boundary value: the first value that exceeds the limit
+            'example.com$$script[max-length="65536"]',
         ])('%s', (rule) => {
             const excluded = [];
             const actual = convertRulesToAdgSyntax([rule], excluded);
             // rule is kept unchanged
-            expect(actual[0]).toBe(rule);
-            // warning is written to the excluded list (diff.txt)
-            expect(excluded.join('\n')).toContain('Warning');
-            expect(excluded.join('\n')).toContain(rule);
+            expect(actual).toEqual([rule]);
+            // the exact warning is written to the excluded list (diff.txt)
+            expect(excluded).toEqual([
+                `! Warning: HTML filtering rule with [min-length] or [max-length] value exceeding ${CORE_LIBS_PCRE2_QUANTIFIER_LIMIT} is kept as-is, because conversion to :contains() would not work in CoreLibs apps: "${rule}"`,
+                rule,
+            ]);
+        });
+    });
+
+    describe('converts html filtering rules with [min-length]/[max-length] values within the limit', () => {
+        it.each([
+            {
+                // boundary value: the limit itself still fits the CoreLibs quantifier range
+                rule: 'example.com$$div[min-length="65535"]',
+                expected: 'example.com$$div:contains(/^(?=.{65535,}$).*/s)',
+            },
+            {
+                // the `[min-length]` substring inside a quoted :contains() argument
+                // is not an attribute selector and must not trigger the keep-as-is workaround
+                rule: 'example.com$$script:contains("[min-length=\'100000\']")[max-length="100"]',
+                expected: 'example.com$$script:contains("[min-length=\'100000\']"):contains(/^(?=.{0,100}$).*/s)',
+            },
+        ])('$rule', ({ rule, expected }) => {
+            const actual = convertRulesToAdgSyntax([rule]);
+            expect(actual[0]).toBe(expected);
         });
     });
 
