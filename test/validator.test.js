@@ -22,6 +22,7 @@ import {
 
 import { setConfiguration, CompatibilityTypes } from '@adguard/tsurlfilter';
 
+import { logger } from '../src/main/utils/log';
 import { validateAndFilterRules, checkAffinityDirectives } from '../src/main/validator';
 
 global.TextEncoder = TextEncoder;
@@ -31,7 +32,7 @@ global.TextDecoder = TextDecoder;
 setConfiguration({ compatibility: CompatibilityTypes.Corelibs });
 
 // Mock log to hide error messages
-vi.mock('../main/utils/log');
+vi.mock('../src/main/utils/log');
 
 describe('validator', () => {
     describe('validate standard css selectors', () => {
@@ -291,6 +292,31 @@ describe('validator', () => {
         ];
         test.each(validRules)('%s', (rule) => {
             expect(validateAndFilterRules([rule])).toHaveLength(1);
+        });
+
+        it('keeps html filtering rules with unparseable bodies and logs a warning', () => {
+            vi.mocked(logger.warn).mockClear();
+
+            // kept as-is by the AGTree identity fallback (unbalanced `:contains()`);
+            // tsurlfilter cannot parse such bodies, so the validator forgives
+            // the AdblockSyntaxError and logs a warning instead
+            const rule = 'example.com$$div[min-length=\"abc\"]:contains((foo';
+            const result = validateAndFilterRules([rule]);
+            expect(result).toEqual([rule]);
+            expect(logger.warn).toHaveBeenCalledWith(
+                `Skipped tsurlfilter validation for the HTML filtering rule with unparseable body kept as-is: \"${rule}\"`,
+            );
+        });
+
+        it('does not forgive invalid domains of html filtering rules', () => {
+            vi.mocked(logger.warn).mockClear();
+
+            // a plain SyntaxError (invalid domain) must not be forgiven —
+            // only AdblockSyntaxError body-parse errors are
+            const rule = 'bad..domain$$script[data-src=\"x\"]';
+            const result = validateAndFilterRules([rule], [], [], 'test');
+            expect(result).toEqual([]);
+            expect(logger.warn).not.toHaveBeenCalled();
         });
     });
 

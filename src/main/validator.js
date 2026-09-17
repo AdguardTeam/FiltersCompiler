@@ -1,4 +1,5 @@
 import {
+    AdblockSyntaxError,
     CommentParser,
     CosmeticRuleType,
     RuleConverter,
@@ -127,9 +128,17 @@ class RuleValidator {
                     // CSS selector list and throws for such rules, but they are valid
                     // in CoreLibs apps (the only consumers of HTML filtering rules),
                     // so we skip the tsurlfilter validation for them.
-                    if (ruleNode.type !== CosmeticRuleType.HtmlFilteringRule) {
+                    // Only body syntax errors (AdblockSyntaxError) are forgiven;
+                    // other errors (e.g. invalid domains) must not be forgiven.
+                    if (
+                        ruleNode.type !== CosmeticRuleType.HtmlFilteringRule
+                        || !(error instanceof AdblockSyntaxError)
+                    ) {
                         throw error;
                     }
+
+                    // eslint-disable-next-line max-len
+                    logger.warn(`Skipped tsurlfilter validation for the HTML filtering rule with unparseable body kept as-is: "${text}"`);
                 }
                 return RuleValidator.createValidationResult(true);
             }
