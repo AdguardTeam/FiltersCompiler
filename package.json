@@ -33,7 +33,7 @@
         "pnpm": ">=10.33.4 <11"
     },
     "dependencies": {
-        "@adguard/agtree": "https://ak.int.agrd.dev/npm/npm-internal-dev/@adguard/agtree/-/agtree-4.2.2-dev.pr37.983e6fd1.tgz",
+        "@adguard/agtree": "https://ak.int.agrd.dev/npm/npm-internal-dev/@adguard/agtree/-/agtree-4.2.2-dev.pr37.6184356a.tgz",
         "@adguard/css-tokenizer": "1.2.0",
         "@adguard/ecss-tree": "2.0.1",
         "@adguard/extended-css": "2.2.0",
@@ -74,8 +74,8 @@
     },
     "pnpm": {
         "overrides": {
-            "@adguard/agtree": "https://ak.int.agrd.dev/npm/npm-internal-dev/@adguard/agtree/-/agtree-4.2.2-dev.pr37.983e6fd1.tgz",
-            "@adguard/css-tokenizer": "https://ak.int.agrd.dev/npm/npm-internal-dev/@adguard/css-tokenizer/-/css-tokenizer-1.2.1-dev.pr37.983e6fd1.tgz"
+            "@adguard/agtree": "https://ak.int.agrd.dev/npm/npm-internal-dev/@adguard/agtree/-/agtree-4.2.2-dev.pr37.6184356a.tgz",
+            "@adguard/css-tokenizer": "https://ak.int.agrd.dev/npm/npm-internal-dev/@adguard/css-tokenizer/-/css-tokenizer-1.2.1-dev.pr37.6184356a.tgz"
         }
     }
 }

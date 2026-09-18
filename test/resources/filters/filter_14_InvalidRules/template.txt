@@ -1,7 +1,7 @@
 ! Homepage: https://example.com/
 ! License: https://creativecommons.org/licenses/by-sa/3.0/
 !
-! normalized to a quoted argument during conversion (unbalanced :contains() argument)
+! kept as-is during conversion (unbalanced :contains() argument, CoreLibs parity)
 filter14.example.com$$script:contains(eval(function(p,a,c,k,e,d))
 ! Valid rule
 ||filter14.example.com^

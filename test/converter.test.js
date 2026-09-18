@@ -441,27 +441,17 @@ describe('converter', () => {
         });
     });
 
-    describe('normalizes html rules with unbalanced pseudo-class arguments to a quoted form', () => {
+    describe('keeps html rules with unbalanced pseudo-class arguments as-is', () => {
+        // CoreLibs parity: `:contains()` arguments are treated as raw text,
+        // so unbalanced pseudo-class arguments are kept as-is, no quoting is inserted.
         it.each([
-            [
-                'example.com$$script:contains(eval(function(p,a,c,k,e,d))',
-                'example.com$$script:contains("eval(function(p,a,c,k,e,d)")',
-            ],
-            [
-                'example.com$$script:contains((function(_0x)',
-                'example.com$$script:contains("(function(_0x")',
-            ],
-            [
-                'example.com$$script:contains(Array.from(document.querySelectorAll)',
-                'example.com$$script:contains("Array.from(document.querySelectorAll")',
-            ],
-            [
-                "example.com$$script:contains(document.addEventListener('click')",
-                "example.com$$script:contains(\"document.addEventListener('click'\")",
-            ],
-        ])('%s', (input, expected) => {
-            const actual = convertRulesToAdgSyntax([input]);
-            expect(actual[0]).toBe(expected);
+            'example.com$$script:contains(eval(function(p,a,c,k,e,d))',
+            'example.com$$script:contains((function(_0x)',
+            'example.com$$script:contains(Array.from(document.querySelectorAll)',
+            "example.com$$script:contains(document.addEventListener('click')",
+        ])('%s', (rule) => {
+            const actual = convertRulesToAdgSyntax([rule]);
+            expect(actual[0]).toBe(rule);
         });
     });
 

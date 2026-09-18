@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - HTML filtering rules with deprecated special attribute selectors
   `[min-length]` / `[max-length]` are now converted to the `:contains()`
   pseudo-class during AdGuard syntax conversion [tsurlfilter#96].
+- HTML filtering rules with unbalanced `:contains()` pseudo-class arguments
+  are now kept as-is during conversion (CoreLibs parity),
+  `:contains()` arguments are treated as raw text.
 - Removed the temporary workaround that kept HTML filtering rules with
   pseudo-classes as-is.
 
