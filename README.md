@@ -446,6 +446,7 @@ Each writes its output to a subdirectory under `platformsPath`.
 | `EXTENSION_CHROMIUM`                | `extension/chromium`                | AdGuard Browser Extension (Chromium, MV2) |
 | `EXTENSION_CHROMIUM_MV3`            | `extension/chromium-mv3`            | AdGuard Browser Extension (Chromium, MV3) |
 | `EXTENSION_EDGE`                    | `extension/edge`                    | AdGuard Browser Extension (Edge, MV2)     |
+| `EXTENSION_EDGE_MV3`                | `extension/edge-mv3`                | AdGuard Browser Extension (Edge, MV3)     |
 | `EXTENSION_OPERA`                   | `extension/opera`                   | AdGuard Browser Extension (Opera, MV2)    |
 | `EXTENSION_OPERA_MV3`               | `extension/opera-mv3`               | AdGuard Browser Extension (Opera, MV3)    |
 | `EXTENSION_FIREFOX`                 | `extension/firefox`                 | AdGuard Browser Extension (Firefox)       |

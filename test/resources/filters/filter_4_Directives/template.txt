@@ -15,6 +15,9 @@ chrome_mv3_specific_rule
 !#if (adguard_ext_opera_mv3)
 opera_mv3_specific_rule
 !#endif
+!#if (adguard_ext_edge_mv3)
+edge_mv3_specific_rule
+!#endif
 !#if (adguard_ext_chromium && adguard_ext_edge)
 if_edge_chromium
 !#endif
