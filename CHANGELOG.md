@@ -11,11 +11,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `OptimizationStatsError`
+    - **BREAKING:** Its constructor now takes a required third positional
+    parameter, `reason: 'retrieval' | 'validation'`, before `options`.
+    Update call sites to `new OptimizationStatsError(filterId,
+    sourcePath, 'retrieval', { cause })` (or `'validation'`).
+    - `getOptimizationStatistics()` now throws it for validation failures
+    too, not only retrieval failures, carrying `filterId` and `sourcePath`
+    either way. Its `code` is `OPTIMIZATION_STATS_INVALID` for validation
+    failures and `OPTIMIZATION_STATS_UNAVAILABLE` for retrieval failures,
+    so callers can branch on the failure kind.
+    - Its `message` now folds in `cause.message` when the cause is an
+    `Error`, so the specific reason survives for callers that log only
+    `error.message` and never walk the `cause` chain.
+- `assertValidStats()` now throws a `TypeError` (previously a bare `Error`),
+  built through a single shared helper so every check — non-object stats,
+  missing/empty `groups`, and malformed group entries — gets the same
+  message shape: `"Optimization stats for <id>: <defect>, but got <value>"`.
+  Previously the `groups`/group-entry checks buried the offending value in
+  an untyped `{ groups }`/`{ group }` payload nested two levels deep in
+  `error.cause.cause`, which no consumer could safely read; it's now folded
+  directly into the message instead.
+
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+
+- `assertValidStats()` now also rejects a `groups` entry that is missing a
+  `rules` object or a numeric `config.hits`, instead of letting it through to
+  crash `skipRuleWithOptimization()` later with an undecorated `TypeError`
+  that `instanceof OptimizationStatsError` can't catch.
 
 ### Security
 

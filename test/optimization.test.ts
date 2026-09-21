@@ -288,12 +288,80 @@ describe('getOptimizationStatistics()', () => {
             return EMPTY_STRING;
         });
 
-        const error = await getOptimizationStatistics(VALID_FILTER_ID).catch((e: unknown) => e);
+        const error = await getOptimizationStatistics(VALID_FILTER_ID)
+            .catch((e: unknown) => e) as OptimizationStatsError;
 
         expect(error).toBeInstanceOf(OptimizationStatsError);
         expect(error).toMatchObject({
             filterId: VALID_FILTER_ID,
             sourcePath: expect.stringContaining(`/${FILTERS_DIR_NAME}/${VALID_FILTER_ID}/${STATS_JSON}`),
+            code: 'OPTIMIZATION_STATS_UNAVAILABLE',
+            cause: expect.any(Error),
+        });
+        // User should be able to see the specific cause message in the error log.
+        const causeMessage = (error.cause as Error)?.message;
+        expect(error.message).toContain(causeMessage);
+    });
+
+    it('throws when stats contents is valid JSON but fails structural validation', async () => {
+        downloadFile.mockImplementation((url: string) => {
+            if (url.includes(PERCENT_JSON)) {
+                return JSON.stringify(MOCK_PERCENT_JSON);
+            }
+            return JSON.stringify({ groups: [] });
+        });
+
+        const error = await getOptimizationStatistics(VALID_FILTER_ID)
+            .catch((e: unknown) => e) as OptimizationStatsError;
+
+        expect(error).toBeInstanceOf(OptimizationStatsError);
+        expect(error).toMatchObject({
+            filterId: VALID_FILTER_ID,
+            sourcePath: expect.stringContaining(`/${FILTERS_DIR_NAME}/${VALID_FILTER_ID}/${STATS_JSON}`),
+            code: 'OPTIMIZATION_STATS_INVALID',
+            cause: expect.any(TypeError),
+        });
+        // User should be able to see the specific cause message in the error log.
+        const causeMessage = (error.cause as TypeError).message;
+        expect((error).message).toContain(causeMessage);
+    });
+
+    describe('with a local cache: validation failures', () => {
+        // The test above only exercises the remote path; this needs its own use() setup.
+        let tmpDir: string;
+
+        beforeAll(async () => {
+            tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'opt-local-invalid-'));
+
+            const statsDir = path.join(tmpDir, FILTERS_DIR_NAME, String(VALID_FILTER_ID));
+            await fs.mkdir(statsDir, { recursive: true });
+            await fs.writeFile(
+                path.join(statsDir, STATS_JSON),
+                JSON.stringify({ groups: [] }),
+                'utf-8',
+            );
+
+            localOptimizationStatistics.use(tmpDir);
+        });
+
+        afterAll(async () => {
+            await localOptimizationStatistics.reset(tmpDir);
+        });
+
+        it('throws with the local sourcePath and validation code, not the remote URL', async () => {
+            const error = await getOptimizationStatistics(VALID_FILTER_ID)
+                .catch((e: unknown) => e) as OptimizationStatsError;
+
+            expect(error).toBeInstanceOf(OptimizationStatsError);
+            expect(error).toMatchObject({
+                filterId: VALID_FILTER_ID,
+                sourcePath: path.join(tmpDir, FILTERS_DIR_NAME, String(VALID_FILTER_ID), STATS_JSON),
+                code: 'OPTIMIZATION_STATS_INVALID',
+                cause: expect.any(TypeError),
+            });
+            expect(error.message).toContain(
+                (error.cause as Error).message,
+            );
         });
     });
 
@@ -348,25 +416,109 @@ describe('use()', () => {
         const result = await getOptimizationStatistics(INVALID_FILTER_ID);
         expect(result).toBeNull();
     });
+
+    it('throws with the local file path when the listed filter has no local stats.json', async () => {
+        const [, FILTER_ID_WITHOUT_LOCAL_STATS] = VALID_FILTER_IDS;
+
+        const error = await getOptimizationStatistics(FILTER_ID_WITHOUT_LOCAL_STATS).catch((e: unknown) => e);
+
+        expect(error).toBeInstanceOf(OptimizationStatsError);
+        expect(error).toMatchObject({
+            filterId: FILTER_ID_WITHOUT_LOCAL_STATS,
+            sourcePath: path.join(tmpDir, FILTERS_DIR_NAME, String(FILTER_ID_WITHOUT_LOCAL_STATS), STATS_JSON),
+            code: 'OPTIMIZATION_STATS_UNAVAILABLE',
+        });
+    });
 });
 
 describe('assertValidStats()', () => {
-    it('throws when stats is not an object', () => {
-        expect(() => assertValidStats(VALID_FILTER_ID, null)).toThrow('expected an object');
-        expect(() => assertValidStats(VALID_FILTER_ID, undefined)).toThrow('expected an object');
+    const getStatsValidationError = (stats: unknown): TypeError => {
+        try {
+            assertValidStats(VALID_FILTER_ID, stats);
+        } catch (e) {
+            return e as TypeError;
+        }
+        throw new Error('assertValidStats did not throw');
+    };
+
+    describe('throws non-object stats', () => {
+        it.each([
+            { label: 'null', value: null, printed: 'null' },
+            { label: 'undefined', value: undefined, printed: 'undefined' },
+            { label: 'a number', value: 5, printed: '5' },
+            { label: 'a string', value: 'oops', printed: '"oops"' },
+            { label: 'a BigInt', value: BigInt(10), printed: '10' },
+            { label: 'a NaN', value: NaN, printed: 'NaN' },
+            { label: 'a Infinity', value: Infinity, printed: 'Infinity' },
+            { label: 'a -Infinity', value: -Infinity, printed: '-Infinity' },
+        ])('throws a TypeError for $label', ({ value, printed }) => {
+            const error = getStatsValidationError(value);
+
+            expect(error).toBeInstanceOf(TypeError);
+            expect(error.message).toBe(
+                `Optimization stats for ${VALID_FILTER_ID}: must be a non-null object, but got ${printed}`,
+            );
+        });
     });
 
-    it('throws when groups is missing', () => {
-        expect(() => assertValidStats(VALID_FILTER_ID, {})).toThrow('missing or empty groups');
+    describe('throws on invalid groups', () => {
+        it.each([
+            { label: 'groups is missing', value: {}, printed: 'undefined' },
+            { label: 'groups is an empty array', value: { groups: [] }, printed: '[]' },
+            { label: 'groups is null', value: { groups: null }, printed: 'null' },
+            { label: 'groups is not an array', value: { groups: 'nope' }, printed: '"nope"' },
+        ])('throws a TypeError naming the offending groups value when $label', ({ value, printed }) => {
+            const error = getStatsValidationError(value);
+
+            expect(error).toBeInstanceOf(TypeError);
+            expect(error.message).toBe(
+                `Optimization stats for ${VALID_FILTER_ID}: groups must be a non-empty array, but got ${printed}`,
+            );
+        });
     });
 
-    it('throws when groups is an empty array', () => {
-        expect(() => assertValidStats(VALID_FILTER_ID, { groups: [] })).toThrow('missing or empty groups');
-    });
+    describe('throws on malformed group entries', () => {
+        it.each([
+            { label: 'a group missing rules', group: { config: { hits: 1 } } },
+            { label: 'a group missing config', group: { rules: {} } },
+            { label: 'a group with rules as an array', group: { config: { hits: 1 }, rules: [] } },
+            { label: 'a group with rules as null', group: { config: { hits: 1 }, rules: null } },
+            { label: 'a group with rules as a primitive', group: { config: { hits: 1 }, rules: 'oops' } },
+            { label: 'a group with config as null', group: { rules: {}, config: null } },
+            { label: 'a group with config as a primitive', group: { rules: {}, config: 'oops' } },
+            { label: 'a group with a non-numeric config.hits', group: { config: { hits: '1' }, rules: {} } },
+            { label: 'a group that is null', group: null },
+            { label: 'a group that is a primitive', group: 'oops' },
+            { label: 'a group that is an array', group: [] },
+        ])('throws a TypeError naming the offending group when $label', ({ group }) => {
+            const error = getStatsValidationError({ groups: [group] });
 
-    it('throws when groups is not an array', () => {
-        expect(() => assertValidStats(VALID_FILTER_ID, { groups: null }))
-            .toThrow('missing or empty groups');
+            expect(error).toBeInstanceOf(TypeError);
+            expect(error.message).toBe(
+                `Optimization stats for ${VALID_FILTER_ID}: groups[0] must have a "rules" object `
+                + `and a numeric "config.hits", but got ${JSON.stringify(group)}`,
+            );
+        });
+
+        it('reports the index of the first malformed group among otherwise-valid ones', () => {
+            const validGroup = { config: { hits: 1 }, rules: {} };
+            const malformedGroup = { config: { hits: 1 } };
+
+            const error = getStatsValidationError({ groups: [validGroup, malformedGroup] });
+
+            expect(error.message).toContain('groups[1]');
+        });
+
+        it('truncates a large but validly-serializable offending group instead of embedding it whole', () => {
+            const manyRules = Object.fromEntries(
+                Array.from({ length: 1000 }, (_, i) => [`rule-${i}`, i]),
+            );
+            const malformedGroup = { rules: manyRules };
+
+            const error = getStatsValidationError({ groups: [malformedGroup] });
+
+            expect(error.message.length).toBeLessThan(400);
+        });
     });
 
     it('does not throw for valid stats', () => {

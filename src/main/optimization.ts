@@ -45,25 +45,36 @@ export interface OptimizationStats {
 }
 
 /**
- * Thrown by `getOptimizationStatistics` when a filter's stats cannot be
- * retrieved, from either a local file or the remote server.
+ * Thrown by `getOptimizationStatistics` when a filter's stats are unusable,
+ * either because they could not be retrieved (local file or remote server)
+ * or because retrieved stats failed structural validation.
  *
  * Carries `filterId` and `sourcePath` as structured fields so callers can
- * build their own actionable message instead of matching on `error.message`.
+ * build their own actionable message, and a `code` so callers can branch on
+ * the failure kind, instead of matching on `error.message`. When `options.cause`
+ * is an `Error`, its message is folded into this error's own `message` too, so
+ * the specific reason survives even for callers that only log `error.message`
+ * and never walk the `cause` chain.
  */
 export class OptimizationStatsError extends Error {
-    code = 'OPTIMIZATION_STATS_UNAVAILABLE' as const;
+    code: 'OPTIMIZATION_STATS_UNAVAILABLE' | 'OPTIMIZATION_STATS_INVALID';
 
     constructor(
         public filterId: number,
         public sourcePath: string,
+        reason: 'retrieval' | 'validation',
         options?: ErrorOptions,
     ) {
+        const causeMessage = options?.cause instanceof Error ? options.cause.message : undefined;
+        const detail = causeMessage !== undefined ? ` ${causeMessage}` : '';
         super(
-            `Unable to retrieve optimization stats for ${filterId}, at ${sourcePath}. `
-            + 'Please ensure the stats file exists and is accessible.',
+            reason === 'validation'
+                ? `Invalid optimization stats for ${filterId}, at ${sourcePath}.${detail}`
+                : `Unable to retrieve optimization stats for ${filterId}, at ${sourcePath}. `
+                    + `Please ensure the stats file exists and is accessible.${detail}`,
             options,
         );
+        this.code = reason === 'validation' ? 'OPTIMIZATION_STATS_INVALID' : 'OPTIMIZATION_STATS_UNAVAILABLE';
         this.name = 'OptimizationStatsError';
     }
 }
@@ -124,18 +135,86 @@ const getOptimizableFilterIds = async () => {
 };
 
 /**
- * Validates that stats have non-empty groups.
+ * `JSON.stringify` with a safe fallback for values it can't represent: it
+ * throws on `BigInt`, and returns `undefined` (not a string) for
+ * `symbol`/`function`, which would otherwise print as the misleading
+ * literal text "undefined".
+ *
+ * @param stats - Value to describe for an error message.
+ * @returns A printable representation of `stats`.
+ */
+const describeInvalidStats = (stats: unknown): string => {
+    if (typeof stats === 'number' && !Number.isFinite(stats)) {
+        return String(stats);
+    }
+    let printed: string;
+    try {
+        const json = JSON.stringify(stats);
+        printed = json === undefined ? String(stats) : json;
+    } catch {
+        printed = String(stats);
+    }
+    return printed.slice(0, 200);
+};
+
+/**
+ * Validates that stats have non-empty groups, and that every group has the
+ * shape `skipRuleWithOptimization` relies on. Only validates — does not
+ * know where `stats` came from, so it throws a plain `TypeError`; the
+ * caller (`getOptimizationStatistics`) decorates it with `filterId` and
+ * `sourcePath` as an `OptimizationStatsError`.
  *
  * @param filterId - Numeric filter identifier.
  * @param stats - Parsed optimization stats object.
- * @throws {Error} if stats is not an object, or if stats.groups is missing or empty.
+ * @throws {TypeError} if stats is not an object, if stats.groups is missing, not an
+ * array, or empty, or if any group lacks a `rules` object or a numeric `config.hits`.
  */
 export function assertValidStats(filterId: number, stats: unknown): asserts stats is OptimizationStats {
+    /**
+     * @param defect - What's wrong, e.g. `"groups must be a non-empty array"`.
+     * @param value - The offending value, folded into the message via `describeInvalidStats`.
+     * @returns The `TypeError` to throw.
+     */
+    const invalidStatsError = (defect: string, value: unknown): TypeError => (
+        new TypeError(`Optimization stats for ${filterId}: ${defect}, but got ${describeInvalidStats(value)}`)
+    );
+
     if (stats === null || typeof stats !== 'object') {
-        throw new Error(`Invalid optimization stats for ${filterId}: expected an object`);
+        throw invalidStatsError('must be a non-null object', stats);
     }
     if (!('groups' in stats) || !Array.isArray(stats.groups) || stats.groups.length === 0) {
-        throw new Error(`Invalid optimization stats for ${filterId}: missing or empty groups`);
+        throw invalidStatsError('groups must be a non-empty array', (stats as { groups?: unknown }).groups);
+    }
+
+    /**
+     * Checks that a single group has the shape `skipRuleWithOptimization` relies
+     * on: a `rules` object to index into, and a numeric `config.hits` to compare
+     * against.
+     *
+     * @param group - Value to check.
+     * @returns Whether `group` has a valid shape.
+     */
+    const isValidOptimizationGroup = (group: unknown): boolean => {
+        if (group === null || typeof group !== 'object') {
+            return false;
+        }
+        const { rules, config } = group as { rules?: unknown; config?: unknown };
+        if (rules === null || typeof rules !== 'object' || Array.isArray(rules)) {
+            return false;
+        }
+        if (config === null || typeof config !== 'object') {
+            return false;
+        }
+        return Number.isFinite((config as { hits?: unknown }).hits);
+    };
+
+    const { groups } = stats;
+    const invalidGroupIndex = groups.findIndex((group) => !isValidOptimizationGroup(group));
+    if (invalidGroupIndex !== -1) {
+        throw invalidStatsError(
+            `groups[${invalidGroupIndex}] must have a "rules" object and a numeric "config.hits"`,
+            groups[invalidGroupIndex],
+        );
     }
 }
 
@@ -241,7 +320,7 @@ export const localOptimizationStatistics = {
  *
  * @param filterId - Numeric filter identifier.
  * @returns Parsed stats object, or `null` when the filter has no optimization stats.
- * @throws {Error} When the stats are missing or malformed.
+ * @throws {OptimizationStatsError} When the stats are missing or malformed.
  */
 export const getOptimizationStatistics = async (filterId: number) => {
     if (!optimizationEnabled) {
@@ -256,20 +335,24 @@ export const getOptimizationStatistics = async (filterId: number) => {
 
     let stats: unknown;
 
+    const statsPath = localStatsPath === null
+        ? getOptimizationStatsUrl(filterId)
+        : path.join(localStatsPath, FILTERS_DIR_NAME, String(filterId), STATS_JSON);
+
     try {
         const content = localStatsPath !== null
-            ? await fs.readFile(path.join(localStatsPath, FILTERS_DIR_NAME, String(filterId), STATS_JSON), 'utf-8')
+            ? await fs.readFile(statsPath, 'utf-8')
             : await downloadOptimizationStats(filterId);
         stats = JSON.parse(content);
     } catch (originalError) {
-        const statsPath = localStatsPath === null
-            ? getOptimizationStatsUrl(filterId)
-            : `${localStatsPath}/filters/${filterId}/stats.json`;
-
-        throw new OptimizationStatsError(filterId, statsPath, { cause: originalError });
+        throw new OptimizationStatsError(filterId, statsPath, 'retrieval', { cause: originalError });
     }
 
-    assertValidStats(filterId, stats);
+    try {
+        assertValidStats(filterId, stats);
+    } catch (originalError) {
+        throw new OptimizationStatsError(filterId, statsPath, 'validation', { cause: originalError });
+    }
 
     return stats;
 };
