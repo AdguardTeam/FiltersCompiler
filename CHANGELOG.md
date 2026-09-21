@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.4.0] - 2026-09-21
+
+### Added
+
 - Support of `ext_edge_mv3` platform.
 
 ### Changed
@@ -35,18 +49,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `error.cause.cause`, which no consumer could safely read; it's now folded
   directly into the message instead.
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - `assertValidStats()` now also rejects a `groups` entry that is missing a
   `rules` object or a numeric `config.hits`, instead of letting it through to
   crash `skipRuleWithOptimization()` later with an undecorated `TypeError`
   that `instanceof OptimizationStatsError` can't catch.
-
-### Security
 
 ## [3.3.2-beta.0] - 2026-09-15
 
@@ -978,7 +986,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [@adguard/tsurlfilter]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/tsurlfilter/CHANGELOG.md
 [@adguard/logger]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/logger/CHANGELOG.md
 
-[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.3.2-beta.0...HEAD
+[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.4.0...HEAD
+[3.4.0]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.3.1...v3.4.0
 [3.3.2-beta.0]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.3.1...v3.3.2-beta.0
 [3.3.1]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.3.0...v3.3.1
 [3.3.0]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.3.0-beta.1...v3.3.0
