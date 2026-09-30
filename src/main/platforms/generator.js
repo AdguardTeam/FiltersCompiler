@@ -91,7 +91,7 @@ let adguardFiltersServerUrl = null;
 const readFile = function (path) {
     try {
         return fs.readFileSync(path, { encoding: 'utf-8' });
-    } catch (e) {
+    } catch {
         return null;
     }
 };

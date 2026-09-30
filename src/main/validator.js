@@ -86,7 +86,7 @@ class RuleValidator {
         try {
             // eslint-disable-next-line no-new
             new RegExp(pattern.slice(1, -1));
-        } catch (e) {
+        } catch {
             throw new SyntaxError(`Rule has invalid regex pattern: "${ruleText}"`);
         }
     }

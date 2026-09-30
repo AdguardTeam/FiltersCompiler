@@ -24,7 +24,7 @@ vi.mock('../main/utils/log');
 const readFile = (path) => {
     try {
         return fs.readFile(path, { encoding: 'utf-8' });
-    } catch (e) {
+    } catch {
         return null;
     }
 };

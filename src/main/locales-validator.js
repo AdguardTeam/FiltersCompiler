@@ -267,7 +267,7 @@ const validate = (dirPath, requiredLocales, logFormat = 'text') => {
     let locales;
     try {
         locales = readDir(dirPath);
-    } catch (e) {
+    } catch {
         throw new Error(`There is no locales dir '${dirPath}'`);
     }
 
@@ -301,7 +301,7 @@ const validate = (dirPath, requiredLocales, logFormat = 'text') => {
             let messagesData;
             try {
                 messagesData = JSON.parse(readFile(messagesPath));
-            } catch (e) {
+            } catch {
                 localeWarnings.push([
                     // if there is invalid data format, we consider it's critical
                     WARNING_TYPES.CRITICAL,
