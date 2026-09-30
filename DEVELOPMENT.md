@@ -13,6 +13,7 @@ running tests, and contributing code to the AdGuard Filters Compiler.
     - [3. Build the Library](#3-build-the-library)
     - [4. Run Tests](#4-run-tests)
     - [5. Run Linter](#5-run-linter)
+    - [ESLint Configuration](#eslint-configuration)
 - [Development Workflow](#development-workflow)
     - [Available Commands](#available-commands)
     - [TypeScript](#typescript)
@@ -93,6 +94,46 @@ pnpm test
 ```bash
 pnpm lint
 ```
+
+### ESLint Configuration
+
+`eslint.config.js` is a native flat config with no dependency on `eslint-config-airbnb-base`.
+That package cannot run on ESLint 10: `eslint-plugin-import` (which `airbnb-base` depends on)
+calls a `SourceCode` method ESLint 10 removed.
+
+Rather than replace the project's rule set, it was ported: the rules were captured from the
+project's own effective configuration under ESLint 8 (`airbnb-base` 15.0.0 +
+`plugin:@typescript-eslint/recommended` + `eslint-plugin-jsdoc` plus every project-specific
+override the former `.eslintrc.cjs` carried) and written directly into `eslint.config.js`. This
+was a one-time migration step, verified with a one-off config-and-lint comparison; the file is
+self-contained and is not regenerated from the airbnb package at lint time or in CI. Same
+approach as [AdguardTeam/FiltersRegistry#1257](https://github.com/AdguardTeam/FiltersRegistry/pull/1257)
+(AG-59261).
+
+A few rule ids changed on the way in, with no change in behaviour:
+
+- Formatting rules that `@typescript-eslint` v7 shipped and v8 dropped (`brace-style`,
+  `comma-dangle`, `comma-spacing`, `func-call-spacing`, `keyword-spacing`,
+  `lines-between-class-members`, `no-extra-parens`, `no-extra-semi`, `object-curly-spacing`,
+  `space-before-blocks`, `space-before-function-paren`, `space-infix-ops`) now live under
+  `@stylistic/*`. `indent`, `quotes`, and `semi` were never moved — the former `.eslintrc.cjs`
+  never overrode their TS variants, so they stay plain core rules.
+- `import/*` is now `import-x/*`, since `eslint-plugin-import-x` is the maintained fork used in
+  place of `eslint-plugin-import`.
+
+Two known, intentional differences from the old ESLint 8 configuration:
+
+- `import-x/no-cycle`'s `disableScc` option no longer exists in the current rule's schema, so
+  that one key was dropped from its options; the rest of the rule's configuration (`maxDepth`,
+  `ignoreExternal`, etc.) is unchanged.
+- ESLint 9+ changed `no-unused-vars`'s `caughtErrors` default from `"none"` to `"all"`. Five
+  `catch (e)` blocks that never used the bound error started failing as a result — fixed by
+  dropping the unused binding (`catch {}`), not by changing the rule's configuration.
+
+Rule ids and options are otherwise identical to the pre-migration configuration. There is no
+automated check enforcing this going forward — treat any future ESLint or plugin upgrade as a
+normal config change, and update this section if a rule's behaviour needs to diverge from what
+is documented here.
 
 ## Development Workflow
 

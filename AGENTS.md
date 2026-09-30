@@ -28,12 +28,14 @@ The library exposes four public API functions: `compile`, `validateJSONSchema`,
 
 ## Technical Context
 
-- **Language**: JavaScript (ES2022 modules), Node.js >=22
+- **Language**: JavaScript (ES2022 modules), Node.js >=24
 - **Package Manager**: pnpm >=10.33.4 and <11
 - **Bundler**: Rollup (dual ESM + CJS output)
 - **Testing**: Vitest (node environment, `test/*.test.{js,ts}`)
-- **Code Linting**: ESLint 8 with airbnb-base config (4-space indent, 120
-  char max line length)
+- **Code Linting**: ESLint 10, native flat config (`eslint.config.js`) — a
+  one-time port of the project's former ESLint 8 + airbnb-base rule set, no
+  airbnb dependency (4-space indent, 120 char max line length). See
+  [DEVELOPMENT.md — ESLint Configuration](DEVELOPMENT.md#eslint-configuration).
 - **Type Checking**: TypeScript 6 (`strict` mode, new `.ts` files only)
 - **Markdown Linting**: markdownlint (120 char line length, dash ul-style)
 - **Target Platform**: Node.js (library)
@@ -96,7 +98,7 @@ The library exposes four public API functions: `compile`, `validateJSONSchema`,
 ├── rollup.config.js                   # Rollup bundler configuration
 ├── vitest.config.js                   # Vitest test configuration
 ├── tsconfig.json                      # TypeScript configuration
-├── .eslintrc.cjs                      # ESLint configuration
+├── eslint.config.js                   # ESLint flat config
 ├── .markdownlint.json                 # Markdownlint configuration
 ├── Dockerfile                         # Multi-stage Docker build
 ├── AGENTS.md                          # AI agent instructions (this file)
@@ -277,10 +279,10 @@ Public API layer.
 - **Indentation**: 4 spaces. Configured in ESLint (`indent` rule).
 - **Line length**: 120 characters maximum (code and comments). Configured in
   ESLint (`max-len` rule) and markdownlint.
-- **Semicolons**: Required (enforced by airbnb-base).
-- **String quotes**: Single quotes preferred (airbnb-base default).
-- **Trailing commas**: Required for multi-line objects and arrays (airbnb-base
-  default).
+- **Semicolons**: Required (ported from the project's former airbnb-base config).
+- **String quotes**: Single quotes preferred (ported from airbnb-base).
+- **Trailing commas**: Required for multi-line objects and arrays (ported from
+  airbnb-base).
 - **Unused variables**: Forbidden. ESLint enforces `no-unused-vars` (JS) and
   `@typescript-eslint/no-unused-vars` (TS).
 - **Import extensions**: Required for local imports in JS files (`.js`, `.ts`
