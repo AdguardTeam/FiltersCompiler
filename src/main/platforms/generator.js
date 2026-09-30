@@ -1,4 +1,3 @@
-/* eslint-disable global-require */
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -197,7 +196,6 @@ const calculateChecksum = function (header, rules) {
 const createDir = (dir) => {
     const { sep } = path;
     const initDir = path.isAbsolute(dir) ? sep : '';
-    // eslint-disable-next-line no-undef
     const baseDir = __dirname;
 
     return dir.split(sep).reduce((parentDir, childDir) => {
