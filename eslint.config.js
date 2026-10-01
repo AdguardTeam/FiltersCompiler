@@ -1,4 +1,3 @@
-import stylistic from '@stylistic/eslint-plugin';
 import importXPlugin from 'eslint-plugin-import-x';
 import jsdocPlugin from 'eslint-plugin-jsdoc';
 import globals from 'globals';
@@ -8,16 +7,11 @@ import tseslint from 'typescript-eslint';
  * This rule set is a direct, one-time port of the project's effective ESLint 8 configuration
  * (airbnb-base + plugin:@typescript-eslint/recommended + eslint-plugin-jsdoc + every
  * project-specific override the former .eslintrc.cjs carried). See DEVELOPMENT.md, ESLint
- * configuration section, for the rationale and how to handle future upgrades. Modeled on the
- * same migration in AdguardTeam/FiltersRegistry (AG-59261, PR #1257).
+ * configuration section, for the rationale and how to handle future upgrades.
  *
- * Rules renamed on the way in (same rule, same behaviour, new id only):
- *   - formatting rules typescript-eslint v7 shipped and v8 dropped now live under @stylistic/* (brace-style,
- *     comma-dangle, comma-spacing, func-call-spacing, indent, keyword-spacing, lines-between-class-members,
- *     no-extra-parens, no-extra-semi, object-curly-spacing, quotes, semi, space-before-blocks,
- *     space-before-function-paren, space-infix-ops).
- *   - @typescript-eslint/no-throw-literal is now @typescript-eslint/only-throw-error.
- *   - import/* is now import-x/*.
+ * Only one rule id actually changed on the way in: import/* is now import-x/*. Formatting rules
+ * (indent, quotes, semi, comma-dangle, and the rest) are, and remain, plain core rules below —
+ * none of them live on an id that moved.
  */
 
 export default tseslint.config(
@@ -32,7 +26,6 @@ export default tseslint.config(
     {
         plugins: {
             'import-x': importXPlugin,
-            '@stylistic': stylistic,
             '@typescript-eslint': tseslint.plugin,
             jsdoc: jsdocPlugin,
         },

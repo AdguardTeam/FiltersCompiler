@@ -106,20 +106,13 @@ project's own effective configuration under ESLint 8 (`airbnb-base` 15.0.0 +
 `plugin:@typescript-eslint/recommended` + `eslint-plugin-jsdoc` plus every project-specific
 override the former `.eslintrc.cjs` carried) and written directly into `eslint.config.js`. This
 was a one-time migration step, verified with a one-off config-and-lint comparison; the file is
-self-contained and is not regenerated from the airbnb package at lint time or in CI. Same
-approach as [AdguardTeam/FiltersRegistry#1257](https://github.com/AdguardTeam/FiltersRegistry/pull/1257)
-(AG-59261).
+self-contained and is not regenerated from the airbnb package at lint time or in CI.
 
-A few rule ids changed on the way in, with no change in behaviour:
-
-- Formatting rules that `@typescript-eslint` v7 shipped and v8 dropped (`brace-style`,
-  `comma-dangle`, `comma-spacing`, `func-call-spacing`, `keyword-spacing`,
-  `lines-between-class-members`, `no-extra-parens`, `no-extra-semi`, `object-curly-spacing`,
-  `space-before-blocks`, `space-before-function-paren`, `space-infix-ops`) now live under
-  `@stylistic/*`. `indent`, `quotes`, and `semi` were never moved — the former `.eslintrc.cjs`
-  never overrode their TS variants, so they stay plain core rules.
-- `import/*` is now `import-x/*`, since `eslint-plugin-import-x` is the maintained fork used in
-  place of `eslint-plugin-import`.
+Only one rule id actually changed on the way in: `import/*` is now `import-x/*`, since
+`eslint-plugin-import-x` is the maintained fork used in place of `eslint-plugin-import`.
+Formatting rules (`indent`, `quotes`, `semi`, `comma-dangle`, and the rest) are, and remain,
+plain core rules — the former `.eslintrc.cjs` never overrode their TS-specific variants, so
+there was never anything to move.
 
 Two known, intentional differences from the old ESLint 8 configuration:
 
