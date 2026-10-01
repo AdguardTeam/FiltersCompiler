@@ -30,13 +30,15 @@ export default tseslint.config(
             jsdoc: jsdocPlugin,
         },
         settings: {
-            'import-x/extensions': ['.js', '.ts'],
+            'import-x/extensions': ['.js', '.ts', '.jsx'],
             'import-x/resolver': {
                 node: {
-                    extensions: ['.js', '.ts'],
+                    extensions: ['.js', '.ts', '.json'],
                 },
                 exports: {},
             },
+            'import-x/core-modules': [],
+            'import-x/ignore': ['node_modules', '\\.(coffee|scss|css|less|hbs|svg|json)$'],
         },
         languageOptions: {
             ecmaVersion: 2022,
