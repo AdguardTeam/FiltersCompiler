@@ -72,14 +72,17 @@ importers:
       eslint-import-resolver-exports:
         specifier: 1.0.0-beta.5
         version: 1.0.0-beta.5(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.70.1(eslint@10.11.0)(typescript@6.0.3))(eslint@10.11.0))(eslint@10.11.0)
+      eslint-import-resolver-node:
+        specifier: 0.3.9
+        version: 0.3.9
       eslint-plugin-import-x:
-        specifier: ^4.17.1
+        specifier: 4.17.1
         version: 4.17.1(@typescript-eslint/utils@8.70.1(eslint@10.11.0)(typescript@6.0.3))(eslint-import-resolver-node@0.3.9)(eslint@10.11.0)
       eslint-plugin-jsdoc:
         specifier: 63.2.0
         version: 63.2.0(eslint@10.11.0)
       globals:
-        specifier: ^17.12.0
+        specifier: 17.12.0
         version: 17.12.0
       husky:
         specifier: 8.0.2
@@ -109,7 +112,7 @@ importers:
         specifier: 6.0.3
         version: 6.0.3
       typescript-eslint:
-        specifier: ^8.70.1
+        specifier: 8.70.1
         version: 8.70.1(eslint@10.11.0)(typescript@6.0.3)
       vitest:
         specifier: 3.0.5
@@ -3706,7 +3709,7 @@ snapshots:
 
   eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.70.1(eslint@10.11.0)(typescript@6.0.3))(eslint-import-resolver-node@0.3.9)(eslint@10.11.0):
     dependencies:
-      '@typescript-eslint/types': 8.65.0
+      '@typescript-eslint/types': 8.70.1
       comment-parser: 1.4.7
       debug: 4.4.3
       eslint: 10.11.0
