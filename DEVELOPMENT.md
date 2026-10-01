@@ -114,7 +114,7 @@ Formatting rules (`indent`, `quotes`, `semi`, `comma-dangle`, and the rest) are,
 plain core rules — the former `.eslintrc.cjs` never overrode their TS-specific variants, so
 there was never anything to move.
 
-Two known, intentional differences from the old ESLint 8 configuration:
+Three known, intentional differences from the old ESLint 8 configuration:
 
 - `import-x/no-cycle`'s `disableScc` option no longer exists in the current rule's schema, so
   that one key was dropped from its options; the rest of the rule's configuration (`maxDepth`,
