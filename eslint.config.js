@@ -1,3 +1,4 @@
+import { defineConfig } from 'eslint/config';
 import importXPlugin from 'eslint-plugin-import-x';
 import jsdocPlugin from 'eslint-plugin-jsdoc';
 import globals from 'globals';
@@ -14,7 +15,7 @@ import tseslint from 'typescript-eslint';
  * none of them live on an id that moved.
  */
 
-export default tseslint.config(
+export default defineConfig(
     {
         ignores: [
             'dist/**',
