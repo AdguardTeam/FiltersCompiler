@@ -901,7 +901,7 @@ export default defineConfig(
         },
     },
     {
-        // The ported rule messages below are quoted verbatim from their source and cannot be rewrapped.
+        // Rule messages and the JSX ignoredNodes list above are copied exactly and can't be rewrapped.
         files: ['eslint.config.js'],
         rules: {
             'max-len': 'off',
