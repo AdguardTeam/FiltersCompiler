@@ -36,7 +36,6 @@ export default defineConfig(
                 node: {
                     extensions: ['.js', '.ts', '.json'],
                 },
-                exports: {},
             },
             'import-x/core-modules': [],
             'import-x/ignore': ['node_modules', '\\.(coffee|scss|css|less|hbs|svg|json)$'],
