@@ -291,7 +291,7 @@ Public API layer.
 - **Param reassignment**: Permitted (`no-param-reassign: off`).
 - **Prefer destructuring**: Encouraged for objects in variable declarations,
   arrays in assignment expressions.
-- **Default exports**: Not required (`import/prefer-default-export: 0`).
+- **Default exports**: Not required.
 - **AdGuard JavaScript Code Guidelines**: Follow for conventions not covered by
   the linter (see [style guide][code-guidelines]).
 - **ES module syntax**: Always use `import`/`export` (`"type": "module"` in
