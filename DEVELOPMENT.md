@@ -122,10 +122,13 @@ Three known, intentional differences from the old ESLint 8 configuration:
 - ESLint 9+ changed `no-unused-vars`'s `caughtErrors` default from `"none"` to `"all"`. Five
   `catch (e)` blocks that never used the bound error started failing as a result — fixed by
   dropping the unused binding (`catch {}`), not by changing the rule's configuration.
-- `no-undef` is looser than before: the old config only had the `es6` env, while this one's
-  `ecmaVersion: 2022` makes `no-undef` aware of every ES2016–2022 global (`WeakRef`,
-  `AggregateError`, etc.) that `es6` didn't cover. Kept as-is — it only makes the rule more
-  permissive, never less.
+- `no-undef` changes in both directions, because the `globals` package version changed
+  (ESLint 8 bundled `globals` 13; this config uses `globals` 17):
+    - Looser: names that are now defined and were not before, mostly modern browser APIs
+      (`WeakRef`, `AggregateError`, `GPUDevice`, etc.). Kept as-is.
+    - Stricter: about 30 names that were defined and now are not, e.g. `fdescribe`, `pit`,
+      `applicationCache`, `openDatabase`, `registerProcessor`, `MediaStreamConstraints`. None of
+      them are used in this repository, so no code needed to change.
 
 ESLint 9+ also changed the defaults of four more rules (`no-inner-declarations`,
 `no-constant-condition`, `no-useless-computed-key`, `no-shadow-restricted-names`); those are
