@@ -97,48 +97,54 @@ pnpm lint
 
 ### ESLint Configuration
 
-`eslint.config.js` is a native flat config with no dependency on `eslint-config-airbnb-base`.
-That package cannot run on ESLint 10: `eslint-plugin-import` (which `airbnb-base` depends on)
-calls a `SourceCode` method ESLint 10 removed.
+`eslint.config.js` is a native flat config with no dependency on
+`eslint-config-airbnb-base`. That package cannot run on ESLint 10:
+`eslint-plugin-import` (which `airbnb-base` depends on) calls a `SourceCode`
+method ESLint 10 removed.
 
-Rather than replace the project's rule set, it was ported: the rules were captured from the
-project's own effective configuration under ESLint 8 (`airbnb-base` 15.0.0 +
-`plugin:@typescript-eslint/recommended` + `eslint-plugin-jsdoc` plus every project-specific
-override the former `.eslintrc.cjs` carried) and written directly into `eslint.config.js`. This
-was a one-time migration step, verified with a one-off config-and-lint comparison; the file is
-self-contained and is not regenerated from the airbnb package at lint time or in CI.
+Rather than replace the project's rule set, it was ported: the rules were
+captured from the project's own effective configuration under ESLint 8
+(`airbnb-base` 15.0.0 + `plugin:@typescript-eslint/recommended` +
+`eslint-plugin-jsdoc` plus every project-specific override the former
+`.eslintrc.cjs` carried) and written directly into `eslint.config.js`. This was
+a one-time migration step, verified with a one-off config-and-lint comparison;
+the file is self-contained and is not regenerated from the airbnb package at
+lint time or in CI.
 
-Only one rule id actually changed on the way in: `import/*` is now `import-x/*`, since
-`eslint-plugin-import-x` is the maintained fork used in place of `eslint-plugin-import`.
-Formatting rules (`indent`, `quotes`, `semi`, `comma-dangle`, and the rest) are, and remain,
-plain core rules — the former `.eslintrc.cjs` never overrode their TS-specific variants, so
-there was never anything to move.
+Only one rule id actually changed on the way in: `import/*` is now `import-x/*`,
+since `eslint-plugin-import-x` is the maintained fork used in place of
+`eslint-plugin-import`. Formatting rules (`indent`, `quotes`, `semi`,
+`comma-dangle`, and the rest) are, and remain, plain core rules — the former
+`.eslintrc.cjs` never overrode their TS-specific variants, so there was never
+anything to move.
 
 Three known, intentional differences from the old ESLint 8 configuration:
 
-- `import-x/no-cycle`'s `disableScc` option no longer exists in the current rule's schema, so
-  that one key was dropped from its options; the rest of the rule's configuration (`maxDepth`,
-  `ignoreExternal`, etc.) is unchanged.
-- ESLint 9+ changed `no-unused-vars`'s `caughtErrors` default from `"none"` to `"all"`. Five
-  `catch (e)` blocks that never used the bound error started failing as a result — fixed by
-  dropping the unused binding (`catch {}`), not by changing the rule's configuration.
-- `no-undef` changes in both directions, because the `globals` package version changed
-  (ESLint 8 bundled `globals` 13; this config uses `globals` 17):
-    - Looser: names that are now defined and were not before, mostly modern browser APIs
-      (`WeakRef`, `AggregateError`, `GPUDevice`, etc.). Kept as-is.
-    - Stricter: about 30 names that were defined and now are not, e.g. `fdescribe`, `pit`,
-      `applicationCache`, `openDatabase`, `registerProcessor`, `MediaStreamConstraints`. None of
-      them are used in this repository, so no code needed to change.
+- `import-x/no-cycle`'s `disableScc` option no longer exists in the current
+  rule's schema, so that one key was dropped from its options; the rest of the
+  rule's configuration (`maxDepth`, `ignoreExternal`, etc.) is unchanged.
+- ESLint 9+ changed `no-unused-vars`'s `caughtErrors` default from `"none"` to
+  `"all"`. Five `catch (e)` blocks that never used the bound error started
+  failing as a result — fixed by dropping the unused binding (`catch {}`), not
+  by changing the rule's configuration.
+- `no-undef` changes in both directions, because the `globals` package version
+  changed (ESLint 8 bundled `globals` 13; this config uses `globals` 17):
+    - Looser: names that are now defined and were not before, mostly modern
+      browser APIs (`WeakRef`, `AggregateError`, `GPUDevice`, etc.). Kept as-is.
+    - Stricter: about 30 names that were defined and now are not, e.g.
+      `fdescribe`, `pit`, `applicationCache`, `openDatabase`,
+      `registerProcessor`, `MediaStreamConstraints`. None of them are used in
+      this repository, so no code needed to change.
 
 ESLint 9+ also changed the defaults of four more rules (`no-inner-declarations`,
-`no-constant-condition`, `no-useless-computed-key`, `no-shadow-restricted-names`); those are
-pinned back to their ESLint 8 behaviour with explicit options in `eslint.config.js` rather than
-left as differences.
+`no-constant-condition`, `no-useless-computed-key`,
+`no-shadow-restricted-names`); those are pinned back to their ESLint 8 behaviour
+with explicit options in `eslint.config.js` rather than left as differences.
 
-Rule ids and options are otherwise identical to the pre-migration configuration. There is no
-automated check enforcing this going forward — treat any future ESLint or plugin upgrade as a
-normal config change, and update this section if a rule's behaviour needs to diverge from what
-is documented here.
+Rule ids and options are otherwise identical to the pre-migration configuration.
+There is no automated check enforcing this going forward — treat any future
+ESLint or plugin upgrade as a normal config change, and update this section if a
+rule's behaviour needs to diverge from what is documented here.
 
 ## Development Workflow
 

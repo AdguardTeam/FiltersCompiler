@@ -279,7 +279,8 @@ Public API layer.
 - **Indentation**: 4 spaces. Configured in ESLint (`indent` rule).
 - **Line length**: 120 characters maximum (code and comments). Configured in
   ESLint (`max-len` rule) and markdownlint.
-- **Semicolons**: Required (ported from the project's former airbnb-base config).
+- **Semicolons**: Required (ported from the project's former airbnb-base
+  config).
 - **String quotes**: Single quotes preferred (ported from airbnb-base).
 - **Trailing commas**: Required for multi-line objects and arrays (ported from
   airbnb-base).
