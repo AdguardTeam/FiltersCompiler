@@ -286,8 +286,8 @@ Public API layer.
   airbnb-base).
 - **Unused variables**: Forbidden. ESLint enforces `no-unused-vars` (JS) and
   `@typescript-eslint/no-unused-vars` (TS).
-- **Import extensions**: Required for local imports in JS files (`.js`, `.ts`
-  extensions must be specified). TypeScript files are exempt.
+- **Import extensions**: Omitted for local imports (`.js`, `.ts` extensions
+  must not be specified; `import-x/extensions` reports either one).
 - **No useless escape characters**: Disabled (`no-useless-escape: off`).
 - **Param reassignment**: Permitted (`no-param-reassign: off`).
 - **Prefer destructuring**: Encouraged for objects in variable declarations,
