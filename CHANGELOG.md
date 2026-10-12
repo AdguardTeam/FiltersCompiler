@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   set into native flat config (`eslint.config.js`). No consumer-facing effect —
   the `engines.node` floor is unchanged. See
   [DEVELOPMENT.md](DEVELOPMENT.md#eslint-configuration) for details.
+- Removed a dead condition and de-duplicated two hardcoded platform ids in
+  `generator.js` (`createDir`, `writeFilterRules`), found while addressing
+  ESLint migration review comments. No behaviour change.
 
 ### Deprecated
 
