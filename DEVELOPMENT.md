@@ -174,7 +174,7 @@ Only one rule id actually changed on the way in: `import/*` is now `import-x/*`,
 since `eslint-plugin-import-x` is the maintained fork used in place of
 `eslint-plugin-import`.
 
-Three known, intentional differences from the old ESLint 8 configuration:
+Known, intentional differences from the old ESLint 8 configuration:
 
 - `import-x/no-cycle`'s `disableScc` option no longer exists in the current
   rule's schema, so that one key was dropped from its options; the rest of the
