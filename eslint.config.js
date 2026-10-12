@@ -236,7 +236,21 @@ export default defineConfig(
                     ObjectExpression: 1,
                     ImportDeclaration: 1,
                     flatTernaryExpressions: false,
-                    ignoredNodes: ['JSXElement', 'JSXElement > *', 'JSXAttribute', 'JSXIdentifier', 'JSXNamespacedName', 'JSXMemberExpression', 'JSXSpreadAttribute', 'JSXExpressionContainer', 'JSXOpeningElement', 'JSXClosingElement', 'JSXText', 'JSXEmptyExpression', 'JSXSpreadChild'],
+                    ignoredNodes: [
+                        'JSXElement',
+                        'JSXElement > *',
+                        'JSXAttribute',
+                        'JSXIdentifier',
+                        'JSXNamespacedName',
+                        'JSXMemberExpression',
+                        'JSXSpreadAttribute',
+                        'JSXExpressionContainer',
+                        'JSXOpeningElement',
+                        'JSXClosingElement',
+                        'JSXText',
+                        'JSXEmptyExpression',
+                        'JSXSpreadChild',
+                    ],
                     ignoreComments: false,
                     offsetTernaryExpressions: false,
                 },
@@ -901,7 +915,8 @@ export default defineConfig(
         },
     },
     {
-        // Rule messages and the JSX ignoredNodes list above are copied exactly and can't be rewrapped.
+        // The no-restricted-globals and no-restricted-syntax messages above are copied exactly from
+        // their source and can't be rewrapped.
         files: ['eslint.config.js'],
         rules: {
             'max-len': 'off',
