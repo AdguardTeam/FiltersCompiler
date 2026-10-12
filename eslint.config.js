@@ -10,9 +10,7 @@ import tseslint from 'typescript-eslint';
  * project-specific override the former .eslintrc.cjs carried). See DEVELOPMENT.md, ESLint
  * configuration section, for the rationale and how to handle future upgrades.
  *
- * Only one rule id actually changed on the way in: import/* is now import-x/*. Formatting rules
- * (indent, quotes, semi, comma-dangle, and the rest) are, and remain, plain core rules below —
- * none of them live on an id that moved.
+ * Only one rule id actually changed on the way in: import/* is now import-x/*.
  */
 
 export default defineConfig(

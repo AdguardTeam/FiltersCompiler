@@ -172,10 +172,7 @@ lint time or in CI.
 
 Only one rule id actually changed on the way in: `import/*` is now `import-x/*`,
 since `eslint-plugin-import-x` is the maintained fork used in place of
-`eslint-plugin-import`. Formatting rules (`indent`, `quotes`, `semi`,
-`comma-dangle`, and the rest) are, and remain, plain core rules — the former
-`.eslintrc.cjs` never overrode their TS-specific variants, so there was never
-anything to move.
+`eslint-plugin-import`.
 
 Three known, intentional differences from the old ESLint 8 configuration:
 
