@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Migrated ESLint from v8 to v10, porting the project's effective ESLint 8 rule
   set into native flat config (`eslint.config.js`). No consumer-facing effect —
-  the enforced rule set and `engines.node` floor are unchanged. See
+  the `engines.node` floor is unchanged. See
   [DEVELOPMENT.md](DEVELOPMENT.md#eslint-configuration) for details.
 
 ### Deprecated
