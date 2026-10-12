@@ -837,8 +837,11 @@ export default defineConfig(
     },
     {
         // Ported from the former overrides: [{ files: ['**/*.ts'] }] block — the
-        // plugin:@typescript-eslint/recommended rule set, TS-safe core rules turned off in favor of their
-        // @typescript-eslint equivalents, and jsdoc/require-returns(-check) scoped to .ts only.
+        // plugin:@typescript-eslint/recommended rule set, plus the former config's own additions below.
+        // Most of the core rules turned off here have no @typescript-eslint equivalent; they're off
+        // because tsc already reports them (typescript-eslint's eslint-recommended). Only
+        // no-array-constructor, no-unused-expressions, no-unused-vars, and no-use-before-define are
+        // actual replacements, by the @typescript-eslint/* rules of the same name above.
         files: ['**/*.ts'],
         languageOptions: {
             parser: tseslint.parser,
@@ -872,8 +875,11 @@ export default defineConfig(
             '@typescript-eslint/triple-slash-reference': 'error',
             'constructor-super': 'off',
             'getter-return': 'off',
+            // TypeScript handles module resolution — disable import rules that conflict with TS resolution.
             'import-x/extensions': 'off',
             'import-x/no-unresolved': 'off',
+            // Legacy .js files predate this convention; scoped to .ts to avoid flagging pre-existing debt
+            // while still migrating.
             'jsdoc/require-returns': 'error',
             'jsdoc/require-returns-check': 'error',
             'no-array-constructor': 'off',
