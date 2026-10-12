@@ -183,12 +183,14 @@ Known, intentional differences from the old ESLint 8 configuration:
   `"all"`. Five `catch (e)` blocks that never used the bound error started
   failing as a result — fixed by dropping the unused binding (`catch {}`), not
   by changing the rule's configuration.
-- `no-undef` changes in both directions, because the `globals` package version
-  changed (ESLint 8 bundled `globals` 13; this config uses `globals` 17):
-    - Looser: names that are now defined and were not before, mostly modern
-      browser APIs (`WeakRef`, `AggregateError`, `GPUDevice`, etc.). Kept as-is.
-    - Stricter: about 30 names that were defined and now are not, e.g.
-      `fdescribe`, `pit`, `applicationCache`, `openDatabase`,
+- `no-undef` changes in both directions, for two independent reasons:
+    - Looser, from `ecmaVersion`: flat config's `ecmaVersion: 2022` defines
+      ES2016-2022 builtins (`WeakRef`, `AggregateError`, etc.) that the old
+      `es6` env didn't cover. With `ecmaVersion: 2015` they're reported again.
+    - Looser and stricter, from the `globals` package version (ESLint 8 bundled
+      `globals` 13; this config uses `globals` 17): modern browser APIs like
+      `GPUDevice` are newly defined, and a handful of legacy names are no longer
+      defined, e.g. `fdescribe`, `pit`, `applicationCache`, `openDatabase`,
       `registerProcessor`, `MediaStreamConstraints`. None of them are used in
       this repository, so no code needed to change.
 
