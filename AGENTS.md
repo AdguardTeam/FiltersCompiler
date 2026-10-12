@@ -288,8 +288,8 @@ Public API layer.
   `@typescript-eslint/no-unused-vars` (TS).
 - **Import extensions**: Omitted for local imports (`.js`, `.ts` extensions
   must not be specified; `import-x/extensions` reports either one).
-- **No useless escape characters**: Disabled (`no-useless-escape: off`).
-- **Param reassignment**: Permitted (`no-param-reassign: off`).
+- **Useless escape characters**: Not flagged.
+- **Param reassignment**: Permitted.
 - **Prefer destructuring**: Encouraged for objects in variable declarations,
   arrays in assignment expressions.
 - **Default exports**: Not required.
