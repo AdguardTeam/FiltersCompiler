@@ -42,13 +42,7 @@ export default defineConfig(
             ecmaVersion: 2022,
             sourceType: 'module',
             globals: {
-                ...globals.browser,
                 ...globals.node,
-                ...globals.jest,
-                adguard: true,
-                chrome: true,
-                QUnit: true,
-                browser: true,
             },
         },
         rules: {
