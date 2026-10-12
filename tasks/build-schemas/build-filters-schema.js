@@ -5,7 +5,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { logger } from '../../src/main/utils/log.js';
+import { logger } from '../../src/main/utils/log.ts';
 
 import {
     SCHEMA_DRAFT,
