@@ -199,6 +199,11 @@ ESLint 9+ also changed the defaults of four more rules (`no-inner-declarations`,
 `no-shadow-restricted-names`); those are pinned back to their ESLint 8 behaviour
 with explicit options in `eslint.config.js` rather than left as differences.
 
+Flat config also defaults `linterOptions.reportUnusedDisableDirectives` to
+`warn`; the legacy config format never reported unused `eslint-disable` comments
+at all. That's what surfaced the nine stale directives removed earlier in this
+migration — they were always unused, just never flagged.
+
 Rule ids and options are otherwise identical to the pre-migration configuration.
 There is no automated check enforcing this going forward — treat any future
 ESLint or plugin upgrade as a normal config change, and update this section if a
