@@ -212,8 +212,7 @@ const createDir = (dir) => {
                 throw new Error(`EACCES: permission denied, mkdir '${parentDir}'`);
             }
 
-            const caughtErr = ['EACCES', 'EPERM', 'EISDIR'].indexOf(err.code) > -1;
-            if ((!caughtErr || caughtErr) && (curDir === path.resolve(dir))) {
+            if (curDir === path.resolve(dir)) {
                 throw err; // Throw if it's just the last created dir.
             }
         }
