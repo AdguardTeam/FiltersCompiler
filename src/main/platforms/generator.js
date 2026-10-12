@@ -17,6 +17,7 @@ import {
     modifyBaseFilterHeader,
 } from '../utils/workaround';
 import { convertToUbo } from '../converter';
+import { platformsConfig } from '../platforms-config';
 import { getOptimizationStatistics } from '../optimization';
 import { RuleMasks } from '../rule/rule-masks';
 
@@ -26,7 +27,12 @@ const RULES_SEPARATOR = '\r\n';
 let filterIdsPool = [];
 let metadataFilterIdsPool = [];
 
-const OPTIMIZED_PLATFORMS_LIST = ['ext_safari', 'android', 'ios', 'ext_android_cb'];
+const OPTIMIZED_PLATFORMS_LIST = [
+    platformsConfig.EXTENSION_SAFARI.platform,
+    platformsConfig.ANDROID.platform,
+    platformsConfig.IOS.platform,
+    platformsConfig.EXTENSION_ANDROID_CONTENT_BLOCKER.platform,
+];
 
 const PLATFORM_FILTERS_DIR = 'filters';
 const FILTERS_METADATA_FILE_JSON = 'filters.json';
@@ -911,7 +917,7 @@ const writeFilterRules = function (filterId, dir, config, rulesHeader, rules, op
     // Exclude script rules
     // and script rules exceptions https://github.com/AdguardTeam/FiltersCompiler/issues/199
     // Modify title for base filter
-    if (config.platform === 'ext_ublock') {
+    if (config.platform === platformsConfig.EXTENSION_UBLOCK.platform) {
         rulesList = convertToUbo(rulesList);
         rulesList = excludeScriptRules(rulesList);
         if (filterId === 2) {
@@ -922,7 +928,7 @@ const writeFilterRules = function (filterId, dir, config, rulesHeader, rules, op
     writeFilterFile(filterFile, config.configuration.adbHeader, rulesHeader, rulesList);
 
     // For English filter only we should provide additional filter version.
-    if (filterId === 2 && config.platform === 'ext_ublock' && !optimized) {
+    if (filterId === 2 && config.platform === platformsConfig.EXTENSION_UBLOCK.platform && !optimized) {
         const correctedHeader = rewriteHeader(rulesHeader);
         const correctedRules = rewriteRules(rulesList);
 
