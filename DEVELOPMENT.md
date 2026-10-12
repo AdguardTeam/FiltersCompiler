@@ -204,6 +204,11 @@ Flat config also defaults `linterOptions.reportUnusedDisableDirectives` to
 at all. That's what surfaced the nine stale directives removed earlier in this
 migration — they were always unused, just never flagged.
 
+64 of the core rules this config enables are already deprecated with
+`availableUntil: 11.0.0`: all the formatting rules, plus `global-require`,
+`no-buffer-constructor`, `no-new-symbol`, and a few others. The ESLint 11
+upgrade will need replacements for them.
+
 Rule ids and options are otherwise identical to the pre-migration configuration.
 There is no automated check enforcing this going forward — treat any future
 ESLint or plugin upgrade as a normal config change, and update this section if a
