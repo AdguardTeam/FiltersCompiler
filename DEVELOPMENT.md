@@ -187,12 +187,11 @@ Known, intentional differences from the old ESLint 8 configuration:
     - Looser, from `ecmaVersion`: flat config's `ecmaVersion: 2022` defines
       ES2016-2022 builtins (`WeakRef`, `AggregateError`, etc.) that the old
       `es6` env didn't cover. With `ecmaVersion: 2015` they're reported again.
-    - Looser and stricter, from the `globals` package version (ESLint 8 bundled
-      `globals` 13; this config uses `globals` 17): modern browser APIs like
-      `GPUDevice` are newly defined, and a handful of legacy names are no longer
-      defined, e.g. `fdescribe`, `pit`, `applicationCache`, `openDatabase`,
-      `registerProcessor`, `MediaStreamConstraints`. None of them are used in
-      this repository, so no code needed to change.
+    - Stricter, from dropping unused globals: this config only defines
+      `globals.node`, so familiar Jest/Jasmine names like `describe`, `it`,
+      `expect`, `beforeEach`, `afterEach` are no longer defined as globals
+      either. Harmless here — every test file already imports them from
+      `vitest` instead of relying on the global.
 
 ESLint 9+ also changed the defaults of four more rules (`no-inner-declarations`,
 `no-constant-condition`, `no-useless-computed-key`,
