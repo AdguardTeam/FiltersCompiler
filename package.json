@@ -24,7 +24,7 @@
         "lint:code": "eslint --cache .",
         "lint:types": "tsc --noEmit",
         "lint:md": "markdownlint .",
-        "build-schemas": "node --experimental-specifier-resolution=node tasks/build-schemas/index.js",
+        "build-schemas": "node --experimental-strip-types --experimental-specifier-resolution=node tasks/build-schemas/index.js",
         "prepare": "husky install",
         "tgz": "pnpm pack --out filters-compiler.tgz"
     },
