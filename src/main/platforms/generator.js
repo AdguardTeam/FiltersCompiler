@@ -27,12 +27,12 @@ const RULES_SEPARATOR = '\r\n';
 let filterIdsPool = [];
 let metadataFilterIdsPool = [];
 
-const OPTIMIZED_PLATFORMS_LIST = [
+const isOptimizedPlatform = (platform) => [
     platformsConfig.EXTENSION_SAFARI.platform,
     platformsConfig.ANDROID.platform,
     platformsConfig.IOS.platform,
     platformsConfig.EXTENSION_ANDROID_CONTENT_BLOCKER.platform,
-];
+].includes(platform);
 
 const PLATFORM_FILTERS_DIR = 'filters';
 const FILTERS_METADATA_FILE_JSON = 'filters.json';
@@ -402,7 +402,7 @@ const processFiltersFromMetadata = function (filtersMetadata) {
  * @param config
  */
 export const postProcessUrls = (metadata, config) => {
-    const useOptimized = OPTIMIZED_PLATFORMS_LIST.indexOf(config.platform) >= 0;
+    const useOptimized = isOptimizedPlatform(config.platform);
 
     const result = {};
 
