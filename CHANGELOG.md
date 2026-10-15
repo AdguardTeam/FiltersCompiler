@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - `pnpm build-schemas` failing with `ERR_MODULE_NOT_FOUND` because of a stale
-  `log.js` import, and the out-of-date tag 10 default examples in
+  `log.js` import, and the out-of-date tags in
   `schemas/filters_i18n.schema.json` that went unnoticed as a result.
 
 ### Security
