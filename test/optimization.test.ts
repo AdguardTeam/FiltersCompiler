@@ -504,6 +504,16 @@ describe('percentPath injection', () => {
             expect(error).toBeInstanceOf(TypeError);
             expect((error as TypeError).message).toContain(percentPath);
         });
+
+        it('throws an Error naming the path and keeping the cause for a file that is not valid JSON', async () => {
+            await fs.writeFile(percentPath, '[{ "filterId": 7 ', 'utf-8');
+
+            const error = await run(percentPath).catch((e: unknown) => e);
+
+            expect(error).toBeInstanceOf(Error);
+            expect((error as Error).message).toContain(percentPath);
+            expect((error as Error).cause).toBeInstanceOf(SyntaxError);
+        });
     });
 
     it('reads the percentPath file once across repeated lookups', async () => {
@@ -521,6 +531,46 @@ describe('percentPath injection', () => {
         const percentReads = readFile.mock.calls.filter(([file]) => file === percentPath);
         readFile.mockRestore();
         expect(percentReads).toHaveLength(1);
+    });
+
+    it('reuses the cached entries for repeated use() calls with the same percentPath', async () => {
+        await fs.writeFile(percentPath, JSON.stringify([{ filterId: LOCAL_FILTER_ID }]), 'utf-8');
+        const readFile = vi.spyOn(fs, 'readFile');
+
+        localOptimizationStatistics.use(tmpDir, { percentPath });
+        await getOptimizationStatistics(LOCAL_FILTER_ID);
+        localOptimizationStatistics.use(tmpDir, { percentPath });
+        await getOptimizationStatistics(LOCAL_FILTER_ID);
+
+        const percentReads = readFile.mock.calls.filter(([file]) => file === percentPath);
+        readFile.mockRestore();
+        expect(percentReads).toHaveLength(1);
+    });
+
+    it('reads each distinct percentPath once when download() and use() alternate between them', async () => {
+        const otherPercentPath = path.join(tmpDir, 'other-percent-config.json');
+        await fs.writeFile(percentPath, JSON.stringify([{ filterId: LOCAL_FILTER_ID }]), 'utf-8');
+        await fs.writeFile(otherPercentPath, JSON.stringify([{ filterId: VALID_FILTER_ID }]), 'utf-8');
+        const readFile = vi.spyOn(fs, 'readFile');
+        const downloadDir = path.join(tmpDir, 'downloaded');
+
+        localOptimizationStatistics.use(tmpDir, { percentPath });
+        await getOptimizationStatistics(LOCAL_FILTER_ID);
+        await localOptimizationStatistics.download(downloadDir, [], [], { percentPath: otherPercentPath });
+        await getOptimizationStatistics(LOCAL_FILTER_ID);
+        await localOptimizationStatistics.download(downloadDir, [], [], { percentPath: otherPercentPath });
+
+        const reads = (file: string) => readFile.mock.calls.filter(([f]) => f === file).length;
+        const counts = [reads(percentPath), reads(otherPercentPath)];
+        readFile.mockRestore();
+        expect(counts).toEqual([1, 1]);
+    });
+
+    it('download() without percentPath reuses the remote percent.json fetched earlier in the process', async () => {
+        await localOptimizationStatistics.download(path.join(tmpDir, 'first'));
+        await localOptimizationStatistics.download(path.join(tmpDir, 'second'));
+
+        expect(percentCallCount()).toBe(1);
     });
 
     it('reset() clears the injected percentPath', async () => {

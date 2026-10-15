@@ -34,8 +34,10 @@ export interface PercentJson {
 export interface PercentOptions {
     /**
      * Local JSON file holding an array of `{ filterId }` entries, such as the
-     * registry's `optimization_config.json`, to use instead of fetching the
+     * FiltersRegistry's `optimization_config.json`, to use instead of fetching the
      * remote `percent.json`.
+     *
+     * @see {@link https://github.com/AdguardTeam/FiltersRegistry/blob/master/optimization_config.json}
      */
     percentPath?: string;
 }
@@ -119,10 +121,11 @@ let localPercentPath: string | null = null;
 
 /**
  * Cached optimizable filter entries, keyed by the local path they were read from
- * (`null` for the remote fetch). Populated lazily on the first `getPercentEntries`
- * call and shared across concurrent callers, so the file is read (or fetched) once.
+ * (`null` for the remote fetch). Populated lazily by `getPercentEntries` and shared
+ * across concurrent callers, so each source is read (or fetched) once per process
+ * until `reset()` clears the cache.
  */
-let percentEntriesCache: { percentPath: string | null; promise: Promise<PercentEntry[]> } | null = null;
+const percentEntriesCache = new Map<string | null, Promise<PercentEntry[]>>();
 
 /**
  * Validates that a parsed value is an array of entries with an integer `filterId`.
@@ -155,38 +158,55 @@ const assertPercentEntries = (entries: unknown, source: string): PercentEntry[] 
  *
  * @param percentPath - Local file path, or `null` to fetch remotely.
  * @returns Optimizable filter entries.
+ * @throws {Error} If the source can't be read or isn't valid JSON; carries the
+ * source in its message and the original error as `cause`.
+ * @throws {TypeError} If the content is not an array of `{ filterId }` entries.
  */
 const loadPercentEntries = async (percentPath: string | null): Promise<PercentEntry[]> => {
-    if (percentPath === null) {
-        const { config } = JSON.parse(await downloadOptimizationPercent()) as PercentJson;
-        return assertPercentEntries(config, 'the remote percent.json');
+    const source = percentPath ?? 'the remote percent.json';
+
+    let entries: unknown;
+    try {
+        if (percentPath === null) {
+            entries = (JSON.parse(await downloadOptimizationPercent()) as PercentJson).config;
+        } else {
+            entries = JSON.parse(await fs.readFile(percentPath, 'utf-8'));
+        }
+    } catch (cause) {
+        const detail = cause instanceof Error ? ` ${cause.message}` : '';
+        throw new Error(`Unable to load the percent config from ${source}.${detail}`, { cause });
     }
-    return assertPercentEntries(JSON.parse(await fs.readFile(percentPath, 'utf-8')), percentPath);
+
+    return assertPercentEntries(entries, source);
 };
 
 /**
  * Returns the optimizable filter entries, loading them once per `percentPath`.
  *
- * Lazily initializes a shared singleton on first call so that concurrent
- * callers share one in-flight read or fetch.
+ * Results are cached per source for the lifetime of the process (or until
+ * `localOptimizationStatistics.reset()`), so a later `download()` or `use()`
+ * with the same `percentPath` — or a later `download()` without one — reuses
+ * the entries instead of reading or fetching them again.
+ * Concurrent callers share one in-flight read or fetch.
  *
  * @param percentPath - Local file path, or `null` to fetch remotely.
  * @returns Optimizable filter entries.
  */
 const getPercentEntries = async (percentPath: string | null): Promise<PercentEntry[]> => {
-    if (percentEntriesCache === null || percentEntriesCache.percentPath !== percentPath) {
-        const promise = loadPercentEntries(percentPath);
-        const entry = { percentPath, promise };
-        percentEntriesCache = entry;
-        // Clear the singleton on rejection so a transient network error
+    let promise = percentEntriesCache.get(percentPath);
+    if (promise === undefined) {
+        const loading = loadPercentEntries(percentPath);
+        promise = loading;
+        percentEntriesCache.set(percentPath, loading);
+        // Drop the entry on rejection so a transient network error
         // doesn't poison the cache for all subsequent callers.
-        promise.catch(() => {
-            if (percentEntriesCache === entry) {
-                percentEntriesCache = null;
+        loading.catch(() => {
+            if (percentEntriesCache.get(percentPath) === loading) {
+                percentEntriesCache.delete(percentPath);
             }
         });
     }
-    return percentEntriesCache.promise;
+    return promise;
 };
 
 /**
@@ -291,18 +311,24 @@ export function assertValidStats(filterId: number, stats: unknown): asserts stat
  * Manages a local on-disk cache of optimization stats files.
  *
  * Typical usage for generating the cache:
- * 1. `download(basePath, includedFilterIds, excludedFilterIds)` — save
- *    `stats.json` for filters listed in the remote `percent.json`.
+ * 1. `download(basePath, includedFilterIds, excludedFilterIds, options)` — save
+ *    `stats.json` for filters listed in the remote `percent.json`, or in the
+ *    local file at `options.percentPath` when given.
  *
  * Typical usage for using the cache:
- * 1. `use(basePath)` — tells `getOptimizationStatistics` to read stats
+ * 1. `use(basePath, options)` — tells `getOptimizationStatistics` to read stats
  *    from local files lazily during compilation instead of fetching remotely.
+ *    The optimizable filters come from `options.percentPath` when given,
+ *    otherwise from the remote `percent.json`.
  * 2. `reset(basePath)` — remove the cache directory and clear in-memory state.
  */
 export const localOptimizationStatistics = {
     /**
      * Downloads `stats.json` files for filters listed in the remote
-     * `percent.json` and saves them to disk. Downloads into a staged
+     * `percent.json` — or in the local file at `options.percentPath` — and
+     * saves them to disk. The list is cached per source for the process, so
+     * a later `download()` reuses it instead of fetching the remote
+     * `percent.json` again until `reset()` is called. Downloads into a staged
      * directory first and swaps it in only after all downloads succeed,
      * so a failed refresh leaves any previously cached stats intact.
      *
@@ -314,7 +340,8 @@ export const localOptimizationStatistics = {
      * @param includedFilterIds - Filter IDs to process; empty (default) processes all.
      * @param excludedFilterIds - Filter IDs to exclude; empty (default) excludes none.
      * @param options - Optional settings.
-     * @param options.percentPath - Local `percent.json` to use instead of fetching it remotely.
+     * @param options.percentPath - Local JSON file holding an array of `{ filterId }`
+     * entries to use instead of fetching the remote `percent.json`.
      */
     download: async (
         basePath: string,
@@ -364,18 +391,19 @@ export const localOptimizationStatistics = {
     /**
      * Configures `getOptimizationStatistics` to read stats from local files under
      * `basePath` instead of fetching from the remote server.
-     * Stats are loaded lazily on demand during compilation. `percent.json`
-     * (which determines which filters are optimizable) is read from
-     * `options.percentPath` when given, otherwise fetched remotely.
+     * Stats are loaded lazily on demand during compilation. The optimizable
+     * filters (the remote `percent.json`) are read from `options.percentPath`
+     * when given, otherwise fetched remotely. Calling `use()` again without
+     * `percentPath` stops using a previously given one.
      *
      * @param basePath - Directory containing `filters/<filterId>/stats.json`.
      * @param options - Optional settings.
-     * @param options.percentPath - Local `percent.json` to use instead of fetching it remotely.
+     * @param options.percentPath - Local JSON file holding an array of `{ filterId }`
+     * entries to use instead of fetching the remote `percent.json`.
      */
     use(basePath: string, options: PercentOptions = {}) {
         localStatsPath = basePath;
         localPercentPath = options.percentPath ?? null;
-        percentEntriesCache = null;
     },
 
     /**
@@ -387,7 +415,7 @@ export const localOptimizationStatistics = {
         await fs.rm(basePath, { recursive: true, force: true });
         localStatsPath = null;
         localPercentPath = null;
-        percentEntriesCache = null;
+        percentEntriesCache.clear();
     },
 };
 
