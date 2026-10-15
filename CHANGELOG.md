@@ -31,6 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `:contains()` arguments are treated as raw text.
 - Removed the temporary workaround that kept HTML filtering rules with
   pseudo-classes as-is.
+- Updated [@adguard/agtree] to v4.3.0.
+- Updated [@adguard/tsurlfilter] to v6.0.4.
 
 ### Fixed
 
