@@ -174,8 +174,8 @@ comment.
 A namespace for caching optimization statistics locally so that
 `compile()` reads each filter's `stats.json` from disk instead of
 fetching it from the remote server. `percent.json` (which determines
-which filters are optimizable) is always fetched remotely, even when
-using the local cache.
+which filters are optimizable) is fetched remotely unless a local
+`percentPath` is passed to `download` or `use`.
 
 It exposes `download`, `use`, and `reset` methods and throws
 `OptimizationStatsError` (an `Error` subclass carrying `filterId`,
@@ -459,7 +459,7 @@ Each writes its output to a subdirectory under `platformsPath`.
 `localOptimizationStatistics` provides a workflow for caching optimization statistics
 locally so that `compile()` reads each filter's `stats.json` from disk instead of fetching it
 from the remote server. `percent.json` (which determines which filters are optimizable) is
-always fetched remotely, even when using the local cache.
+fetched remotely unless a local `percentPath` is passed to `download` or `use`.
 
 ### Directory layout
 
@@ -472,14 +472,20 @@ always fetched remotely, even when using the local cache.
 
 ### Workflow
 
-1. Call `download(basePath, includedFilterIds, excludedFilterIds)` to save
-   `stats.json` for filters listed in the remote `percent.json`.
+1. Call `download(basePath, includedFilterIds, excludedFilterIds, { percentPath })` to save
+   `stats.json` for filters listed in `percent.json` (the remote one, or the local array
+   at the optional `percentPath`).
    `includedFilterIds` limits processing to those IDs (default `[]` = all).
    `excludedFilterIds` skips those IDs (default `[]` = none). When both are
    given, a filter is processed only if it is included and not excluded.
-2. Call `use(basePath)` before `compile()` to tell
+2. Call `use(basePath, { percentPath })` before `compile()` to tell
    `getOptimizationStatistics` to read stats from local files under
    `basePath` instead of fetching from the remote server.
+   The optional `percentPath` points to a local JSON file holding an array of
+   `{ "filterId": 1 }` entries, such as the registry's `optimization_config.json`,
+   instead of the remote `percent.json` — so the set of optimizable filters is
+   pinned and no network access is needed. The file is read once and cached.
+   Calling `use()` without `percentPath` (or `reset()`) clears it.
 3. Call `reset(basePath)` when done to remove the cache directory and clear
    in-memory state.
 
@@ -499,7 +505,7 @@ import { localOptimizationStatistics } from '@adguard/filters-compiler';
 await localOptimizationStatistics.download('./stats-cache');
 
 // 2. Tell compile() to read stats from the local cache
-localOptimizationStatistics.use('./stats-cache');
+localOptimizationStatistics.use('./stats-cache', { percentPath: './optimization_config.json' });
 await compile('./filters', undefined, undefined, './platforms', [], []);
 
 // 3. Clean up when done

@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `percentPath` option for `localOptimizationStatistics.use()` and
+  `localOptimizationStatistics.download()` to load `percent.json` from a local
+  file (an array of `{ filterId }` entries) instead of fetching it remotely.
+  The parsed file is read once and cached.
+
 ### Changed
 
 ### Deprecated
