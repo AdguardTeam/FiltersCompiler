@@ -11,6 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.4.1] - 2026-10-15
+
+### Changed
+
 - HTML filtering rules with deprecated special attribute selectors
   `[min-length]` / `[max-length]` are now converted to the `:contains()`
   pseudo-class during AdGuard syntax conversion [tsurlfilter#96].
@@ -19,10 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `:contains()` arguments are treated as raw text.
 - Removed the temporary workaround that kept HTML filtering rules with
   pseudo-classes as-is.
-
-### Deprecated
-
-### Removed
+- Updated [@adguard/agtree] to v4.3.0.
+- Updated [@adguard/tsurlfilter] to v6.0.4.
 
 ### Fixed
 
@@ -56,10 +66,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   when the attribute selector follows another quoted one, so such
   rules (e.g. the `msn.com` triple-quoted rule that was previously
   dropped with a parse error) are converted instead of being excluded.
-
-### Security
-
-[tsurlfilter#96]: https://github.com/AdguardTeam/tsurlfilter/issues/96
 
 ## [3.4.0] - 2026-09-21
 
@@ -1028,7 +1034,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [@adguard/tsurlfilter]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/tsurlfilter/CHANGELOG.md
 [@adguard/logger]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/logger/CHANGELOG.md
 
-[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.4.0...HEAD
+[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.4.1...HEAD
+[3.4.1]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.4.0...v3.4.1
 [3.4.0]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.3.1...v3.4.0
 [3.3.2-beta.0]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.3.1...v3.3.2-beta.0
 [3.3.1]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.3.0...v3.3.1
@@ -1038,3 +1045,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [3.2.11]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.2.10...v3.2.11
 [3.2.10]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.2.10-beta.0...v3.2.10
 [3.2.10-beta.0]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.2.9...v3.2.10-beta.0
+
+[tsurlfilter#96]: https://github.com/AdguardTeam/tsurlfilter/issues/96
