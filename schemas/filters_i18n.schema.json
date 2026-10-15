@@ -18616,14 +18616,14 @@
                   "$id": "#/properties/tags/properties/10/ar/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/ar/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -18641,14 +18641,14 @@
                   "$id": "#/properties/tags/properties/10/be/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/be/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -18666,14 +18666,14 @@
                   "$id": "#/properties/tags/properties/10/bg/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/bg/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -18691,14 +18691,14 @@
                   "$id": "#/properties/tags/properties/10/ca/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/ca/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -18716,14 +18716,14 @@
                   "$id": "#/properties/tags/properties/10/cs/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/cs/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -18741,14 +18741,14 @@
                   "$id": "#/properties/tags/properties/10/da/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/da/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -18766,14 +18766,14 @@
                   "$id": "#/properties/tags/properties/10/de/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/de/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -18791,14 +18791,14 @@
                   "$id": "#/properties/tags/properties/10/el/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/el/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -18816,14 +18816,14 @@
                   "$id": "#/properties/tags/properties/10/en/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/en/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -18841,14 +18841,14 @@
                   "$id": "#/properties/tags/properties/10/es/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/es/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -18866,14 +18866,14 @@
                   "$id": "#/properties/tags/properties/10/es_ES/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/es_ES/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -18891,14 +18891,14 @@
                   "$id": "#/properties/tags/properties/10/fa/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/fa/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -18916,14 +18916,14 @@
                   "$id": "#/properties/tags/properties/10/fi/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/fi/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -18941,14 +18941,14 @@
                   "$id": "#/properties/tags/properties/10/fr/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/fr/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -18966,14 +18966,14 @@
                   "$id": "#/properties/tags/properties/10/he/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/he/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -18991,14 +18991,14 @@
                   "$id": "#/properties/tags/properties/10/hi/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/hi/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -19016,14 +19016,14 @@
                   "$id": "#/properties/tags/properties/10/hr/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/hr/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -19041,14 +19041,14 @@
                   "$id": "#/properties/tags/properties/10/hu/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/hu/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -19066,14 +19066,14 @@
                   "$id": "#/properties/tags/properties/10/hy/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/hy/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -19091,14 +19091,14 @@
                   "$id": "#/properties/tags/properties/10/id/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/id/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -19116,14 +19116,14 @@
                   "$id": "#/properties/tags/properties/10/it/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/it/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -19141,14 +19141,14 @@
                   "$id": "#/properties/tags/properties/10/ja/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/ja/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -19166,14 +19166,14 @@
                   "$id": "#/properties/tags/properties/10/ko/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/ko/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -19191,14 +19191,14 @@
                   "$id": "#/properties/tags/properties/10/lt/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/lt/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -19216,14 +19216,14 @@
                   "$id": "#/properties/tags/properties/10/mk/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/mk/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -19241,14 +19241,14 @@
                   "$id": "#/properties/tags/properties/10/ms/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/ms/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -19266,14 +19266,14 @@
                   "$id": "#/properties/tags/properties/10/nl/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/nl/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -19291,14 +19291,14 @@
                   "$id": "#/properties/tags/properties/10/no/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/no/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -19316,14 +19316,14 @@
                   "$id": "#/properties/tags/properties/10/pl/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/pl/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -19341,14 +19341,14 @@
                   "$id": "#/properties/tags/properties/10/pt/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/pt/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -19366,14 +19366,14 @@
                   "$id": "#/properties/tags/properties/10/pt_BR/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/pt_BR/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -19391,14 +19391,14 @@
                   "$id": "#/properties/tags/properties/10/pt_PT/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/pt_PT/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -19416,14 +19416,14 @@
                   "$id": "#/properties/tags/properties/10/ro/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/ro/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -19441,14 +19441,14 @@
                   "$id": "#/properties/tags/properties/10/ru/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/ru/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -19466,14 +19466,14 @@
                   "$id": "#/properties/tags/properties/10/sk/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/sk/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -19491,14 +19491,14 @@
                   "$id": "#/properties/tags/properties/10/sl/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/sl/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -19516,14 +19516,14 @@
                   "$id": "#/properties/tags/properties/10/sr/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/sr/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -19541,14 +19541,14 @@
                   "$id": "#/properties/tags/properties/10/sv/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/sv/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -19566,14 +19566,14 @@
                   "$id": "#/properties/tags/properties/10/th/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/th/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -19591,14 +19591,14 @@
                   "$id": "#/properties/tags/properties/10/tr/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/tr/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -19616,14 +19616,14 @@
                   "$id": "#/properties/tags/properties/10/uk/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/uk/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -19641,14 +19641,14 @@
                   "$id": "#/properties/tags/properties/10/vi/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/vi/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -19666,14 +19666,14 @@
                   "$id": "#/properties/tags/properties/10/zh/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/zh/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
@@ -19691,14 +19691,14 @@
                   "$id": "#/properties/tags/properties/10/zh_TW/properties/name",
                   "type": "string",
                   "title": "The NAME Schema",
-                  "default": "AdGuard recommendation",
+                  "default": "Recommended",
                   "pattern": "^(.*)$"
                 },
                 "description": {
                   "$id": "#/properties/tags/properties/10/zh_TW/properties/description",
                   "type": "string",
                   "title": "The DESCRIPTION Schema",
-                  "default": "Recommended to use with AdGuard ad blocker",
+                  "default": "Approved for use by the AdGuard team",
                   "pattern": "^(.*)$"
                 }
               }
