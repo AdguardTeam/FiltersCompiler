@@ -16,6 +16,7 @@ import {
     convertRulesToAdgSyntax,
     convertToUbo,
 } from '../src/main/converter';
+import { CORE_LIBS_PCRE2_QUANTIFIER_LIMIT } from '../src/main/utils/workaround';
 
 // Mock log to hide error messages
 vi.mock('../src/main/utils/log');
@@ -342,15 +343,82 @@ describe('converter', () => {
         expect(actual[0]).toBe(expected);
     });
 
-    describe('keeps html filtering rules with [min-length] and [max-length] as is', () => {
+    describe('converts html filtering rules with [min-length] and [max-length]', () => {
+        it.each([
+            {
+                rule: 'example.com$$script[min-length="100"][max-length="500"]',
+                expected: 'example.com$$script:contains(/^(?=.{100,500}$).*/s)',
+            },
+            {
+                rule: 'example.com$$script[min-length="1000"]',
+                expected: 'example.com$$script:contains(/^(?=.{1000,}$).*/s)',
+            },
+            {
+                rule: 'example.com$$script[max-length="5000"]',
+                expected: 'example.com$$script:contains(/^(?=.{0,5000}$).*/s)',
+            },
+            {
+                rule: 'example.com$$script[tag-content="Flags."][min-length="20000"][max-length="30000"]',
+                expected: 'example.com$$script:contains(Flags.):contains(/^(?=.{20000,30000}$).*/s)',
+            },
+        ])('$rule', ({ rule, expected }) => {
+            const actual = convertRulesToAdgSyntax([rule]);
+            expect(actual[0]).toBe(expected);
+        });
+    });
+
+    describe('keeps html filtering rules with [min-length]/[max-length] values exceeding 65535 as is', () => {
         it.each([
             'example.com$$script[tag-content="Flags."][min-length="20000"][max-length="300000"]',
-            'example.com$$script[min-length="100"][max-length="500"]',
-            'example.com$$script[min-length="1000"]',
-            'example.com$$script[max-length="5000"]',
+            'example.com$$script[min-length="100000"]',
+            'example.com$$script[max-length="70000"]',
+            // single-quoted values are also converted to :contains() by AGTree,
+            // so they must be kept as-is as well
+            "example.com$$script[min-length='100000']",
+            "example.com$$script[max-length='70000']",
+            "example.com$$script[min-length='20000'][max-length='300000']",
+            // whitespace inside the attribute selector is normalized by the parser,
+            // so such rules must be kept as-is as well
+            'example.com$$script[min-length="100000" ]',
+            'example.com$$script[min-length = "100000"]',
+            // non-decimal integer spellings are covered by the Number() conversion,
+            // matching the conversion semantics
+            'example.com$$script[min-length="1e5"]',
+            // the lenient parser (AGTree) keeps the body parseable even with an
+            // unbalanced :contains() argument, so the AST-based check still sees
+            // the oversized length attribute and keeps the rule as-is
+            'example.com$$script[min-length="100000"]:contains(eval(function(p,a,c,k,e,d))',
+            // boundary value: the first value that exceeds the limit
+            'example.com$$script[max-length="65536"]',
         ])('%s', (rule) => {
+            const excluded = [];
+            const actual = convertRulesToAdgSyntax([rule], excluded);
+            // rule is kept unchanged
+            expect(actual).toEqual([rule]);
+            // the exact warning is written to the excluded list (diff.txt)
+            expect(excluded).toEqual([
+                `! Warning: HTML filtering rule with [min-length] or [max-length] value exceeding ${CORE_LIBS_PCRE2_QUANTIFIER_LIMIT} is kept as-is, because conversion to :contains() would not work in CoreLibs apps: "${rule}"`,
+                rule,
+            ]);
+        });
+    });
+
+    describe('converts html filtering rules with [min-length]/[max-length] values within the limit', () => {
+        it.each([
+            {
+                // boundary value: the limit itself still fits the CoreLibs quantifier range
+                rule: 'example.com$$div[min-length="65535"]',
+                expected: 'example.com$$div:contains(/^(?=.{65535,}$).*/s)',
+            },
+            {
+                // the `[min-length]` substring inside a quoted :contains() argument
+                // is not an attribute selector and must not trigger the keep-as-is workaround
+                rule: 'example.com$$script:contains("[min-length=\'100000\']")[max-length="100"]',
+                expected: 'example.com$$script:contains("[min-length=\'100000\']"):contains(/^(?=.{0,100}$).*/s)',
+            },
+        ])('$rule', ({ rule, expected }) => {
             const actual = convertRulesToAdgSyntax([rule]);
-            expect(actual[0]).toBe(rule);
+            expect(actual[0]).toBe(expected);
         });
     });
 
@@ -377,17 +445,23 @@ describe('converter', () => {
         });
     });
 
-    describe('converts html rules with pseudo-classes', () => {
+    describe('keeps html rules with unbalanced pseudo-class arguments as-is', () => {
+        // CoreLibs parity: `:contains()` arguments are treated as raw text,
+        // so unbalanced pseudo-class arguments are kept as-is, no quoting is inserted.
         it.each([
             'example.com$$script:contains(eval(function(p,a,c,k,e,d))',
             'example.com$$script:contains((function(_0x)',
             'example.com$$script:contains(Array.from(document.querySelectorAll)',
             "example.com$$script:contains(document.addEventListener('click')",
-        ])('$input', (input) => {
-            const actual = convertRulesToAdgSyntax([input]);
-            // keep the rule as is. TODO: check while AG-24662 resolving
-            expect(actual[0]).toBe(input);
+        ])('%s', (rule) => {
+            const actual = convertRulesToAdgSyntax([rule]);
+            expect(actual[0]).toBe(rule);
         });
+    });
+
+    it('converts html rules with :has-text to :contains', () => {
+        const actual = convertRulesToAdgSyntax(['example.com$$script:has-text(ad)']);
+        expect(actual[0]).toBe('example.com$$script:contains(ad)');
     });
 
     it('converts $1p to $~third-party and $3p to $third-party', () => {

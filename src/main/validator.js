@@ -1,6 +1,8 @@
 import {
+    AdblockSyntaxError,
     CommentParser,
     CosmeticRuleType,
+    DomainUtils,
     RuleConverter,
     RuleParser,
     RuleGenerator,
@@ -21,7 +23,6 @@ import { getErrorMessage } from '@adguard/logger';
 import { RuleMasks } from './rule/rule-masks';
 import { logger } from './utils/log';
 import { validateCssSelector } from './utils/extended-css-validator';
-import { shouldKeepAdgHtmlFilteringRuleAsIs } from './utils/workaround';
 
 /**
  * @typedef {import('@adguard/agtree').AnyRule} AnyRule
@@ -117,8 +118,43 @@ class RuleValidator {
         try {
             // Validate cosmetic rules
             if (ruleNode.category === RuleCategory.Cosmetic) {
-                // eslint-disable-next-line no-new
-                new CosmeticRule(text, 0);
+                try {
+                    // eslint-disable-next-line no-new
+                    new CosmeticRule(text, 0);
+                } catch (error) {
+                    // HTML filtering rules with unparseable bodies (e.g. `:contains()`
+                    // with an unbalanced parenthesis or an unterminated string in the
+                    // argument) are kept as-is by the AGTree identity fallback during
+                    // conversion. tsurlfilter's CosmeticRule parses the rule body as a
+                    // CSS selector list and throws for such rules, but they are valid
+                    // in CoreLibs apps (the only consumers of HTML filtering rules),
+                    // so we skip the tsurlfilter validation for them.
+                    // Only body syntax errors (AdblockSyntaxError) are forgiven;
+                    // other errors (e.g. invalid domains) must not be forgiven.
+                    if (
+                        ruleNode.type !== CosmeticRuleType.HtmlFilteringRule
+                        || !(error instanceof AdblockSyntaxError)
+                    ) {
+                        throw error;
+                    }
+
+                    // CosmeticRule throws on the unparseable body before
+                    // validating the domains, so forgiving the body syntax
+                    // error here would also accept invalid domains (e.g.
+                    // `bad..domain$$...`). Validate the domains the same way
+                    // CosmeticRule does before forgiving the body error.
+                    const invalidDomain = (ruleNode.domains?.children || []).find(
+                        ({ value: domain }) => !RegExpUtils.isRegexPattern(domain)
+                            && !DomainUtils.isValidDomainOrHostname(domain),
+                    );
+                    if (invalidDomain) {
+                        // eslint-disable-next-line max-len
+                        throw new Error(`'${invalidDomain.value}' is not a valid domain name or regexp pattern`);
+                    }
+
+                    // eslint-disable-next-line max-len
+                    logger.warn(`Skipped tsurlfilter validation for the HTML filtering rule with unparseable body kept as-is: "${text}"`);
+                }
                 return RuleValidator.createValidationResult(true);
             }
 
@@ -202,12 +238,6 @@ export const validateAndFilterRules = (list, excluded, invalid = [], filterName)
                 parseAbpSpecificRules: false,
                 parseUboSpecificRules: false,
             });
-
-            // temporary workaround for AdGuard's HTML filtering rules with pseudo-classes.
-            // TODO: remove during AG-24662 resolving
-            if (shouldKeepAdgHtmlFilteringRuleAsIs(ruleNode)) {
-                return true;
-            }
 
             const conversionResult = RuleConverter.convertToAdg(ruleNode);
             convertedRuleNodes = conversionResult.result;

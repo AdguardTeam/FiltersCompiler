@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@adguard/agtree':
-        specifier: 4.2.1
-        version: 4.2.1
+        specifier: 4.3.0
+        version: 4.3.0
       '@adguard/css-tokenizer':
         specifier: 1.2.0
         version: 1.2.0
@@ -30,8 +30,8 @@ importers:
         specifier: 2.5.1
         version: 2.5.1
       '@adguard/tsurlfilter':
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.0.4
+        version: 6.0.4
       '@date-fns/utc':
         specifier: 2.1.1
         version: 2.1.1
@@ -124,6 +124,10 @@ packages:
     resolution: {integrity: sha512-SYS+88MBs7FxUovsjcWxxWS366toEjkvb3QzURJFlzHtGXNn4Sbx444RfHrBD2ZqojrJ7fFyWnlXPHxGE9/cZA==}
     engines: {node: '>=22'}
 
+  '@adguard/agtree@4.3.0':
+    resolution: {integrity: sha512-b55w0xZANTQV93JpbS5JyQDTZVFzS7IMVlYqTcYyFl4zawtmO2fIopJRlNCqlJdfkMsE29qrrv2KFN9+BB9S6g==}
+    engines: {node: '>=22'}
+
   '@adguard/css-tokenizer@1.2.0':
     resolution: {integrity: sha512-cUj5j/AU5z/T4//5M6KnIJBpykAY4QbDsoiQ2DaWX/r2XkepMkTb8DhIbUHJD/QLGEyLeQLpi+nlxAgf4NTRRQ==}
 
@@ -147,12 +151,16 @@ packages:
     resolution: {integrity: sha512-jOiL0gy+uhrezJwI5j1mzpXyta1AFOhpEgKrqRlLN6puArFmHDmLH06civQs12tFWjtUCX+uGgUd1i4x/PCU1g==}
     engines: {node: '>=22'}
 
+  '@adguard/logger@2.0.1':
+    resolution: {integrity: sha512-ZHF6u0qN3RPjAJREOX0b9nDgkQnyIvu39yQOEl04BUXJqUSZvnOLcpaMTbqGIbT9/nuzR0hZx/nXBNuvRgTp9w==}
+    engines: {node: '>=22'}
+
   '@adguard/scriptlets@2.5.1':
     resolution: {integrity: sha512-008B4qm6mXU4mqHOl1HE/jfRa0D/LUX2Lx4k00G45csiBF/fnIGzVivPsT1Q+Uhp9C+zj5tKoekkL39W8HqjzA==}
     engines: {pnpm: '>=10.33.4 <11'}
 
-  '@adguard/tsurlfilter@6.0.3':
-    resolution: {integrity: sha512-CXdpEtVFKuvphlSTuvyjrinmYiLC6oRdkvcPM4H0lojfmQm00E2slDdTUue6vd+LQ8HhBDEjZps8q2XL9ljqmg==}
+  '@adguard/tsurlfilter@6.0.4':
+    resolution: {integrity: sha512-UDjqDnvfKm6BW0EtvBm0P2etJYkqVDgMi/gTp9SoPedjACPHgwQc2JilVPw3UP/0X1EcHNhwgJ6IhQWVi+RrYQ==}
     engines: {node: '>=22'}
 
   '@date-fns/utc@2.1.1':
@@ -2508,6 +2516,18 @@ snapshots:
       tldts: 5.7.112
       zod: 3.24.4
 
+  '@adguard/agtree@4.3.0':
+    dependencies:
+      '@adguard/css-tokenizer': 1.2.0
+      camelcase-keys: 7.0.2
+      clone-deep: 4.0.1
+      glob-to-regexp: 0.4.1
+      is-ip: 3.1.0
+      json5: 2.2.3
+      sprintf-js: 1.1.3
+      tldts: 5.7.112
+      zod: 3.24.4
+
   '@adguard/css-tokenizer@1.2.0': {}
 
   '@adguard/diff-builder@1.1.4':
@@ -2532,17 +2552,19 @@ snapshots:
 
   '@adguard/logger@2.0.0': {}
 
+  '@adguard/logger@2.0.1': {}
+
   '@adguard/scriptlets@2.5.1':
     dependencies:
       '@adguard/agtree': 4.2.1
       '@types/trusted-types': 2.0.7
       js-yaml: 3.14.1
 
-  '@adguard/tsurlfilter@6.0.3':
+  '@adguard/tsurlfilter@6.0.4':
     dependencies:
-      '@adguard/agtree': 4.2.1
+      '@adguard/agtree': 4.3.0
       '@adguard/css-tokenizer': 1.2.0
-      '@adguard/logger': 2.0.0
+      '@adguard/logger': 2.0.1
       '@adguard/scriptlets': 2.5.1
       cidr-tools: 6.4.2
       is-cidr: 4.0.2

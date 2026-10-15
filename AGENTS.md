@@ -326,6 +326,9 @@ Public API layer.
 - **Pin all dependency versions explicitly** — do not use version ranges that
   allow automatic upgrades to untested versions. All dependencies in
   `package.json` use exact versions (e.g., `4.0.5` not `^4.0.5`).
+- **No `packageManager` field** — do not add a `packageManager` field to
+  `package.json`. The `engines.pnpm` version range is enough to declare the
+  supported pnpm version.
 - **Prefer vanilla solutions** — use Node.js built-in APIs when they
   adequately solve the problem. Only add a dependency when it provides
   significant value over a vanilla implementation.

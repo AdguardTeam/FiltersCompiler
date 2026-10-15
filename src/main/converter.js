@@ -1,4 +1,5 @@
 import {
+    AdblockSyntax,
     RuleConverter,
     RuleParser,
     RuleGenerator,
@@ -8,7 +9,10 @@ import { getErrorMessage } from '@adguard/logger';
 
 import { logger } from './utils/log';
 import { RuleMasks } from './rule/rule-masks';
-import { shouldKeepAdgHtmlFilteringRuleAsIs } from './utils/workaround';
+import {
+    CORE_LIBS_PCRE2_QUANTIFIER_LIMIT,
+    shouldKeepHtmlRuleWithOversizedLengths,
+} from './utils/workaround';
 
 /**
  * Excludes rule
@@ -40,11 +44,24 @@ export const convertRulesToAdgSyntax = (rulesList, excluded = [], invalidRules =
         try {
             const ruleNode = RuleParser.parse(rule);
 
-            // temporary workaround for AdGuard's HTML filtering rules with pseudo-classes.
-            // TODO: remove during AG-24662 resolving
-            if (shouldKeepAdgHtmlFilteringRuleAsIs(ruleNode)) {
-                const message = `Keeping HTML filtering rule with pseudo-classes as is: "${rule}"`;
+            // HTML filtering rules with [min-length]/[max-length] attribute values
+            // exceeding the CoreLibs PCRE2 quantifier limit (65535) are kept as-is,
+            // because converting them to `:contains()` with a regexp quantifier
+            // would make them silently fail in CoreLibs apps,
+            // while the old syntax works there natively.
+            // The length check only applies to AdGuard HTML filtering rules, so
+            // the already-parsed node is checked first to avoid re-parsing every
+            // network and element-hiding rule in the helper.
+            if (
+                ruleNode.type === CosmeticRuleType.HtmlFilteringRule
+                && ruleNode.syntax === AdblockSyntax.Adg
+                && shouldKeepHtmlRuleWithOversizedLengths(rule)
+            ) {
+                // eslint-disable-next-line max-len
+                const message = `Warning: HTML filtering rule with [min-length] or [max-length] value exceeding ${CORE_LIBS_PCRE2_QUANTIFIER_LIMIT} `
+                    + `is kept as-is, because conversion to :contains() would not work in CoreLibs apps: "${rule}"`;
                 logger.warn(message);
+                excludeRule(rule, excluded, message);
                 result.push(rule);
                 continue;
             }

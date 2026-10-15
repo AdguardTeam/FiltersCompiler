@@ -1534,6 +1534,8 @@ describe('Invalid rules collection in report', () => {
 
         const diffLines = diffContent.split('\n');
         expect(diffLines.length).toBe(2);
+        // the unbalanced :contains() rule is kept as-is (CoreLibs parity),
+        // only the genuinely invalid rule is collected in the diff
         expect(diffLines[0]).toContain('Error: Unable to convert rule to AdGuard syntax');
         expect(diffLines[1]).toContain('filter14.example.com#$#selector:style()');
     });

@@ -11,13 +11,55 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- HTML filtering rules with deprecated special attribute selectors
+  `[min-length]` / `[max-length]` are now converted to the `:contains()`
+  pseudo-class during AdGuard syntax conversion [tsurlfilter#96].
+- HTML filtering rules with unbalanced `:contains()` pseudo-class arguments
+  are now kept as-is during conversion (CoreLibs parity),
+  `:contains()` arguments are treated as raw text.
+- Removed the temporary workaround that kept HTML filtering rules with
+  pseudo-classes as-is.
+
 ### Deprecated
 
 ### Removed
 
 ### Fixed
 
+- HTML filtering rules with `[min-length]` / `[max-length]` values exceeding
+  `65535` are kept as-is with a warning in `diff.txt`, because the converted
+  `:contains()` regexp quantifier would silently fail in CoreLibs apps
+  as not supported. The oversized-value detection is AST-based, so it covers
+  whitespace and non-decimal integer spellings in attribute selectors and
+  does not misfire on `[min-length]`-like substrings inside quoted
+  `:contains()` arguments.
+- HTML filtering rules kept as-is by the converter are now forgiven by the
+  validator only for body syntax errors (`AdblockSyntaxError`) — other
+  validation errors still discard the rule. Because `CosmeticRule` throws
+  the body error before validating the domain list, the domains of such
+  rules are now validated explicitly before forgiving the body error (e.g.
+  `bad..domain$$script[tag-content="unterminated]` is discarded). A warning
+  is logged for each forgiven rule.
+- Converted HTML filtering rules no longer produce `:contains()` chains
+  that CoreLibs rejects or mis-parses: combinations of deprecated
+  special attribute selectors that cannot be represented as separate
+  `:contains()` pseudo-classes (an unbalanced `[tag-content]` value
+  chained with a length regexp, two regex `:contains()` from
+  `[wildcard]` + `[min-length]`/`[max-length]`, multiple
+  `[tag-content]` or `[wildcard]` values, etc.) are now merged into a
+  single regex `:contains()` built from lookaheads, e.g.
+  `aces.gg$$script[tag-content="$('#alert').on('click'"][max-length="250"]`
+  converts to
+  `aces.gg$$script:contains(/^(?=.{0,250}$)(?=.*\$\('#alert'\)\.on\('click').*/s)`
+  (via the updated `@adguard/agtree`). Legacy `""` quote doubling in a
+  `[tag-content]` / `[wildcard]` value is now also handled correctly
+  when the attribute selector follows another quoted one, so such
+  rules (e.g. the `msn.com` triple-quoted rule that was previously
+  dropped with a parse error) are converted instead of being excluded.
+
 ### Security
+
+[tsurlfilter#96]: https://github.com/AdguardTeam/tsurlfilter/issues/96
 
 ## [3.4.0] - 2026-09-21
 
