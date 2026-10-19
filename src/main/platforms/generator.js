@@ -17,7 +17,6 @@ import {
     modifyBaseFilterHeader,
 } from '../utils/workaround';
 import { convertToUbo } from '../converter';
-import { platformsConfig } from '../platforms-config';
 import { getOptimizationStatistics } from '../optimization';
 import { RuleMasks } from '../rule/rule-masks';
 
@@ -27,12 +26,10 @@ const RULES_SEPARATOR = '\r\n';
 let filterIdsPool = [];
 let metadataFilterIdsPool = [];
 
-const isOptimizedPlatform = (platform) => [
-    platformsConfig.EXTENSION_SAFARI.platform,
-    platformsConfig.ANDROID.platform,
-    platformsConfig.IOS.platform,
-    platformsConfig.EXTENSION_ANDROID_CONTENT_BLOCKER.platform,
-].includes(platform);
+// Plain ids, not read from platformsConfig: compile() lets customPlatformsConfig
+// override its entries in place, which must not change this behaviour.
+const OPTIMIZED_PLATFORMS_LIST = ['ext_safari', 'android', 'ios', 'ext_android_cb'];
+const UBLOCK_PLATFORM = 'ext_ublock';
 
 const PLATFORM_FILTERS_DIR = 'filters';
 const FILTERS_METADATA_FILE_JSON = 'filters.json';
@@ -402,7 +399,7 @@ const processFiltersFromMetadata = function (filtersMetadata) {
  * @param config
  */
 export const postProcessUrls = (metadata, config) => {
-    const useOptimized = isOptimizedPlatform(config.platform);
+    const useOptimized = OPTIMIZED_PLATFORMS_LIST.includes(config.platform);
 
     const result = {};
 
@@ -917,7 +914,7 @@ const writeFilterRules = function (filterId, dir, config, rulesHeader, rules, op
     // Exclude script rules
     // and script rules exceptions https://github.com/AdguardTeam/FiltersCompiler/issues/199
     // Modify title for base filter
-    if (config.platform === platformsConfig.EXTENSION_UBLOCK.platform) {
+    if (config.platform === UBLOCK_PLATFORM) {
         rulesList = convertToUbo(rulesList);
         rulesList = excludeScriptRules(rulesList);
         if (filterId === 2) {
@@ -928,7 +925,7 @@ const writeFilterRules = function (filterId, dir, config, rulesHeader, rules, op
     writeFilterFile(filterFile, config.configuration.adbHeader, rulesHeader, rulesList);
 
     // For English filter only we should provide additional filter version.
-    if (filterId === 2 && config.platform === platformsConfig.EXTENSION_UBLOCK.platform && !optimized) {
+    if (filterId === 2 && config.platform === UBLOCK_PLATFORM && !optimized) {
         const correctedHeader = rewriteHeader(rulesHeader);
         const correctedRules = rewriteRules(rulesList);
 

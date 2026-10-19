@@ -15,8 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   set into native flat config (`eslint.config.js`). No consumer-facing effect —
   the `engines.node` floor is unchanged. See
   [DEVELOPMENT.md](DEVELOPMENT.md#eslint-configuration) for details.
-- Replaced hardcoded platform ids in `generator.js` with `platformsConfig`
-  references and removed a dead condition in `createDir`.
+- Named the repeated platform id literals in `generator.js` and removed a dead
+  condition in `createDir`. No behaviour change.
 
 ### Deprecated
 
