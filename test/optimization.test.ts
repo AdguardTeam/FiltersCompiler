@@ -5,6 +5,7 @@ import {
     vi,
     beforeAll,
     afterAll,
+    beforeEach,
     afterEach,
 } from 'vitest';
 
@@ -428,6 +429,188 @@ describe('use()', () => {
             sourcePath: path.join(tmpDir, FILTERS_DIR_NAME, String(FILTER_ID_WITHOUT_LOCAL_STATS), STATS_JSON),
             code: 'OPTIMIZATION_STATS_UNAVAILABLE',
         });
+    });
+});
+
+describe('percentPath injection', () => {
+    const LOCAL_FILTER_ID = 7;
+    let tmpDir: string;
+    let percentPath: string;
+
+    const percentCallCount = () => downloadFile.mock.calls.filter(([url]) => url.includes(PERCENT_JSON)).length;
+
+    const writeLocalStats = async (filterId: number) => {
+        const statsDir = path.join(tmpDir, FILTERS_DIR_NAME, String(filterId));
+        await fs.mkdir(statsDir, { recursive: true });
+        await fs.writeFile(path.join(statsDir, STATS_JSON), JSON.stringify(MOCK_STATS_JSON), 'utf-8');
+    };
+
+    beforeEach(async () => {
+        tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'opt-percent-'));
+        percentPath = path.join(tmpDir, 'percent-config.json');
+        await writeLocalStats(LOCAL_FILTER_ID);
+        vi.clearAllMocks();
+    });
+
+    afterEach(async () => {
+        await localOptimizationStatistics.reset(tmpDir);
+        vi.clearAllMocks();
+    });
+
+    it('use() without percentPath clears a previously injected percentPath', async () => {
+        await fs.writeFile(percentPath, JSON.stringify([{ filterId: LOCAL_FILTER_ID }]), 'utf-8');
+        localOptimizationStatistics.use(tmpDir, { percentPath });
+        localOptimizationStatistics.use(tmpDir);
+
+        expect(await getOptimizationStatistics(LOCAL_FILTER_ID)).toBeNull();
+        expect(percentCallCount()).toBe(1);
+    });
+
+    // Both entry points resolve optimizable ids from percentPath; `run` resolves with those ids.
+    describe.each([
+        ['use()', async (file: string) => {
+            localOptimizationStatistics.use(tmpDir, { percentPath: file });
+            const found = await Promise.all(
+                [LOCAL_FILTER_ID, VALID_FILTER_ID].map(async (id) => (
+                    await getOptimizationStatistics(id) === null ? null : id
+                )),
+            );
+            return found.filter((id) => id !== null);
+        }],
+        ['download()', async (file: string) => {
+            const downloadDir = path.join(tmpDir, 'downloaded');
+            await localOptimizationStatistics.download(downloadDir, [], [], { percentPath: file });
+            const dirs = await fs.readdir(path.join(downloadDir, FILTERS_DIR_NAME));
+            return dirs.map(Number);
+        }],
+    ])('%s', (_, run) => {
+        it('takes optimizable ids from an array of { filterId } entries in percentPath without fetching', async () => {
+            const entries = [{ filterId: LOCAL_FILTER_ID, percent: 40, strict: true }];
+            await fs.writeFile(percentPath, JSON.stringify(entries), 'utf-8');
+
+            // VALID_FILTER_ID is listed in the mocked remote percent.json, but absent from the local file.
+            expect(await run(percentPath)).toEqual([LOCAL_FILTER_ID]);
+            expect(percentCallCount()).toBe(0);
+        });
+
+        it.each([
+            ['an object instead of an array', { filterId: LOCAL_FILTER_ID }],
+            ['an entry without filterId', [{ id: 1 }]],
+        ])('throws a TypeError naming the path for %s in percentPath', async (__, content) => {
+            await fs.writeFile(percentPath, JSON.stringify(content), 'utf-8');
+
+            const error = await run(percentPath).catch((e: unknown) => e);
+
+            expect(error).toBeInstanceOf(TypeError);
+            expect((error as TypeError).message).toContain(percentPath);
+        });
+
+        it('throws an Error naming the path and keeping the cause for a file that is not valid JSON', async () => {
+            await fs.writeFile(percentPath, '[{ "filterId": 7 ', 'utf-8');
+
+            const error = await run(percentPath).catch((e: unknown) => e);
+
+            expect(error).toBeInstanceOf(Error);
+            expect((error as Error).message).toContain(percentPath);
+            expect((error as Error).cause).toBeInstanceOf(SyntaxError);
+        });
+    });
+
+    it('reads the percentPath file once across repeated lookups', async () => {
+        await fs.writeFile(percentPath, JSON.stringify([{ filterId: LOCAL_FILTER_ID }]), 'utf-8');
+        const readFile = vi.spyOn(fs, 'readFile');
+        localOptimizationStatistics.use(tmpDir, { percentPath });
+
+        await Promise.all([
+            getOptimizationStatistics(LOCAL_FILTER_ID),
+            getOptimizationStatistics(LOCAL_FILTER_ID),
+            getOptimizationStatistics(INVALID_FILTER_ID),
+        ]);
+        await getOptimizationStatistics(LOCAL_FILTER_ID);
+
+        const percentReads = readFile.mock.calls.filter(([file]) => file === percentPath);
+        readFile.mockRestore();
+        expect(percentReads).toHaveLength(1);
+    });
+
+    it('reuses the cached entries for repeated use() calls with the same percentPath', async () => {
+        await fs.writeFile(percentPath, JSON.stringify([{ filterId: LOCAL_FILTER_ID }]), 'utf-8');
+        const readFile = vi.spyOn(fs, 'readFile');
+
+        localOptimizationStatistics.use(tmpDir, { percentPath });
+        await getOptimizationStatistics(LOCAL_FILTER_ID);
+        localOptimizationStatistics.use(tmpDir, { percentPath });
+        await getOptimizationStatistics(LOCAL_FILTER_ID);
+
+        const percentReads = readFile.mock.calls.filter(([file]) => file === percentPath);
+        readFile.mockRestore();
+        expect(percentReads).toHaveLength(1);
+    });
+
+    it('reads each distinct percentPath once when download() and use() alternate between them', async () => {
+        const otherPercentPath = path.join(tmpDir, 'other-percent-config.json');
+        await fs.writeFile(percentPath, JSON.stringify([{ filterId: LOCAL_FILTER_ID }]), 'utf-8');
+        await fs.writeFile(otherPercentPath, JSON.stringify([{ filterId: VALID_FILTER_ID }]), 'utf-8');
+        const readFile = vi.spyOn(fs, 'readFile');
+        const downloadDir = path.join(tmpDir, 'downloaded');
+
+        localOptimizationStatistics.use(tmpDir, { percentPath });
+        await getOptimizationStatistics(LOCAL_FILTER_ID);
+        await localOptimizationStatistics.download(downloadDir, [], [], { percentPath: otherPercentPath });
+        await getOptimizationStatistics(LOCAL_FILTER_ID);
+        await localOptimizationStatistics.download(downloadDir, [], [], { percentPath: otherPercentPath });
+
+        const reads = (file: string) => readFile.mock.calls.filter(([f]) => f === file).length;
+        const counts = [reads(percentPath), reads(otherPercentPath)];
+        readFile.mockRestore();
+        expect(counts).toEqual([1, 1]);
+    });
+
+    it('download() without percentPath reuses the remote percent.json fetched earlier in the process', async () => {
+        await localOptimizationStatistics.download(path.join(tmpDir, 'first'));
+        await localOptimizationStatistics.download(path.join(tmpDir, 'second'));
+
+        expect(percentCallCount()).toBe(1);
+    });
+
+    it('reset() clears the injected percentPath', async () => {
+        await fs.writeFile(percentPath, JSON.stringify([{ filterId: LOCAL_FILTER_ID }]), 'utf-8');
+        localOptimizationStatistics.use(tmpDir, { percentPath });
+        await localOptimizationStatistics.reset(tmpDir);
+        await writeLocalStats(VALID_FILTER_ID);
+        localOptimizationStatistics.use(tmpDir);
+
+        expect(await getOptimizationStatistics(VALID_FILTER_ID)).not.toBeNull();
+        expect(percentCallCount()).toBe(1);
+    });
+
+    it('download() applies includedFilterIds and excludedFilterIds to the ids from percentPath', async () => {
+        const OTHER_FILTER_ID = 8;
+        await fs.writeFile(
+            percentPath,
+            JSON.stringify([{ filterId: LOCAL_FILTER_ID }, { filterId: OTHER_FILTER_ID }]),
+            'utf-8',
+        );
+        const downloadDir = path.join(tmpDir, 'downloaded');
+
+        await localOptimizationStatistics.download(
+            downloadDir,
+            [LOCAL_FILTER_ID, OTHER_FILTER_ID],
+            [OTHER_FILTER_ID],
+            { percentPath },
+        );
+
+        const dirs = await fs.readdir(path.join(downloadDir, FILTERS_DIR_NAME));
+        expect(dirs).toEqual([String(LOCAL_FILTER_ID)]);
+    });
+
+    it('download() does not leave percentPath active for a later use() without percentPath', async () => {
+        await fs.writeFile(percentPath, JSON.stringify([{ filterId: LOCAL_FILTER_ID }]), 'utf-8');
+        await localOptimizationStatistics.download(path.join(tmpDir, 'downloaded'), [], [], { percentPath });
+        localOptimizationStatistics.use(tmpDir);
+
+        expect(await getOptimizationStatistics(LOCAL_FILTER_ID)).toBeNull();
+        expect(percentCallCount()).toBe(1);
     });
 });
 
