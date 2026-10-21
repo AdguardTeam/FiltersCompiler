@@ -1,4 +1,3 @@
-/* eslint-disable global-require */
 import { createRequire } from 'module';
 
 import { logger } from './log';

@@ -11,11 +11,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Migrated ESLint from v8 to v10, porting the project's effective ESLint 8 rule
+  set into native flat config (`eslint.config.js`). No consumer-facing effect —
+  the `engines.node` floor is unchanged. See
+  [DEVELOPMENT.md](DEVELOPMENT.md#eslint-configuration) for details.
+- Named the repeated platform id literals in `generator.js` and removed a dead
+  condition in `createDir`. No behaviour change.
+
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+
+- `pnpm build-schemas` failing with `ERR_MODULE_NOT_FOUND` because of a stale
+  `log.js` import, and the out-of-date tags in
+  `schemas/filters_i18n.schema.json` that went unnoticed as a result.
 
 ### Security
 

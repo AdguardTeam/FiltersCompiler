@@ -16,6 +16,7 @@ running tests, and contributing code to the AdGuard Filters Compiler.
 - [Development Workflow](#development-workflow)
     - [Available Commands](#available-commands)
     - [TypeScript](#typescript)
+    - [ESLint Configuration](#eslint-configuration)
     - [IDE Configuration](#ide-configuration)
     - [Before Committing](#before-committing)
     - [Branching Strategy](#branching-strategy)
@@ -152,6 +153,65 @@ Create test files as `test/*.test.ts`. Vitest discovers both `.test.js` and
 - **`strict` mode**: Enabled for all `.ts` files
 - **Naming collisions**: Do not create `foo.ts` alongside `foo.js` in the same
   directory — rename or migrate instead
+
+### ESLint Configuration
+
+`eslint.config.js` is a native flat config with no dependency on
+`eslint-config-airbnb-base`. That package cannot run on ESLint 10:
+`eslint-plugin-import` (which `airbnb-base` depends on) calls a `SourceCode`
+method ESLint 10 removed.
+
+Rather than replace the project's rule set, it was ported: the rules were
+captured from the project's own effective configuration under ESLint 8
+(`airbnb-base` 15.0.0 + `plugin:@typescript-eslint/recommended` +
+`eslint-plugin-jsdoc` plus every project-specific override the former
+`.eslintrc.cjs` carried) and written directly into `eslint.config.js`. This was
+a one-time migration step, verified with a one-off config-and-lint comparison;
+the file is self-contained and is not regenerated from the airbnb package at
+lint time or in CI.
+
+Only one rule id actually changed on the way in: `import/*` is now `import-x/*`,
+since `eslint-plugin-import-x` is the maintained fork used in place of
+`eslint-plugin-import`.
+
+Known, intentional differences from the old ESLint 8 configuration:
+
+- `import-x/no-cycle`'s `disableScc` option no longer exists in the current
+  rule's schema, so that one key was dropped from its options; the rest of the
+  rule's configuration (`maxDepth`, `ignoreExternal`, etc.) is unchanged.
+- ESLint 9+ changed `no-unused-vars`'s `caughtErrors` default from `"none"` to
+  `"all"`. Five `catch (e)` blocks that never used the bound error started
+  failing as a result — fixed by dropping the unused binding (`catch {}`), not
+  by changing the rule's configuration.
+- `no-undef` changes in both directions, for two independent reasons:
+    - Looser, from `ecmaVersion`: flat config's `ecmaVersion: 2022` defines
+      ES2016-2022 builtins (`WeakRef`, `AggregateError`, etc.) that the old
+      `es6` env didn't cover. With `ecmaVersion: 2015` they're reported again.
+    - Stricter, from dropping unused globals: this config only defines
+      `globals.node`, so familiar Jest/Jasmine names like `describe`, `it`,
+      `expect`, `beforeEach`, `afterEach` are no longer defined as globals
+      either. Harmless here — every test file already imports them from
+      `vitest` instead of relying on the global.
+
+ESLint 9+ also changed the defaults of four more rules (`no-inner-declarations`,
+`no-constant-condition`, `no-useless-computed-key`,
+`no-shadow-restricted-names`); those are pinned back to their ESLint 8 behaviour
+with explicit options in `eslint.config.js` rather than left as differences.
+
+Flat config also defaults `linterOptions.reportUnusedDisableDirectives` to
+`warn`; the legacy config format never reported unused `eslint-disable` comments
+at all. That's what surfaced the nine stale directives removed earlier in this
+migration — they were always unused, just never flagged.
+
+64 of the core rules this config enables are already deprecated with
+`availableUntil: 11.0.0`: all the formatting rules, plus `global-require`,
+`no-buffer-constructor`, `no-new-symbol`, and a few others. The ESLint 11
+upgrade will need replacements for them.
+
+Rule ids and options are otherwise identical to the pre-migration configuration.
+There is no automated check enforcing this going forward — treat any future
+ESLint or plugin upgrade as a normal config change, and update this section if a
+rule's behaviour needs to diverge from what is documented here.
 
 ### IDE Configuration
 

@@ -190,7 +190,6 @@ describe('generator', () => {
             await fs.rm(tmpDir, { recursive: true, force: true });
         });
 
-        /* eslint-disable-next-line max-len */
         test.each(TIMEZONE_TESTS)('makeHeader keeps TimeUpdated in UTC under local time zone %s', async (tz) => {
             const UTC_TIME_UPDATED = '2024-01-15T10:00:00.000Z';
             const EXPECTED_TIME_UPDATED = '2024-01-15T10:00:00+00:00';

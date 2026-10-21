@@ -1,5 +1,3 @@
-/* eslint-disable global-require */
-
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -671,7 +669,6 @@ const buildFilter = async function (filterDir, includedFilterIds, excludedFilter
     }
 
     const trustLevel = metadata.trustLevel ? metadata.trustLevel : DEFAULT_TRUST_LEVEL;
-    // eslint-disable-next-line no-undef
     const trustLevelSettings = path.resolve(__dirname, TRUST_LEVEL_DIR, `exclusions-${trustLevel}.txt`);
 
     const { name: filterName } = metadata;
@@ -697,7 +694,6 @@ const buildFilter = async function (filterDir, includedFilterIds, excludedFilter
     writeFile(path.join(filterDir, EXCLUDED_LINES_FILE), excluded.join('\r\n'));
     logger.info('Writing revision file..');
 
-    // eslint-disable-next-line no-buffer-constructor
     const hash = Buffer.from(md5(compiledData, { asString: true })).toString('base64').trim();
     const revisionFile = path.join(filterDir, REVISION_FILE);
     const revision = makeRevision(revisionFile, hash);
