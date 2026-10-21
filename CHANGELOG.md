@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   [DEVELOPMENT.md](DEVELOPMENT.md#eslint-configuration) for details.
 - Named the repeated platform id literals in `generator.js` and removed a dead
   condition in `createDir`. No behaviour change.
+- `assertValidStats` now validates only the structure of optimization stats.
+  Treating an empty `groups` array as absent stats is owned solely by
+  `getOptimizationStatistics`, so that policy lives in one place. No behaviour
+  change.
 
 ### Deprecated
 

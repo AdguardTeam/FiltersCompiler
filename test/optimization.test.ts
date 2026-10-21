@@ -339,12 +339,11 @@ describe('getOptimizationStatistics()', () => {
         const result = await getOptimizationStatistics(VALID_FILTER_ID);
 
         expect(result).toBeNull();
-        expect(logger.warn).toHaveBeenCalledWith(
-            expect.stringContaining(`Optimization stats for ${VALID_FILTER_ID}`),
-        );
-        expect(logger.warn).toHaveBeenCalledWith(
-            expect.stringContaining(`https://chrome.adtidy.org/filters/${VALID_FILTER_ID}/stats.json`),
-        );
+        expect(logger.warn).toHaveBeenCalledTimes(1);
+        const [warning] = vi.mocked(logger.warn).mock.calls[0];
+        expect(warning).toContain(`Optimization stats for ${VALID_FILTER_ID} at `);
+        expect(warning).toContain(`https://chrome.adtidy.org/filters/${VALID_FILTER_ID}/stats.json`);
+        expect(warning).toContain('built without optimization');
     });
 
     describe('with a local cache: validation failures', () => {
@@ -361,7 +360,11 @@ describe('getOptimizationStatistics()', () => {
                 JSON.stringify({ groups: 'not an array' }),
                 'utf-8',
             );
+        });
 
+        // The outer afterEach resets the module-level localStatsPath, so re-arm
+        // the local cache before every test, not just once per block.
+        beforeEach(() => {
             localOptimizationStatistics.use(tmpDir);
         });
 
@@ -399,7 +402,11 @@ describe('getOptimizationStatistics()', () => {
                 JSON.stringify({ groups: [] }),
                 'utf-8',
             );
+        });
 
+        // The outer afterEach resets the module-level localStatsPath, so re-arm
+        // the local cache before every test, not just once per block.
+        beforeEach(() => {
             localOptimizationStatistics.use(tmpDir);
         });
 
@@ -411,11 +418,13 @@ describe('getOptimizationStatistics()', () => {
             const result = await getOptimizationStatistics(VALID_FILTER_ID);
 
             expect(result).toBeNull();
-            expect(logger.warn).toHaveBeenCalledWith(
-                expect.stringContaining(
-                    path.join(tmpDir, FILTERS_DIR_NAME, String(VALID_FILTER_ID), STATS_JSON),
-                ),
+            expect(logger.warn).toHaveBeenCalledTimes(1);
+            const [warning] = vi.mocked(logger.warn).mock.calls[0];
+            expect(warning).toContain(`Optimization stats for ${VALID_FILTER_ID} at `);
+            expect(warning).toContain(
+                path.join(tmpDir, FILTERS_DIR_NAME, String(VALID_FILTER_ID), STATS_JSON),
             );
+            expect(warning).toContain('built without optimization');
         });
     });
 
@@ -700,7 +709,6 @@ describe('assertValidStats()', () => {
     describe('throws on invalid groups', () => {
         it.each([
             { label: 'groups is missing', value: {}, printed: 'undefined' },
-            { label: 'groups is an empty array', value: { groups: [] }, printed: '[]' },
             { label: 'groups is null', value: { groups: null }, printed: 'null' },
             { label: 'groups is not an array', value: { groups: 'nope' }, printed: '"nope"' },
         ])('throws a TypeError naming the offending groups value when $label', ({ value, printed }) => {
@@ -708,8 +716,12 @@ describe('assertValidStats()', () => {
 
             expect(error).toBeInstanceOf(TypeError);
             expect(error.message).toBe(
-                `Optimization stats for ${VALID_FILTER_ID}: groups must be a non-empty array, but got ${printed}`,
+                `Optimization stats for ${VALID_FILTER_ID}: groups must be an array, but got ${printed}`,
             );
+        });
+
+        it('accepts an empty groups array, leaving the "no hit data" policy to the caller', () => {
+            expect(() => assertValidStats(VALID_FILTER_ID, { groups: [] })).not.toThrow();
         });
     });
 

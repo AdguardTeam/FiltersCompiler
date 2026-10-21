@@ -264,24 +264,24 @@ const hasEmptyGroups = (stats: unknown): boolean => {
 };
 
 /**
- * Validates that stats have non-empty groups, and that every group has the
- * shape `skipRuleWithOptimization` relies on. Only validates — does not
- * know where `stats` came from, so it throws a plain `TypeError`; the
+ * Validates that stats have a `groups` array, and that every group has the
+ * shape `skipRuleWithOptimization` relies on. Only validates structure — does
+ * not know where `stats` came from, so it throws a plain `TypeError`; the
  * caller (`getOptimizationStatistics`) decorates it with `filterId` and
  * `sourcePath` as an `OptimizationStatsError`.
  *
- * Empty groups are invalid here by design. `getOptimizationStatistics`
- * detects that case and returns `null` before calling this function, so
- * only a direct caller of this validator sees the error.
+ * An empty `groups` array is structurally valid here. What it means — no hit
+ * data collected yet — is a policy decision owned by
+ * `getOptimizationStatistics`, which treats such stats as absent.
  *
  * @param filterId - Numeric filter identifier.
  * @param stats - Parsed optimization stats object.
- * @throws {TypeError} if stats is not an object, if stats.groups is missing, not an
- * array, or empty, or if any group lacks a `rules` object or a numeric `config.hits`.
+ * @throws {TypeError} if stats is not an object, if stats.groups is missing or not
+ * an array, or if any group lacks a `rules` object or a numeric `config.hits`.
  */
 export function assertValidStats(filterId: number, stats: unknown): asserts stats is OptimizationStats {
     /**
-     * @param defect - What's wrong, e.g. `"groups must be a non-empty array"`.
+     * @param defect - What's wrong, e.g. `"groups must be an array"`.
      * @param value - The offending value, folded into the message via `describeInvalidStats`.
      * @returns The `TypeError` to throw.
      */
@@ -292,8 +292,8 @@ export function assertValidStats(filterId: number, stats: unknown): asserts stat
     if (stats === null || typeof stats !== 'object') {
         throw invalidStatsError('must be a non-null object', stats);
     }
-    if (!('groups' in stats) || !Array.isArray(stats.groups) || stats.groups.length === 0) {
-        throw invalidStatsError('groups must be a non-empty array', (stats as { groups?: unknown }).groups);
+    if (!('groups' in stats) || !Array.isArray(stats.groups)) {
+        throw invalidStatsError('groups must be an array', (stats as { groups?: unknown }).groups);
     }
 
     /**
