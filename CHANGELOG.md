@@ -24,6 +24,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- The compiler no longer fails the whole build when a filter's optimization
+  stats have an empty `groups` array (no hit data collected yet). Such stats
+  are treated as absent: a warning names the filter and the stats source, and
+  the filter is built without optimization. Other malformed stats still throw
+  `OptimizationStatsError`.
 - `pnpm build-schemas` failing with `ERR_MODULE_NOT_FOUND` because of a stale
   `log.js` import, and the out-of-date tags in
   `schemas/filters_i18n.schema.json` that went unnoticed as a result.

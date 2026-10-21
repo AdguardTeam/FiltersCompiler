@@ -13,6 +13,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { downloadFile } from './utils/webutils';
 import { mapWithConcurrency } from './utils/concurrent';
+import { logger } from './utils/log';
 
 // Here we can access optimizable filters and its optimization percentages
 const OPTIMIZATION_KEY = '4DDBE80A3DA94D819A00523252FB6380';
@@ -247,11 +248,31 @@ const describeInvalidStats = (stats: unknown): string => {
 };
 
 /**
+ * Checks whether parsed stats have an empty `groups` array. A filter whose hit
+ * data has not been collected yet has stats of this shape; `getOptimizationStatistics`
+ * treats it as absent stats rather than invalid ones.
+ *
+ * @param stats - Parsed optimization stats value.
+ * @returns `true` if `stats.groups` is an empty array.
+ */
+const hasEmptyGroups = (stats: unknown): boolean => {
+    if (stats === null || typeof stats !== 'object' || !('groups' in stats)) {
+        return false;
+    }
+    const { groups } = stats as { groups?: unknown };
+    return Array.isArray(groups) && groups.length === 0;
+};
+
+/**
  * Validates that stats have non-empty groups, and that every group has the
  * shape `skipRuleWithOptimization` relies on. Only validates — does not
  * know where `stats` came from, so it throws a plain `TypeError`; the
  * caller (`getOptimizationStatistics`) decorates it with `filterId` and
  * `sourcePath` as an `OptimizationStatsError`.
+ *
+ * Empty groups are invalid here by design. `getOptimizationStatistics`
+ * detects that case and returns `null` before calling this function, so
+ * only a direct caller of this validator sees the error.
  *
  * @param filterId - Numeric filter identifier.
  * @param stats - Parsed optimization stats object.
@@ -421,7 +442,10 @@ export const localOptimizationStatistics = {
 
 /**
  * Returns the optimization stats for the given filter, or `null` when
- * optimization is disabled or the filter is not listed in `percent.json`.
+ * optimization is disabled, the filter is not listed in `percent.json`, or its
+ * stats have an empty `groups` array (no hit data has been collected yet).
+ * An empty `groups` array is not an error: it is logged as a warning and the
+ * filter is built without optimization. Any other malformed stats still throw.
  *
  * When `localOptimizationStatistics.use(path)` has been called, stats
  * are read lazily from local files. Otherwise stats are fetched from the
@@ -430,6 +454,7 @@ export const localOptimizationStatistics = {
  * @param filterId - Numeric filter identifier.
  * @returns Parsed stats object, or `null` when the filter has no optimization stats.
  * @throws {OptimizationStatsError} When the stats are missing or malformed.
+ * Empty `groups` yields `null` instead.
  */
 export const getOptimizationStatistics = async (filterId: number) => {
     if (!optimizationEnabled) {
@@ -455,6 +480,17 @@ export const getOptimizationStatistics = async (filterId: number) => {
         stats = JSON.parse(content);
     } catch (originalError) {
         throw new OptimizationStatsError(filterId, statsPath, 'retrieval', { cause: originalError });
+    }
+
+    // No hit data has been collected for the filter yet, so its stats file has
+    // an empty `groups` array. Treat it as "no stats" and build the filter
+    // without optimization instead of failing the whole build.
+    if (hasEmptyGroups(stats)) {
+        logger.warn(
+            `Optimization stats for ${filterId} at ${statsPath} have no groups, `
+            + 'so the filter will be built without optimization',
+        );
+        return null;
     }
 
     try {
