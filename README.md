@@ -180,7 +180,10 @@ which filters are optimizable) is fetched remotely unless a local
 It exposes `download`, `use`, and `reset` methods and throws
 `OptimizationStatsError` (an `Error` subclass carrying `filterId`,
 `sourcePath`, and `code` fields) when stats for a filter cannot be
-retrieved or fail structural validation.
+retrieved or fail structural validation. Stats whose `groups` array is
+empty — a filter whose hit data has not been collected yet — are not an
+error: they are logged as a warning and the filter is built without
+optimization.
 
 See [Local Optimization Statistics](#local-optimization-statistics)
 for a complete workflow.
@@ -502,6 +505,12 @@ retrieval failures, `OPTIMIZATION_STATS_INVALID` for validation failures) so
 callers can branch on the failure kind instead of matching on `error.message`.
 Its constructor takes a `reason: 'retrieval' | 'validation'` argument after
 `sourcePath`.
+
+One case is not a failure: stats whose `groups` array is empty mean that no
+hit data has been collected for the filter yet. `getOptimizationStatistics`
+logs a warning with the filter ID and the stats source and returns `null`, so
+the filter is built without optimization. Any other malformed `groups` value
+still throws `OptimizationStatsError`.
 
 ```js
 import { compile, localOptimizationStatistics } from '@adguard/filters-compiler';
