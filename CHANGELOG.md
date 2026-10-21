@@ -11,6 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.4.3] - 2026-10-21
+
+### Changed
+
 - Migrated ESLint from v8 to v10, porting the project's effective ESLint 8 rule
   set into native flat config (`eslint.config.js`). No consumer-facing effect —
   the `engines.node` floor is unchanged. See
@@ -22,10 +34,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `getOptimizationStatistics`, so that policy lives in one place. No behaviour
   change.
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - The compiler no longer fails the whole build when a filter's optimization
@@ -36,8 +44,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `pnpm build-schemas` failing with `ERR_MODULE_NOT_FOUND` because of a stale
   `log.js` import, and the out-of-date tags in
   `schemas/filters_i18n.schema.json` that went unnoticed as a result.
-
-### Security
 
 ## [3.4.2] - 2026-10-21
 
@@ -1065,7 +1071,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [@adguard/tsurlfilter]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/tsurlfilter/CHANGELOG.md
 [@adguard/logger]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/logger/CHANGELOG.md
 
-[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.4.2...HEAD
+[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.4.3...HEAD
+[3.4.3]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.4.2...v3.4.3
 [3.4.2]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.4.2-beta.1...v3.4.2
 [3.4.2-beta.1]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.4.1...v3.4.2-beta.1
 [3.4.1]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.4.0...v3.4.1
