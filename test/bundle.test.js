@@ -79,9 +79,9 @@ describe('Bundle smoke tests', () => {
             expect(existsSync(filePath)).toBe(true);
         });
 
-        it('filters_i18n.schema.json should exist', () => {
+        it('filters_i18n.schema.json should not be bundled', () => {
             const filePath = path.join(schemasDir, 'filters_i18n.schema.json');
-            expect(existsSync(filePath)).toBe(true);
+            expect(existsSync(filePath)).toBe(false);
         });
     });
 
