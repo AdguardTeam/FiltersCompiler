@@ -262,12 +262,18 @@ automatically.
 
 ### Updating JSON Schemas
 
-Schemas in `schemas/` are generated — **never edit them directly**. Edit the
-generation scripts in `tasks/build-schemas/` instead:
+`schemas/filters.schema.json` is generated — **never edit it directly**. Edit
+the generation scripts in `tasks/build-schemas/` instead:
 
 ```bash
 pnpm build-schemas
 ```
+
+The `filters_i18n` schema is not a repository file. `validateJSONSchema()`
+generates it at runtime from the platform's `filters.json` and the
+FiltersRegistry `locales` directory. Do not add filter, group, or tag text to
+the compiler. To test the generated schema, pass `localesPath` to
+`validateJSONSchema()`.
 
 > **Important**: Legacy schemas in `schemas/mac/` and `schemas/mac_v2/` must not
 > be changed.
@@ -351,9 +357,9 @@ nvm use 22
 
 ### Schema Validation Errors After Manual Edit
 
-**Problem**: Tests fail after directly editing files in `schemas/`.
+**Problem**: Tests fail after directly editing `schemas/filters.schema.json`.
 
-**Solution**: Never edit schemas manually. Revert your changes and use the
+**Solution**: Never edit the schema manually. Revert your changes and use the
 generation scripts:
 
 ```bash

@@ -124,16 +124,43 @@ writes the results to `platformsPath`.
 ### `validateJSONSchema(...)`
 
 ```ts
+interface ValidateJSONSchemaOptions {
+    localesPath: string;
+    requiredLocales?: string[];
+    logPath?: string;
+}
+
 function validateJSONSchema(
     platformsPath: string,
     requiredFiltersAmount: number,
+    options: ValidateJSONSchemaOptions,
 ): boolean;
 ```
 
-Recursively validates the built JSON files in `platformsPath` against
-the schemas bundled with the library (`filters.schema.json` and
-`filters_i18n.schema.json`). `requiredFiltersAmount` is the minimum
-number of filters expected in each platform's `filters.json`.
+Recursively validates the built JSON files in `platformsPath`.
+`requiredFiltersAmount` is the minimum number of filters expected in
+each platform's `filters.json`.
+
+The `filters_i18n` schema is generated at runtime for every platform
+from its `filters.json` and the FiltersRegistry locale data in
+`localesPath`. The entity IDs come from `filters.json`. The required
+locales and the English fallback strings come from the locale
+directory. The compiler does not keep a copy of filter, group, or tag
+text.
+
+- `localesPath` — path to the FiltersRegistry `locales` directory.
+- `requiredLocales` — locales that must be present for every group,
+  tag, and filter. Defaults to all locale subdirectories of
+  `localesPath`.
+- `logPath` — optional validation log file. When omitted, messages go
+  to the console.
+
+Missing translations are filled with the base (`en`) value, and each
+fallback is logged as a warning. A built entity with no English
+localization, or a missing required locale, fails validation.
+
+The `filters.schema.json` and the legacy `mac`/`mac_v2` schemas remain
+static and are bundled with the library.
 
 Returns `true` when all files are valid. On validation failure it logs
 the errors and returns `false` instead of throwing, so callers must
@@ -247,13 +274,16 @@ await compile(
 
 ### Validating built filters
 
-After compiling, validate the built output against the bundled schemas:
+After compiling, validate the built output:
 
 ```js
 import { validateJSONSchema } from '@adguard/filters-compiler';
 
 // Each platform build must contain at least 50 filters
-const valid = validateJSONSchema('./platforms', 50);
+const valid = validateJSONSchema('./platforms', 50, {
+    localesPath: './locales',
+    logPath: './json-validation.log',
+});
 if (!valid) {
     throw new Error('Schema validation failed, see log for details');
 }
