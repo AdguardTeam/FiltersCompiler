@@ -49,8 +49,17 @@ export const compile = (
     );
 };
 
-export const validateJSONSchema = (platformsPath, requiredFiltersAmount) => {
-    return schemaValidator.validate(platformsPath, jsonSchemasConfigDir, requiredFiltersAmount);
+export const validateJSONSchema = (
+    platformsPath,
+    requiredFiltersAmount,
+    options,
+) => {
+    return schemaValidator.validate(
+        platformsPath,
+        jsonSchemasConfigDir,
+        requiredFiltersAmount,
+        options,
+    );
 };
 
 export const validateLocales = (localesDirPath, requiredLocales, logFormat) => {

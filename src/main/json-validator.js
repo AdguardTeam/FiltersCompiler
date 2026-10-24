@@ -2,10 +2,18 @@ import fs from 'fs';
 import path from 'path';
 import Ajv from 'ajv';
 import { logger } from './utils/log';
+import { generateFiltersI18nSchema } from './filters-i18n-schema';
 
 const SCHEMA_EXTENSION = '.schema.json';
 const OLD_MAC_V1_PLATFORM = 'mac';
 const OLD_MAC_V2_PLATFORM = 'mac_v2';
+const LEGACY_PLATFORMS = [OLD_MAC_V1_PLATFORM, OLD_MAC_V2_PLATFORM];
+
+const FILTERS_METADATA_FILE_NAME = 'filters';
+const FILTERS_I18N_FILE_NAME = 'filters_i18n';
+
+const ENTITY_KINDS = ['groups', 'tags', 'filters'];
+const LOCALE_FIELDS = ['name', 'description'];
 
 /**
  * Loads all available schemas from dir
@@ -31,6 +39,83 @@ const loadSchemas = (dir) => {
 };
 
 /**
+ * Logs every missing translation that Ajv will fill with an English fallback.
+ *
+ * @param {object} json Parsed filters_i18n.json.
+ * @param {object} schema Generated filters_i18n schema.
+ * @param {string} item Path to the validated file.
+ */
+const logAppliedDefaults = (json, schema, item) => {
+    let count = 0;
+
+    ENTITY_KINDS.forEach((kind) => {
+        const kindSchema = schema.properties[kind];
+        if (!kindSchema) {
+            return;
+        }
+
+        Object.entries(kindSchema.properties).forEach(([id, idSchema]) => {
+            const idData = json[kind] && json[kind][id];
+            if (!idData) {
+                return;
+            }
+
+            Object.entries(idSchema.properties).forEach(([locale, localeSchema]) => {
+                const localeData = idData[locale];
+                if (!localeData) {
+                    return;
+                }
+
+                LOCALE_FIELDS.forEach((field) => {
+                    if (localeData[field] !== undefined) {
+                        return;
+                    }
+
+                    const fallback = localeSchema.properties[field].default;
+                    const message = `Missing ${kind} ${id} ${field} for locale '${locale}' in ${item}. `
+                        + `Using English fallback: "${fallback}"`;
+                    logger.warn(message);
+                    count += 1;
+                });
+            });
+        });
+    });
+
+    if (count > 0) {
+        logger.warn(`Applied ${count} English fallback(s) in ${item}`);
+    }
+};
+
+/**
+ * Reads the platform's filters.json metadata.
+ *
+ * @param {string} item Path to the filters_i18n.json file.
+ * @returns {object} Parsed filters.json.
+ * @throws {Error} If filters.json is missing.
+ */
+const readFiltersMetadata = (item) => {
+    const filtersMetadataPath = path.join(path.dirname(item), `${FILTERS_METADATA_FILE_NAME}.json`);
+
+    if (!fs.existsSync(filtersMetadataPath)) {
+        throw new Error(`Cannot generate filters_i18n schema: ${filtersMetadataPath} is missing`);
+    }
+
+    return JSON.parse(fs.readFileSync(filtersMetadataPath, 'utf8'));
+};
+
+/**
+ * Builds a cache key from the entity ids that the generated schema depends on.
+ *
+ * @param {object} filtersMetadata Parsed filters.json.
+ * @returns {string} Cache key.
+ */
+const getI18nSchemaCacheKey = (filtersMetadata) => JSON.stringify({
+    groups: filtersMetadata.groups.map((group) => group.groupId),
+    tags: filtersMetadata.tags.map((tag) => tag.tagId),
+    filters: filtersMetadata.filters.map((filter) => filter.filterId),
+});
+
+/**
  * Recursively validates dir content with provided schemas
  *
  * @param dir
@@ -38,9 +123,11 @@ const loadSchemas = (dir) => {
  * @param schemas
  * @param oldSchemas
  * @param filtersRequiredAmount
+ * @param options
+ * @param {Map} i18nValidators Cache of compiled filters_i18n validators
  * @returns {boolean}
  */
-const validateDir = (dir, validator, schemas, oldSchemas, filtersRequiredAmount) => {
+const validateDir = (dir, validator, schemas, oldSchemas, filtersRequiredAmount, options, i18nValidators) => {
     let items;
     try {
         items = fs.readdirSync(dir);
@@ -52,23 +139,45 @@ const validateDir = (dir, validator, schemas, oldSchemas, filtersRequiredAmount)
     for (const f of items) {
         const item = path.join(dir, f);
         if (fs.lstatSync(item).isDirectory()) {
-            if (!validateDir(item, validator, schemas, oldSchemas)) {
+            if (!validateDir(item, validator, schemas, oldSchemas, filtersRequiredAmount, options, i18nValidators)) {
                 return false;
             }
         } else {
             const fileName = path.basename(item, '.json');
+            const platformName = path.basename(path.dirname(item));
+            const isLegacyPlatform = LEGACY_PLATFORMS.includes(platformName);
             let schema = schemas[fileName];
+            let compiledValidator = null;
 
-            // Validate `mac` (mac v1) dir with old schemas
-            if (path.basename(path.dirname(item)) === OLD_MAC_V1_PLATFORM) {
-                logger.info('Look up old schemas for mac directory');
-                schema = oldSchemas[OLD_MAC_V1_PLATFORM][fileName];
-            }
+            // Validate legacy platforms with their frozen schemas
+            if (isLegacyPlatform) {
+                logger.info(`Look up old schemas for ${platformName} directory`);
+                schema = oldSchemas[platformName][fileName];
+            } else if (fileName === FILTERS_I18N_FILE_NAME) {
+                try {
+                    const filtersMetadata = readFiltersMetadata(item);
+                    const cacheKey = getI18nSchemaCacheKey(filtersMetadata);
+                    const cachedValidator = i18nValidators.get(cacheKey);
 
-            // Validate `mac_v2` dir with old schemas
-            if (path.basename(path.dirname(item)) === OLD_MAC_V2_PLATFORM) {
-                logger.info('Look up old schemas for mac_v2 directory');
-                schema = oldSchemas[OLD_MAC_V2_PLATFORM][fileName];
+                    if (cachedValidator) {
+                        schema = cachedValidator.schema;
+                        compiledValidator = cachedValidator.validate;
+                    } else {
+                        schema = generateFiltersI18nSchema({
+                            localesPath: options.localesPath,
+                            filtersMetadata,
+                            requiredLocales: options.requiredLocales,
+                        });
+                        compiledValidator = validator.compile(schema);
+                        i18nValidators.set(cacheKey, {
+                            schema,
+                            validate: compiledValidator,
+                        });
+                    }
+                } catch (e) {
+                    logger.error(e.message);
+                    return false;
+                }
             }
 
             if (schema) {
@@ -77,14 +186,18 @@ const validateDir = (dir, validator, schemas, oldSchemas, filtersRequiredAmount)
                 const json = JSON.parse(fs.readFileSync(item));
 
                 // Validate filters amount
-                if (fileName === 'filters') {
+                if (fileName === FILTERS_METADATA_FILE_NAME) {
                     if (json.filters.length < filtersRequiredAmount) {
                         logger.error(`Invalid filters amount in ${item}`);
                         return false;
                     }
                 }
 
-                const validate = validator.compile(schema);
+                if (!isLegacyPlatform && fileName === FILTERS_I18N_FILE_NAME) {
+                    logAppliedDefaults(json, schema, item);
+                }
+
+                const validate = compiledValidator ?? validator.compile(schema);
                 const valid = validate(json);
 
                 // json can be updated with default values
@@ -115,8 +228,21 @@ const validateDir = (dir, validator, schemas, oldSchemas, filtersRequiredAmount)
  * @param platformsPath - Path to platforms folder
  * @param jsonSchemasConfigDir - Path to json schemas config folder
  * @param filtersRequiredAmount - Minimum required amount of filters
+ * @param options - Validation options
+ * @param options.localesPath - Path to the locales directory
+ * @param {string[]} [options.requiredLocales] - Locales that must be present for every entity
+ * @param {string} [options.logPath] - Path to the validation log file
+ * @returns {boolean} Validation result
  */
-const validate = (platformsPath, jsonSchemasConfigDir, filtersRequiredAmount) => {
+const validate = (platformsPath, jsonSchemasConfigDir, filtersRequiredAmount, options) => {
+    if (!options || !options.localesPath) {
+        throw new Error('validateJSONSchema: options.localesPath is required');
+    }
+
+    if (options.logPath) {
+        logger.initialize(options.logPath);
+    }
+
     logger.info('Validating json schemas for platforms');
 
     const schemas = loadSchemas(jsonSchemasConfigDir);
@@ -132,8 +258,17 @@ const validate = (platformsPath, jsonSchemasConfigDir, filtersRequiredAmount) =>
         allErrors: true,
         useDefaults: true,
     });
+    const i18nValidators = new Map();
 
-    const result = validateDir(platformsPath, ajv, schemas, oldSchemas, filtersRequiredAmount);
+    const result = validateDir(
+        platformsPath,
+        ajv,
+        schemas,
+        oldSchemas,
+        filtersRequiredAmount,
+        options,
+        i18nValidators,
+    );
 
     logger.info('Validating json schemas for platforms - done');
     logger.info(`Validation result: ${result}`);

@@ -44,17 +44,48 @@ export function compile(
 ): Promise<void>;
 
 /**
+ * Options for `validateJSONSchema`.
+ */
+export interface ValidateJSONSchemaOptions {
+    /**
+     * Path to the FiltersRegistry locales directory.
+     *
+     * The directory supplies the list of locales and the base (`en`) strings
+     * that the generated `filters_i18n` schema uses as fallback defaults.
+     */
+    localesPath: string;
+
+    /**
+     * Locales that must be present for every group, tag, and filter.
+     * Defaults to all locale subdirectories of `localesPath`.
+     */
+    requiredLocales?: string[];
+
+    /**
+     * Path to the validation log file.
+     * When omitted, messages go to the console only.
+     */
+    logPath?: string;
+}
+
+/**
  * Validates built filter files against JSON schemas.
+ *
+ * The `filters_i18n` schema is generated at runtime from the platform's
+ * `filters.json` and the FiltersRegistry locale data. Missing translations
+ * are filled with the base (`en`) value and logged as warnings.
  *
  * Validation failures are logged, not thrown — check the return value.
  *
  * @param platformsPath Path to the built platform output.
  * @param requiredFiltersAmount Minimum number of filters expected.
+ * @param options Validation options.
  * @returns `true` when all files are valid, `false` on validation failure.
  */
 export function validateJSONSchema(
     platformsPath: string,
     requiredFiltersAmount: number,
+    options: ValidateJSONSchemaOptions,
 ): boolean;
 
 /**
