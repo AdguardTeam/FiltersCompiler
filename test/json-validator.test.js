@@ -1,3 +1,6 @@
+/**
+ * @vitest-environment jsdom
+ */
 import {
     describe,
     it,
@@ -8,15 +11,116 @@ import {
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 import { schemaValidator } from '../src/main/json-validator';
 import { logger } from '../src/main/utils/log';
+import { build } from '../src/main/builder';
+import { disableOptimization } from '../src/main/optimization';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const createTempDir = (prefix) => fs.mkdtempSync(path.join(os.tmpdir(), prefix));
 
 const writeJson = (filePath, data) => {
     fs.mkdirSync(path.dirname(filePath), { recursive: true });
     fs.writeFileSync(filePath, JSON.stringify(data, null, '\t'));
+};
+
+const readJson = (filePath) => JSON.parse(fs.readFileSync(filePath, 'utf8'));
+
+/**
+ * Adds locale messages for entities that have no message for the key prefix.
+ *
+ * @param {object[]} messages Locale messages.
+ * @param {string} keyPrefix Key prefix, for example `group`.
+ * @param {object[]} items Entities with `id` and `data` fields.
+ * @param {Function} createMessage Creates a message object for an entity.
+ */
+const appendMissingMessages = (messages, keyPrefix, items, createMessage) => {
+    const existingIds = new Set();
+
+    messages.forEach((message) => {
+        Object.keys(message).forEach((key) => {
+            const match = new RegExp(`^${keyPrefix}\\.(\\d+)\\.`).exec(key);
+            if (match) {
+                existingIds.add(match[1]);
+            }
+        });
+    });
+
+    items.forEach((item) => {
+        const id = String(item.id);
+        if (!existingIds.has(id)) {
+            messages.push(createMessage(id, item.data));
+        }
+    });
+};
+
+/**
+ * Creates a temporary filter tree with complete English locale data.
+ *
+ * The tree contains the real test filters, groups, tags, and locales. Missing
+ * English messages are added from the metadata so that every built entity has
+ * an English localization.
+ *
+ * @returns {{root: string, filtersDir: string, localesPath: string}} Fixture paths.
+ */
+const createIntegrationFixture = () => {
+    const root = createTempDir('filters-compiler-json-validator-fixture-');
+    const filtersDir = path.join(root, 'filters');
+    const localesPath = path.join(root, 'locales');
+
+    fs.cpSync(path.join(__dirname, 'resources/filters'), filtersDir, { recursive: true });
+    fs.cpSync(path.join(__dirname, 'resources/groups'), path.join(root, 'groups'), { recursive: true });
+    fs.cpSync(path.join(__dirname, 'resources/tags'), path.join(root, 'tags'), { recursive: true });
+    fs.cpSync(path.join(__dirname, 'resources/locales'), localesPath, { recursive: true });
+
+    const groups = readJson(path.join(root, 'groups', 'metadata.json'));
+    const tags = readJson(path.join(root, 'tags', 'metadata.json'));
+    const filters = fs.readdirSync(filtersDir, { withFileTypes: true })
+        .filter((entry) => entry.isDirectory())
+        .map((entry) => readJson(path.join(filtersDir, entry.name, 'metadata.json')));
+
+    const enPath = path.join(localesPath, 'en');
+
+    const groupMessages = readJson(path.join(enPath, 'groups.json'));
+    appendMissingMessages(
+        groupMessages,
+        'group',
+        groups.map((group) => ({ id: group.groupId, data: group })),
+        (id, group) => ({
+            [`group.${id}.name`]: group.groupName,
+            [`group.${id}.description`]: group.groupDescription,
+        }),
+    );
+    writeJson(path.join(enPath, 'groups.json'), groupMessages);
+
+    const tagMessages = readJson(path.join(enPath, 'tags.json'));
+    appendMissingMessages(
+        tagMessages,
+        'tag',
+        tags.map((tag) => ({ id: tag.tagId, data: tag })),
+        (id, tag) => ({
+            [`tag.${id}.name`]: tag.keyword,
+            [`tag.${id}.description`]: tag.keyword,
+        }),
+    );
+    writeJson(path.join(enPath, 'tags.json'), tagMessages);
+
+    const filterMessages = readJson(path.join(enPath, 'filters.json'));
+    appendMissingMessages(
+        filterMessages,
+        'filter',
+        filters.map((filter) => ({ id: filter.filterId, data: filter })),
+        (id, filter) => ({
+            [`filter.${id}.name`]: filter.name,
+            [`filter.${id}.description`]: filter.description,
+        }),
+    );
+    writeJson(path.join(enPath, 'filters.json'), filterMessages);
+
+    return { root, filtersDir, localesPath };
 };
 
 /**
@@ -483,6 +587,33 @@ describe('json validator', () => {
             fs.rmSync(schemasDir, { recursive: true, force: true });
         }
     });
+
+    it('builds the real platform tree and validates it with the bundled schemas', async () => {
+        const fixture = createIntegrationFixture();
+        const platformsPath = createTempDir('filters-compiler-json-validator-platforms-');
+        const logPath = path.join(fixture.root, 'build.log');
+        const reportPath = path.join(fixture.root, 'report.txt');
+
+        try {
+            const config = readJson(path.join(__dirname, 'resources/platforms.json'));
+
+            disableOptimization();
+            await build(fixture.filtersDir, logPath, reportPath, platformsPath, config);
+
+            const result = schemaValidator.validate(
+                platformsPath,
+                path.join(__dirname, 'resources/schemas'),
+                2,
+                { localesPath: fixture.localesPath, requiredLocales: ['en'] },
+            );
+
+            expect(result).toBe(true);
+        } finally {
+            logger.close();
+            fs.rmSync(fixture.root, { recursive: true, force: true });
+            fs.rmSync(platformsPath, { recursive: true, force: true });
+        }
+    }, 180000);
 
     it('requires options.localesPath', () => {
         expect(() => schemaValidator.validate('platforms', 'schemas', 1)).toThrow(
