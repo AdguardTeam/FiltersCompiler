@@ -2,7 +2,11 @@ import fs from 'fs';
 import path from 'path';
 import Ajv from 'ajv';
 import { logger } from './utils/log';
-import { generateFiltersI18nSchema } from './filters-i18n-schema';
+import {
+    ENTITY_KINDS,
+    generateFiltersI18nSchema,
+    LOCALE_FIELDS,
+} from './filters-i18n-schema';
 
 const SCHEMA_EXTENSION = '.schema.json';
 const OLD_MAC_V1_PLATFORM = 'mac';
@@ -11,9 +15,6 @@ const LEGACY_PLATFORMS = [OLD_MAC_V1_PLATFORM, OLD_MAC_V2_PLATFORM];
 
 const FILTERS_METADATA_FILE_NAME = 'filters';
 const FILTERS_I18N_FILE_NAME = 'filters_i18n';
-
-const ENTITY_KINDS = ['groups', 'tags', 'filters'];
-const LOCALE_FIELDS = ['name', 'description'];
 
 /**
  * Loads all available schemas from dir
@@ -91,7 +92,7 @@ const logAppliedDefaults = (json, schema, item) => {
  *
  * @param {string} item Path to the filters_i18n.json file.
  * @returns {object} Parsed filters.json.
- * @throws {Error} If filters.json is missing.
+ * @throws {Error} If filters.json is missing or has no groups, tags, or filters array.
  */
 const readFiltersMetadata = (item) => {
     const filtersMetadataPath = path.join(path.dirname(item), `${FILTERS_METADATA_FILE_NAME}.json`);
@@ -100,7 +101,13 @@ const readFiltersMetadata = (item) => {
         throw new Error(`Cannot generate filters_i18n schema: ${filtersMetadataPath} is missing`);
     }
 
-    return JSON.parse(fs.readFileSync(filtersMetadataPath, 'utf8'));
+    const filtersMetadata = JSON.parse(fs.readFileSync(filtersMetadataPath, 'utf8'));
+
+    if (!filtersMetadata || ENTITY_KINDS.some((kind) => !Array.isArray(filtersMetadata[kind]))) {
+        throw new Error(`${filtersMetadataPath} must contain groups, tags, and filters arrays`);
+    }
+
+    return filtersMetadata;
 };
 
 /**
@@ -154,15 +161,24 @@ const validateDir = (dir, validator, schemas, oldSchemas, filtersRequiredAmount,
                 logger.info(`Look up old schemas for ${platformName} directory`);
                 schema = oldSchemas[platformName][fileName];
             } else if (fileName === FILTERS_I18N_FILE_NAME) {
-                try {
-                    const filtersMetadata = readFiltersMetadata(item);
-                    const cacheKey = getI18nSchemaCacheKey(filtersMetadata);
-                    const cachedValidator = i18nValidators.get(cacheKey);
+                let cacheKey;
+                let filtersMetadata;
 
-                    if (cachedValidator) {
-                        schema = cachedValidator.schema;
-                        compiledValidator = cachedValidator.validate;
-                    } else {
+                try {
+                    filtersMetadata = readFiltersMetadata(item);
+                    cacheKey = getI18nSchemaCacheKey(filtersMetadata);
+                } catch (e) {
+                    logger.error(`Cannot read filters metadata for ${item}: ${e.message}`);
+                    return false;
+                }
+
+                const cachedValidator = i18nValidators.get(cacheKey);
+
+                if (cachedValidator) {
+                    schema = cachedValidator.schema;
+                    compiledValidator = cachedValidator.validate;
+                } else {
+                    try {
                         schema = generateFiltersI18nSchema({
                             localesPath: options.localesPath,
                             filtersMetadata,
@@ -173,10 +189,10 @@ const validateDir = (dir, validator, schemas, oldSchemas, filtersRequiredAmount,
                             schema,
                             validate: compiledValidator,
                         });
+                    } catch (e) {
+                        logger.error(`Cannot generate filters_i18n schema for ${item}: ${e.message}`);
+                        return false;
                     }
-                } catch (e) {
-                    logger.error(e.message);
-                    return false;
                 }
             }
 
@@ -231,8 +247,9 @@ const validateDir = (dir, validator, schemas, oldSchemas, filtersRequiredAmount,
  * @param options - Validation options
  * @param options.localesPath - Path to the locales directory
  * @param {string[]} [options.requiredLocales] - Locales that must be present for every entity
- * @param {string} [options.logPath] - Path to the validation log file
+ * @param {string} [options.logPath] - Path to the validation log file; the file is appended to
  * @returns {boolean} Validation result
+ * @throws {Error} If options or options.localesPath is missing
  */
 const validate = (platformsPath, jsonSchemasConfigDir, filtersRequiredAmount, options) => {
     if (!options || !options.localesPath) {
@@ -240,7 +257,7 @@ const validate = (platformsPath, jsonSchemasConfigDir, filtersRequiredAmount, op
     }
 
     if (options.logPath) {
-        logger.initialize(options.logPath);
+        logger.initialize(options.logPath, true);
     }
 
     logger.info('Validating json schemas for platforms');

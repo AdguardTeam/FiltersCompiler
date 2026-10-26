@@ -55,10 +55,13 @@ class CompilerLogger extends Logger {
      * Initializes logger
      *
      * @param logFilePath - log file path
+     * @param append - append to the file instead of truncating it
      *
-     * The log file is opened with 'w' (truncate/create). Subsequent writes are appended.
+     * By default, the log file is opened with 'w' (truncate/create). With
+     * `append`, it is opened with 'a' (create/append). Subsequent writes are
+     * appended in both modes.
      */
-    initialize(logFilePath: string | undefined): void {
+    initialize(logFilePath: string | undefined, append = false): void {
         if (!logFilePath) {
             /* eslint-disable no-console */
             console.warn('Log file is not specified');
@@ -79,8 +82,8 @@ class CompilerLogger extends Logger {
             this.#fd = null;
         }
 
-        // Open (truncate) now; we'll append to the same fd later.
-        this.#fd = fs.openSync(logFilePath, 'w');
+        // Open now; we'll append to the same fd later.
+        this.#fd = fs.openSync(logFilePath, append ? 'a' : 'w');
         this.logFile = logFilePath;
     }
 
