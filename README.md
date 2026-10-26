@@ -428,9 +428,10 @@ Log levels:
 
 ### Environment variables
 
-| Variable | Default           | Purpose                                                                                           |
-| -------- | ----------------- | ------------------------------------------------------------------------------------------------- |
-| `TLS`    | (system defaults) | Set to `insecure` to bypass TLS certificate verification when downloading external filter sources |
+| Variable             | Default           | Purpose                                                                                           |
+| -------------------- | ----------------- | ------------------------------------------------------------------------------------------------- |
+| `TLS`                | (system defaults) | Set to `insecure` to bypass TLS certificate verification when downloading external filter sources |
+| `NODE_USE_ENV_PROXY` | (unset)           | Set to `1` to let remote `!#include` downloads use `HTTP_PROXY`, `HTTPS_PROXY`, and `NO_PROXY`    |
 
 ## Supported platforms
 

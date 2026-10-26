@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Updated `@adguard/filters-downloader` to `3.0.0-beta.0`. This version
+  removes the vulnerable `axios` dependency and uses native `fetch`.
+- `engines.node` is now `^22.21.0 || >=24.0.0`. Node.js 23.x is not
+  supported.
+- Remote `!#include` downloads no longer use `HTTP_PROXY`, `HTTPS_PROXY`,
+  and `NO_PROXY` automatically. Set `NODE_USE_ENV_PROXY=1` to enable this.
+
 ### Deprecated
 
 ### Removed

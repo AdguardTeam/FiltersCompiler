@@ -28,7 +28,7 @@ The library exposes four public API functions: `compile`, `validateJSONSchema`,
 
 ## Technical Context
 
-- **Language**: JavaScript (ES2022 modules), Node.js >=22
+- **Language**: JavaScript (ES2022 modules), Node.js ^22.21.0 || >=24.0.0
 - **Package Manager**: pnpm >=10.33.4 and <11
 - **Bundler**: Rollup (dual ESM + CJS output)
 - **Testing**: Vitest (node environment, `test/*.test.{js,ts}`)
