@@ -9,7 +9,7 @@ const SCHEMA_DRAFT = 'http://json-schema.org/draft-07/schema#';
 /**
  * Top-level entity kinds in filters_i18n.json.
  */
-const ENTITY_KINDS = ['groups', 'tags', 'filters'] as const;
+export const ENTITY_KINDS = ['groups', 'tags', 'filters'] as const;
 
 /**
  * Entity kind.
@@ -19,7 +19,7 @@ type EntityKind = typeof ENTITY_KINDS[number];
 /**
  * Fields that every locale object must contain.
  */
-const LOCALE_FIELDS = ['name', 'description'] as const;
+export const LOCALE_FIELDS = ['name', 'description'] as const;
 
 /**
  * Locale field name.
@@ -71,6 +71,9 @@ export interface FiltersI18nSchemaOptions {
     /**
      * Locales that must be present for every entity.
      * Defaults to all locale directories in `localesPath`.
+     *
+     * The schema validates every locale directory in `localesPath`, even when
+     * this list contains a subset.
      */
     requiredLocales?: string[];
 }
@@ -209,6 +212,7 @@ const createLocaleSchema = (
  * @param entry English locale data for the entity.
  * @param kind Entity kind.
  * @param id Entity id.
+ * @param availableLocales Locales that the schema validates.
  * @param requiredLocales Locales that must be present.
  * @param englishPath Path to the English locale directory.
  *
@@ -218,13 +222,14 @@ const createIdSchema = (
     entry: LocaleEntry,
     kind: EntityKind,
     id: string,
+    availableLocales: string[],
     requiredLocales: string[],
     englishPath: string,
 ): Record<string, unknown> => ({
     type: 'object',
     required: requiredLocales,
     properties: Object.fromEntries(
-        requiredLocales.map((locale) => [locale, createLocaleSchema(entry, kind, id, englishPath)]),
+        availableLocales.map((locale) => [locale, createLocaleSchema(entry, kind, id, englishPath)]),
     ),
 });
 
@@ -234,6 +239,7 @@ const createIdSchema = (
  * @param kind Entity kind.
  * @param ids Entity ids.
  * @param englishData English locale data for the entity kind.
+ * @param availableLocales Locales that the schema validates.
  * @param requiredLocales Locales that must be present.
  * @param englishPath Path to the English locale directory.
  *
@@ -245,6 +251,7 @@ const createTopLevelSchema = (
     kind: EntityKind,
     ids: string[],
     englishData: LocaleData,
+    availableLocales: string[],
     requiredLocales: string[],
     englishPath: string,
 ): Record<string, unknown> => {
@@ -256,7 +263,14 @@ const createTopLevelSchema = (
             throw new Error(`Missing English localization for ${kind} ${id} in ${englishPath}`);
         }
 
-        properties[id] = createIdSchema(entry, kind, id, requiredLocales, englishPath);
+        properties[id] = createIdSchema(
+            entry,
+            kind,
+            id,
+            availableLocales,
+            requiredLocales,
+            englishPath,
+        );
     });
 
     return {
@@ -269,9 +283,10 @@ const createTopLevelSchema = (
 /**
  * Generates the filters_i18n JSON schema from FiltersRegistry data.
  *
- * The entity ids come from the platform metadata. The locale list and the
- * English fallback strings come from the locales directory. The compiler
- * does not keep its own copy of filter, group, or tag text.
+ * The entity ids come from the platform metadata. The schema validates every
+ * locale directory in the locales path. The required locales and the English
+ * fallback strings come from the locales directory. The compiler does not
+ * keep its own copy of filter, group, or tag text.
  *
  * @param options Schema generation options.
  *
@@ -283,8 +298,8 @@ export const generateFiltersI18nSchema = (options: FiltersI18nSchemaOptions): Re
     const { localesPath, filtersMetadata, requiredLocales } = options;
 
     const availableLocales = getLocaleDirectories(localesPath);
-    const locales = requiredLocales ?? availableLocales;
-    const missingLocales = locales.filter((locale) => !availableLocales.includes(locale));
+    const required = requiredLocales ?? availableLocales;
+    const missingLocales = required.filter((locale) => !availableLocales.includes(locale));
 
     if (missingLocales.length > 0) {
         throw new Error(`Required locales are missing in ${localesPath}: ${missingLocales.join(', ')}`);
@@ -296,7 +311,14 @@ export const generateFiltersI18nSchema = (options: FiltersI18nSchemaOptions): Re
 
     ENTITY_KINDS.forEach((kind) => {
         const ids = getEntityIds(filtersMetadata, kind);
-        properties[kind] = createTopLevelSchema(kind, ids, englishData[kind], locales, englishPath);
+        properties[kind] = createTopLevelSchema(
+            kind,
+            ids,
+            englishData[kind],
+            availableLocales,
+            required,
+            englishPath,
+        );
     });
 
     // Do not add `$id`: Ajv caches compiled schemas by id, and every platform

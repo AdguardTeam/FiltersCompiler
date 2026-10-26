@@ -57,6 +57,7 @@ describe('filters i18n schema generator', () => {
             expect(schema.properties.filters.required).toEqual(['25']);
 
             expect(schema.properties.groups.properties['1'].required).toEqual(['de', 'en']);
+            expect(Object.keys(schema.properties.groups.properties['1'].properties)).toEqual(['de', 'en']);
             expect(schema.properties.groups.properties['1'].properties.en.properties.name.default)
                 .toBe('Group');
             expect(schema.properties.filters.properties['25'].properties.de.properties.description.default)
@@ -66,7 +67,7 @@ describe('filters i18n schema generator', () => {
         }
     });
 
-    it('uses requiredLocales instead of all locale directories', () => {
+    it('keeps requiredLocales required and validates all available locales', () => {
         const tempDir = createTempDir('filters-i18n-schema-');
         const localesPath = path.join(tempDir, 'locales');
 
@@ -82,7 +83,9 @@ describe('filters i18n schema generator', () => {
                 requiredLocales: ['en'],
             });
 
-            expect(schema.properties.groups.properties['1'].required).toEqual(['en']);
+            const groupSchema = schema.properties.groups.properties['1'];
+            expect(groupSchema.required).toEqual(['en']);
+            expect(Object.keys(groupSchema.properties)).toEqual(['de', 'en']);
         } finally {
             fs.rmSync(tempDir, { recursive: true, force: true });
         }

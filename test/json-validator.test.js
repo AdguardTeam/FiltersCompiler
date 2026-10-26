@@ -281,6 +281,48 @@ describe('json validator', () => {
         }
     });
 
+    it('validates locales outside requiredLocales', () => {
+        const tempDir = createTempDir('filters-compiler-json-validator-');
+        const platformsPath = path.join(tempDir, 'platforms');
+        const localesPath = path.join(tempDir, 'locales');
+        const schemasDir = createSchemasDir();
+
+        try {
+            createLocales(localesPath, {
+                en: {
+                    groups: [{ 'group.1.name': 'Group', 'group.1.description': 'Group description' }],
+                    tags: [{ 'tag.2.name': 'Tag', 'tag.2.description': 'Tag description' }],
+                    filters: [{ 'filter.25.name': 'Filter 25', 'filter.25.description': 'Filter 25 description' }],
+                },
+                de: {
+                    groups: [{ 'group.1.name': 42 }],
+                    tags: [{ 'tag.2.name': 'Tag', 'tag.2.description': 'Tag-Beschreibung' }],
+                    filters: [{ 'filter.25.name': 'Filter 25', 'filter.25.description': 'Filter 25 Beschreibung' }],
+                },
+            });
+            createPlatform(
+                platformsPath,
+                'test',
+                createFiltersMetadata(),
+                createFiltersI18n({ deGroup: { name: 42 } }),
+            );
+
+            vi.spyOn(logger, 'error').mockImplementation(() => {});
+
+            const result = schemaValidator.validate(
+                platformsPath,
+                schemasDir,
+                1,
+                { localesPath, requiredLocales: ['en'] },
+            );
+
+            expect(result).toBe(false);
+        } finally {
+            fs.rmSync(tempDir, { recursive: true, force: true });
+            fs.rmSync(schemasDir, { recursive: true, force: true });
+        }
+    });
+
     it('fails when filters.json is missing next to filters_i18n.json', () => {
         const tempDir = createTempDir('filters-compiler-json-validator-');
         const platformsPath = path.join(tempDir, 'platforms');
