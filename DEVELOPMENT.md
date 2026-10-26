@@ -21,7 +21,7 @@ running tests, and contributing code to the AdGuard Filters Compiler.
     - [Before Committing](#before-committing)
     - [Branching Strategy](#branching-strategy)
 - [Common Tasks](#common-tasks)
-    - [Updating JSON Schemas](#updating-json-schemas)
+    - [Updating the Filters Schema](#updating-the-filters-schema)
     - [Updating Scriptlets and Redirects](#updating-scriptlets-and-redirects)
     - [Building a Release](#building-a-release)
 - [Testing](#testing)
@@ -108,7 +108,7 @@ pnpm lint
 | `pnpm lint:code`     | Run ESLint                                            |
 | `pnpm lint:types`    | Run TypeScript type checker (`tsc --noEmit`)          |
 | `pnpm lint:md`       | Lint markdown files                                   |
-| `pnpm build-schemas` | Regenerate JSON schemas from `tasks/build-schemas/`   |
+| `pnpm build-schemas` | Regenerate filters schema from `tasks/build-schemas/` |
 | `pnpm tgz`           | Pack release tarball (`filters-compiler.tgz`)         |
 
 > **Note**: `pnpm tgz` requires a temporary `version` field in
@@ -260,7 +260,7 @@ automatically.
 
 ## Common Tasks
 
-### Updating JSON Schemas
+### Updating the Filters Schema
 
 `schemas/filters.schema.json` is generated — **never edit it directly**. Edit
 the generation scripts in `tasks/build-schemas/` instead:

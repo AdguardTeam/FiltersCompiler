@@ -141,19 +141,20 @@ Recursively validates the built JSON files in `platformsPath`.
 `requiredFiltersAmount` is the minimum number of filters expected in
 each platform's `filters.json`.
 
-The `filters_i18n` schema is generated at runtime for every platform
-from its `filters.json` and the FiltersRegistry locale data in
+The `filters_i18n` schema is generated at runtime for every non-legacy
+platform from its `filters.json` and the FiltersRegistry locale data in
 `localesPath`. The entity IDs come from `filters.json`. The required
 locales and the English fallback strings come from the locale
 directory. The compiler does not keep a copy of filter, group, or tag
-text.
+text. The legacy `mac` and `mac_v2` platforms use their frozen schemas.
 
 - `localesPath` — path to the FiltersRegistry `locales` directory.
 - `requiredLocales` — locales that must be present for every group,
   tag, and filter. Defaults to all locale subdirectories of
-  `localesPath`.
-- `logPath` — optional validation log file. When omitted, messages go
-  to the console.
+  `localesPath`. The schema validates every locale directory in
+  `localesPath`, even when this list contains a subset.
+- `logPath` — optional validation log file. The file is appended to.
+  When omitted, messages go to the console.
 
 Missing translations are filled with the base (`en`) value, and each
 fallback is logged as a warning. A built entity with no English
@@ -164,7 +165,8 @@ static and are bundled with the library.
 
 Returns `true` when all files are valid. On validation failure it logs
 the errors and returns `false` instead of throwing, so callers must
-check the return value.
+check the return value. It throws when `options` or
+`options.localesPath` is missing.
 
 ### `validateLocales(...)`
 

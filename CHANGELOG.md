@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `validateJSONSchema()` now accepts a `ValidateJSONSchemaOptions` object with
   `localesPath`, `requiredLocales`, and `logPath`. Missing translations filled
   with the base (`en`) value are logged as warnings. With `logPath`, the
-  warnings are written to the specified file.
+  warnings are appended to the specified file.
 
 ### Changed
 
@@ -21,7 +21,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   platform's `filters.json` and the FiltersRegistry `locales` directory
   instead of a bundled static schema. The required entity IDs now match the
   filters that the platform actually builds, and the required locales and
-  English fallback strings come from FiltersRegistry.
+  English fallback strings come from FiltersRegistry. Every locale directory
+  in `localesPath` is validated, even when `requiredLocales` contains a
+  subset.
 
 ### Deprecated
 
@@ -29,7 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `schemas/filters_i18n.schema.json` (4.3 MB), its generation scripts, and the
   hardcoded `filters-i18n-defaults.js` data. The npm package no longer contains
-  the `filters_i18n` schema.
+  the root `filters_i18n` schema. The frozen `mac` and `mac_v2` schemas are
+  still shipped.
 - Hardcoded `SUPPORTED_LOCALES` and `NON_REQUIRED_FILTER_IDS` lists from the
   schema generation scripts.
 
