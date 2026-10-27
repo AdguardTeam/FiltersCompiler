@@ -84,8 +84,19 @@ export interface FiltersI18nSchemaOptions {
  * @param filePath Path to the JSON file.
  *
  * @returns Parsed JSON value.
+ *
+ * @throws {Error} When the file cannot be parsed as JSON.
  */
-const readJson = <T>(filePath: string): T => JSON.parse(fs.readFileSync(filePath, 'utf8')) as T;
+const readJson = <T>(filePath: string): T => {
+    const content = fs.readFileSync(filePath, 'utf8');
+
+    try {
+        return JSON.parse(content) as T;
+    } catch (e) {
+        const message = e instanceof Error ? e.message : String(e);
+        throw new Error(`Cannot parse ${filePath}: ${message}`);
+    }
+};
 
 /**
  * Parses a locale file into a map keyed by entity id.
@@ -98,7 +109,7 @@ const readJson = <T>(filePath: string): T => JSON.parse(fs.readFileSync(filePath
 const parseLocaleFile = (filePath: string, kind: EntityKind): LocaleData => {
     const messages = readJson<Array<Record<string, string>>>(filePath);
     const data: LocaleData = {};
-    const keyPattern = new RegExp(`^${KEY_PREFIXES[kind]}\\.(\\d+)\\.(name|description)$`);
+    const keyPattern = new RegExp(`^${KEY_PREFIXES[kind]}\\.(\\d+)\\.(${LOCALE_FIELDS.join('|')})$`);
 
     messages.forEach((message) => {
         Object.entries(message).forEach(([key, value]) => {
@@ -147,6 +158,18 @@ const loadEnglishLocales = (localesPath: string): Record<EntityKind, LocaleData>
 };
 
 /**
+ * Entity id getters keyed by entity kind.
+ *
+ * A `Record` makes a missing kind a TypeScript error, unlike a `switch` with
+ * an unreachable default branch.
+ */
+const ENTITY_ID_GETTERS: Record<EntityKind, (metadata: FiltersMetadata) => number[]> = {
+    groups: (metadata) => metadata.groups.map((group) => group.groupId),
+    tags: (metadata) => metadata.tags.map((tag) => tag.tagId),
+    filters: (metadata) => metadata.filters.map((filter) => filter.filterId),
+};
+
+/**
  * Returns the entity ids from the platform metadata.
  *
  * @param metadata Platform metadata from filters.json.
@@ -154,18 +177,10 @@ const loadEnglishLocales = (localesPath: string): Record<EntityKind, LocaleData>
  *
  * @returns Entity ids as strings.
  */
-const getEntityIds = (metadata: FiltersMetadata, kind: EntityKind): string[] => {
-    switch (kind) {
-        case 'groups':
-            return metadata.groups.map((group) => String(group.groupId));
-        case 'tags':
-            return metadata.tags.map((tag) => String(tag.tagId));
-        case 'filters':
-            return metadata.filters.map((filter) => String(filter.filterId));
-        default:
-            return [];
-    }
-};
+export const getEntityIds = (
+    metadata: FiltersMetadata,
+    kind: EntityKind,
+): string[] => ENTITY_ID_GETTERS[kind](metadata).map((id) => String(id));
 
 /**
  * Creates the schema for a single locale object.
@@ -177,7 +192,7 @@ const getEntityIds = (metadata: FiltersMetadata, kind: EntityKind): string[] => 
  *
  * @returns Schema definition for the locale object.
  *
- * @throws Error when the English locale data is incomplete.
+ * @throws {Error} When the English locale data is incomplete.
  */
 const createLocaleSchema = (
     entry: LocaleEntry,
@@ -207,29 +222,39 @@ const createLocaleSchema = (
 };
 
 /**
+ * Returns the JSON pointer for an entity's shared locale schema definition.
+ *
+ * @param kind Entity kind.
+ * @param id Entity id.
+ *
+ * @returns JSON pointer to the definition.
+ */
+const getLocaleDefinitionRef = (kind: EntityKind, id: string): string => `#/definitions/${kind}.${id}`;
+
+/**
  * Creates the schema for a single entity id.
  *
- * @param entry English locale data for the entity.
+ * Every locale references one shared definition instead of embedding a copy
+ * of the same subschema. This keeps the generated schema small and makes Ajv
+ * compile it faster.
+ *
  * @param kind Entity kind.
  * @param id Entity id.
  * @param availableLocales Locales that the schema validates.
  * @param requiredLocales Locales that must be present.
- * @param englishPath Path to the English locale directory.
  *
  * @returns Schema definition for the entity id.
  */
 const createIdSchema = (
-    entry: LocaleEntry,
     kind: EntityKind,
     id: string,
     availableLocales: string[],
     requiredLocales: string[],
-    englishPath: string,
 ): Record<string, unknown> => ({
     type: 'object',
     required: requiredLocales,
     properties: Object.fromEntries(
-        availableLocales.map((locale) => [locale, createLocaleSchema(entry, kind, id, englishPath)]),
+        availableLocales.map((locale) => [locale, { $ref: getLocaleDefinitionRef(kind, id) }]),
     ),
 });
 
@@ -242,10 +267,11 @@ const createIdSchema = (
  * @param availableLocales Locales that the schema validates.
  * @param requiredLocales Locales that must be present.
  * @param englishPath Path to the English locale directory.
+ * @param definitions Shared schema definitions, keyed by entity.
  *
  * @returns Schema definition for the top-level entity kind.
  *
- * @throws Error when an entity has no English locale data.
+ * @throws {Error} When an entity has no English locale data.
  */
 const createTopLevelSchema = (
     kind: EntityKind,
@@ -254,6 +280,7 @@ const createTopLevelSchema = (
     availableLocales: string[],
     requiredLocales: string[],
     englishPath: string,
+    definitions: Record<string, unknown>,
 ): Record<string, unknown> => {
     const properties: Record<string, unknown> = {};
 
@@ -263,14 +290,8 @@ const createTopLevelSchema = (
             throw new Error(`Missing English localization for ${kind} ${id} in ${englishPath}`);
         }
 
-        properties[id] = createIdSchema(
-            entry,
-            kind,
-            id,
-            availableLocales,
-            requiredLocales,
-            englishPath,
-        );
+        definitions[`${kind}.${id}`] = createLocaleSchema(entry, kind, id, englishPath);
+        properties[id] = createIdSchema(kind, id, availableLocales, requiredLocales);
     });
 
     return {
@@ -292,7 +313,7 @@ const createTopLevelSchema = (
  *
  * @returns Generated JSON schema.
  *
- * @throws Error when a required locale or an English localization is missing.
+ * @throws {Error} When a required locale or an English localization is missing.
  */
 export const generateFiltersI18nSchema = (options: FiltersI18nSchemaOptions): Record<string, unknown> => {
     const { localesPath, filtersMetadata, requiredLocales } = options;
@@ -308,6 +329,7 @@ export const generateFiltersI18nSchema = (options: FiltersI18nSchemaOptions): Re
     const englishPath = path.join(localesPath, 'en');
     const englishData = loadEnglishLocales(localesPath);
     const properties: Record<string, unknown> = {};
+    const definitions: Record<string, unknown> = {};
 
     ENTITY_KINDS.forEach((kind) => {
         const ids = getEntityIds(filtersMetadata, kind);
@@ -318,13 +340,14 @@ export const generateFiltersI18nSchema = (options: FiltersI18nSchemaOptions): Re
             availableLocales,
             required,
             englishPath,
+            definitions,
         );
     });
 
     // Do not add `$id`: Ajv caches compiled schemas by id, and every platform
     // gets its own generated schema.
     return {
-        definitions: {},
+        definitions,
         '$schema': SCHEMA_DRAFT,
         type: 'object',
         title: 'The Root Schema',

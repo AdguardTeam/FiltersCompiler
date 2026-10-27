@@ -40,6 +40,22 @@ const loadSchemas = (dir) => {
 };
 
 /**
+ * Resolves a local `$ref` in the generated filters_i18n schema.
+ *
+ * @param {object} schema Generated filters_i18n schema.
+ * @param {object} node Schema node that may be a reference.
+ * @returns {object} Resolved schema node.
+ */
+const resolveSchemaRef = (schema, node) => {
+    if (!node || typeof node.$ref !== 'string') {
+        return node;
+    }
+
+    const definitionName = node.$ref.replace('#/definitions/', '');
+    return schema.definitions[definitionName];
+};
+
+/**
  * Logs every missing translation that Ajv will fill with an English fallback.
  *
  * @param {object} json Parsed filters_i18n.json.
@@ -61,11 +77,13 @@ const logAppliedDefaults = (json, schema, item) => {
                 return;
             }
 
-            Object.entries(idSchema.properties).forEach(([locale, localeSchema]) => {
+            Object.entries(idSchema.properties).forEach(([locale, localeRef]) => {
                 const localeData = idData[locale];
                 if (!localeData) {
                     return;
                 }
+
+                const localeSchema = resolveSchemaRef(schema, localeRef);
 
                 LOCALE_FIELDS.forEach((field) => {
                     if (localeData[field] !== undefined) {
