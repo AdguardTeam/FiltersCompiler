@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Updated `@adguard/filters-downloader` to `3.0.0`. This version
+- Updated [@adguard/filters-downloader] to v3.0.0. This version
   removes the vulnerable `axios` dependency and uses native `fetch`.
 - `engines.node` is now `^22.21.0 || >=24.0.0`. Node.js 23.x is not
   supported.
