@@ -336,17 +336,18 @@ try {
 
 **Problem**: Build or tests fail with unexpected errors.
 
-**Solution**: Ensure you are using Node.js 22:
+**Solution**: Ensure you use a supported Node.js version. `package.json`
+declares `^22.21.0 || >=24.0.0`:
 
 ```bash
-node --version  # Should be v22.x.x
+node --version  # Should be v22.21.0 or later, or v24.0.0 or later
 ```
 
 If using nvm:
 
 ```bash
-nvm install 22
-nvm use 22
+nvm install 24
+nvm use 24
 ```
 
 ### Schema Validation Errors After Manual Edit

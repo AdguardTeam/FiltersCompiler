@@ -141,7 +141,7 @@ The `Dockerfile` uses multi-stage builds based on `adguard/node-ssh:22.22--0`:
 
 | Stage                    | Purpose           | Key Steps                                                                    |
 | ------------------------ | ----------------- | ---------------------------------------------------------------------------- |
-| `base`                   | Shared foundation | Node.js 22, pnpm 10.33.4 (from base image)                                   |
+| `base`                   | Shared foundation | Node.js 22.22, pnpm 10.33.4 (from base image)                                |
 | `deps`                   | Dependency cache  | `pnpm install --frozen-lockfile --ignore-scripts`                            |
 | `source`                 | Full source       | Copies project files over `deps`                                             |
 | `test-output`            | CI validation     | `pnpm lint && pnpm build && pnpm test`                                       |
