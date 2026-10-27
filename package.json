@@ -37,7 +37,7 @@
         "@adguard/css-tokenizer": "1.2.0",
         "@adguard/ecss-tree": "2.0.1",
         "@adguard/extended-css": "2.2.0",
-        "@adguard/filters-downloader": "3.0.0-beta.0",
+        "@adguard/filters-downloader": "3.0.0",
         "@adguard/logger": "2.0.0",
         "@adguard/scriptlets": "2.5.1",
         "@adguard/tsurlfilter": "6.0.4",

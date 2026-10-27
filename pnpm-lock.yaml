@@ -21,8 +21,8 @@ importers:
         specifier: 2.2.0
         version: 2.2.0
       '@adguard/filters-downloader':
-        specifier: 3.0.0-beta.0
-        version: 3.0.0-beta.0
+        specifier: 3.0.0
+        version: 3.0.0
       '@adguard/logger':
         specifier: 2.0.0
         version: 2.0.0
@@ -137,8 +137,8 @@ packages:
     resolution: {integrity: sha512-LCSQDGV1yvtbehNsFmv0nMFHxLtYAzu8by9QJd9zmS07ZsgL6n5YQ3TZzqaUdLvBIuTIuG4Lfn73xwuRk5J9Og==}
     engines: {node: '>=16'}
 
-  '@adguard/filters-downloader@3.0.0-beta.0':
-    resolution: {integrity: sha512-bqrcg+tdq+hRlIME9GhxnZMh+U8GRyZFc1hzcI7/XwF3Uqov7XKb4NzQc4/sfB8mZXu0NewS3NdwrVc8+LKInw==}
+  '@adguard/filters-downloader@3.0.0':
+    resolution: {integrity: sha512-/wxV2Ssv83xz8sZQm0vo7kBOfZEehFEBcqVEib5UNfasryZ7pw90tAlAq9KuS8QWKgoyV1X4jMZ/ls1HDVS5vQ==}
     engines: {node: ^22.21.0 || >=24.0.0, pnpm: '>=10.33.4 <11'}
 
   '@adguard/logger@2.0.0':
@@ -2240,7 +2240,7 @@ snapshots:
 
   '@adguard/extended-css@2.2.0': {}
 
-  '@adguard/filters-downloader@3.0.0-beta.0':
+  '@adguard/filters-downloader@3.0.0':
     dependencies:
       '@adguard/diff-builder': 1.1.4
       crypto-js: 4.2.0
