@@ -1,67 +1,35 @@
 import path from 'path';
-import { setConfiguration, CompatibilityTypes } from '@adguard/tsurlfilter';
+import { fileURLToPath } from 'url';
 
-import { build } from './src/main/builder';
+import * as compiler from './src/index';
 import { schemaValidator } from './src/main/json-validator';
-import { localesValidator } from './src/main/locales-validator';
-import { logger } from './src/main/utils/log';
 
-// default platforms config
-import { platformsConfig } from './src/main/platforms-config';
+// `validateJSONSchema` is defined below because the development entry point
+// resolves the schemas from the repository root instead of `dist/`.
+export const {
+    compile,
+    localOptimizationStatistics,
+    OptimizationStatsError,
+    validateLocales,
+} = compiler;
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// Sets configuration compatibility
-setConfiguration({ compatibility: CompatibilityTypes.Corelibs });
+// The bundled entry point resolves `./schemas/` relative to `dist/`; the
+// unbundled development entry point uses the repository's root `schemas/`.
+const jsonSchemasConfigDir = path.join(__dirname, 'schemas');
 
-const jsonSchemasConfigDir = path.join(__dirname, './schemas/');
-
-process.on('unhandledRejection', (error) => {
-    throw error;
-});
-
-export const compile = (
-    path,
-    logPath,
-    reportFile,
+/**
+ * Validates built filter files against the bundled JSON schemas.
+ *
+ * @param platformsPath Path to the built platform output.
+ * @param requiredFiltersAmount Minimum number of filters expected.
+ * @param options Validation options.
+ * @returns `true` when all files are valid, `false` on validation failure.
+ */
+export const validateJSONSchema = (platformsPath, requiredFiltersAmount, options) => schemaValidator.validate(
     platformsPath,
-    includedFilterIds,
-    excludedFilterIds,
-    customPlatformsConfig,
-) => {
-    if (customPlatformsConfig) {
-        logger.info('Using custom platforms configuration');
-        // eslint-disable-next-line no-restricted-syntax, guard-for-in
-        for (const platform in customPlatformsConfig) {
-            logger.info(`Redefining platform ${platform}`);
-            platformsConfig[platform] = customPlatformsConfig[platform];
-        }
-    }
-
-    return build(
-        path,
-        logPath,
-        reportFile,
-        platformsPath,
-        platformsConfig,
-        includedFilterIds,
-        excludedFilterIds,
-    );
-};
-
-export const validateJSONSchema = (
-    platformsPath,
+    jsonSchemasConfigDir,
     requiredFiltersAmount,
     options,
-) => {
-    return schemaValidator.validate(
-        platformsPath,
-        jsonSchemasConfigDir,
-        requiredFiltersAmount,
-        options,
-    );
-};
-
-export const validateLocales = (localesDirPath, requiredLocales, logFormat) => {
-    return localesValidator.validate(localesDirPath, requiredLocales, logFormat);
-};
+);
