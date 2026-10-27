@@ -65,8 +65,9 @@ export interface ValidateJSONSchemaOptions {
     requiredLocales?: string[];
 
     /**
-     * Path to the validation log file. The file is appended to.
-     * When omitted, messages go to the console only.
+     * Path to the validation log file. The file is appended to and closed
+     * when validation finishes. When omitted, messages go to the console
+     * only; a log file opened by an earlier call is not reused.
      */
     logPath?: string;
 }
@@ -76,8 +77,9 @@ export interface ValidateJSONSchemaOptions {
  *
  * The `filters_i18n` schema is generated at runtime for every non-legacy
  * platform from the platform's `filters.json` and the FiltersRegistry locale
- * data. Missing translations are filled with the base (`en`) value and logged
- * as warnings. The legacy `mac` and `mac_v2` platforms use frozen schemas.
+ * data. Missing fields in an existing locale object are filled with the base
+ * (`en`) value and logged as warnings. The legacy `mac` and `mac_v2`
+ * platforms use frozen schemas.
  *
  * Validation failures are logged, not thrown — check the return value.
  *
@@ -85,7 +87,8 @@ export interface ValidateJSONSchemaOptions {
  * @param requiredFiltersAmount Minimum number of filters expected.
  * @param options Validation options.
  * @returns `true` when all files are valid, `false` on validation failure.
- * @throws {Error} When `options` or `options.localesPath` is missing.
+ * @throws {Error} When `options` or `options.localesPath` is missing, or when
+ * `options.logPath` cannot be opened.
  */
 export function validateJSONSchema(
     platformsPath: string,

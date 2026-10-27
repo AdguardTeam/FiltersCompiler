@@ -139,7 +139,9 @@ function validateJSONSchema(
 
 Recursively validates the built JSON files in `platformsPath`.
 `requiredFiltersAmount` is the minimum number of filters expected in
-each platform's `filters.json`.
+each platform's `filters.json`. It is applied only to files directly
+under `platformsPath`; platform metadata lives in subdirectories, so the
+threshold is not enforced per platform.
 
 The `filters_i18n` schema is generated at runtime for every non-legacy
 platform from its `filters.json` and the FiltersRegistry locale data in
@@ -153,11 +155,14 @@ text. The legacy `mac` and `mac_v2` platforms use their frozen schemas.
   tag, and filter. Defaults to all locale subdirectories of
   `localesPath`. The schema validates every locale directory in
   `localesPath`, even when this list contains a subset.
-- `logPath` — optional validation log file. The file is appended to.
-  When omitted, messages go to the console.
+- `logPath` — optional validation log file. The file is appended to and
+  closed when validation finishes. When omitted, messages go to the
+  console only; a log file opened by an earlier call is not reused.
 
-Missing translations are filled with the base (`en`) value, and each
-fallback is logged as a warning. A built entity with no English
+Missing fields in an existing locale object are filled with the base
+(`en`) value, and each fallback is logged as a warning. A locale object
+that is missing entirely for an entity is not filled: it fails
+validation when the locale is required. A built entity with no English
 localization, or a missing required locale, fails validation.
 
 The `filters.schema.json` and the legacy `mac`/`mac_v2` schemas remain
@@ -166,7 +171,8 @@ static and are bundled with the library.
 Returns `true` when all files are valid. On validation failure it logs
 the errors and returns `false` instead of throwing, so callers must
 check the return value. It throws when `options` or
-`options.localesPath` is missing.
+`options.localesPath` is missing, or when `options.logPath` cannot be
+opened.
 
 ### `validateLocales(...)`
 

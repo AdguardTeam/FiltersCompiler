@@ -10,9 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `validateJSONSchema()` now accepts a `ValidateJSONSchemaOptions` object with
-  `localesPath`, `requiredLocales`, and `logPath`. Missing translations filled
-  with the base (`en`) value are logged as warnings. With `logPath`, the
-  warnings are appended to the specified file.
+  `localesPath`, `requiredLocales`, and `logPath`. Missing fields in existing
+  locale objects are filled with the base (`en`) value and logged as warnings.
+  With `logPath`, the warnings are appended to the specified file, which is
+  closed when validation finishes.
 
 ### Changed
 
@@ -41,6 +42,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Stale and missing English defaults in the `filters_i18n` schema. Groups,
   tags, and filters now use the current `locales/en` strings. Filters 25, 26,
   and 27 are now validated.
+- Validation errors written to `logPath` are formatted as text instead of
+  `[object Object]`.
+- The validation log file is closed when `validateJSONSchema()` finishes, so a
+  later call without `logPath` does not append to it.
+- `validateJSONSchema()` reports the path of a malformed locale file instead of
+  a bare JSON parse error.
 
 ### Security
 
