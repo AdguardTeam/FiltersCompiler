@@ -4,6 +4,28 @@ import path from 'node:path';
 import { Logger } from '@adguard/logger';
 
 /**
+ * Formats a log message for the log file.
+ *
+ * Non-string values (for example Ajv error arrays) would otherwise be written
+ * as `[object Object]`.
+ *
+ * @param message Message to format.
+ *
+ * @returns Message as text.
+ */
+const formatMessage = (message: unknown): string => {
+    if (typeof message === 'string') {
+        return message;
+    }
+
+    if (message instanceof Error) {
+        return message.stack ?? message.message;
+    }
+
+    return JSON.stringify(message, null, 2) ?? String(message);
+};
+
+/**
  * Extend logger implementation
  */
 class CompilerLogger extends Logger {
@@ -27,7 +49,7 @@ class CompilerLogger extends Logger {
             return;
         }
 
-        const line = `[${new Date().toLocaleTimeString()}] [${level}]: ${message}${os.EOL}`;
+        const line = `[${new Date().toLocaleTimeString()}] [${level}]: ${formatMessage(message)}${os.EOL}`;
 
         // Using appendFileSync with an fd ensures atomic append semantics.
         fs.appendFileSync(this.#fd, line, 'utf8');
@@ -73,14 +95,7 @@ class CompilerLogger extends Logger {
         fs.mkdirSync(dir, { recursive: true });
 
         // Close any previous descriptor to avoid leaks
-        if (this.#fd != null) {
-            try {
-                fs.closeSync(this.#fd);
-            } catch {
-                /* noop */
-            }
-            this.#fd = null;
-        }
+        this.close();
 
         // Open now; we'll append to the same fd later.
         this.#fd = fs.openSync(logFilePath, append ? 'a' : 'w');
@@ -94,10 +109,14 @@ class CompilerLogger extends Logger {
         if (this.#fd != null) {
             try {
                 fs.closeSync(this.#fd);
+            } catch {
+                /* noop */
             } finally {
                 this.#fd = null;
             }
         }
+
+        this.logFile = undefined;
     }
 }
 

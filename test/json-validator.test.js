@@ -9,7 +9,6 @@ import {
     afterEach,
 } from 'vitest';
 import fs from 'fs';
-import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -18,16 +17,14 @@ import { logger } from '../src/main/utils/log';
 import { build } from '../src/main/builder';
 import { disableOptimization } from '../src/main/optimization';
 
+import {
+    createLocales,
+    createTempDir,
+    readJson,
+    writeJson,
+} from './utils/fixtures';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-const createTempDir = (prefix) => fs.mkdtempSync(path.join(os.tmpdir(), prefix));
-
-const writeJson = (filePath, data) => {
-    fs.mkdirSync(path.dirname(filePath), { recursive: true });
-    fs.writeFileSync(filePath, JSON.stringify(data, null, '\t'));
-};
-
-const readJson = (filePath) => JSON.parse(fs.readFileSync(filePath, 'utf8'));
 
 /**
  * Adds locale messages for entities that have no message for the key prefix.
@@ -124,30 +121,30 @@ const createIntegrationFixture = () => {
 };
 
 /**
- * Creates an empty schemas directory with the legacy subdirectories that
- * `schemaValidator.validate()` expects.
+ * Creates a schemas directory with the bundled filters schema and the legacy
+ * test fixtures.
+ *
+ * The frozen legacy schemas in `schemas/` require every FiltersRegistry
+ * locale, but the test platform data only contains en, ko, and ru. The
+ * fixtures keep legacy validation minimal for the test data.
  *
  * @returns {string} Path to the schemas directory.
  */
-const createSchemasDir = () => {
+const createBundledSchemasDir = () => {
     const schemasDir = createTempDir('filters-compiler-schemas-');
-    fs.mkdirSync(path.join(schemasDir, 'mac'));
-    fs.mkdirSync(path.join(schemasDir, 'mac_v2'));
-    return schemasDir;
-};
 
-/**
- * Creates locale files for the given locales.
- *
- * @param {string} localesPath Path to the locales directory.
- * @param {object} locales Locale data keyed by locale name and entity kind.
- */
-const createLocales = (localesPath, locales) => {
-    Object.entries(locales).forEach(([locale, data]) => {
-        Object.entries(data).forEach(([kind, messages]) => {
-            writeJson(path.join(localesPath, locale, `${kind}.json`), messages);
-        });
-    });
+    fs.copyFileSync(
+        path.join(__dirname, '../schemas/filters.schema.json'),
+        path.join(schemasDir, 'filters.schema.json'),
+    );
+    fs.cpSync(path.join(__dirname, 'resources/schemas/mac'), path.join(schemasDir, 'mac'), { recursive: true });
+    fs.cpSync(
+        path.join(__dirname, 'resources/schemas/mac_v2'),
+        path.join(schemasDir, 'mac_v2'),
+        { recursive: true },
+    );
+
+    return schemasDir;
 };
 
 /**
@@ -222,153 +219,178 @@ const createFiltersI18n = ({
     return result;
 };
 
+/**
+ * Creates complete English locale messages for the standard test entities.
+ *
+ * @returns {object} English locale messages keyed by entity kind.
+ */
+const createEnglishLocales = () => ({
+    groups: [{ 'group.1.name': 'Group', 'group.1.description': 'Group description' }],
+    tags: [{ 'tag.2.name': 'Tag', 'tag.2.description': 'Tag description' }],
+    filters: [{ 'filter.25.name': 'Filter 25', 'filter.25.description': 'Filter 25 description' }],
+});
+
+/**
+ * Creates a temporary validation fixture.
+ *
+ * @param {object} [options] Fixture options.
+ * @param {object} [options.locales] Locale data.
+ * @param {string} [options.platform] Platform directory name.
+ * @param {object} [options.filtersMetadata] Contents of filters.json.
+ * @param {object} [options.filtersI18n] Contents of filters_i18n.json.
+ * @returns {object} Fixture paths and a cleanup function.
+ */
+const createValidationFixture = ({
+    locales,
+    platform,
+    filtersMetadata,
+    filtersI18n,
+} = {}) => {
+    const root = createTempDir('filters-compiler-json-validator-');
+    const platformsPath = path.join(root, 'platforms');
+    const localesPath = path.join(root, 'locales');
+    const schemasDir = path.join(root, 'schemas');
+
+    fs.mkdirSync(path.join(schemasDir, 'mac'), { recursive: true });
+    fs.mkdirSync(path.join(schemasDir, 'mac_v2'), { recursive: true });
+
+    if (locales) {
+        createLocales(localesPath, locales);
+    }
+
+    if (platform) {
+        createPlatform(platformsPath, platform, filtersMetadata, filtersI18n);
+    }
+
+    return {
+        root,
+        platformsPath,
+        localesPath,
+        schemasDir,
+        logPath: path.join(root, 'validation.log'),
+        cleanup: () => fs.rmSync(root, { recursive: true, force: true }),
+    };
+};
+
+/**
+ * Runs a test body with a temporary validation fixture and cleans it up.
+ *
+ * @param {object} fixtureOptions Fixture options.
+ * @param {Function} callback Test body.
+ * @returns {*} Callback result.
+ */
+const withValidationFixture = async (fixtureOptions, callback) => {
+    const fixture = createValidationFixture(fixtureOptions);
+
+    try {
+        return await callback(fixture);
+    } finally {
+        fixture.cleanup();
+    }
+};
+
 describe('json validator', () => {
     afterEach(() => {
         vi.restoreAllMocks();
         logger.close();
     });
 
-    it('fills missing translations with English values and logs them', () => {
-        const tempDir = createTempDir('filters-compiler-json-validator-');
-        const platformsPath = path.join(tempDir, 'platforms');
-        const localesPath = path.join(tempDir, 'locales');
-        const schemasDir = createSchemasDir();
+    it('fills missing translations with English values and logs them', () => withValidationFixture({
+        locales: {
+            en: createEnglishLocales(),
+            de: {
+                groups: [{ 'group.1.name': 'Gruppe' }],
+                tags: [{ 'tag.2.name': 'Tag', 'tag.2.description': 'Tag-Beschreibung' }],
+                filters: [{ 'filter.25.description': 'Filter 25 Beschreibung' }],
+            },
+        },
+        platform: 'test',
+        filtersMetadata: createFiltersMetadata(),
+        filtersI18n: createFiltersI18n(),
+    }, ({ platformsPath, localesPath, schemasDir }) => {
+        const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
 
-        try {
-            createLocales(localesPath, {
-                en: {
-                    groups: [{ 'group.1.name': 'Group', 'group.1.description': 'Group description' }],
-                    tags: [{ 'tag.2.name': 'Tag', 'tag.2.description': 'Tag description' }],
-                    filters: [{ 'filter.25.name': 'Filter 25', 'filter.25.description': 'Filter 25 description' }],
-                },
-                de: {
-                    groups: [{ 'group.1.name': 'Gruppe' }],
-                    tags: [{ 'tag.2.name': 'Tag', 'tag.2.description': 'Tag-Beschreibung' }],
-                    filters: [{ 'filter.25.description': 'Filter 25 Beschreibung' }],
-                },
-            });
-            createPlatform(platformsPath, 'test', createFiltersMetadata(), createFiltersI18n());
+        const result = schemaValidator.validate(
+            platformsPath,
+            schemasDir,
+            1,
+            { localesPath, requiredLocales: ['en', 'de'] },
+        );
 
-            const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+        expect(result).toBe(true);
+        expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining(
+            "Missing groups 1 description for locale 'de'",
+        ));
+        expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining(
+            "Missing filters 25 name for locale 'de'",
+        ));
+        expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Applied 2 English fallback(s)'));
 
-            const result = schemaValidator.validate(
-                platformsPath,
-                schemasDir,
-                1,
-                { localesPath, requiredLocales: ['en', 'de'] },
-            );
+        const filtersI18n = readJson(path.join(platformsPath, 'test', 'filters_i18n.json'));
+        expect(filtersI18n.groups['1'].de.description).toBe('Group description');
+        expect(filtersI18n.filters['25'].de.name).toBe('Filter 25');
+    }));
 
-            expect(result).toBe(true);
-            expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining(
-                "Missing groups 1 description for locale 'de'",
-            ));
-            expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining(
-                "Missing filters 25 name for locale 'de'",
-            ));
-            expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Applied 2 English fallback(s)'));
+    it('validates several platforms in one call', () => withValidationFixture({
+        locales: { en: createEnglishLocales() },
+    }, ({ platformsPath, localesPath, schemasDir }) => {
+        createPlatform(platformsPath, 'first', createFiltersMetadata(), createFiltersI18n({ includeDe: false }));
+        createPlatform(platformsPath, 'second', createFiltersMetadata(), createFiltersI18n({ includeDe: false }));
 
-            const filtersI18n = JSON.parse(fs.readFileSync(
-                path.join(platformsPath, 'test', 'filters_i18n.json'),
-                'utf8',
-            ));
-            expect(filtersI18n.groups['1'].de.description).toBe('Group description');
-            expect(filtersI18n.filters['25'].de.name).toBe('Filter 25');
-        } finally {
-            fs.rmSync(tempDir, { recursive: true, force: true });
-            fs.rmSync(schemasDir, { recursive: true, force: true });
-        }
-    });
+        const result = schemaValidator.validate(
+            platformsPath,
+            schemasDir,
+            1,
+            { localesPath, requiredLocales: ['en'] },
+        );
 
-    it('validates several platforms in one call', () => {
-        const tempDir = createTempDir('filters-compiler-json-validator-');
-        const platformsPath = path.join(tempDir, 'platforms');
-        const localesPath = path.join(tempDir, 'locales');
-        const schemasDir = createSchemasDir();
+        expect(result).toBe(true);
+    }));
 
-        try {
-            createLocales(localesPath, {
-                en: {
-                    groups: [{ 'group.1.name': 'Group', 'group.1.description': 'Group description' }],
-                    tags: [{ 'tag.2.name': 'Tag', 'tag.2.description': 'Tag description' }],
-                    filters: [{ 'filter.25.name': 'Filter 25', 'filter.25.description': 'Filter 25 description' }],
-                },
-            });
-            createPlatform(platformsPath, 'first', createFiltersMetadata(), createFiltersI18n({ includeDe: false }));
-            createPlatform(platformsPath, 'second', createFiltersMetadata(), createFiltersI18n({ includeDe: false }));
+    it('fails when a built entity has no English localization', () => withValidationFixture({
+        locales: {
+            en: {
+                groups: [{ 'group.1.name': 'Group', 'group.1.description': 'Group description' }],
+                tags: [{ 'tag.2.name': 'Tag', 'tag.2.description': 'Tag description' }],
+                filters: [],
+            },
+        },
+        platform: 'test',
+        filtersMetadata: createFiltersMetadata(),
+        filtersI18n: createFiltersI18n({ includeDe: false }),
+    }, ({ platformsPath, localesPath, schemasDir }) => {
+        const errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => {});
 
-            const result = schemaValidator.validate(
-                platformsPath,
-                schemasDir,
-                1,
-                { localesPath, requiredLocales: ['en'] },
-            );
+        const result = schemaValidator.validate(
+            platformsPath,
+            schemasDir,
+            1,
+            { localesPath, requiredLocales: ['en'] },
+        );
 
-            expect(result).toBe(true);
-        } finally {
-            fs.rmSync(tempDir, { recursive: true, force: true });
-            fs.rmSync(schemasDir, { recursive: true, force: true });
-        }
-    });
-
-    it('fails when a built entity has no English localization', () => {
-        const tempDir = createTempDir('filters-compiler-json-validator-');
-        const platformsPath = path.join(tempDir, 'platforms');
-        const localesPath = path.join(tempDir, 'locales');
-        const schemasDir = createSchemasDir();
-
-        try {
-            createLocales(localesPath, {
-                en: {
-                    groups: [{ 'group.1.name': 'Group', 'group.1.description': 'Group description' }],
-                    tags: [{ 'tag.2.name': 'Tag', 'tag.2.description': 'Tag description' }],
-                    filters: [],
-                },
-            });
-            createPlatform(platformsPath, 'test', createFiltersMetadata(), createFiltersI18n({ includeDe: false }));
-
-            const errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => {});
-
-            const result = schemaValidator.validate(
-                platformsPath,
-                schemasDir,
-                1,
-                { localesPath, requiredLocales: ['en'] },
-            );
-
-            expect(result).toBe(false);
-            expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining(
-                'Missing English localization for filters 25',
-            ));
-        } finally {
-            fs.rmSync(tempDir, { recursive: true, force: true });
-            fs.rmSync(schemasDir, { recursive: true, force: true });
-        }
-    });
+        expect(result).toBe(false);
+        expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining(
+            'Missing English localization for filters 25',
+        ));
+    }));
 
     it('fails when a required locale is absent for a built filter', () => {
-        const tempDir = createTempDir('filters-compiler-json-validator-');
-        const platformsPath = path.join(tempDir, 'platforms');
-        const localesPath = path.join(tempDir, 'locales');
-        const schemasDir = createSchemasDir();
+        const filtersI18n = createFiltersI18n();
+        delete filtersI18n.filters['25'].de;
 
-        try {
-            createLocales(localesPath, {
-                en: {
-                    groups: [{ 'group.1.name': 'Group', 'group.1.description': 'Group description' }],
-                    tags: [{ 'tag.2.name': 'Tag', 'tag.2.description': 'Tag description' }],
-                    filters: [{ 'filter.25.name': 'Filter 25', 'filter.25.description': 'Filter 25 description' }],
-                },
+        return withValidationFixture({
+            locales: {
+                en: createEnglishLocales(),
                 de: {
                     groups: [{ 'group.1.name': 'Gruppe', 'group.1.description': 'Gruppenbeschreibung' }],
                     tags: [{ 'tag.2.name': 'Tag', 'tag.2.description': 'Tag-Beschreibung' }],
                     filters: [{ 'filter.25.name': 'Filter 25', 'filter.25.description': 'Filter 25 Beschreibung' }],
                 },
-            });
-
-            const filtersI18n = createFiltersI18n();
-            delete filtersI18n.filters['25'].de;
-            createPlatform(platformsPath, 'test', createFiltersMetadata(), filtersI18n);
-
+            },
+            platform: 'test',
+            filtersMetadata: createFiltersMetadata(),
+            filtersI18n,
+        }, ({ platformsPath, localesPath, schemasDir }) => {
             vi.spyOn(logger, 'error').mockImplementation(() => {});
 
             const result = schemaValidator.validate(
@@ -379,218 +401,264 @@ describe('json validator', () => {
             );
 
             expect(result).toBe(false);
-        } finally {
-            fs.rmSync(tempDir, { recursive: true, force: true });
-            fs.rmSync(schemasDir, { recursive: true, force: true });
-        }
+        });
     });
 
-    it('validates locales outside requiredLocales', () => {
-        const tempDir = createTempDir('filters-compiler-json-validator-');
-        const platformsPath = path.join(tempDir, 'platforms');
-        const localesPath = path.join(tempDir, 'locales');
-        const schemasDir = createSchemasDir();
+    it('validates locales outside requiredLocales', () => withValidationFixture({
+        locales: {
+            en: createEnglishLocales(),
+            de: {
+                groups: [{ 'group.1.name': 42 }],
+                tags: [{ 'tag.2.name': 'Tag', 'tag.2.description': 'Tag-Beschreibung' }],
+                filters: [{ 'filter.25.name': 'Filter 25', 'filter.25.description': 'Filter 25 Beschreibung' }],
+            },
+        },
+        platform: 'test',
+        filtersMetadata: createFiltersMetadata(),
+        filtersI18n: createFiltersI18n({ deGroup: { name: 42 } }),
+    }, ({ platformsPath, localesPath, schemasDir }) => {
+        vi.spyOn(logger, 'error').mockImplementation(() => {});
 
-        try {
-            createLocales(localesPath, {
-                en: {
-                    groups: [{ 'group.1.name': 'Group', 'group.1.description': 'Group description' }],
-                    tags: [{ 'tag.2.name': 'Tag', 'tag.2.description': 'Tag description' }],
-                    filters: [{ 'filter.25.name': 'Filter 25', 'filter.25.description': 'Filter 25 description' }],
-                },
-                de: {
-                    groups: [{ 'group.1.name': 42 }],
-                    tags: [{ 'tag.2.name': 'Tag', 'tag.2.description': 'Tag-Beschreibung' }],
-                    filters: [{ 'filter.25.name': 'Filter 25', 'filter.25.description': 'Filter 25 Beschreibung' }],
-                },
-            });
-            createPlatform(
-                platformsPath,
-                'test',
-                createFiltersMetadata(),
-                createFiltersI18n({ deGroup: { name: 42 } }),
-            );
+        const result = schemaValidator.validate(
+            platformsPath,
+            schemasDir,
+            1,
+            { localesPath, requiredLocales: ['en'] },
+        );
 
-            vi.spyOn(logger, 'error').mockImplementation(() => {});
+        expect(result).toBe(false);
+    }));
 
-            const result = schemaValidator.validate(
-                platformsPath,
-                schemasDir,
-                1,
-                { localesPath, requiredLocales: ['en'] },
-            );
+    it('fails when filters.json is missing next to filters_i18n.json', () => withValidationFixture({
+        locales: { en: createEnglishLocales() },
+    }, ({ platformsPath, localesPath, schemasDir }) => {
+        writeJson(
+            path.join(platformsPath, 'test', 'filters_i18n.json'),
+            createFiltersI18n({ includeDe: false }),
+        );
 
-            expect(result).toBe(false);
-        } finally {
-            fs.rmSync(tempDir, { recursive: true, force: true });
-            fs.rmSync(schemasDir, { recursive: true, force: true });
-        }
-    });
+        const errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => {});
 
-    it('fails when filters.json is missing next to filters_i18n.json', () => {
-        const tempDir = createTempDir('filters-compiler-json-validator-');
-        const platformsPath = path.join(tempDir, 'platforms');
-        const localesPath = path.join(tempDir, 'locales');
-        const schemasDir = createSchemasDir();
+        const result = schemaValidator.validate(
+            platformsPath,
+            schemasDir,
+            1,
+            { localesPath, requiredLocales: ['en'] },
+        );
 
-        try {
-            createLocales(localesPath, {
-                en: {
-                    groups: [{ 'group.1.name': 'Group', 'group.1.description': 'Group description' }],
-                    tags: [{ 'tag.2.name': 'Tag', 'tag.2.description': 'Tag description' }],
-                    filters: [{ 'filter.25.name': 'Filter 25', 'filter.25.description': 'Filter 25 description' }],
-                },
-            });
-            writeJson(
-                path.join(platformsPath, 'test', 'filters_i18n.json'),
-                createFiltersI18n({ includeDe: false }),
-            );
+        expect(result).toBe(false);
+        expect(errorSpy).toHaveBeenCalledWith(expect.stringMatching(
+            /^Cannot read filters metadata for .*filters_i18n\.json: .*filters\.json is missing$/,
+        ));
+    }));
 
-            const errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => {});
+    it('writes fallback warnings to the log file', () => withValidationFixture({
+        locales: {
+            en: createEnglishLocales(),
+            de: {
+                groups: [{ 'group.1.name': 'Gruppe' }],
+                tags: [{ 'tag.2.name': 'Tag', 'tag.2.description': 'Tag-Beschreibung' }],
+                filters: [{ 'filter.25.name': 'Filter 25', 'filter.25.description': 'Filter 25 Beschreibung' }],
+            },
+        },
+        platform: 'test',
+        filtersMetadata: createFiltersMetadata(),
+        filtersI18n: createFiltersI18n({
+            deFilter: { name: 'Filter 25', description: 'Filter 25 Beschreibung' },
+        }),
+    }, ({
+        platformsPath,
+        localesPath,
+        schemasDir,
+        logPath,
+    }) => {
+        const result = schemaValidator.validate(
+            platformsPath,
+            schemasDir,
+            1,
+            { localesPath, requiredLocales: ['en', 'de'], logPath },
+        );
 
-            const result = schemaValidator.validate(
-                platformsPath,
-                schemasDir,
-                1,
-                { localesPath, requiredLocales: ['en'] },
-            );
+        expect(result).toBe(true);
 
-            expect(result).toBe(false);
-            expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('is missing'));
-        } finally {
-            fs.rmSync(tempDir, { recursive: true, force: true });
-            fs.rmSync(schemasDir, { recursive: true, force: true });
-        }
-    });
+        const log = fs.readFileSync(logPath, 'utf8');
+        expect(log).toContain("Missing groups 1 description for locale 'de'");
+        expect(log).toContain('Applied 1 English fallback(s)');
+    }));
 
-    it('writes fallback warnings to the log file', () => {
-        const tempDir = createTempDir('filters-compiler-json-validator-');
-        const platformsPath = path.join(tempDir, 'platforms');
-        const localesPath = path.join(tempDir, 'locales');
-        const schemasDir = createSchemasDir();
-        const logPath = path.join(tempDir, 'validation.log');
+    it('appends fallback warnings to an existing log file', () => withValidationFixture({
+        locales: {
+            en: createEnglishLocales(),
+            de: {
+                groups: [{ 'group.1.name': 'Gruppe' }],
+                tags: [{ 'tag.2.name': 'Tag', 'tag.2.description': 'Tag-Beschreibung' }],
+                filters: [{ 'filter.25.name': 'Filter 25', 'filter.25.description': 'Filter 25 Beschreibung' }],
+            },
+        },
+        platform: 'test',
+        filtersMetadata: createFiltersMetadata(),
+        filtersI18n: createFiltersI18n(),
+    }, ({
+        platformsPath,
+        localesPath,
+        schemasDir,
+        logPath,
+    }) => {
+        fs.writeFileSync(logPath, 'existing log line\n');
 
-        try {
-            createLocales(localesPath, {
-                en: {
-                    groups: [{ 'group.1.name': 'Group', 'group.1.description': 'Group description' }],
-                    tags: [{ 'tag.2.name': 'Tag', 'tag.2.description': 'Tag description' }],
-                    filters: [{ 'filter.25.name': 'Filter 25', 'filter.25.description': 'Filter 25 description' }],
-                },
-                de: {
-                    groups: [{ 'group.1.name': 'Gruppe' }],
-                    tags: [{ 'tag.2.name': 'Tag', 'tag.2.description': 'Tag-Beschreibung' }],
-                    filters: [{ 'filter.25.name': 'Filter 25', 'filter.25.description': 'Filter 25 Beschreibung' }],
-                },
-            });
-            createPlatform(
-                platformsPath,
-                'test',
-                createFiltersMetadata(),
-                createFiltersI18n({ deFilter: { name: 'Filter 25', description: 'Filter 25 Beschreibung' } }),
-            );
+        const result = schemaValidator.validate(
+            platformsPath,
+            schemasDir,
+            1,
+            { localesPath, requiredLocales: ['en', 'de'], logPath },
+        );
 
-            const result = schemaValidator.validate(
-                platformsPath,
-                schemasDir,
-                1,
-                { localesPath, requiredLocales: ['en', 'de'], logPath },
-            );
+        expect(result).toBe(true);
 
-            expect(result).toBe(true);
+        const log = fs.readFileSync(logPath, 'utf8');
+        expect(log).toContain('existing log line');
+        expect(log).toContain("Missing groups 1 description for locale 'de'");
+    }));
 
-            const log = fs.readFileSync(logPath, 'utf8');
-            expect(log).toContain("Missing groups 1 description for locale 'de'");
-            expect(log).toContain('Applied 1 English fallback(s)');
-        } finally {
-            fs.rmSync(tempDir, { recursive: true, force: true });
-            fs.rmSync(schemasDir, { recursive: true, force: true });
-        }
-    });
+    it('closes the log file after validation', () => withValidationFixture({
+        locales: {
+            en: createEnglishLocales(),
+            de: {
+                groups: [{ 'group.1.name': 'Gruppe' }],
+                tags: [{ 'tag.2.name': 'Tag', 'tag.2.description': 'Tag-Beschreibung' }],
+                filters: [{ 'filter.25.name': 'Filter 25', 'filter.25.description': 'Filter 25 Beschreibung' }],
+            },
+        },
+        platform: 'test',
+        filtersMetadata: createFiltersMetadata(),
+        filtersI18n: createFiltersI18n(),
+    }, ({
+        platformsPath,
+        localesPath,
+        schemasDir,
+        logPath,
+    }) => {
+        const firstResult = schemaValidator.validate(
+            platformsPath,
+            schemasDir,
+            1,
+            { localesPath, requiredLocales: ['en', 'de'], logPath },
+        );
 
-    it('appends fallback warnings to an existing log file', () => {
-        const tempDir = createTempDir('filters-compiler-json-validator-');
-        const platformsPath = path.join(tempDir, 'platforms');
-        const localesPath = path.join(tempDir, 'locales');
-        const schemasDir = createSchemasDir();
-        const logPath = path.join(tempDir, 'validation.log');
+        expect(firstResult).toBe(true);
+        expect(logger.logFile).toBeUndefined();
 
-        try {
-            fs.writeFileSync(logPath, 'existing log line\n');
+        const logAfterFirstCall = fs.readFileSync(logPath, 'utf8');
 
-            createLocales(localesPath, {
-                en: {
-                    groups: [{ 'group.1.name': 'Group', 'group.1.description': 'Group description' }],
-                    tags: [{ 'tag.2.name': 'Tag', 'tag.2.description': 'Tag description' }],
-                    filters: [{ 'filter.25.name': 'Filter 25', 'filter.25.description': 'Filter 25 description' }],
-                },
-                de: {
-                    groups: [{ 'group.1.name': 'Gruppe' }],
-                    tags: [{ 'tag.2.name': 'Tag', 'tag.2.description': 'Tag-Beschreibung' }],
-                    filters: [{ 'filter.25.name': 'Filter 25', 'filter.25.description': 'Filter 25 Beschreibung' }],
-                },
-            });
-            createPlatform(platformsPath, 'test', createFiltersMetadata(), createFiltersI18n());
+        createPlatform(platformsPath, 'second', createFiltersMetadata(), createFiltersI18n());
+        const secondResult = schemaValidator.validate(
+            platformsPath,
+            schemasDir,
+            1,
+            { localesPath, requiredLocales: ['en', 'de'] },
+        );
 
-            const result = schemaValidator.validate(
-                platformsPath,
-                schemasDir,
-                1,
-                { localesPath, requiredLocales: ['en', 'de'], logPath },
-            );
+        expect(secondResult).toBe(true);
+        expect(logger.logFile).toBeUndefined();
+        expect(fs.readFileSync(logPath, 'utf8')).toBe(logAfterFirstCall);
+    }));
 
-            expect(result).toBe(true);
+    it('throws when logPath cannot be opened', () => withValidationFixture({
+        locales: { en: createEnglishLocales() },
+        platform: 'test',
+        filtersMetadata: createFiltersMetadata(),
+        filtersI18n: createFiltersI18n({ includeDe: false }),
+    }, ({
+        platformsPath,
+        localesPath,
+        schemasDir,
+        root,
+    }) => {
+        const logPath = path.join(root, 'log-directory');
+        fs.mkdirSync(logPath);
 
-            const log = fs.readFileSync(logPath, 'utf8');
-            expect(log).toContain('existing log line');
-            expect(log).toContain("Missing groups 1 description for locale 'de'");
-        } finally {
-            logger.close();
-            fs.rmSync(tempDir, { recursive: true, force: true });
-            fs.rmSync(schemasDir, { recursive: true, force: true });
-        }
-    });
+        expect(() => schemaValidator.validate(
+            platformsPath,
+            schemasDir,
+            1,
+            { localesPath, requiredLocales: ['en'], logPath },
+        )).toThrow();
+    }));
 
-    it('uses the frozen schema for legacy mac platforms', () => {
-        const tempDir = createTempDir('filters-compiler-json-validator-');
-        const platformsPath = path.join(tempDir, 'platforms');
-        const localesPath = path.join(tempDir, 'locales');
-        const schemasDir = createSchemasDir();
+    it('does not apply requiredFiltersAmount to nested platform directories', () => withValidationFixture({
+        locales: { en: createEnglishLocales() },
+        platform: 'test',
+        filtersMetadata: createFiltersMetadata(),
+        filtersI18n: createFiltersI18n({ includeDe: false }),
+    }, ({ platformsPath, localesPath, schemasDir }) => {
+        const result = schemaValidator.validate(
+            platformsPath,
+            schemasDir,
+            80,
+            { localesPath, requiredLocales: ['en'] },
+        );
 
-        try {
-            createLocales(localesPath, {
-                en: {
-                    groups: [{ 'group.1.name': 'Group', 'group.1.description': 'Group description' }],
-                    tags: [{ 'tag.2.name': 'Tag', 'tag.2.description': 'Tag description' }],
-                    filters: [{ 'filter.25.name': 'Filter 25', 'filter.25.description': 'Filter 25 description' }],
-                },
-            });
-            writeJson(path.join(schemasDir, 'mac', 'filters_i18n.schema.json'), {
-                type: 'object',
-                required: ['legacy'],
-                properties: {
-                    legacy: { type: 'string' },
-                },
-            });
-            writeJson(path.join(platformsPath, 'mac', 'filters_i18n.json'), { legacy: 'ok' });
+        expect(result).toBe(true);
+    }));
 
-            const result = schemaValidator.validate(
-                platformsPath,
-                schemasDir,
-                1,
-                { localesPath, requiredLocales: ['en'] },
-            );
+    it('writes validation errors to the log file as text', () => withValidationFixture({
+        locales: {
+            en: createEnglishLocales(),
+            de: {
+                groups: [{ 'group.1.name': 42 }],
+                tags: [{ 'tag.2.name': 'Tag', 'tag.2.description': 'Tag-Beschreibung' }],
+                filters: [{ 'filter.25.name': 'Filter 25', 'filter.25.description': 'Filter 25 Beschreibung' }],
+            },
+        },
+        platform: 'test',
+        filtersMetadata: createFiltersMetadata(),
+        filtersI18n: createFiltersI18n({ deGroup: { name: 42 } }),
+    }, ({
+        platformsPath,
+        localesPath,
+        schemasDir,
+        logPath,
+    }) => {
+        const result = schemaValidator.validate(
+            platformsPath,
+            schemasDir,
+            1,
+            { localesPath, requiredLocales: ['en'], logPath },
+        );
 
-            expect(result).toBe(true);
-        } finally {
-            fs.rmSync(tempDir, { recursive: true, force: true });
-            fs.rmSync(schemasDir, { recursive: true, force: true });
-        }
-    });
+        expect(result).toBe(false);
+
+        const log = fs.readFileSync(logPath, 'utf8');
+        expect(log).toContain('must be string');
+        expect(log).not.toContain('[object Object]');
+    }));
+
+    it('uses the frozen schema for legacy mac platforms', () => withValidationFixture({
+        locales: { en: createEnglishLocales() },
+    }, ({ platformsPath, localesPath, schemasDir }) => {
+        writeJson(path.join(schemasDir, 'mac', 'filters_i18n.schema.json'), {
+            type: 'object',
+            required: ['legacy'],
+            properties: {
+                legacy: { type: 'string' },
+            },
+        });
+        writeJson(path.join(platformsPath, 'mac', 'filters_i18n.json'), { legacy: 'ok' });
+
+        const result = schemaValidator.validate(
+            platformsPath,
+            schemasDir,
+            1,
+            { localesPath, requiredLocales: ['en'] },
+        );
+
+        expect(result).toBe(true);
+    }));
 
     it('builds the real platform tree and validates it with the bundled schemas', async () => {
         const fixture = createIntegrationFixture();
         const platformsPath = createTempDir('filters-compiler-json-validator-platforms-');
+        const schemasDir = createBundledSchemasDir();
         const logPath = path.join(fixture.root, 'build.log');
         const reportPath = path.join(fixture.root, 'report.txt');
 
@@ -602,7 +670,7 @@ describe('json validator', () => {
 
             const result = schemaValidator.validate(
                 platformsPath,
-                path.join(__dirname, 'resources/schemas'),
+                schemasDir,
                 2,
                 { localesPath: fixture.localesPath, requiredLocales: ['en'] },
             );
@@ -612,6 +680,7 @@ describe('json validator', () => {
             logger.close();
             fs.rmSync(fixture.root, { recursive: true, force: true });
             fs.rmSync(platformsPath, { recursive: true, force: true });
+            fs.rmSync(schemasDir, { recursive: true, force: true });
         }
     }, 180000);
 

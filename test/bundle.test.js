@@ -83,6 +83,24 @@ describe('Bundle smoke tests', () => {
             const filePath = path.join(schemasDir, 'filters_i18n.schema.json');
             expect(existsSync(filePath)).toBe(false);
         });
+
+        ['mac', 'mac_v2'].forEach((platform) => {
+            describe(`${platform} legacy schemas`, () => {
+                const platformDir = path.join(schemasDir, platform);
+
+                it('directory should exist', () => {
+                    expect(existsSync(platformDir)).toBe(true);
+                });
+
+                it('filters.schema.json should exist', () => {
+                    expect(existsSync(path.join(platformDir, 'filters.schema.json'))).toBe(true);
+                });
+
+                it('filters_i18n.schema.json should exist', () => {
+                    expect(existsSync(path.join(platformDir, 'filters_i18n.schema.json'))).toBe(true);
+                });
+            });
+        });
     });
 
     describe('Main entry points', () => {
