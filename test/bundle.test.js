@@ -13,8 +13,14 @@ import {
 import path from 'path';
 import { existsSync, readFileSync } from 'fs';
 
+import { LEGACY_PLATFORMS, platformsConfig } from '../src/main/platforms-config';
+
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const distDir = path.join(__dirname, '../dist');
+
+// Directory names of the legacy macOS platform builds, derived from the same
+// platform config keys that the generator and the validator use.
+const legacyPlatformDirs = LEGACY_PLATFORMS.map((key) => platformsConfig[key].path);
 
 describe('Bundle smoke tests', () => {
     describe('Trust-level exclusion files', () => {
@@ -84,7 +90,7 @@ describe('Bundle smoke tests', () => {
             expect(existsSync(filePath)).toBe(false);
         });
 
-        ['mac', 'mac_v2'].forEach((platform) => {
+        legacyPlatformDirs.forEach((platform) => {
             describe(`${platform} legacy schemas`, () => {
                 const platformDir = path.join(schemasDir, platform);
 

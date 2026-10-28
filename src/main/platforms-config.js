@@ -583,6 +583,15 @@ export const CSS_GENERIC_RULES_PATTERNS = [
     '^#\\$#',
 ];
 
+/**
+ * Platform config keys of the legacy macOS builds.
+ *
+ * These builds keep the frozen `mac`/`mac_v2` schemas and the old metadata
+ * format; the runtime `filters_i18n` schema generation is not used for them.
+ * The directory names are `platformsConfig[key].path`.
+ */
+export const LEGACY_PLATFORMS = ['MAC', 'MAC_V2'];
+
 export const platformsConfig = {
     'WINDOWS': {
         'platform': 'windows',

@@ -9,11 +9,14 @@ import {
     LOCALE_FIELDS,
     resolveLocaleSchemaRef,
 } from './filters-i18n-schema';
+import { LEGACY_PLATFORMS, platformsConfig } from './platforms-config';
 
 const SCHEMA_EXTENSION = '.schema.json';
-const OLD_MAC_V1_PLATFORM = 'mac';
-const OLD_MAC_V2_PLATFORM = 'mac_v2';
-const LEGACY_PLATFORMS = [OLD_MAC_V1_PLATFORM, OLD_MAC_V2_PLATFORM];
+
+// Directory names of the legacy macOS platform builds, derived from the
+// platform config keys so that the generator and the validator stay in sync.
+const LEGACY_PLATFORM_PATHS = LEGACY_PLATFORMS.map((key) => platformsConfig[key].path);
+const [OLD_MAC_V1_PLATFORM, OLD_MAC_V2_PLATFORM] = LEGACY_PLATFORM_PATHS;
 
 const FILTERS_METADATA_FILE_NAME = 'filters';
 const FILTERS_I18N_FILE_NAME = 'filters_i18n';
@@ -215,7 +218,7 @@ const validateDir = (dir, context) => {
         } else {
             const fileName = path.basename(item, '.json');
             const platformName = path.basename(path.dirname(item));
-            const isLegacyPlatform = LEGACY_PLATFORMS.includes(platformName);
+            const isLegacyPlatform = LEGACY_PLATFORM_PATHS.includes(platformName);
             let schema = schemas[fileName];
             let compiledValidator = null;
 

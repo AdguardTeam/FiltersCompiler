@@ -19,6 +19,7 @@ import {
 import { convertToUbo } from '../converter';
 import { getOptimizationStatistics } from '../optimization';
 import { RuleMasks } from '../rule/rule-masks';
+import { LEGACY_PLATFORMS } from '../platforms-config';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -30,6 +31,10 @@ let metadataFilterIdsPool = [];
 // override its entries in place, which must not change this behaviour.
 const OPTIMIZED_PLATFORMS_LIST = ['ext_safari', 'android', 'ios', 'ext_android_cb'];
 const UBLOCK_PLATFORM = 'ext_ublock';
+
+// Single source of truth for the legacy macOS platform keys
+// (see `LEGACY_PLATFORMS` in `../platforms-config`).
+const [MAC_V1_PLATFORM, MAC_V2_PLATFORM] = LEGACY_PLATFORMS;
 
 const PLATFORM_FILTERS_DIR = 'filters';
 const FILTERS_METADATA_FILE_JSON = 'filters.json';
@@ -671,9 +676,9 @@ const writeFiltersMetadata = function (platformsPath, filtersDir, filtersMetadat
         metadata = postProcessUrls(metadata, config);
         metadata = removeRedundantFiltersMetadata(metadata, config.platform);
 
-        if (platform === 'MAC') {
+        if (platform === MAC_V1_PLATFORM) {
             metadata = rewriteMetadataForOldMacV1(metadata);
-        } else if (platform === 'MAC_V2') {
+        } else if (platform === MAC_V2_PLATFORM) {
             metadata = rewriteMetadataForOldMacV2(metadata);
             metadata = removeObsoleteFilters(metadata);
         } else {
@@ -691,7 +696,7 @@ const writeFiltersMetadata = function (platformsPath, filtersDir, filtersMetadat
 
         let localizedFilters;
 
-        if (platform === 'MAC' || platform === 'MAC_V2') {
+        if (LEGACY_PLATFORMS.includes(platform)) {
             // Legacy platforms keep their current behavior: every localization
             // that is not excluded for the platform stays, including ids that
             // have no matching metadata (the frozen schemas require them).
@@ -708,7 +713,7 @@ const writeFiltersMetadata = function (platformsPath, filtersDir, filtersMetadat
 
             // old MAC platform may not support absence some filters i18n metadata,
             // for all other platforms we can exclude obsolete filters
-            if (platform === 'MAC_V2') {
+            if (platform === MAC_V2_PLATFORM) {
                 localizedFilters = excludeObsoleteFilters(localizedFilters, obsoleteFilters);
             }
         } else {
@@ -734,7 +739,7 @@ const writeFiltersMetadata = function (platformsPath, filtersDir, filtersMetadat
         let i18nGroups = localizations.groups;
 
         // no new fields should be added for old 'MAC' platform
-        if (platform === 'MAC') {
+        if (platform === MAC_V1_PLATFORM) {
             delete i18nMetadata.tags;
             i18nGroups = removeGroupDescriptions(localizations.groups);
         }

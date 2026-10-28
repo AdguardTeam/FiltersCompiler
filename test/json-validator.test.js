@@ -23,8 +23,13 @@ import {
     readJson,
     writeJson,
 } from './utils/fixtures';
+import { LEGACY_PLATFORMS, platformsConfig } from '../src/main/platforms-config';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Directory names of the legacy macOS platform builds, derived from the same
+// platform config keys that the generator and the validator use.
+const legacyPlatformNames = new Set(LEGACY_PLATFORMS.map((key) => platformsConfig[key].path));
 
 /**
  * Adds locale messages for entities that have no message for the key prefix.
@@ -649,9 +654,8 @@ describe('json validator', () => {
             // filters_i18n schema requires the same entity ids in both files.
             // The legacy `mac` and `mac_v2` platforms keep their historical
             // behavior (frozen schemas).
-            const legacyPlatforms = new Set(['mac', 'mac_v2']);
             fs.readdirSync(platformsPath)
-                .filter((platform) => !legacyPlatforms.has(platform)
+                .filter((platform) => !legacyPlatformNames.has(platform)
                     && fs.existsSync(path.join(platformsPath, platform, 'filters.json')))
                 .forEach((platform) => {
                     const platformDir = path.join(platformsPath, platform);
