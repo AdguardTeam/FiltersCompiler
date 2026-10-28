@@ -20,8 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking:** `validateJSONSchema()` drops the `requiredFiltersAmount`
   parameter. It only applied to `filters.json` files directly under
   `platformsPath`, and platform metadata always lives in subdirectories, so
-  it was never enforced for real platform trees. The FiltersRegistry caller
-  no longer passes it.
+  it was never enforced for real platform trees. The check did run when
+  `platformsPath` pointed at a single platform directory: callers that used
+  it that way need their own minimum-count check now. The FiltersRegistry
+  caller no longer passes it.
 - **Breaking:** `validateJSONSchema()` now requires the `options` argument.
   The `filters_i18n` schema is generated at runtime from the platform's
   `filters.json` and the FiltersRegistry `locales` directory instead of a
