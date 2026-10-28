@@ -32,6 +32,37 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const legacyPlatformNames = new Set(LEGACY_PLATFORMS.map((key) => platformsConfig[key].path));
 
 /**
+ * Returns the directories under `root` that contain a `filters.json` file.
+ *
+ * Walks the whole tree: platform directories may be nested, like the
+ * registry's `extension/*` or the test config's `config/test`.
+ *
+ * @param {string} root Directory to walk.
+ * @returns {string[]} Paths of the directories containing filters.json.
+ */
+const collectPlatformDirs = (root) => {
+    const result = [];
+
+    const walk = (dir) => {
+        fs.readdirSync(dir, { withFileTypes: true }).forEach((entry) => {
+            const entryPath = path.join(dir, entry.name);
+            if (!entry.isDirectory()) {
+                return;
+            }
+
+            if (fs.existsSync(path.join(entryPath, 'filters.json'))) {
+                result.push(entryPath);
+            }
+
+            walk(entryPath);
+        });
+    };
+
+    walk(root);
+    return result;
+};
+
+/**
  * Adds locale messages for entities that have no message for the key prefix.
  *
  * @param {object[]} messages Locale messages.
@@ -654,12 +685,9 @@ describe('json validator', () => {
             // filters_i18n schema requires the same entity ids in both files.
             // The legacy `mac` and `mac_v2` platforms keep their historical
             // behavior (frozen schemas).
-            fs.readdirSync(platformsPath)
-                .filter((platform) => !legacyPlatformNames.has(platform)
-                    && fs.existsSync(path.join(platformsPath, platform, 'filters.json')))
-                .forEach((platform) => {
-                    const platformDir = path.join(platformsPath, platform);
-
+            collectPlatformDirs(platformsPath)
+                .filter((platformDir) => !legacyPlatformNames.has(path.basename(platformDir)))
+                .forEach((platformDir) => {
                     const filtersMetadata = readJson(path.join(platformDir, 'filters.json'));
                     const filtersI18n = readJson(path.join(platformDir, 'filters_i18n.json'));
                     const metadataFilterIds = filtersMetadata.filters
