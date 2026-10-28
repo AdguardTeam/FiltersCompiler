@@ -550,9 +550,11 @@ describe('json validator', () => {
         );
 
         expect(firstResult).toBe(true);
-        expect(logger.logFile).toBeUndefined();
 
+        // The log file must be closed: a later message must not reach it.
+        logger.warn('logged after validation');
         const logAfterFirstCall = fs.readFileSync(logPath, 'utf8');
+        expect(logAfterFirstCall).not.toContain('logged after validation');
 
         createPlatform(platformsPath, 'second', createFiltersMetadata(), createFiltersI18n());
         const secondResult = schemaValidator.validate(
@@ -563,7 +565,6 @@ describe('json validator', () => {
         );
 
         expect(secondResult).toBe(true);
-        expect(logger.logFile).toBeUndefined();
         expect(fs.readFileSync(logPath, 'utf8')).toBe(logAfterFirstCall);
     }));
 

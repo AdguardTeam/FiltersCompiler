@@ -37,11 +37,6 @@ class CompilerLogger extends Logger {
     #fd: number | null = null;
 
     /**
-     * Log file path, set after successful initialization.
-     */
-    logFile: string | undefined;
-
-    /**
      * Helper to append message to log file
      */
     #append(message: unknown, level: 'INFO' | 'WARN' | 'ERROR'): void {
@@ -99,7 +94,6 @@ class CompilerLogger extends Logger {
 
         // Open now; we'll append to the same fd later.
         this.#fd = fs.openSync(logFilePath, append ? 'a' : 'w');
-        this.logFile = logFilePath;
     }
 
     /**
@@ -115,8 +109,6 @@ class CompilerLogger extends Logger {
                 this.#fd = null;
             }
         }
-
-        this.logFile = undefined;
     }
 }
 
