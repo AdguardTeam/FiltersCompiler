@@ -496,6 +496,39 @@ const parseInfo = (string, mask) => {
 };
 
 /**
+ * Loads one locale data kind (groups, tags, or filters) into the result.
+ *
+ * @param {Object} result Locale data accumulator.
+ * @param {string} localeDir Directory of one locale.
+ * @param {string} locale Locale name.
+ * @param {string} kind Entity kind: `groups`, `tags`, or `filters`.
+ * @param {string} keyPrefix Key prefix with a trailing dot, e.g. `group.`.
+ * @returns {void}
+ */
+const loadLocaleKind = (result, localeDir, locale, kind, keyPrefix) => {
+    const entries = JSON.parse(readFile(path.join(localeDir, `${kind}.json`)));
+    if (!entries) {
+        return;
+    }
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const entry of entries) {
+        // eslint-disable-next-line guard-for-in,no-restricted-syntax
+        for (const p in entry) {
+            const info = parseInfo(p, keyPrefix);
+            if (!info || !info.id) {
+                continue;
+            }
+
+            const { id } = info;
+            result[kind][id] = result[kind][id] || {};
+            result[kind][id][locale] = result[kind][id][locale] || {};
+            result[kind][id][locale][info.message] = entry[p];
+        }
+    }
+};
+
+/**
  * Loads locale data from a specified directory and organizes it into groups, tags, and filters.
  *
  * @param {string} dir - The directory containing locale subdirectories with JSON files.
@@ -513,62 +546,9 @@ const loadLocales = function (dir) {
     for (const directory of locales) {
         const localeDir = path.join(dir, directory);
         if (fs.lstatSync(localeDir).isDirectory()) {
-            const groups = JSON.parse(readFile(path.join(localeDir, 'groups.json')));
-            if (groups) {
-                // eslint-disable-next-line no-restricted-syntax
-                for (const group of groups) {
-                    // eslint-disable-next-line guard-for-in,no-restricted-syntax
-                    for (const p in group) {
-                        const info = parseInfo(p, 'group.');
-                        if (!info || !info.id) {
-                            continue;
-                        }
-
-                        const { id } = info;
-                        result.groups[id] = result.groups[id] || {};
-                        result.groups[id][directory] = result.groups[id][directory] || {};
-                        result.groups[id][directory][info.message] = group[p];
-                    }
-                }
-            }
-
-            const tags = JSON.parse(readFile(path.join(localeDir, 'tags.json')));
-            if (tags) {
-                // eslint-disable-next-line no-restricted-syntax
-                for (const tag of tags) {
-                    // eslint-disable-next-line guard-for-in,no-restricted-syntax
-                    for (const p in tag) {
-                        const info = parseInfo(p, 'tag.');
-                        if (!info || !info.id) {
-                            continue;
-                        }
-
-                        const { id } = info;
-                        result.tags[id] = result.tags[id] || {};
-                        result.tags[id][directory] = result.tags[id][directory] || {};
-                        result.tags[id][directory][info.message] = tag[p];
-                    }
-                }
-            }
-
-            const filters = JSON.parse(readFile(path.join(localeDir, 'filters.json')));
-            if (filters) {
-                // eslint-disable-next-line no-restricted-syntax
-                for (const filter of filters) {
-                    // eslint-disable-next-line guard-for-in,no-restricted-syntax
-                    for (const p in filter) {
-                        const info = parseInfo(p, 'filter.');
-                        if (!info || !info.id) {
-                            continue;
-                        }
-
-                        const { id } = info;
-                        result.filters[id] = result.filters[id] || {};
-                        result.filters[id][directory] = result.filters[id][directory] || {};
-                        result.filters[id][directory][info.message] = filter[p];
-                    }
-                }
-            }
+            loadLocaleKind(result, localeDir, directory, 'groups', 'group.');
+            loadLocaleKind(result, localeDir, directory, 'tags', 'tag.');
+            loadLocaleKind(result, localeDir, directory, 'filters', 'filter.');
         }
     }
 
