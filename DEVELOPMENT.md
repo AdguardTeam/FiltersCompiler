@@ -340,14 +340,14 @@ try {
 declares `^22.21.0 || >=24.0.0`:
 
 ```bash
-node --version  # Should be v22.21.0 or later, or v24.0.0 or later
+node --version  # Should be v22.21+ on 22.x, or v24+
 ```
 
-If using nvm:
+If using nvm, install the latest 22.x to match CI and the Docker image:
 
 ```bash
-nvm install 24
-nvm use 24
+nvm install 22
+nvm use 22
 ```
 
 ### Schema Validation Errors After Manual Edit
