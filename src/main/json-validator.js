@@ -304,7 +304,7 @@ const validateDir = (dir, context, filtersRequiredAmount) => {
  *
  * @param platformsPath - Path to platforms folder
  * @param jsonSchemasConfigDir - Path to json schemas config folder
- * @param filtersRequiredAmount - Minimum required amount of filters
+ * @param filtersRequiredAmount - Minimum required amount of filters for files directly under platformsPath
  * @param options - Validation options
  * @param options.localesPath - Path to the locales directory
  * @param {string[]} [options.requiredLocales] - Locales that must be present for every entity
