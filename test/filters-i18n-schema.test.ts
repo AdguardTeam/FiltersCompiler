@@ -12,7 +12,7 @@ import {
 } from '../src/main/filters-i18n-schema';
 import {
     createLocales,
-    createTempDir,
+    withTempDir,
 } from './utils/fixtures';
 
 /**
@@ -99,11 +99,11 @@ const getLocaleSchema = (
 };
 
 describe('filters i18n schema generator', () => {
-    it('generates required ids, locales, and English defaults from registry data', () => {
-        const tempDir = createTempDir('filters-i18n-schema-');
-        const localesPath = path.join(tempDir, 'locales');
+    it('generates required ids, locales, and English defaults from registry data', () => withTempDir(
+        'filters-i18n-schema-',
+        (tempDir) => {
+            const localesPath = path.join(tempDir, 'locales');
 
-        try {
             createLocales(localesPath, {
                 en: createLocaleMessages(),
                 de: createLocaleMessages(),
@@ -126,16 +126,14 @@ describe('filters i18n schema generator', () => {
                 .toBe('Filter 25 description');
 
             expect(Object.keys(schema.definitions)).toEqual(['groups.1', 'tags.2', 'filters.25']);
-        } finally {
-            fs.rmSync(tempDir, { recursive: true, force: true });
-        }
-    });
+        },
+    ));
 
-    it('keeps requiredLocales required and validates all available locales', () => {
-        const tempDir = createTempDir('filters-i18n-schema-');
-        const localesPath = path.join(tempDir, 'locales');
+    it('keeps requiredLocales required and validates all available locales', () => withTempDir(
+        'filters-i18n-schema-',
+        (tempDir) => {
+            const localesPath = path.join(tempDir, 'locales');
 
-        try {
             createLocales(localesPath, {
                 en: createLocaleMessages(),
                 de: createLocaleMessages(),
@@ -146,16 +144,14 @@ describe('filters i18n schema generator', () => {
             const groupSchema = schema.properties.groups.properties['1'];
             expect(groupSchema.required).toEqual(['en']);
             expect(Object.keys(groupSchema.properties)).toEqual(['de', 'en']);
-        } finally {
-            fs.rmSync(tempDir, { recursive: true, force: true });
-        }
-    });
+        },
+    ));
 
-    it('throws when an entity has no English localization', () => {
-        const tempDir = createTempDir('filters-i18n-schema-');
-        const localesPath = path.join(tempDir, 'locales');
+    it('throws when an entity has no English localization', () => withTempDir(
+        'filters-i18n-schema-',
+        (tempDir) => {
+            const localesPath = path.join(tempDir, 'locales');
 
-        try {
             createLocales(localesPath, {
                 en: {
                     groups: [{ 'group.1.name': 'Group', 'group.1.description': 'Group description' }],
@@ -165,16 +161,14 @@ describe('filters i18n schema generator', () => {
             });
 
             expect(() => generateSchema(localesPath)).toThrow('Missing English localization for filters 25');
-        } finally {
-            fs.rmSync(tempDir, { recursive: true, force: true });
-        }
-    });
+        },
+    ));
 
-    it('throws when an English field is missing', () => {
-        const tempDir = createTempDir('filters-i18n-schema-');
-        const localesPath = path.join(tempDir, 'locales');
+    it('throws when an English field is missing', () => withTempDir(
+        'filters-i18n-schema-',
+        (tempDir) => {
+            const localesPath = path.join(tempDir, 'locales');
 
-        try {
             createLocales(localesPath, {
                 en: {
                     groups: [{ 'group.1.name': 'Group', 'group.1.description': 'Group description' }],
@@ -184,31 +178,27 @@ describe('filters i18n schema generator', () => {
             });
 
             expect(() => generateSchema(localesPath)).toThrow('Missing English description for filters 25');
-        } finally {
-            fs.rmSync(tempDir, { recursive: true, force: true });
-        }
-    });
+        },
+    ));
 
-    it('throws when a required locale directory is missing', () => {
-        const tempDir = createTempDir('filters-i18n-schema-');
-        const localesPath = path.join(tempDir, 'locales');
+    it('throws when a required locale directory is missing', () => withTempDir(
+        'filters-i18n-schema-',
+        (tempDir) => {
+            const localesPath = path.join(tempDir, 'locales');
 
-        try {
             createLocales(localesPath, {
                 en: createLocaleMessages(),
             });
 
             expect(() => generateSchema(localesPath, ['en', 'fr'])).toThrow('Required locales are missing');
-        } finally {
-            fs.rmSync(tempDir, { recursive: true, force: true });
-        }
-    });
+        },
+    ));
 
-    it('reports the locale file path when a locale file is not valid JSON', () => {
-        const tempDir = createTempDir('filters-i18n-schema-');
-        const localesPath = path.join(tempDir, 'locales');
+    it('reports the locale file path when a locale file is not valid JSON', () => withTempDir(
+        'filters-i18n-schema-',
+        (tempDir) => {
+            const localesPath = path.join(tempDir, 'locales');
 
-        try {
             createLocales(localesPath, {
                 en: createLocaleMessages(),
             });
@@ -217,8 +207,6 @@ describe('filters i18n schema generator', () => {
             expect(() => generateSchema(localesPath)).toThrow(
                 /Cannot parse .*locales[\\/]en[\\/]groups\.json/,
             );
-        } finally {
-            fs.rmSync(tempDir, { recursive: true, force: true });
-        }
-    });
+        },
+    ));
 });

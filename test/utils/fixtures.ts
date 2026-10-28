@@ -54,3 +54,21 @@ export const createLocales = (localesPath: string, locales: LocalesData): void =
         });
     });
 };
+
+/**
+ * Runs a test body with a temporary directory and removes it afterwards.
+ *
+ * @param prefix Directory name prefix.
+ * @param callback Test body receiving the directory path.
+ *
+ * @returns Callback result.
+ */
+export const withTempDir = <T>(prefix: string, callback: (dir: string) => T): T => {
+    const dir = createTempDir(prefix);
+
+    try {
+        return callback(dir);
+    } finally {
+        fs.rmSync(dir, { recursive: true, force: true });
+    }
+};
