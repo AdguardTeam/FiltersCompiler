@@ -428,10 +428,15 @@ Log levels:
 
 ### Environment variables
 
-| Variable             | Default           | Purpose                                                                                           |
-| -------------------- | ----------------- | ------------------------------------------------------------------------------------------------- |
-| `TLS`                | (system defaults) | Set to `insecure` to bypass TLS certificate verification when downloading external filter sources |
-| `NODE_USE_ENV_PROXY` | (unset)           | Set to `1` to let remote `!#include` downloads use `HTTP_PROXY`, `HTTPS_PROXY`, and `NO_PROXY`    |
+| Variable             | Default           | Purpose                                                                        |
+| -------------------- | ----------------- | ------------------------------------------------------------------------------ |
+| `TLS`                | (system defaults) | Set to `insecure` to make `curl` skip TLS certificate verification             |
+| `NODE_USE_ENV_PROXY` | (unset)           | Set to `1` to use proxy environment variables for remote `!#include` downloads |
+
+`TLS=insecure` applies only to `curl` downloads (`@include` and optimization
+stats). Remote `!#include` downloads use `fetch` and always verify
+certificates. `NODE_USE_ENV_PROXY=1` enables `HTTP_PROXY`, `HTTPS_PROXY`, and
+`NO_PROXY` for remote `!#include` downloads. `ALL_PROXY` is not supported.
 
 ## Supported platforms
 
