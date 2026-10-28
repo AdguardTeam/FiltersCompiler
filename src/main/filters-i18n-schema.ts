@@ -222,6 +222,11 @@ const createLocaleSchema = (
 };
 
 /**
+ * Prefix of the JSON pointers to the shared locale schema definitions.
+ */
+const LOCALE_DEFINITION_PREFIX = '#/definitions/';
+
+/**
  * Returns the JSON pointer for an entity's shared locale schema definition.
  *
  * @param kind Entity kind.
@@ -229,7 +234,27 @@ const createLocaleSchema = (
  *
  * @returns JSON pointer to the definition.
  */
-const getLocaleDefinitionRef = (kind: EntityKind, id: string): string => `#/definitions/${kind}.${id}`;
+const getLocaleDefinitionRef = (kind: EntityKind, id: string): string => `${LOCALE_DEFINITION_PREFIX}${kind}.${id}`;
+
+/**
+ * Resolves a locale `$ref` node against the generated schema definitions.
+ *
+ * Every locale property in the generated schema is a `$ref` to a shared
+ * definition (see {@link createIdSchema}), so the node is expected to be a
+ * reference.
+ *
+ * @param schema Generated filters_i18n schema.
+ * @param node Schema node that references a locale definition.
+ *
+ * @returns Resolved locale schema definition.
+ */
+export const resolveLocaleSchemaRef = (
+    schema: Record<string, unknown>,
+    node: Record<string, unknown>,
+): Record<string, unknown> => {
+    const definitionName = String(node.$ref).replace(LOCALE_DEFINITION_PREFIX, '');
+    return (schema.definitions as Record<string, unknown>)[definitionName] as Record<string, unknown>;
+};
 
 /**
  * Creates the schema for a single entity id.

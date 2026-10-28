@@ -7,6 +7,7 @@ import {
     generateFiltersI18nSchema,
     getEntityIds,
     LOCALE_FIELDS,
+    resolveLocaleSchemaRef,
 } from './filters-i18n-schema';
 
 const SCHEMA_EXTENSION = '.schema.json';
@@ -50,22 +51,6 @@ const loadSchemas = (dir) => {
 };
 
 /**
- * Resolves a local `$ref` in the generated filters_i18n schema.
- *
- * @param {object} schema Generated filters_i18n schema.
- * @param {object} node Schema node that may be a reference.
- * @returns {object} Resolved schema node.
- */
-const resolveSchemaRef = (schema, node) => {
-    if (!node || typeof node.$ref !== 'string') {
-        return node;
-    }
-
-    const definitionName = node.$ref.replace('#/definitions/', '');
-    return schema.definitions[definitionName];
-};
-
-/**
  * Logs every missing translation that Ajv will fill with an English fallback.
  *
  * @param {object} json Parsed filters_i18n.json.
@@ -93,7 +78,7 @@ const logAppliedDefaults = (json, schema, item) => {
                     return;
                 }
 
-                const localeSchema = resolveSchemaRef(schema, localeRef);
+                const localeSchema = resolveLocaleSchemaRef(schema, localeRef);
 
                 LOCALE_FIELDS.forEach((field) => {
                     if (localeData[field] !== undefined) {
