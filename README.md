@@ -165,6 +165,11 @@ that is missing entirely for an entity is not filled: it fails
 validation when the locale is required. A built entity with no English
 localization, or a missing required locale, fails validation.
 
+`requiredLocales` and the English fallback apply only to the generated
+schema used for non-legacy platforms. The frozen `mac` and `mac_v2`
+schemas ignore `requiredLocales`, fill their own defaults, and log no
+fallbacks.
+
 The `filters.schema.json` and the legacy `mac`/`mac_v2` schemas remain
 static and are bundled with the library.
 

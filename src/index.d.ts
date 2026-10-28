@@ -78,8 +78,9 @@ export interface ValidateJSONSchemaOptions {
  * The `filters_i18n` schema is generated at runtime for every non-legacy
  * platform from the platform's `filters.json` and the FiltersRegistry locale
  * data. Missing fields in an existing locale object are filled with the base
- * (`en`) value and logged as warnings. The legacy `mac` and `mac_v2`
- * platforms use frozen schemas.
+ * (`en`) value and logged as warnings. These behaviors apply only to the
+ * generated schema: the legacy `mac` and `mac_v2` platforms use their frozen
+ * schemas, ignore `requiredLocales`, and log no fallbacks.
  *
  * Validation failures are logged, not thrown — check the return value.
  *

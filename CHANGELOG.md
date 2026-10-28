@@ -39,9 +39,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Stale and missing English defaults in the `filters_i18n` schema. Groups,
-  tags, and filters now use the current `locales/en` strings. Filters 25, 26,
-  and 27 are now validated.
+- Stale and missing English defaults in the generated `filters_i18n` schema.
+  Groups, tags, and filters now use the current `locales/en` strings. Filters
+  25, 26, and 27 are now validated for non-legacy platforms; the frozen
+  `mac`/`mac_v2` schemas are unchanged.
 - Validation errors written to `logPath` are formatted as text instead of
   `[object Object]`.
 - The validation log file is closed when `validateJSONSchema()` finishes, so a
