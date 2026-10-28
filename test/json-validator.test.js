@@ -231,6 +231,24 @@ const createEnglishLocales = () => ({
 });
 
 /**
+ * Creates German locale messages with the group description always missing,
+ * so the fallback tests exercise the English fallback for it.
+ *
+ * @param {object} [options] Fixture options.
+ * @param {boolean} [options.completeFilter] Include the German filter name
+ * (the default); set to `false` to also leave the filter name missing.
+ * @returns {object} German locale messages keyed by entity kind.
+ */
+const createGermanLocales = ({ completeFilter = true } = {}) => ({
+    groups: [{ 'group.1.name': 'Gruppe' }],
+    tags: [{ 'tag.2.name': 'Tag', 'tag.2.description': 'Tag-Beschreibung' }],
+    filters: [{
+        ...(completeFilter ? { 'filter.25.name': 'Filter 25' } : {}),
+        'filter.25.description': 'Filter 25 Beschreibung',
+    }],
+});
+
+/**
  * Creates a temporary validation fixture.
  *
  * @param {object} [options] Fixture options.
@@ -298,11 +316,7 @@ describe('json validator', () => {
     it('fills missing translations with English values and logs them', () => withValidationFixture({
         locales: {
             en: createEnglishLocales(),
-            de: {
-                groups: [{ 'group.1.name': 'Gruppe' }],
-                tags: [{ 'tag.2.name': 'Tag', 'tag.2.description': 'Tag-Beschreibung' }],
-                filters: [{ 'filter.25.description': 'Filter 25 Beschreibung' }],
-            },
+            de: createGermanLocales({ completeFilter: false }),
         },
         platform: 'test',
         filtersMetadata: createFiltersMetadata(),
@@ -455,11 +469,7 @@ describe('json validator', () => {
     it('writes fallback warnings to the log file', () => withValidationFixture({
         locales: {
             en: createEnglishLocales(),
-            de: {
-                groups: [{ 'group.1.name': 'Gruppe' }],
-                tags: [{ 'tag.2.name': 'Tag', 'tag.2.description': 'Tag-Beschreibung' }],
-                filters: [{ 'filter.25.name': 'Filter 25', 'filter.25.description': 'Filter 25 Beschreibung' }],
-            },
+            de: createGermanLocales(),
         },
         platform: 'test',
         filtersMetadata: createFiltersMetadata(),
@@ -489,11 +499,7 @@ describe('json validator', () => {
     it('appends fallback warnings to an existing log file', () => withValidationFixture({
         locales: {
             en: createEnglishLocales(),
-            de: {
-                groups: [{ 'group.1.name': 'Gruppe' }],
-                tags: [{ 'tag.2.name': 'Tag', 'tag.2.description': 'Tag-Beschreibung' }],
-                filters: [{ 'filter.25.name': 'Filter 25', 'filter.25.description': 'Filter 25 Beschreibung' }],
-            },
+            de: createGermanLocales(),
         },
         platform: 'test',
         filtersMetadata: createFiltersMetadata(),
@@ -523,11 +529,7 @@ describe('json validator', () => {
     it('closes the log file after validation', () => withValidationFixture({
         locales: {
             en: createEnglishLocales(),
-            de: {
-                groups: [{ 'group.1.name': 'Gruppe' }],
-                tags: [{ 'tag.2.name': 'Tag', 'tag.2.description': 'Tag-Beschreibung' }],
-                filters: [{ 'filter.25.name': 'Filter 25', 'filter.25.description': 'Filter 25 Beschreibung' }],
-            },
+            de: createGermanLocales(),
         },
         platform: 'test',
         filtersMetadata: createFiltersMetadata(),
