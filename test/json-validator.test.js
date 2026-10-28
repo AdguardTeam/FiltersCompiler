@@ -121,16 +121,18 @@ const createIntegrationFixture = () => {
 };
 
 /**
- * Creates a schemas directory with the bundled filters schema and the legacy
- * test fixtures.
+ * Creates a schemas directory with the real shipped filters schema and the
+ * legacy test fixtures.
  *
- * The frozen legacy schemas in `schemas/` require every FiltersRegistry
- * locale, but the test platform data only contains en, ko, and ru. The
- * fixtures keep legacy validation minimal for the test data.
+ * `filters.schema.json` is copied from `schemas/` (the shipped schema). The
+ * frozen legacy schemas in `schemas/` require every FiltersRegistry locale,
+ * but the test platform data only contains en, ko, and ru. The fixtures keep
+ * legacy validation minimal for the test data, so they are not the shipped
+ * `mac`/`mac_v2` schemas.
  *
  * @returns {string} Path to the schemas directory.
  */
-const createBundledSchemasDir = () => {
+const createTestSchemasDir = () => {
     const schemasDir = createTempDir('filters-compiler-schemas-');
 
     fs.copyFileSync(
@@ -657,10 +659,10 @@ describe('json validator', () => {
         expect(result).toBe(true);
     }));
 
-    it('builds the real platform tree and validates it with the bundled schemas', async () => {
+    it('builds the real platform tree and validates it with the shipped schema and legacy fixtures', async () => {
         const fixture = createIntegrationFixture();
         const platformsPath = createTempDir('filters-compiler-json-validator-platforms-');
-        const schemasDir = createBundledSchemasDir();
+        const schemasDir = createTestSchemasDir();
         const logPath = path.join(fixture.root, 'build.log');
         const reportPath = path.join(fixture.root, 'report.txt');
 
