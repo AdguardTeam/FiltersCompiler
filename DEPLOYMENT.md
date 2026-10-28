@@ -67,11 +67,22 @@ prevent redundant CI runs when a new push arrives for the same ref.
 - **Default:** (system defaults)
 - **Purpose:** Set to `insecure` to bypass TLS certificate verification
   when downloading external filter sources via `curl`. Only affects
-  `src/main/utils/webutils.js`.
+  `src/main/utils/webutils.ts`. Remote `!#include` downloads use `fetch`
+  and always verify certificates.
 
-This is the only environment variable read at runtime. All CI/CD configuration
-(such as npm publish tokens, Octopass, and Slack webhooks) is handled by the
-shared workflows and does not require per-project configuration.
+### `NODE_USE_ENV_PROXY`
+
+- **Required:** No
+- **Default:** (unset)
+- **Purpose:** Set to `1` to let remote `!#include` downloads use
+  `HTTP_PROXY`, `HTTPS_PROXY`, and `NO_PROXY`. Node.js reads this
+  variable. `ALL_PROXY` is not supported.
+
+`TLS` is the only environment variable that the compiler reads directly.
+`NODE_USE_ENV_PROXY` is read by Node.js for `fetch` proxy support. All
+CI/CD configuration (such as npm publish tokens, Octopass, and Slack
+webhooks) is handled by the shared workflows and does not require
+per-project configuration.
 
 ## Infrastructure Dependencies
 
@@ -83,13 +94,13 @@ queue dependencies. The only infrastructure requirement is:
 | **curl**   | Yes      | Downloading external filter sources via shell-out  |
 
 `curl` is invoked synchronously via `child_process.execFileSync` from
-`src/main/utils/webutils.js`. The Docker base image
+`src/main/utils/webutils.ts`. The Docker base image
 (`adguard/node-ssh:22.22--0`) includes `curl` by default.
 
 ## Logging
 
 The compiler uses `@adguard/logger` with a custom file writer
-(`src/main/utils/log.js`). Logging is file-based and initialized when the
+(`src/main/utils/log.ts`). Logging is file-based and initialized when the
 consumer passes a `logPath` to the `compile()` function.
 
 | Aspect        | Details                                                 |
@@ -122,11 +133,13 @@ The compiler downloads filter lists and optimization data at runtime via `curl`:
 | URL                                              | Purpose                                  | Consumer                   |
 | ------------------------------------------------ | ---------------------------------------- | -------------------------- |
 | `https://filters.adtidy.org/`                    | Base URL for filter list downloads       | `src/main/builder.js`      |
-| `https://chrome.adtidy.org/optimization_config/` | Optimization percentage and stats config | `src/main/optimization.js` |
+| `https://chrome.adtidy.org/optimization_config/` | Optimization percentage and stats config | `src/main/optimization.ts` |
 
 Both services must be reachable at runtime. The `TLS` environment variable
-can be set to `insecure` to bypass certificate validation if needed
-(see [Environment Variables](#environment-variables)).
+can be set to `insecure` to bypass certificate validation for `curl`
+downloads. Remote `!#include` downloads do not use `TLS`. Set
+`NODE_USE_ENV_PROXY=1` to use an HTTP proxy for them (see
+[Environment Variables](#environment-variables)).
 
 ## Error Reporting
 

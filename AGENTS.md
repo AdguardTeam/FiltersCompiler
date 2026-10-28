@@ -367,7 +367,8 @@ supply chain risks, and long-term maintenance costs.
 
 - **Runtime configuration**: The library is configured at compile time via
   the `customPlatformsConfig` parameter passed to `compile()`. There is no
-  runtime config file or environment variable mechanism.
+  runtime config file. The library reads `TLS`, and Node.js reads
+  `NODE_USE_ENV_PROXY` for remote `!#include` downloads.
 - **Platform definitions**: Static configuration is defined in
   `src/main/platforms-config.js`. This file defines all 16 platform
   configurations with their `removeRulePatterns`, `defines`, and metadata.
