@@ -132,16 +132,11 @@ interface ValidateJSONSchemaOptions {
 
 function validateJSONSchema(
     platformsPath: string,
-    requiredFiltersAmount: number,
     options: ValidateJSONSchemaOptions,
 ): boolean;
 ```
 
 Recursively validates the built JSON files in `platformsPath`.
-`requiredFiltersAmount` is the minimum number of filters for a
-`filters.json` file. It is applied only to files directly under
-`platformsPath`; platform metadata always lives in subdirectories, so
-the threshold is not enforced for real platform builds.
 
 The `filters_i18n` schema is generated at runtime for every non-legacy
 platform from its `filters.json` and the FiltersRegistry locale data in
@@ -292,10 +287,7 @@ After compiling, validate the built output:
 ```js
 import { validateJSONSchema } from '@adguard/filters-compiler';
 
-// Minimum number of filters for filters.json files directly under
-// './platforms'; platform metadata lives in subdirectories and is not
-// subject to this threshold
-const valid = validateJSONSchema('./platforms', 50, {
+const valid = validateJSONSchema('./platforms', {
     localesPath: './locales',
     logPath: './json-validation.log',
 });

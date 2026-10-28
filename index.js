@@ -23,13 +23,11 @@ const jsonSchemasConfigDir = path.join(__dirname, 'schemas');
  * Validates built filter files against the bundled JSON schemas.
  *
  * @param platformsPath Path to the built platform output.
- * @param requiredFiltersAmount Minimum number of filters expected.
  * @param options Validation options.
  * @returns `true` when all files are valid, `false` on validation failure.
  */
-export const validateJSONSchema = (platformsPath, requiredFiltersAmount, options) => schemaValidator.validate(
+export const validateJSONSchema = (platformsPath, options) => schemaValidator.validate(
     platformsPath,
     jsonSchemasConfigDir,
-    requiredFiltersAmount,
     options,
 );

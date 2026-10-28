@@ -17,14 +17,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Breaking:** `validateJSONSchema()` now requires the third `options`
-  argument. The `filters_i18n` schema is generated at runtime from the
-  platform's `filters.json` and the FiltersRegistry `locales` directory
-  instead of a bundled static schema. The required entity IDs now match the
-  filters that the platform actually builds, and the required locales and
-  English fallback strings come from FiltersRegistry. Every locale directory
-  in `localesPath` is validated, even when `requiredLocales` contains a
-  subset.
+- **Breaking:** `validateJSONSchema()` drops the `requiredFiltersAmount`
+  parameter. It only applied to `filters.json` files directly under
+  `platformsPath`, and platform metadata always lives in subdirectories, so
+  it was never enforced for real platform trees. The FiltersRegistry caller
+  no longer passes it.
+- **Breaking:** `validateJSONSchema()` now requires the `options` argument.
+  The `filters_i18n` schema is generated at runtime from the platform's
+  `filters.json` and the FiltersRegistry `locales` directory instead of a
+  bundled static schema. The required entity IDs now match the filters that
+  the platform actually builds, and the required locales and English fallback
+  strings come from FiltersRegistry. Every locale directory in `localesPath`
+  is validated, even when `requiredLocales` contains a subset.
 
 ### Deprecated
 

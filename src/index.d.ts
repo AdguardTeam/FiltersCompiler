@@ -85,8 +85,6 @@ export interface ValidateJSONSchemaOptions {
  * Validation failures are logged, not thrown — check the return value.
  *
  * @param platformsPath Path to the built platform output.
- * @param requiredFiltersAmount Minimum number of filters for `filters.json`
- * files directly under `platformsPath` (not enforced per platform).
  * @param options Validation options.
  * @returns `true` when all files are valid, `false` on validation failure.
  * @throws {Error} When `options` or `options.localesPath` is missing, or when
@@ -94,7 +92,6 @@ export interface ValidateJSONSchemaOptions {
  */
 export function validateJSONSchema(
     platformsPath: string,
-    requiredFiltersAmount: number,
     options: ValidateJSONSchemaOptions,
 ): boolean;
 

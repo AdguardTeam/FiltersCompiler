@@ -206,19 +206,11 @@ const resolveI18nSchema = (item, context) => {
 /**
  * Recursively validates dir content with provided schemas.
  *
- * `filtersRequiredAmount` is intentionally applied only to files directly
- * under the top-level directory. Platform metadata always lives in
- * subdirectories, so the threshold does not run per platform. This preserves
- * the historical behavior: a single global threshold would reject platforms
- * that legitimately build fewer filters (for example MV3 builds).
- *
  * @param {string} dir Directory to validate.
  * @param {object} context Validation context.
- * @param {number} [filtersRequiredAmount] Minimum number of filters for files
- * directly in `dir`.
  * @returns {boolean} Validation result.
  */
-const validateDir = (dir, context, filtersRequiredAmount) => {
+const validateDir = (dir, context) => {
     const { validator, schemas, oldSchemas } = context;
 
     let items;
@@ -262,14 +254,6 @@ const validateDir = (dir, context, filtersRequiredAmount) => {
 
                 const json = JSON.parse(fs.readFileSync(item));
 
-                // Validate filters amount
-                if (fileName === FILTERS_METADATA_FILE_NAME) {
-                    if (json.filters.length < filtersRequiredAmount) {
-                        logger.error(`Invalid filters amount in ${item}`);
-                        return false;
-                    }
-                }
-
                 if (!isLegacyPlatform && fileName === FILTERS_I18N_FILE_NAME) {
                     logAppliedDefaults(json, schema, item);
                 }
@@ -304,7 +288,6 @@ const validateDir = (dir, context, filtersRequiredAmount) => {
  *
  * @param platformsPath - Path to platforms folder
  * @param jsonSchemasConfigDir - Path to json schemas config folder
- * @param filtersRequiredAmount - Minimum required amount of filters for files directly under platformsPath
  * @param options - Validation options
  * @param options.localesPath - Path to the locales directory
  * @param {string[]} [options.requiredLocales] - Locales that must be present for every entity
@@ -313,7 +296,7 @@ const validateDir = (dir, context, filtersRequiredAmount) => {
  * @returns {boolean} Validation result
  * @throws {Error} If options or options.localesPath is missing, or if options.logPath cannot be opened
  */
-const validate = (platformsPath, jsonSchemasConfigDir, filtersRequiredAmount, options) => {
+const validate = (platformsPath, jsonSchemasConfigDir, options) => {
     if (!options || !options.localesPath) {
         throw new Error('validateJSONSchema: options.localesPath is required');
     }
@@ -348,7 +331,7 @@ const validate = (platformsPath, jsonSchemasConfigDir, filtersRequiredAmount, op
             i18nValidators: new Map(),
         };
 
-        const result = validateDir(platformsPath, context, filtersRequiredAmount);
+        const result = validateDir(platformsPath, context);
 
         logger.info('Validating json schemas for platforms - done');
         logger.info(`Validation result: ${result}`);

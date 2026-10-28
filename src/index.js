@@ -54,13 +54,11 @@ export const compile = (
 
 export const validateJSONSchema = (
     platformsPath,
-    requiredFiltersAmount,
     options,
 ) => {
     return schemaValidator.validate(
         platformsPath,
         jsonSchemasConfigDir,
-        requiredFiltersAmount,
         options,
     );
 };

@@ -329,7 +329,6 @@ describe('json validator', () => {
         const result = schemaValidator.validate(
             platformsPath,
             schemasDir,
-            1,
             { localesPath, requiredLocales: ['en', 'de'] },
         );
 
@@ -356,7 +355,6 @@ describe('json validator', () => {
         const result = schemaValidator.validate(
             platformsPath,
             schemasDir,
-            1,
             { localesPath, requiredLocales: ['en'] },
         );
 
@@ -380,7 +378,6 @@ describe('json validator', () => {
         const result = schemaValidator.validate(
             platformsPath,
             schemasDir,
-            1,
             { localesPath, requiredLocales: ['en'] },
         );
 
@@ -412,7 +409,6 @@ describe('json validator', () => {
             const result = schemaValidator.validate(
                 platformsPath,
                 schemasDir,
-                1,
                 { localesPath, requiredLocales: ['en', 'de'] },
             );
 
@@ -438,7 +434,6 @@ describe('json validator', () => {
         const result = schemaValidator.validate(
             platformsPath,
             schemasDir,
-            1,
             { localesPath, requiredLocales: ['en'] },
         );
 
@@ -458,7 +453,6 @@ describe('json validator', () => {
         const result = schemaValidator.validate(
             platformsPath,
             schemasDir,
-            1,
             { localesPath, requiredLocales: ['en'] },
         );
 
@@ -487,7 +481,6 @@ describe('json validator', () => {
         const result = schemaValidator.validate(
             platformsPath,
             schemasDir,
-            1,
             { localesPath, requiredLocales: ['en', 'de'], logPath },
         );
 
@@ -517,7 +510,6 @@ describe('json validator', () => {
         const result = schemaValidator.validate(
             platformsPath,
             schemasDir,
-            1,
             { localesPath, requiredLocales: ['en', 'de'], logPath },
         );
 
@@ -545,7 +537,6 @@ describe('json validator', () => {
         const firstResult = schemaValidator.validate(
             platformsPath,
             schemasDir,
-            1,
             { localesPath, requiredLocales: ['en', 'de'], logPath },
         );
 
@@ -560,7 +551,6 @@ describe('json validator', () => {
         const secondResult = schemaValidator.validate(
             platformsPath,
             schemasDir,
-            1,
             { localesPath, requiredLocales: ['en', 'de'] },
         );
 
@@ -585,25 +575,8 @@ describe('json validator', () => {
         expect(() => schemaValidator.validate(
             platformsPath,
             schemasDir,
-            1,
             { localesPath, requiredLocales: ['en'], logPath },
         )).toThrow();
-    }));
-
-    it('does not apply requiredFiltersAmount to nested platform directories', () => withValidationFixture({
-        locales: { en: createEnglishLocales() },
-        platform: 'test',
-        filtersMetadata: createFiltersMetadata(),
-        filtersI18n: createFiltersI18n({ includeDe: false }),
-    }, ({ platformsPath, localesPath, schemasDir }) => {
-        const result = schemaValidator.validate(
-            platformsPath,
-            schemasDir,
-            80,
-            { localesPath, requiredLocales: ['en'] },
-        );
-
-        expect(result).toBe(true);
     }));
 
     it('writes validation errors to the log file as text', () => withValidationFixture({
@@ -627,7 +600,6 @@ describe('json validator', () => {
         const result = schemaValidator.validate(
             platformsPath,
             schemasDir,
-            1,
             { localesPath, requiredLocales: ['en'], logPath },
         );
 
@@ -653,7 +625,6 @@ describe('json validator', () => {
         const result = schemaValidator.validate(
             platformsPath,
             schemasDir,
-            1,
             { localesPath, requiredLocales: ['en'] },
         );
 
@@ -676,7 +647,6 @@ describe('json validator', () => {
             const result = schemaValidator.validate(
                 platformsPath,
                 schemasDir,
-                2,
                 { localesPath: fixture.localesPath, requiredLocales: ['en'] },
             );
 
@@ -690,7 +660,7 @@ describe('json validator', () => {
     }, 180000);
 
     it('requires options.localesPath', () => {
-        expect(() => schemaValidator.validate('platforms', 'schemas', 1)).toThrow(
+        expect(() => schemaValidator.validate('platforms', 'schemas')).toThrow(
             'validateJSONSchema: options.localesPath is required',
         );
     });
