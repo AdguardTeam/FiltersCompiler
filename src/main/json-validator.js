@@ -39,7 +39,7 @@ const loadSchemas = (dir) => {
     // eslint-disable-next-line no-restricted-syntax
     for (const f of items) {
         if (f.endsWith(SCHEMA_EXTENSION)) {
-            const validationFileName = f.substr(0, f.indexOf(SCHEMA_EXTENSION));
+            const validationFileName = f.slice(0, -SCHEMA_EXTENSION.length);
 
             logger.info(`Loading schema for ${validationFileName}`);
             schemas[validationFileName] = JSON.parse(fs.readFileSync(path.join(dir, f)));

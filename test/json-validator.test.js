@@ -644,6 +644,27 @@ describe('json validator', () => {
             disableOptimization();
             await build(fixture.filtersDir, logPath, reportPath, platformsPath, config);
 
+            // `filters.json` and `filters_i18n.json` must be derived from the
+            // same filtered entity list for non-legacy platforms: the generated
+            // filters_i18n schema requires the same entity ids in both files.
+            // The legacy `mac` and `mac_v2` platforms keep their historical
+            // behavior (frozen schemas).
+            const legacyPlatforms = new Set(['mac', 'mac_v2']);
+            fs.readdirSync(platformsPath)
+                .filter((platform) => !legacyPlatforms.has(platform)
+                    && fs.existsSync(path.join(platformsPath, platform, 'filters.json')))
+                .forEach((platform) => {
+                    const platformDir = path.join(platformsPath, platform);
+
+                    const filtersMetadata = readJson(path.join(platformDir, 'filters.json'));
+                    const filtersI18n = readJson(path.join(platformDir, 'filters_i18n.json'));
+                    const metadataFilterIds = filtersMetadata.filters
+                        .map((filter) => String(filter.filterId)).sort();
+                    const i18nFilterIds = Object.keys(filtersI18n.filters).sort();
+
+                    expect(i18nFilterIds).toEqual(metadataFilterIds);
+                });
+
             const result = schemaValidator.validate(
                 platformsPath,
                 schemasDir,

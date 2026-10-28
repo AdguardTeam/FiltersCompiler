@@ -47,6 +47,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Groups, tags, and filters now use the current `locales/en` strings. Filters
   25, 26, and 27 are now validated for non-legacy platforms; the frozen
   `mac`/`mac_v2` schemas are unchanged.
+- The platform generator derives `filters_i18n.json` from the same filtered
+  filter list as `filters.json` for non-legacy platforms, so the two files can
+  no longer diverge in which filters they list. The legacy `mac` and `mac_v2`
+  platforms keep their current output.
+- Replaced the deprecated `String.prototype.substr` with `slice` in the schema
+  validator.
 - Validation errors written to `logPath` are formatted as text instead of
   `[object Object]`.
 - The validation log file is closed when `validateJSONSchema()` finishes, so a

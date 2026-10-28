@@ -426,7 +426,45 @@ export const postProcessUrls = (metadata, config) => {
 };
 
 /**
+ * Checks whether the filter should be built for the specified platform.
+ *
+ * @param {object} metadata Filter metadata.
+ * @param {string} platform Platform.
+ *
+ * @returns True if
+ * - both `platformsIncluded` and `platformsExcluded` properties are not defined in the `metadata`,
+ * - `platformsExcluded` does not contain the specified `platform`,
+ * - `platformsIncluded` contains the specified `platform`.
+ *
+ * @throws An error if both `platformsIncluded` and `platformsExcluded` are defined.
+ */
+export const shouldBuildFilterForPlatform = (metadata, platform) => {
+    const { filterId, platformsExcluded, platformsIncluded } = metadata;
+
+    if (platformsExcluded && platformsIncluded) {
+        let errorMessage = 'Both platformsIncluded and platformsExcluded cannot be defined simultaneously';
+        if (filterId) {
+            errorMessage += ` for filter ${filterId}`;
+        }
+        throw new Error(errorMessage);
+    }
+
+    if (platformsExcluded && platformsExcluded.includes(platform)) {
+        return false;
+    }
+
+    if (!platformsIncluded) {
+        return true;
+    }
+
+    return platformsIncluded.includes(platform);
+};
+
+/**
  * Removes redundant metadata for included or excluded filters for the current platform
+ *
+ * Uses the same predicate as `shouldBuildFilterForPlatform`, so `filters.json`
+ * and `filters_i18n.json` cannot diverge in which filters they list.
  *
  * @param metadata
  * @param platform
@@ -435,11 +473,7 @@ export const postProcessUrls = (metadata, config) => {
  */
 const removeRedundantFiltersMetadata = (metadata, platform) => {
     // leaves only included filters metadata
-    metadata.filters = metadata.filters.filter((filter) => !filter.platformsIncluded
-        || (filter.platformsIncluded && filter.platformsIncluded.includes(platform)));
-    // removes excluded filters metadata
-    metadata.filters = metadata.filters.filter((filter) => !filter.platformsExcluded
-        || (filter.platformsExcluded && !filter.platformsExcluded.includes(platform)));
+    metadata.filters = metadata.filters.filter((filter) => shouldBuildFilterForPlatform(filter, platform));
 
     return metadata;
 };
@@ -579,41 +613,6 @@ export const sortMetadataFilters = (metadata) => {
 };
 
 /**
- * Checks whether the filter should be built for the specified platform.
- *
- * @param {object} metadata Filter metadata.
- * @param {string} platform Platform.
- *
- * @returns True if
- * - both `platformsIncluded` and `platformsExcluded` properties are not defined in the `metadata`,
- * - `platformsExcluded` does not contain the specified `platform`,
- * - `platformsIncluded` contains the specified `platform`.
- *
- * @throws An error if both `platformsIncluded` and `platformsExcluded` are defined.
- */
-export const shouldBuildFilterForPlatform = (metadata, platform) => {
-    const { filterId, platformsExcluded, platformsIncluded } = metadata;
-
-    if (platformsExcluded && platformsIncluded) {
-        let errorMessage = 'Both platformsIncluded and platformsExcluded cannot be defined simultaneously';
-        if (filterId) {
-            errorMessage += ` for filter ${filterId}`;
-        }
-        throw new Error(errorMessage);
-    }
-
-    if (platformsExcluded && platformsExcluded.includes(platform)) {
-        return false;
-    }
-
-    if (!platformsIncluded) {
-        return true;
-    }
-
-    return platformsIncluded.includes(platform);
-};
-
-/**
  * Removes group descriptions from the input groups.
  *
  * @param {Object} inputGroups Input groups metadata.
@@ -710,21 +709,40 @@ const writeFiltersMetadata = function (platformsPath, filtersDir, filtersMetadat
         const filtersI18nFileJson = path.join(platformDir, FILTERS_I18N_METADATA_FILE_JSON);
         const filtersI18nFileJs = path.join(platformDir, FILTERS_I18N_METADATA_FILE_JS);
 
-        let localizedFilters = { ...localizations.filters };
+        let localizedFilters;
 
-        filtersMetadata.forEach((metadata) => {
-            if (!shouldBuildFilterForPlatform(metadata, config.platform)) {
-                const { filterId } = metadata;
-                // eslint-disable-next-line max-len
-                logger.info(`Adding localization for filter ${filterId} skipped for platform '${config.platform}' due to platformsExcluded or platformsIncluded`);
-                delete localizedFilters[filterId];
+        if (platform === 'MAC' || platform === 'MAC_V2') {
+            // Legacy platforms keep their current behavior: every localization
+            // that is not excluded for the platform stays, including ids that
+            // have no matching metadata (the frozen schemas require them).
+            localizedFilters = { ...localizations.filters };
+
+            filtersMetadata.forEach((filterMetadata) => {
+                if (!shouldBuildFilterForPlatform(filterMetadata, config.platform)) {
+                    const { filterId } = filterMetadata;
+                    // eslint-disable-next-line max-len
+                    logger.info(`Adding localization for filter ${filterId} skipped for platform '${config.platform}' due to platformsExcluded or platformsIncluded`);
+                    delete localizedFilters[filterId];
+                }
+            });
+
+            // old MAC platform may not support absence some filters i18n metadata,
+            // for all other platforms we can exclude obsolete filters
+            if (platform === 'MAC_V2') {
+                localizedFilters = excludeObsoleteFilters(localizedFilters, obsoleteFilters);
             }
-        });
-
-        // old MAC platform may not support absence some filters i18n metadata,
-        // for all other platforms we can exclude obsolete filters
-        if (platform !== 'MAC') {
-            localizedFilters = excludeObsoleteFilters(localizedFilters, obsoleteFilters);
+        } else {
+            // Non-legacy platforms: keep the localizations of exactly the
+            // filters listed in `filters.json`. The runtime filters_i18n schema
+            // requires the same entity ids in both files, so deriving one from
+            // the other's filtered list prevents a silent divergence.
+            const platformFilterIds = new Set(metadata.filters.map((filter) => String(filter.filterId)));
+            localizedFilters = {};
+            Object.entries(localizations.filters).forEach(([filterId, filterLocalizations]) => {
+                if (platformFilterIds.has(filterId)) {
+                    localizedFilters[filterId] = filterLocalizations;
+                }
+            });
         }
 
         const i18nMetadata = {
