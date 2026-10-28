@@ -13,10 +13,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Updated [@adguard/filters-downloader] to v3.0.0. This version
   removes the vulnerable `axios` dependency and uses native `fetch`.
-- `engines.node` is now `^22.21.0 || >=24.0.0`. Node.js 23.x is not
-  supported.
-- Remote `!#include` downloads no longer use `HTTP_PROXY`, `HTTPS_PROXY`,
-  and `NO_PROXY` automatically. Set `NODE_USE_ENV_PROXY=1` to enable this.
+- **BREAKING:** `engines.node` is now `^22.21.0 || >=24.0.0`. Node.js
+  22.0–22.20 and 23.x are not supported.
+- **BREAKING:** Remote `!#include` downloads now use native `fetch`, which
+  changes transport behaviour:
+    - `HTTP_PROXY`, `HTTPS_PROXY`, and `NO_PROXY` are no longer used
+      automatically. Set `NODE_USE_ENV_PROXY=1` to enable them.
+    - `ALL_PROXY` is no longer used, even with `NODE_USE_ENV_PROXY=1`.
+      Set `HTTP_PROXY` or `HTTPS_PROXY` instead.
+    - A nested `!#include` in the content of an `@include` whose URL
+      contains `user:pass@` now fails, because `fetch` rejects URLs
+      with credentials. Previously `axios` sent them as Basic auth.
 
 ### Deprecated
 
