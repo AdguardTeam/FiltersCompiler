@@ -718,9 +718,10 @@ const writeFiltersMetadata = function (platformsPath, filtersDir, filtersMetadat
             }
         } else {
             // Non-legacy platforms: keep the localizations of exactly the
-            // filters listed in `filters.json`. The runtime filters_i18n schema
-            // requires the same entity ids in both files, so deriving one from
-            // the other's filtered list prevents a silent divergence.
+            // filters listed in `filters.json`. A localization without
+            // matching metadata is dropped; the runtime filters_i18n schema
+            // requires the same entity ids in both files, so a filter missing
+            // its localization still fails validation.
             const platformFilterIds = new Set(metadata.filters.map((filter) => String(filter.filterId)));
             localizedFilters = {};
             Object.entries(localizations.filters).forEach(([filterId, filterLocalizations]) => {
