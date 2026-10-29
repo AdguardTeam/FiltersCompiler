@@ -49,6 +49,25 @@ describe('platforms filter', () => {
         expect(after.indexOf('invalid_hint')).toBeGreaterThanOrEqual(0);
     });
 
+    it('Test apps_corelibs hint alias', () => {
+        const rules = [
+            '!+ PLATFORM(apps_corelibs)',
+            'corelibs only',
+            '!+ NOT_PLATFORM(apps_corelibs)',
+            'not corelibs',
+        ];
+        const clean = (platform) => cleanupRules(rules, {
+            platform,
+            path: platform,
+            configuration: { removeRulePatterns: false, ignoreRuleHints: false },
+        }, 0);
+
+        ['windows', 'mac', 'cli', 'android'].forEach((platform) => {
+            expect(clean(platform)).toEqual(['!+ PLATFORM(apps_corelibs)', 'corelibs only']);
+        });
+        expect(clean('ios')).toEqual(['!+ NOT_PLATFORM(apps_corelibs)', 'not corelibs']);
+    });
+
     it('Test optimization hints', () => {
         const config = {
             'platform': 'test',
