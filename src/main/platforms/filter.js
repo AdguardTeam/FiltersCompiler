@@ -23,16 +23,6 @@ const NOT_PLATFORM_HINT_REGEXP = /(.*)NOT_PLATFORM\(([^)]+)\)/g;
 const NOT_OPTIMIZED_HINT = 'NOT_OPTIMIZED';
 
 /**
- * Platform hint aliases, each of which stands for several platforms,
- * e.g. `! PLATFORM(apps_corelibs)` is the same as `! PLATFORM(windows, mac, cli, android)`.
- *
- * `apps_corelibs` matches all CoreLibs-based apps.
- */
-const PLATFORM_HINT_ALIASES = {
-    apps_corelibs: ['windows', 'mac', 'cli', 'android'],
-};
-
-/**
  * Parses rule hints
  *
  * @param rules rules
@@ -99,7 +89,7 @@ const parsePlatforms = function (hint, pattern) {
         // eslint-disable-next-line no-restricted-syntax
         for (let s of split) {
             s = s.trim();
-            result.push(...(PLATFORM_HINT_ALIASES[s] || [s]));
+            result.push(s);
         }
 
         match = pattern.exec(hint);
