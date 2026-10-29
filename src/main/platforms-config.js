@@ -615,6 +615,7 @@ export const platformsConfig = {
         'defines': {
             'adguard': true,
             'adguard_app_windows': true,
+            'apps_corelibs': true,
             'cap_html_filtering': true,
         },
     },
@@ -629,6 +630,7 @@ export const platformsConfig = {
         'defines': {
             'adguard': true,
             'adguard_app_mac': true,
+            'apps_corelibs': true,
         },
     },
     'MAC_V2': {
@@ -642,6 +644,7 @@ export const platformsConfig = {
         'defines': {
             'adguard': true,
             'adguard_app_mac': true,
+            'apps_corelibs': true,
             'cap_html_filtering': true,
         },
     },
@@ -656,6 +659,7 @@ export const platformsConfig = {
         'defines': {
             'adguard': true,
             'adguard_app_mac': true,
+            'apps_corelibs': true,
             'cap_html_filtering': true,
         },
     },
@@ -669,6 +673,7 @@ export const platformsConfig = {
         'defines': {
             'adguard': true,
             'adguard_app_android': true,
+            'apps_corelibs': true,
             'cap_html_filtering': true,
         },
     },
@@ -683,6 +688,7 @@ export const platformsConfig = {
         'defines': {
             'adguard': true,
             'adguard_app_cli': true,
+            'apps_corelibs': true,
             'cap_html_filtering': true,
         },
     },
