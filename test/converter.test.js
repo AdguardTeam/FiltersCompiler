@@ -77,6 +77,32 @@ describe('converter', () => {
     });
 
     // TODO: add more rules under this section
+    describe('hint NOT_CONVERT', () => {
+        const rule = 'example.com##h1:style(background-color: blue !important)';
+        const converted = 'example.com#$#h1 { background-color: blue !important }';
+
+        it('keeps the rule preceded by the hint as is', () => {
+            const [, converted] = convertRulesToAdgSyntax(['!+ NOT_CONVERT', rule]);
+            expect(converted).toBe(rule);
+        });
+
+        it('keeps the rule when the hint is combined with other hints', () => {
+            const [, converted] = convertRulesToAdgSyntax(['!+ PLATFORM(windows) NOT_CONVERT', rule]);
+            expect(converted).toBe(rule);
+        });
+
+        it('keeps the invalid-looking rule as is instead of reporting an error', () => {
+            const [, converted] = convertRulesToAdgSyntax(['!+ NOT_CONVERT', 'example.com#%#//scriptlet('], []);
+            expect(converted).toBe('example.com#%#//scriptlet(');
+        });
+
+        it('applies only to the rule right after the hint', () => {
+            const result = convertRulesToAdgSyntax(['!+ NOT_CONVERT', rule, rule]);
+            expect(result[1]).toBe(rule);
+            expect(result[2]).toBe(converted);
+        });
+    });
+
     describe('convert rules with no change', () => {
         it.each([
             '##div > span',

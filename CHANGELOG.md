@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Support for `!+ NOT_CONVERT` hint, which disables conversion to AdGuard syntax for the next rule [#269].
+
 ### Changed
 
 ### Deprecated
@@ -23,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+[#269]: https://github.com/AdguardTeam/FiltersCompiler/issues/269
 [#270]: https://github.com/AdguardTeam/FiltersCompiler/issues/270
 
 ## [4.0.0] - 2026-11-06
