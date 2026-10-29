@@ -595,6 +595,7 @@ export const platformsConfig = {
         'defines': {
             'adguard': true,
             'adguard_app_windows': true,
+            'cap_html_filtering': true,
         },
     },
     'MAC': {
@@ -607,6 +608,7 @@ export const platformsConfig = {
         'defines': {
             'adguard': true,
             'adguard_app_mac': true,
+            'cap_html_filtering': true,
         },
     },
     'MAC_V2': {
@@ -620,6 +622,7 @@ export const platformsConfig = {
         'defines': {
             'adguard': true,
             'adguard_app_mac': true,
+            'cap_html_filtering': true,
         },
     },
     'MAC_V3': {
@@ -633,6 +636,7 @@ export const platformsConfig = {
         'defines': {
             'adguard': true,
             'adguard_app_mac': true,
+            'cap_html_filtering': true,
         },
     },
     'ANDROID': {
@@ -645,6 +649,7 @@ export const platformsConfig = {
         'defines': {
             'adguard': true,
             'adguard_app_android': true,
+            'cap_html_filtering': true,
         },
     },
     'CLI': {
@@ -658,6 +663,7 @@ export const platformsConfig = {
         'defines': {
             'adguard': true,
             'adguard_app_cli': true,
+            'cap_html_filtering': true,
         },
     },
     'EXTENSION_CHROMIUM': {

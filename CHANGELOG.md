@@ -17,7 +17,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `cap_html_filtering` directive not working: the define was missing from the platforms configuration,
+  so rules inside `!#if (cap_html_filtering)` were dropped on every platform. It is now set for
+  Windows, Mac, Mac v2, Mac v3, Android and CLI [#270].
+
 ### Security
+
+[#270]: https://github.com/AdguardTeam/FiltersCompiler/issues/270
 
 ## [3.4.3] - 2026-10-21
 
