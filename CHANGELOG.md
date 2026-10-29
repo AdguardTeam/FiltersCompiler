@@ -17,12 +17,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Native `:has()` cosmetic rules (`##`) are no longer removed from the Android Content Blocker platform.
+  [#233]
 - `cap_html_filtering` directive not working: the define was missing from the platforms configuration,
   so rules inside `!#if (cap_html_filtering)` were dropped on every platform. It is now set for
   Windows, Mac v2, Mac v3, Android and CLI [#270].
 
 ### Security
 
+[#233]: https://github.com/AdguardTeam/FiltersCompiler/issues/233
 [#270]: https://github.com/AdguardTeam/FiltersCompiler/issues/270
 
 ## [4.0.0] - 2026-11-06

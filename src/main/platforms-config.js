@@ -5,7 +5,7 @@
  * @see {@link https://github.com/AdguardTeam/FiltersRegistry/blob/master/scripts/build/custom_platforms.ts}
  *
  * IMPORTANT: During making any changes in this file,
- * the custom_platforms.js should also be updated through PR on GitHub.
+ * the custom_platforms.ts should also be updated through PR on GitHub.
  */
 
 /**
@@ -482,6 +482,11 @@ const UNBLOCKING_IMPORTANT_RULES_PATTERNS = [
 /**
  * Pattern to detect Extended CSS rules
  *
+ * Plain `:has(` is deliberately absent: it is a native CSS selector supported
+ * by all platforms. `:-abp-has(` is different — it is the Extended CSS alias of
+ * `:has()` and is never native, so it is still removed. Nested `:has()` is not
+ * valid native CSS either, hence it has its own pattern below.
+ *
  * @example
  * ```xup.in#?##xupab```
  * @example
@@ -491,7 +496,6 @@ const UNBLOCKING_IMPORTANT_RULES_PATTERNS = [
  */
 const EXTENDED_CSS_RULES_PATTERNS = [
     '\\[-ext-',
-    ':has\\(',
     ':has-text\\(',
     ':contains\\(',
     ':matches-css\\(',
@@ -505,6 +509,8 @@ const EXTENDED_CSS_RULES_PATTERNS = [
     ':matches-css-after\\(',
     ':-abp-has\\(',
     ':-abp-contains\\(',
+    // Nested `:has()` is not valid native CSS, so it needs Extended CSS.
+    ':has\\([^)]*:has\\(',
     '#\\?#',
     '#\\$\\?#',
     '#@\\?#',
@@ -557,6 +563,7 @@ const SAFARI_BASED_EXTENSION_PATTERNS = [
 ];
 
 /* eslint-disable max-len */
+
 /**
  * Pattern to detect Extended CSS `:matches-property()` rules
  *
@@ -602,6 +609,8 @@ export const MAC_V2_PLATFORM = 'MAC_V2';
  * code that needs one of the keys imports it by name.
  */
 export const LEGACY_PLATFORMS = [MAC_V1_PLATFORM, MAC_V2_PLATFORM];
+
+/* eslint-enable max-len */
 
 export const platformsConfig = {
     'WINDOWS': {
