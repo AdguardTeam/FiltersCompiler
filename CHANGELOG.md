@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `apps_corelibs` directive and hint alias matching all CoreLibs-based apps (Windows, Mac, Android and CLI) [#272]
+
 ### Changed
 
 ### Deprecated
@@ -24,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 
 [#270]: https://github.com/AdguardTeam/FiltersCompiler/issues/270
+[#272]: https://github.com/AdguardTeam/FiltersCompiler/issues/272
 
 ## [3.4.3] - 2026-10-21
 
