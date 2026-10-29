@@ -5,6 +5,7 @@ import {
     vi,
 } from 'vitest';
 
+import { platformsConfig } from '../src/main/platforms-config';
 import { cleanupAndOptimizeRules, cleanupRules } from '../src/main/platforms/filter';
 
 // Mock log to hide error messages
@@ -418,6 +419,25 @@ describe('platforms filter', () => {
         const after = cleanupRules(before, config, 0);
 
         expect(after).toBeDefined();
+        expect(after).toEqual(notMatchRules);
+    });
+
+    it('keeps native :has() rules and removes #?# rules for Android Content Blocker', () => {
+        const config = platformsConfig.EXTENSION_ANDROID_CONTENT_BLOCKER;
+
+        const notMatchRules = [
+            'example.com##.sidebar_list > .widget_text:has(a[title = "ads"])',
+            '##div:has(> .ad)',
+        ];
+        const matchRules = [
+            'example.com#?#div:has(> .ad)',
+            'example.com#?#div:has-text(ad)',
+            'example.com##div:contains(ad)',
+            'example.com##div:-abp-has(.ad)',
+        ];
+
+        const after = cleanupRules([...notMatchRules, ...matchRules], config, 0);
+
         expect(after).toEqual(notMatchRules);
     });
 });

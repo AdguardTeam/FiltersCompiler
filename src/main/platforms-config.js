@@ -491,7 +491,6 @@ const UNBLOCKING_IMPORTANT_RULES_PATTERNS = [
  */
 const EXTENDED_CSS_RULES_PATTERNS = [
     '\\[-ext-',
-    ':has\\(',
     ':has-text\\(',
     ':contains\\(',
     ':matches-css\\(',
@@ -557,6 +556,7 @@ const SAFARI_BASED_EXTENSION_PATTERNS = [
 ];
 
 /* eslint-disable max-len */
+
 /**
  * Pattern to detect Extended CSS `:matches-property()` rules
  *
