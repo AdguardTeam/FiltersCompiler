@@ -14,6 +14,25 @@ import {
     shouldKeepHtmlRuleWithOversizedLengths,
 } from './utils/workaround';
 
+const NOT_CONVERT_HINT = 'NOT_CONVERT';
+
+/**
+ * Checks whether the rule is preceded by the `!+ NOT_CONVERT` hint,
+ * which disables the conversion to AdGuard syntax for the rule.
+ * https://github.com/AdguardTeam/FiltersCompiler/issues/269
+ *
+ * @param {string|undefined} previousLine Line preceding the rule.
+ *
+ * @returns {boolean} `true` if the previous line is a hint containing `NOT_CONVERT`.
+ */
+const isConversionDisabledByHint = (previousLine) => {
+    if (!previousLine || !previousLine.startsWith(RuleMasks.MASK_HINT)) {
+        return false;
+    }
+    const hints = previousLine.substring(RuleMasks.MASK_HINT.length).split(' ');
+    return hints.includes(NOT_CONVERT_HINT);
+};
+
 /**
  * Excludes rule
  * @param {string} rule
@@ -41,6 +60,12 @@ export const convertRulesToAdgSyntax = (rulesList, excluded = [], invalidRules =
 
     for (let i = 0; i < rulesList.length; i += 1) {
         const rule = rulesList[i];
+
+        if (isConversionDisabledByHint(rulesList[i - 1])) {
+            result.push(rule);
+            continue;
+        }
+
         try {
             const ruleNode = RuleParser.parse(rule);
 
