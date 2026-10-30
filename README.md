@@ -160,6 +160,9 @@ that is missing entirely for an entity is not filled: it fails
 validation when the locale is required. A built entity with no English
 localization, or a missing required locale, fails validation.
 
+The validator writes the filled `filters_i18n.json` back to disk, plus a
+`.js` copy, even when validation fails.
+
 `requiredLocales` and the English fallback apply only to the generated
 schema used for non-legacy platforms. The frozen `mac` and `mac_v2`
 schemas ignore `requiredLocales`, fill their own defaults, and log no
@@ -171,14 +174,14 @@ static and are bundled with the library.
 Returns `true` when all files are valid. On validation failure it logs
 the errors and returns `false` instead of throwing, so callers must
 check the return value. It throws when `options` or
-`options.localesPath` is missing, or when `options.logPath` cannot be
-opened.
+`options.localesPath` is missing, when `options.logPath` cannot be
+opened, or when a built JSON file cannot be parsed.
 
 ### `validateLocales(...)`
 
 ```ts
 function validateLocales(
-    localesDirPath: string,
+    localesPath: string,
     requiredLocales: string[],
     logFormat?: 'text' | 'markdown',
 ): ValidateLocalesResult;
@@ -190,7 +193,7 @@ interface ValidateLocalesResult {
 }
 ```
 
-Validates that the locale files in `localesDirPath` are complete — that
+Validates that the locale files in `localesPath` are complete — that
 every filter, group, and tag has a translated name and description for
 all locales listed in `requiredLocales`.
 
@@ -456,6 +459,10 @@ meta characters in `from` when a literal match is intended.
 The compiler writes a timestamped log file when `logPath` is passed to
 `compile()`. If `logPath` is omitted, no log file is written. The parent
 directory is created automatically when it does not exist.
+
+`validateJSONSchema()` accepts the same `logPath` in its options object. It
+appends to the file and closes it when validation finishes. A later call
+without `logPath` does not reuse it.
 
 Log levels:
 

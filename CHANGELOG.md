@@ -59,9 +59,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Validation errors written to `logPath` are formatted as text instead of
   `[object Object]`.
 - The validation log file is closed when `validateJSONSchema()` finishes, so a
-  later call without `logPath` does not append to it.
-- `validateJSONSchema()` reports the path of a malformed locale file instead of
-  a bare JSON parse error.
+  later call without `logPath` does not append to it. The compiler logger also
+  closes the file when `initialize()` is called without a path.
+- `validateJSONSchema()` reports the path of a malformed JSON file instead of a
+  bare JSON parse error.
+- `validateJSONSchema()` logs a failed platform directory read as an error, not
+  as information.
 
 ### Security
 

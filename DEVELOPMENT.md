@@ -272,8 +272,8 @@ pnpm build-schemas
 For non-legacy platforms, the `filters_i18n` schema is not a repository file:
 `validateJSONSchema()` generates it at runtime from the platform's
 `filters.json` and the FiltersRegistry `locales` directory. Do not add filter,
-group, or tag text to the compiler. To test the generated schema, pass
-`localesPath` to `validateJSONSchema()`. The legacy `mac` and `mac_v2`
+group, or tag text to the compiler. The generated-schema tests are in
+`test/filters-i18n-schema.test.ts`. The legacy `mac` and `mac_v2`
 platforms keep their frozen `filters_i18n.schema.json` files in `schemas/mac/`
 and `schemas/mac_v2/`.
 

@@ -82,13 +82,17 @@ export interface ValidateJSONSchemaOptions {
  * generated schema: the legacy `mac` and `mac_v2` platforms use their frozen
  * schemas, ignore `requiredLocales`, and log no fallbacks.
  *
+ * The validator writes the filled `filters_i18n.json` back to disk, plus a
+ * `.js` copy, even when validation fails.
+ *
  * Validation failures are logged, not thrown — check the return value.
  *
  * @param platformsPath Path to the built platform output.
  * @param options Validation options.
  * @returns `true` when all files are valid, `false` on validation failure.
- * @throws {Error} When `options` or `options.localesPath` is missing, or when
- * `options.logPath` cannot be opened.
+ * @throws {Error} When `options` or `options.localesPath` is missing, when
+ * `options.logPath` cannot be opened, or when a built JSON file cannot be
+ * parsed.
  */
 export function validateJSONSchema(
     platformsPath: string,
@@ -115,17 +119,17 @@ export type LocalesLogFormat = 'text' | 'markdown';
 /**
  * Validates locale translation files.
  *
- * @param localesDirPath Path to the locales directory.
+ * @param localesPath Path to the locales directory.
  * @param requiredLocales List of required locale codes.
  * @param logFormat Format of the returned `log` field: `'text'` (default)
  * or `'markdown'`.
  * @returns `{ ok: true }` when no problems are found; when warnings exist,
  * the result includes `data` and `log`, and `ok` is `false` only for
  * critical warnings.
- * @throws Error when the locales directory is missing or empty.
+ * @throws {Error} When the locales directory is missing or empty.
  */
 export function validateLocales(
-    localesDirPath: string,
+    localesPath: string,
     requiredLocales: string[],
     logFormat?: LocalesLogFormat,
 ): ValidateLocalesResult;

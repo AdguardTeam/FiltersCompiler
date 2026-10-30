@@ -63,6 +63,6 @@ export const validateJSONSchema = (
     );
 };
 
-export const validateLocales = (localesDirPath, requiredLocales, logFormat) => {
-    return localesValidator.validate(localesDirPath, requiredLocales, logFormat);
+export const validateLocales = (localesPath, requiredLocales, logFormat) => {
+    return localesValidator.validate(localesPath, requiredLocales, logFormat);
 };
