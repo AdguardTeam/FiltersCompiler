@@ -47,28 +47,36 @@ export type LocaleEntry = Partial<Record<LocaleField, string>>;
 export type LocaleFileData = Record<string, LocaleEntry>;
 
 /**
+ * Messages of one locale file: an array of dotted key-value objects.
+ */
+export type LocaleMessages = Record<string, string>[];
+
+/**
  * Parses the messages of one locale file into entity data keyed by id.
  *
  * A key must match `<prefix>.<numeric id>.<name|description>`. Other keys are
  * ignored, so a malformed key cannot add a field that the schema does not
  * know.
  *
- * @param messages Parsed locale file contents.
+ * @param messages Parsed locale file contents, or `null` when the file is
+ * missing.
  * @param keyPrefix Entity key prefix, for example `filter`.
  *
  * @returns Locale data keyed by entity id.
+ *
+ * @throws {TypeError} When the locale file contents are not an array.
  */
-export const parseLocaleMessages = (messages: unknown, keyPrefix: string): LocaleFileData => {
+export const parseLocaleMessages = (messages: LocaleMessages | null, keyPrefix: string): LocaleFileData => {
     const data: LocaleFileData = {};
 
-    if (!Array.isArray(messages)) {
+    if (!messages) {
         return data;
     }
 
     const keyPattern = new RegExp(`^${keyPrefix}\\.(\\d+)\\.(${LOCALE_FIELDS.join('|')})$`);
 
     messages.forEach((message) => {
-        Object.entries(message as Record<string, string>).forEach(([key, value]) => {
+        Object.entries(message).forEach(([key, value]) => {
             const match = keyPattern.exec(key);
             if (!match) {
                 return;

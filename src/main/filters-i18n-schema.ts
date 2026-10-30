@@ -9,7 +9,9 @@ import {
     type EntityKind,
     type LocaleEntry,
     type LocaleFileData,
+    type LocaleMessages,
 } from './utils/locale-messages';
+import { readJson } from './utils/read-json';
 
 /**
  * JSON Schema draft used by the generated schema.
@@ -58,30 +60,6 @@ export interface RegistryLocales {
      * Base locale data for every entity kind.
      */
     englishData: Record<EntityKind, LocaleFileData>;
-}
-
-/**
- * Options for generating the filters_i18n schema.
- */
-export interface FiltersI18nSchemaOptions {
-    /**
-     * Path to the FiltersRegistry locales directory.
-     */
-    localesPath: string;
-
-    /**
-     * Entity metadata from a platform's filters.json.
-     */
-    filtersMetadata: FiltersMetadata;
-
-    /**
-     * Locales that must be present for every entity.
-     * Defaults to all locale directories in `localesPath`.
-     *
-     * The schema validates every locale directory in `localesPath`, even when
-     * this list contains a subset.
-     */
-    requiredLocales?: string[];
 }
 
 /**
@@ -150,26 +128,6 @@ export interface MissingFallback {
 }
 
 /**
- * Reads and parses a JSON file.
- *
- * @param filePath Path to the JSON file.
- *
- * @returns Parsed JSON value.
- *
- * @throws {Error} When the file cannot be parsed as JSON.
- */
-export const readJson = <T>(filePath: string): T => {
-    const content = fs.readFileSync(filePath, 'utf8');
-
-    try {
-        return JSON.parse(content) as T;
-    } catch (e) {
-        const message = e instanceof Error ? e.message : String(e);
-        throw new Error(`Cannot parse ${filePath}: ${message}`);
-    }
-};
-
-/**
  * Parses a locale file into a map keyed by entity id.
  *
  * @param filePath Path to the locale file.
@@ -178,7 +136,7 @@ export const readJson = <T>(filePath: string): T => {
  * @returns Locale data keyed by entity id.
  */
 const parseLocaleFile = (filePath: string, kind: EntityKind): LocaleFileData => {
-    const messages = readJson<unknown>(filePath);
+    const messages = readJson<LocaleMessages>(filePath);
 
     return parseLocaleMessages(messages, KEY_PREFIXES[kind]);
 };
@@ -315,6 +273,18 @@ const createLocaleSchema = (
 };
 
 /**
+ * Returns the name of an entity's shared locale schema definition.
+ *
+ * @param kind Entity kind.
+ * @param id Entity id.
+ *
+ * @returns Definition name.
+ */
+const getDefinitionName = (kind: EntityKind, id: string): string => {
+    return `${kind}.${id}`;
+};
+
+/**
  * Returns the JSON pointer for an entity's shared locale schema definition.
  *
  * @param kind Entity kind.
@@ -323,7 +293,7 @@ const createLocaleSchema = (
  * @returns JSON pointer to the definition.
  */
 const getLocaleDefinitionRef = (kind: EntityKind, id: string): string => {
-    return `${LOCALE_DEFINITION_PREFIX}${kind}.${id}`;
+    return `${LOCALE_DEFINITION_PREFIX}${getDefinitionName(kind, id)}`;
 };
 
 /**
@@ -381,7 +351,7 @@ const createDefinitions = (
             throw new Error(`Missing English localization for ${kind} ${id} in ${englishPath}`);
         }
 
-        definitions[`${kind}.${id}`] = createLocaleSchema(entry, kind, id, englishPath);
+        definitions[getDefinitionName(kind, id)] = createLocaleSchema(entry, kind, id, englishPath);
     });
 
     return definitions;
@@ -459,26 +429,6 @@ export const buildFiltersI18nSchema = (
 };
 
 /**
- * Generates the filters_i18n JSON schema from FiltersRegistry data.
- *
- * The compiler does not keep its own copy of filter, group, or tag text.
- *
- * @param options Schema generation options.
- *
- * @returns Generated JSON schema.
- *
- * @throws {Error} When a required locale or an English localization is missing.
- */
-export const generateFiltersI18nSchema = (options: FiltersI18nSchemaOptions): FiltersI18nSchema => {
-    const { localesPath, filtersMetadata, requiredLocales } = options;
-
-    return buildFiltersI18nSchema({
-        filtersMetadata,
-        registryLocales: loadRegistryLocales(localesPath, requiredLocales),
-    });
-};
-
-/**
  * Collects the locale fields that Ajv fills with an English fallback.
  *
  * Every locale property in the generated schema references one shared
@@ -500,7 +450,7 @@ export const collectMissingFallbacks = (json: unknown, schema: FiltersI18nSchema
                 return;
             }
 
-            const localeSchema = schema.definitions[`${kind}.${id}`];
+            const localeSchema = schema.definitions[getDefinitionName(kind, id)];
 
             Object.keys(idSchema.properties).forEach((locale) => {
                 const localeData = idData[locale];

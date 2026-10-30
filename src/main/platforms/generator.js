@@ -20,7 +20,8 @@ import { convertToUbo } from '../converter';
 import { getOptimizationStatistics } from '../optimization';
 import { RuleMasks } from '../rule/rule-masks';
 import { LEGACY_PLATFORMS } from '../platforms-config';
-import { parseLocaleMessages } from '../utils/locale-messages';
+import { ENTITY_KINDS, KEY_PREFIXES, parseLocaleMessages } from '../utils/locale-messages';
+import { readJsonOrNull } from '../utils/read-json';
 import {
     FILTERS_I18N_METADATA_FILE_JS,
     FILTERS_I18N_METADATA_FILE_JSON,
@@ -469,8 +470,7 @@ export const shouldBuildFilterForPlatform = (metadata, platform) => {
 /**
  * Removes the metadata of filters that the platform does not build.
  *
- * Uses `shouldBuildFilterForPlatform`, the same predicate as the
- * `filters_i18n.json` filtering for non-legacy platforms.
+ * Uses `shouldBuildFilterForPlatform`.
  *
  * @param metadata
  * @param platform
@@ -495,7 +495,7 @@ const removeRedundantFiltersMetadata = (metadata, platform) => {
  * @returns {void}
  */
 const loadLocaleMessages = (localeDir, localeName, fileName, keyPrefix, target) => {
-    const entries = JSON.parse(readFile(path.join(localeDir, fileName)));
+    const entries = readJsonOrNull(path.join(localeDir, fileName));
     const messages = parseLocaleMessages(entries, keyPrefix);
 
     Object.entries(messages).forEach(([id, fields]) => {
@@ -523,9 +523,9 @@ const loadLocales = function (dir) {
     for (const directory of locales) {
         const localeDir = path.join(dir, directory);
         if (fs.lstatSync(localeDir).isDirectory()) {
-            loadLocaleMessages(localeDir, directory, 'groups.json', 'group', result.groups);
-            loadLocaleMessages(localeDir, directory, 'tags.json', 'tag', result.tags);
-            loadLocaleMessages(localeDir, directory, 'filters.json', 'filter', result.filters);
+            ENTITY_KINDS.forEach((kind) => {
+                loadLocaleMessages(localeDir, directory, `${kind}.json`, KEY_PREFIXES[kind], result[kind]);
+            });
         }
     }
 

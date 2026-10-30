@@ -30,4 +30,10 @@ describe('locale message parser', () => {
     it('returns an empty object when the locale file is missing', () => {
         expect(parseLocaleMessages(null, 'filter')).toEqual({});
     });
+
+    it('throws when the locale file contents are not an array', () => {
+        const messages = { 'filter.1.name': 'Filter 1' } as unknown as Record<string, string>[];
+
+        expect(() => parseLocaleMessages(messages, 'filter')).toThrow(TypeError);
+    });
 });

@@ -75,6 +75,7 @@ The library exposes four public API functions: `compile`, `validateJSONSchema`,
 │           ├── log.ts                 # CompilerLogger (wraps @adguard/logger)
 │           ├── locale-messages.ts     # Locale file parsing shared by generator and schema
 │           ├── metadata-file-names.ts  # Metadata output file names
+│           ├── read-json.ts           # JSON file reading with parse error context
 │           ├── report.js              # Compilation report builder
 │           ├── builder-utils.js       # Helper functions (domain optimization)
 │           ├── extended-css-validator.js  # CSS selector validation

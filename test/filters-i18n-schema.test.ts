@@ -9,9 +9,10 @@ import path from 'node:path';
 import {
     buildFiltersI18nSchema,
     collectMissingFallbacks,
-    generateFiltersI18nSchema,
+    loadRegistryLocales,
     type FiltersI18nSchema,
     type FiltersMetadata,
+    type LocaleSchemaDefinition,
 } from '../src/main/filters-i18n-schema';
 import {
     parseLocaleMessages,
@@ -23,33 +24,6 @@ import {
     createLocales,
     withTempDir,
 } from './utils/fixtures';
-
-/**
- * Schema for a single locale object.
- */
-interface LocaleSchema {
-    required: string[];
-    properties: Record<string, { default: string }>;
-}
-
-/**
- * Schema for a single entity id.
- */
-interface EntityIdSchema {
-    required: string[];
-    properties: Record<string, { $ref: string }>;
-}
-
-/**
- * Subset of the generated schema used by the tests.
- */
-interface GeneratedSchema {
-    definitions: Record<string, LocaleSchema>;
-    properties: Record<string, {
-        required: string[];
-        properties: Record<string, EntityIdSchema>;
-    }>;
-}
 
 const FILTERS_METADATA: FiltersMetadata = {
     groups: [{ groupId: 1 }],
@@ -80,7 +54,7 @@ const createEnglishData = (): Record<EntityKind, LocaleFileData> => {
  *
  * @returns Generated schema.
  */
-const buildSchema = (locales: string[] = ['en']): GeneratedSchema => buildFiltersI18nSchema({
+const buildSchema = (locales: string[] = ['en']): FiltersI18nSchema => buildFiltersI18nSchema({
     filtersMetadata: FILTERS_METADATA,
     registryLocales: {
         availableLocales: locales,
@@ -88,7 +62,7 @@ const buildSchema = (locales: string[] = ['en']): GeneratedSchema => buildFilter
         englishPath: '/locales/en',
         englishData: createEnglishData(),
     },
-}) as unknown as GeneratedSchema;
+});
 
 /**
  * Generates the schema from a locales directory.
@@ -101,11 +75,10 @@ const buildSchema = (locales: string[] = ['en']): GeneratedSchema => buildFilter
 const generateSchema = (
     localesPath: string,
     requiredLocales?: string[],
-): GeneratedSchema => generateFiltersI18nSchema({
-    localesPath,
+): FiltersI18nSchema => buildFiltersI18nSchema({
     filtersMetadata: FILTERS_METADATA,
-    requiredLocales,
-}) as unknown as GeneratedSchema;
+    registryLocales: loadRegistryLocales(localesPath, requiredLocales),
+});
 
 /**
  * Resolves the shared locale schema for an entity.
@@ -118,11 +91,11 @@ const generateSchema = (
  * @returns Locale schema definition.
  */
 const getLocaleSchema = (
-    schema: GeneratedSchema,
-    kind: string,
+    schema: FiltersI18nSchema,
+    kind: EntityKind,
     id: string,
     locale: string,
-): LocaleSchema => {
+): LocaleSchemaDefinition => {
     const ref = schema.properties[kind].properties[id].properties[locale].$ref;
     const definitionName = ref.replace('#/definitions/', '');
 
@@ -172,7 +145,7 @@ describe('filters i18n schema generator', () => {
             },
         };
 
-        expect(collectMissingFallbacks(json, schema as unknown as FiltersI18nSchema)).toEqual([
+        expect(collectMissingFallbacks(json, schema)).toEqual([
             {
                 kind: 'groups',
                 id: '1',

@@ -7,9 +7,9 @@ import {
     collectMissingFallbacks,
     getEntityIds,
     loadRegistryLocales,
-    readJson,
 } from './filters-i18n-schema';
 import { ENTITY_KINDS } from './utils/locale-messages';
+import { readJson } from './utils/read-json';
 import { LEGACY_PLATFORM_PATHS } from './platforms-config';
 import {
     FILTERS_I18N_METADATA_FILE_NAME,
@@ -25,9 +25,9 @@ const AJV_OPTIONS = {
     // shares one definition per entity between all locales, and inlining it
     // would copy the same subschema for every locale again.
     inlineRefs: false,
-    // A `required` list holds one entry per locale (44 on the registry). For
-    // lists of at least this size, a loop is faster and uses less memory than
-    // an unrolled check per entry.
+    // A `required` list holds one entry per locale. For lists of at least this
+    // size, a loop is faster and uses less memory than an unrolled check per
+    // entry.
     loopRequired: 20,
 };
 

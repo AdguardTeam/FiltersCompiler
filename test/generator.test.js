@@ -453,5 +453,13 @@ describe('generator', () => {
                 },
             });
         });
+
+        it('reports the locale file path when a locale file is not valid JSON', async () => {
+            await fs.writeFile(path.join(tmpDir, 'locales', 'ko', 'filters.json'), '{');
+
+            await expect(generate(filtersDir, platformsDir)).rejects.toThrow(
+                /Cannot parse .*locales[\\/]ko[\\/]filters\.json/,
+            );
+        });
     });
 });

@@ -54,8 +54,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   dropped. The generator cannot add a missing localization, so a filter in
   `filters.json` without a `filters_i18n.json` entry still fails validation.
   The legacy `mac` and `mac_v2` platforms keep their current output.
-- Replaced the deprecated `String.prototype.substr` with `slice` in the schema
-  validator.
 - Validation errors written to `logPath` are formatted as text instead of
   `[object Object]`.
 - The validation log file is closed when `validateJSONSchema()` finishes, so a
@@ -65,6 +63,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   bare JSON parse error.
 - `validateJSONSchema()` logs a failed platform directory read as an error, not
   as information.
+- The platform generator reports the path of a malformed locale file instead of
+  a bare JSON parse error.
+- Importing the package no longer installs a process-wide
+  `unhandledRejection` listener.
 
 ### Security
 
