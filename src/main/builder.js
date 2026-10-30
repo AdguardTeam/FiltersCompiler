@@ -464,6 +464,7 @@ const getResolvedPreprocessorIncludes = async function (filterDir, filterName, l
  * @param {string[]} lines Array of raw rules and possibly preprocessor `!#include` directives.
  * @param {string[]} excluded Array of rules to exclude.
  * @param {string[]} invalidRules Invalid rules for the report file.
+ * @param {string} [previousLine] Line preceding the first of `lines` in the template.
  *
  * @returns {Promise<string[]>} Promise which resolves to array of AdGuard syntax rules.
  */
@@ -473,9 +474,10 @@ const prepareAdgRules = async function (
     lines,
     excluded,
     invalidRules,
+    previousLine,
 ) {
     const resolvedIncludes = await getResolvedPreprocessorIncludes(filterDir, filterName, lines);
-    return convertRulesToAdgSyntax(resolvedIncludes, excluded, invalidRules);
+    return convertRulesToAdgSyntax(resolvedIncludes, excluded, invalidRules, previousLine);
 };
 
 /**
@@ -530,6 +532,7 @@ const compile = async function (filterDir, filterName, templateContent, trustLev
     const invalid = [];
 
     const lines = splitLines(templateContent);
+    let previousLine;
     // eslint-disable-next-line no-restricted-syntax
     for (const line of lines) {
         if (line.startsWith(INCLUDE_DIRECTIVE)) {
@@ -571,6 +574,7 @@ const compile = async function (filterDir, filterName, templateContent, trustLev
                 inlineRules,
                 excluded,
                 invalid,
+                previousLine,
             );
 
             logger.info('Applying trust-level exclusions to inline template.txt rules...');
@@ -582,6 +586,8 @@ const compile = async function (filterDir, filterName, templateContent, trustLev
                 result.push(inlineRules[i]);
             }
         }
+
+        previousLine = line.trim();
     }
 
     result = result.filter((line) => !isDiffPathHeaderTag(line));
