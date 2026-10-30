@@ -12,6 +12,7 @@ import {
 import {
     sortMetadataFilters,
     shouldBuildFilterForPlatform,
+    selectLocalizedFilters,
     makeHeader,
     loadFilterMetadata,
     init,
@@ -165,6 +166,25 @@ describe('generator', () => {
             }).toThrow(
                 'Both platformsIncluded and platformsExcluded cannot be defined simultaneously for filter 1',
             );
+        });
+    });
+
+    describe('selectLocalizedFilters', () => {
+        const localizations = {
+            1: { en: { name: 'Filter 1', description: 'Filter 1 description' } },
+            2: { en: { name: 'Filter 2', description: 'Filter 2 description' } },
+            3: { en: { name: 'Filter 3', description: 'Filter 3 description' } },
+        };
+
+        it('keeps only the localizations of the built filters', () => {
+            expect(selectLocalizedFilters(localizations, new Set(['1', '3']))).toEqual({
+                1: localizations['1'],
+                3: localizations['3'],
+            });
+        });
+
+        it('returns no localizations when no filter is built', () => {
+            expect(selectLocalizedFilters(localizations, new Set())).toEqual({});
         });
     });
 
