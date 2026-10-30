@@ -501,17 +501,17 @@ const parseInfo = (string, mask) => {
 };
 
 /**
- * Loads one locale data kind (groups, tags, or filters) into the result.
+ * Loads messages for one entity kind from a locale file and adds them to the target collection.
  *
- * @param {Object} result Locale data accumulator.
- * @param {string} localeDir Directory of one locale.
- * @param {string} locale Locale name.
- * @param {string} kind Entity kind: `groups`, `tags`, or `filters`.
- * @param {string} keyPrefix Key prefix with a trailing dot, e.g. `group.`.
+ * @param {string} localeDir - The directory that contains the locale file.
+ * @param {string} localeName - The locale name used as a key in the target collection.
+ * @param {string} fileName - The name of the JSON file to load.
+ * @param {string} keyPrefix - The message key prefix, for example `group.`.
+ * @param {Object} target - The collection to add the messages to.
  * @returns {void}
  */
-const loadLocaleKind = (result, localeDir, locale, kind, keyPrefix) => {
-    const entries = JSON.parse(readFile(path.join(localeDir, `${kind}.json`)));
+const loadLocaleMessages = (localeDir, localeName, fileName, keyPrefix, target) => {
+    const entries = JSON.parse(readFile(path.join(localeDir, fileName)));
     if (!entries) {
         return;
     }
@@ -526,9 +526,9 @@ const loadLocaleKind = (result, localeDir, locale, kind, keyPrefix) => {
             }
 
             const { id } = info;
-            result[kind][id] = result[kind][id] || {};
-            result[kind][id][locale] = result[kind][id][locale] || {};
-            result[kind][id][locale][info.message] = entry[p];
+            target[id] = target[id] || {};
+            target[id][localeName] = target[id][localeName] || {};
+            target[id][localeName][info.message] = entry[p];
         }
     }
 };
@@ -551,9 +551,9 @@ const loadLocales = function (dir) {
     for (const directory of locales) {
         const localeDir = path.join(dir, directory);
         if (fs.lstatSync(localeDir).isDirectory()) {
-            loadLocaleKind(result, localeDir, directory, 'groups', 'group.');
-            loadLocaleKind(result, localeDir, directory, 'tags', 'tag.');
-            loadLocaleKind(result, localeDir, directory, 'filters', 'filter.');
+            loadLocaleMessages(localeDir, directory, 'groups.json', 'group.', result.groups);
+            loadLocaleMessages(localeDir, directory, 'tags.json', 'tag.', result.tags);
+            loadLocaleMessages(localeDir, directory, 'filters.json', 'filter.', result.filters);
         }
     }
 
