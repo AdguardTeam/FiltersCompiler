@@ -17,6 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `require('@adguard/filters-compiler')` failing with `MODULE_NOT_FOUND`.
+  The package now ships a single ESM build (`dist/index.js`) and relies on
+  Node.js `require(ESM)` support, so both `import` and `require` load the same
+  artifact. The `engines.node` floor is now `>=22.12`.
+
 ### Security
 
 ## [3.4.3] - 2026-10-21

@@ -44,7 +44,7 @@ running tests, and contributing code to the AdGuard Filters Compiler.
 
 | Tool                           | Version            | Notes                        |
 | ------------------------------ | ------------------ | ---------------------------- |
-| [Node.js](https://nodejs.org/) | 22                 | Use [nvm] to manage versions |
+| [Node.js](https://nodejs.org/) | >=22.12            | Use [nvm] to manage versions |
 | [pnpm](https://pnpm.io/)       | >=10.33.4 and <11  | Package manager              |
 | [Git](https://git-scm.com/)    | Latest             | Version control              |
 
@@ -80,7 +80,7 @@ pnpm install
 pnpm build
 ```
 
-Build output goes to `dist/` (ESM: `dist/index.js`, CJS: `dist/index.cjs`).
+Build output goes to `dist/` as a single ES module (`dist/index.js`).
 Rollup also copies JSON schemas and trust-level files into `dist/`.
 
 ### 4. Run Tests
@@ -336,7 +336,8 @@ try {
 
 **Problem**: Build or tests fail with unexpected errors.
 
-**Solution**: Ensure you are using Node.js 22:
+**Solution**: Ensure you are using Node.js 22.12 or later. The package uses
+`require(ESM)`, which Node.js enables by default from version 22.12:
 
 ```bash
 node --version  # Should be v22.x.x

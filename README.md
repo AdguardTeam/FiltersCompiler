@@ -56,6 +56,8 @@ the [FiltersRegistry README][filters-metadata].
 npm install @adguard/filters-compiler
 ```
 
+Requires Node.js 22.12 or later.
+
 Also available via pnpm or yarn:
 
 ```bash
@@ -64,8 +66,8 @@ pnpm add @adguard/filters-compiler
 yarn add @adguard/filters-compiler
 ```
 
-The package ships as dual ESM + CJS, so both `import` and `require`
-work out of the box.
+The package ships as an ES module. Use `import`, or use `require` with
+Node.js 22.12 or later, which supports `require(ESM)`.
 
 ## Quick Start
 
