@@ -77,9 +77,14 @@ class CompilerLogger extends Logger {
      * By default, the log file is opened with 'w' (truncate/create). With
      * `append`, it is opened with 'a' (create/append). Subsequent writes are
      * appended in both modes.
+     *
+     * When `logFilePath` is omitted, the file opened by an earlier call is
+     * closed, so later messages go to the console only.
      */
     initialize(logFilePath: string | undefined, append = false): void {
         if (!logFilePath) {
+            // Do not keep writing to a file opened by an earlier call.
+            this.close();
             /* eslint-disable no-console */
             console.warn('Log file is not specified');
             return;
