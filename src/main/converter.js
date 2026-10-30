@@ -52,16 +52,18 @@ export const excludeRule = (rule, excluded, message) => {
  * @param {string[]} rulesList Input rules.
  * @param {string[]} [excluded=[]] Rules to exclude.
  * @param {string[]} [invalidRules=[]] Collected invalid rules for the report file.
+ * @param {string} [previousLine] Line preceding the first rule of `rulesList`, so that a hint
+ * on a separate line (e.g. `!+ NOT_CONVERT`) is honored when the rules are converted one by one.
  *
  * @return {string[]} Rules converted to AdGuard syntax.
  */
-export const convertRulesToAdgSyntax = (rulesList, excluded = [], invalidRules = []) => {
+export const convertRulesToAdgSyntax = (rulesList, excluded = [], invalidRules = [], previousLine = undefined) => {
     const result = [];
 
     for (let i = 0; i < rulesList.length; i += 1) {
         const rule = rulesList[i];
 
-        if (isConversionDisabledByHint(rulesList[i - 1])) {
+        if (isConversionDisabledByHint(i > 0 ? rulesList[i - 1] : previousLine)) {
             result.push(rule);
             continue;
         }

@@ -22,6 +22,9 @@ example.com#%#//scriptlet('set-constant', 'test123', '123')
 !+ PLATFORM(mac, windows) NOT_VALIDATE
 ||foo.bar^$newmodifier
 somesite.com##.main-banner
+!+ NOT_CONVERT
+||convert1.test^$1p
+||convert2.test^$~third-party
 !+ NOT_VALIDATE PLATFORM(mac, windows)
 ||example.org^$newmodifier
 !#safari_cb_affinity(security)

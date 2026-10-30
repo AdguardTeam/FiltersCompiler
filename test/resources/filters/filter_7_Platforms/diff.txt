@@ -1,2 +1,4 @@
+! Rule "||convert2.test^$1p" converted to: "||convert2.test^$~third-party"
+||convert2.test^$1p
 ! Error: "Unknown modifier: unsupported" in the rule: "||test.org^$unsupported"
 ||test.org^$unsupported

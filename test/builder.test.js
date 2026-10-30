@@ -1,4 +1,5 @@
 /* eslint-disable max-len */
+
 /**
  * @vitest-environment jsdom
  */
@@ -1239,6 +1240,17 @@ describe('Test builder', async () => {
                 expect(filterLines.includes('||example.org^$newmodifier')).toBeTruthy();
                 expect(filterLines.includes('||foo.bar^$newmodifier')).toBeTruthy();
                 expect(filterLines.includes('||test.org^$unsupported')).toBeFalsy();
+            });
+        });
+
+        describe('hint NOT_CONVERT in template.txt inline rules', () => {
+            it('platform/mac keeps uBO `$1p` as is after the hint, otherwise converts it to `$~third-party`', async () => {
+                const filterContent = await readFile(path.join(platformsDir, 'mac', 'filters', '7.txt'));
+                expect(filterContent).toBeTruthy();
+
+                const filterLines = filterContent.split(/\r?\n/);
+                expect(filterLines.includes('||convert1.test^$1p')).toBeTruthy();
+                expect(filterLines.includes('||convert2.test^$~third-party')).toBeTruthy();
             });
         });
 
