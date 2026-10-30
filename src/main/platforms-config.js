@@ -892,3 +892,11 @@ export const platformsConfig = {
         },
     },
 };
+
+/**
+ * Directory names of the legacy macOS platform builds.
+ *
+ * Derived from the platform config keys so that the generator, the JSON
+ * validator, and the tests use the same names.
+ */
+export const LEGACY_PLATFORM_PATHS = LEGACY_PLATFORMS.map((key) => platformsConfig[key].path);

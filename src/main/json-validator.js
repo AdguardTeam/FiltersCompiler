@@ -3,23 +3,20 @@ import path from 'path';
 import Ajv from 'ajv';
 import { logger } from './utils/log';
 import {
-    ENTITY_KINDS,
-    generateFiltersI18nSchema,
+    buildFiltersI18nSchema,
+    collectMissingFallbacks,
     getEntityIds,
-    LOCALE_FIELDS,
-    resolveLocaleSchemaRef,
+    loadRegistryLocales,
+    readJson,
 } from './filters-i18n-schema';
-import { LEGACY_PLATFORMS, platformsConfig } from './platforms-config';
+import { ENTITY_KINDS } from './utils/locale-messages';
+import { LEGACY_PLATFORM_PATHS } from './platforms-config';
+import {
+    FILTERS_I18N_METADATA_FILE_NAME,
+    FILTERS_METADATA_FILE_JSON,
+} from './utils/metadata-file-names';
 
 const SCHEMA_EXTENSION = '.schema.json';
-
-// Directory names of the legacy macOS platform builds, derived from the
-// platform config keys so that the generator and the validator stay in sync.
-const LEGACY_PLATFORM_PATHS = LEGACY_PLATFORMS.map((key) => platformsConfig[key].path);
-const [OLD_MAC_V1_PLATFORM, OLD_MAC_V2_PLATFORM] = LEGACY_PLATFORM_PATHS;
-
-const FILTERS_METADATA_FILE_NAME = 'filters';
-const FILTERS_I18N_FILE_NAME = 'filters_i18n';
 
 const AJV_OPTIONS = {
     allErrors: true,
@@ -28,6 +25,10 @@ const AJV_OPTIONS = {
     // shares one definition per entity between all locales, and inlining it
     // would copy the same subschema for every locale again.
     inlineRefs: false,
+    // A `required` list holds one entry per locale (44 on the registry). For
+    // lists of at least this size, a loop is faster and uses less memory than
+    // an unrolled check per entry.
+    loopRequired: 20,
 };
 
 /**
@@ -61,76 +62,44 @@ const loadSchemas = (dir) => {
  * @param {string} item Path to the validated file.
  */
 const logAppliedDefaults = (json, schema, item) => {
-    let count = 0;
+    const fallbacks = collectMissingFallbacks(json, schema);
 
-    ENTITY_KINDS.forEach((kind) => {
-        const kindSchema = schema.properties[kind];
-        if (!kindSchema) {
-            return;
-        }
-
-        Object.entries(kindSchema.properties).forEach(([id, idSchema]) => {
-            const idData = json[kind] && json[kind][id];
-            if (!idData) {
-                return;
-            }
-
-            Object.entries(idSchema.properties).forEach(([locale, localeRef]) => {
-                const localeData = idData[locale];
-                if (!localeData) {
-                    return;
-                }
-
-                const localeSchema = resolveLocaleSchemaRef(schema, localeRef);
-
-                LOCALE_FIELDS.forEach((field) => {
-                    if (localeData[field] !== undefined) {
-                        return;
-                    }
-
-                    const fallback = localeSchema.properties[field].default;
-                    const message = `Missing ${kind} ${id} ${field} for locale '${locale}' in ${item}. `
-                        + `Using English fallback: "${fallback}"`;
-                    logger.warn(message);
-                    count += 1;
-                });
-            });
-        });
+    fallbacks.forEach(({
+        kind,
+        id,
+        locale,
+        field,
+        fallback,
+    }) => {
+        const message = `Missing ${kind} ${id} ${field} for locale '${locale}' in ${item}. `
+            + `Using English fallback: "${fallback}"`;
+        logger.warn(message);
     });
 
-    if (count > 0) {
-        logger.warn(`Applied ${count} English fallback(s) in ${item}`);
+    if (fallbacks.length > 0) {
+        logger.warn(`Applied ${fallbacks.length} English fallback(s) in ${item}`);
     }
 };
 
 /**
  * Reads the platform's filters.json metadata.
  *
+ * Only the presence of the file needs a check here: `filters.json` is
+ * validated separately against `filters.schema.json`, and a file that cannot
+ * be parsed fails validation through `readJson()`.
+ *
  * @param {string} item Path to the filters_i18n.json file.
  * @returns {object} Parsed filters.json.
- * @throws {Error} If filters.json is missing, is not valid JSON, or has no
- * groups, tags, or filters array.
+ * @throws {Error} If filters.json is missing or is not valid JSON.
  */
 const readFiltersMetadata = (item) => {
-    const filtersMetadataPath = path.join(path.dirname(item), `${FILTERS_METADATA_FILE_NAME}.json`);
+    const filtersMetadataPath = path.join(path.dirname(item), FILTERS_METADATA_FILE_JSON);
 
     if (!fs.existsSync(filtersMetadataPath)) {
         throw new Error(`${filtersMetadataPath} is missing`);
     }
 
-    let filtersMetadata;
-
-    try {
-        filtersMetadata = JSON.parse(fs.readFileSync(filtersMetadataPath, 'utf8'));
-    } catch (e) {
-        throw new Error(`${filtersMetadataPath} is not valid JSON: ${e.message}`);
-    }
-
-    if (!filtersMetadata || ENTITY_KINDS.some((kind) => !Array.isArray(filtersMetadata[kind]))) {
-        throw new Error(`${filtersMetadataPath} must contain groups, tags, and filters arrays`);
-    }
-
-    return filtersMetadata;
+    return readJson(filtersMetadataPath);
 };
 
 /**
@@ -139,21 +108,40 @@ const readFiltersMetadata = (item) => {
  * @param {object} filtersMetadata Parsed filters.json.
  * @returns {string} Cache key.
  */
-const getI18nSchemaCacheKey = (filtersMetadata) => JSON.stringify(
-    ENTITY_KINDS.map((kind) => getEntityIds(filtersMetadata, kind)),
-);
+const getI18nSchemaCacheKey = (filtersMetadata) => {
+    return JSON.stringify(ENTITY_KINDS.map((kind) => getEntityIds(filtersMetadata, kind)));
+};
 
 /**
- * Returns the generated schema and its compiled validator for a
- * filters_i18n.json file.
+ * Returns the registry locale data for the current validation call.
+ *
+ * The data does not change during a call, so it is loaded once, lazily: a
+ * tree with only legacy platforms never reads `localesPath` here.
+ *
+ * @param {object} context Validation context.
+ * @returns {object} Loaded locale data.
+ */
+const getRegistryLocales = (context) => {
+    if (!context.registryLocales) {
+        context.registryLocales = loadRegistryLocales(
+            context.options.localesPath,
+            context.options.requiredLocales,
+        );
+    }
+
+    return context.registryLocales;
+};
+
+/**
+ * Returns the compiled validator for a filters_i18n.json file.
  *
  * @param {string} item Path to the filters_i18n.json file.
  * @param {object} context Validation context.
- * @returns {{schema: object, validate: Function}|null} Schema and compiled
- * validator, or `null` when they cannot be prepared.
+ * @returns {Function|null} Compiled validator, or `null` when it cannot be
+ * prepared. The validator keeps the generated schema in its `schema` property.
  */
-const resolveI18nSchema = (item, context) => {
-    const { validator, options, i18nValidators } = context;
+const resolveI18nValidator = (item, context) => {
+    const { validator, i18nValidators } = context;
 
     let filtersMetadata;
     let cacheKey;
@@ -169,22 +157,18 @@ const resolveI18nSchema = (item, context) => {
     const cachedValidator = i18nValidators.get(cacheKey);
 
     if (cachedValidator) {
-        return {
-            schema: cachedValidator.schema,
-            validate: cachedValidator,
-        };
+        return cachedValidator;
     }
 
     try {
-        const schema = generateFiltersI18nSchema({
-            localesPath: options.localesPath,
+        const schema = buildFiltersI18nSchema({
             filtersMetadata,
-            requiredLocales: options.requiredLocales,
+            registryLocales: getRegistryLocales(context),
         });
-        const validate = validator.compile(schema);
-        i18nValidators.set(cacheKey, validate);
+        const compiledValidator = validator.compile(schema);
+        i18nValidators.set(cacheKey, compiledValidator);
 
-        return { schema, validate };
+        return compiledValidator;
     } catch (e) {
         logger.error(`Cannot generate filters_i18n schema for ${item}: ${e.message}`);
         return null;
@@ -205,7 +189,7 @@ const validateDir = (dir, context) => {
     try {
         items = fs.readdirSync(dir);
     } catch (e) {
-        logger.info(e.message);
+        logger.error(e.message);
         return false;
     }
     // eslint-disable-next-line no-restricted-syntax
@@ -226,37 +210,38 @@ const validateDir = (dir, context) => {
             if (isLegacyPlatform) {
                 logger.info(`Look up old schemas for ${platformName} directory`);
                 schema = oldSchemas[platformName][fileName];
-            } else if (fileName === FILTERS_I18N_FILE_NAME) {
-                const resolved = resolveI18nSchema(item, context);
+            } else if (fileName === FILTERS_I18N_METADATA_FILE_NAME) {
+                compiledValidator = resolveI18nValidator(item, context);
 
-                if (!resolved) {
+                if (!compiledValidator) {
                     return false;
                 }
 
-                schema = resolved.schema;
-                compiledValidator = resolved.validate;
+                schema = compiledValidator.schema;
             }
 
             if (schema) {
                 logger.info(`Validating ${item}`);
 
-                const json = JSON.parse(fs.readFileSync(item));
+                const json = readJson(item);
 
-                if (!isLegacyPlatform && fileName === FILTERS_I18N_FILE_NAME) {
-                    logAppliedDefaults(json, schema, item);
+                if (compiledValidator) {
+                    logAppliedDefaults(json, compiledValidator.schema, item);
                 }
 
                 const validate = compiledValidator ?? validator.compile(schema);
                 const valid = validate(json);
 
                 // json can be updated with default values
-                fs.writeFileSync(item, JSON.stringify(json, null, '\t'));
+                const content = JSON.stringify(json, null, '\t');
+
+                fs.writeFileSync(item, content);
 
                 // duplicate to .js file as well
                 const jsFileName = `${fileName}.js`;
                 fs.writeFileSync(
                     path.join(path.dirname(item), jsFileName),
-                    JSON.stringify(json, null, '\t'),
+                    content,
                 );
 
                 if (!valid) {
@@ -282,7 +267,8 @@ const validateDir = (dir, context) => {
  * @param {string} [options.logPath] - Path to the validation log file; the file is appended to
  * and closed when validation finishes
  * @returns {boolean} Validation result
- * @throws {Error} If options or options.localesPath is missing, or if options.logPath cannot be opened
+ * @throws {Error} If options or options.localesPath is missing, options.logPath cannot be opened,
+ * or a built JSON file cannot be parsed
  */
 const validate = (platformsPath, jsonSchemasConfigDir, options) => {
     if (!options || !options.localesPath) {
@@ -304,19 +290,20 @@ const validate = (platformsPath, jsonSchemasConfigDir, options) => {
 
         const schemas = loadSchemas(jsonSchemasConfigDir);
 
-        const oldSchemasMacV1 = loadSchemas(path.join(jsonSchemasConfigDir, OLD_MAC_V1_PLATFORM));
-        const oldSchemasMacV2 = loadSchemas(path.join(jsonSchemasConfigDir, OLD_MAC_V2_PLATFORM));
-        const oldSchemas = {
-            [OLD_MAC_V1_PLATFORM]: oldSchemasMacV1,
-            [OLD_MAC_V2_PLATFORM]: oldSchemasMacV2,
-        };
+        const oldSchemas = Object.fromEntries(
+            LEGACY_PLATFORM_PATHS.map((platformPath) => [
+                platformPath,
+                loadSchemas(path.join(jsonSchemasConfigDir, platformPath)),
+            ]),
+        );
 
         const context = {
-            validator: new Ajv({ ...AJV_OPTIONS }),
+            validator: new Ajv(AJV_OPTIONS),
             schemas,
             oldSchemas,
             options,
             i18nValidators: new Map(),
+            registryLocales: null,
         };
 
         const result = validateDir(platformsPath, context);

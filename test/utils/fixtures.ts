@@ -72,3 +72,15 @@ export const withTempDir = <T>(prefix: string, callback: (dir: string) => T): T 
         fs.rmSync(dir, { recursive: true, force: true });
     }
 };
+
+/**
+ * Creates complete English locale messages for the entities used by the tests
+ * (group 1, tag 2, filter 25).
+ *
+ * @returns English locale messages keyed by entity kind.
+ */
+export const createEnglishLocales = (): Record<string, LocaleMessages[]> => ({
+    groups: [{ 'group.1.name': 'Group', 'group.1.description': 'Group description' }],
+    tags: [{ 'tag.2.name': 'Tag', 'tag.2.description': 'Tag description' }],
+    filters: [{ 'filter.25.name': 'Filter 25', 'filter.25.description': 'Filter 25 description' }],
+});

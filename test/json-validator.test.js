@@ -18,18 +18,18 @@ import { build } from '../src/main/builder';
 import { disableOptimization } from '../src/main/optimization';
 
 import {
+    createEnglishLocales,
     createLocales,
     createTempDir,
     readJson,
     writeJson,
 } from './utils/fixtures';
-import { LEGACY_PLATFORMS, platformsConfig } from '../src/main/platforms-config';
+import { LEGACY_PLATFORM_PATHS } from '../src/main/platforms-config';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// Directory names of the legacy macOS platform builds, derived from the same
-// platform config keys that the generator and the validator use.
-const legacyPlatformNames = new Set(LEGACY_PLATFORMS.map((key) => platformsConfig[key].path));
+// Directory names of the legacy macOS platform builds.
+const legacyPlatformNames = new Set(LEGACY_PLATFORM_PATHS);
 
 /**
  * Returns the directories under `root` that contain a `filters.json` file.
@@ -258,17 +258,6 @@ const createFiltersI18n = ({
 };
 
 /**
- * Creates complete English locale messages for the standard test entities.
- *
- * @returns {object} English locale messages keyed by entity kind.
- */
-const createEnglishLocales = () => ({
-    groups: [{ 'group.1.name': 'Group', 'group.1.description': 'Group description' }],
-    tags: [{ 'tag.2.name': 'Tag', 'tag.2.description': 'Tag description' }],
-    filters: [{ 'filter.25.name': 'Filter 25', 'filter.25.description': 'Filter 25 description' }],
-});
-
-/**
  * Creates German locale messages with the group description always missing,
  * so the fallback tests exercise the English fallback for it.
  *
@@ -331,6 +320,9 @@ const createValidationFixture = ({
 /**
  * Runs a test body with a temporary validation fixture and cleans it up.
  *
+ * The callback receives the fixture paths and a `validate(options)` helper
+ * that fills in the fixture's paths.
+ *
  * @param {object} fixtureOptions Fixture options.
  * @param {Function} callback Test body.
  * @returns {*} Callback result.
@@ -338,8 +330,14 @@ const createValidationFixture = ({
 const withValidationFixture = async (fixtureOptions, callback) => {
     const fixture = createValidationFixture(fixtureOptions);
 
+    const validate = (options = {}) => schemaValidator.validate(
+        fixture.platformsPath,
+        fixture.schemasDir,
+        { localesPath: fixture.localesPath, ...options },
+    );
+
     try {
-        return await callback(fixture);
+        return await callback({ ...fixture, validate });
     } finally {
         fixture.cleanup();
     }
@@ -359,14 +357,10 @@ describe('json validator', () => {
         platform: 'test',
         filtersMetadata: createFiltersMetadata(),
         filtersI18n: createFiltersI18n(),
-    }, ({ platformsPath, localesPath, schemasDir }) => {
+    }, ({ platformsPath, validate }) => {
         const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
 
-        const result = schemaValidator.validate(
-            platformsPath,
-            schemasDir,
-            { localesPath, requiredLocales: ['en', 'de'] },
-        );
+        const result = validate({ requiredLocales: ['en', 'de'] });
 
         expect(result).toBe(true);
         expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining(
@@ -384,17 +378,11 @@ describe('json validator', () => {
 
     it('validates several platforms in one call', () => withValidationFixture({
         locales: { en: createEnglishLocales() },
-    }, ({ platformsPath, localesPath, schemasDir }) => {
+    }, ({ platformsPath, validate }) => {
         createPlatform(platformsPath, 'first', createFiltersMetadata(), createFiltersI18n({ includeDe: false }));
         createPlatform(platformsPath, 'second', createFiltersMetadata(), createFiltersI18n({ includeDe: false }));
 
-        const result = schemaValidator.validate(
-            platformsPath,
-            schemasDir,
-            { localesPath, requiredLocales: ['en'] },
-        );
-
-        expect(result).toBe(true);
+        expect(validate({ requiredLocales: ['en'] })).toBe(true);
     }));
 
     it('fails when a built entity has no English localization', () => withValidationFixture({
@@ -408,14 +396,10 @@ describe('json validator', () => {
         platform: 'test',
         filtersMetadata: createFiltersMetadata(),
         filtersI18n: createFiltersI18n({ includeDe: false }),
-    }, ({ platformsPath, localesPath, schemasDir }) => {
+    }, ({ validate }) => {
         const errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => {});
 
-        const result = schemaValidator.validate(
-            platformsPath,
-            schemasDir,
-            { localesPath, requiredLocales: ['en'] },
-        );
+        const result = validate({ requiredLocales: ['en'] });
 
         expect(result).toBe(false);
         expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining(
@@ -439,16 +423,10 @@ describe('json validator', () => {
             platform: 'test',
             filtersMetadata: createFiltersMetadata(),
             filtersI18n,
-        }, ({ platformsPath, localesPath, schemasDir }) => {
+        }, ({ validate }) => {
             vi.spyOn(logger, 'error').mockImplementation(() => {});
 
-            const result = schemaValidator.validate(
-                platformsPath,
-                schemasDir,
-                { localesPath, requiredLocales: ['en', 'de'] },
-            );
-
-            expect(result).toBe(false);
+            expect(validate({ requiredLocales: ['en', 'de'] })).toBe(false);
         });
     });
 
@@ -464,21 +442,15 @@ describe('json validator', () => {
         platform: 'test',
         filtersMetadata: createFiltersMetadata(),
         filtersI18n: createFiltersI18n({ deGroup: { name: 42 } }),
-    }, ({ platformsPath, localesPath, schemasDir }) => {
+    }, ({ validate }) => {
         vi.spyOn(logger, 'error').mockImplementation(() => {});
 
-        const result = schemaValidator.validate(
-            platformsPath,
-            schemasDir,
-            { localesPath, requiredLocales: ['en'] },
-        );
-
-        expect(result).toBe(false);
+        expect(validate({ requiredLocales: ['en'] })).toBe(false);
     }));
 
     it('fails when filters.json is missing next to filters_i18n.json', () => withValidationFixture({
         locales: { en: createEnglishLocales() },
-    }, ({ platformsPath, localesPath, schemasDir }) => {
+    }, ({ platformsPath, validate }) => {
         writeJson(
             path.join(platformsPath, 'test', 'filters_i18n.json'),
             createFiltersI18n({ includeDe: false }),
@@ -486,16 +458,25 @@ describe('json validator', () => {
 
         const errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => {});
 
-        const result = schemaValidator.validate(
-            platformsPath,
-            schemasDir,
-            { localesPath, requiredLocales: ['en'] },
-        );
+        const result = validate({ requiredLocales: ['en'] });
 
         expect(result).toBe(false);
         expect(errorSpy).toHaveBeenCalledWith(expect.stringMatching(
             /^Cannot read filters metadata for .*filters_i18n\.json: .*filters\.json is missing$/,
         ));
+    }));
+
+    it('reports the path when a validated file is not valid JSON', () => withValidationFixture({
+        locales: { en: createEnglishLocales() },
+        platform: 'test',
+        filtersMetadata: createFiltersMetadata(),
+        filtersI18n: createFiltersI18n({ includeDe: false }),
+    }, ({ platformsPath, validate }) => {
+        fs.writeFileSync(path.join(platformsPath, 'test', 'filters_i18n.json'), '{');
+
+        expect(() => validate({ requiredLocales: ['en'] })).toThrow(
+            /Cannot parse .*filters_i18n\.json/,
+        );
     }));
 
     it('writes fallback warnings to the log file', () => withValidationFixture({
@@ -508,17 +489,8 @@ describe('json validator', () => {
         filtersI18n: createFiltersI18n({
             deFilter: { name: 'Filter 25', description: 'Filter 25 Beschreibung' },
         }),
-    }, ({
-        platformsPath,
-        localesPath,
-        schemasDir,
-        logPath,
-    }) => {
-        const result = schemaValidator.validate(
-            platformsPath,
-            schemasDir,
-            { localesPath, requiredLocales: ['en', 'de'], logPath },
-        );
+    }, ({ logPath, validate }) => {
+        const result = validate({ requiredLocales: ['en', 'de'], logPath });
 
         expect(result).toBe(true);
 
@@ -535,19 +507,10 @@ describe('json validator', () => {
         platform: 'test',
         filtersMetadata: createFiltersMetadata(),
         filtersI18n: createFiltersI18n(),
-    }, ({
-        platformsPath,
-        localesPath,
-        schemasDir,
-        logPath,
-    }) => {
+    }, ({ logPath, validate }) => {
         fs.writeFileSync(logPath, 'existing log line\n');
 
-        const result = schemaValidator.validate(
-            platformsPath,
-            schemasDir,
-            { localesPath, requiredLocales: ['en', 'de'], logPath },
-        );
+        const result = validate({ requiredLocales: ['en', 'de'], logPath });
 
         expect(result).toBe(true);
 
@@ -566,17 +529,10 @@ describe('json validator', () => {
         filtersI18n: createFiltersI18n(),
     }, ({
         platformsPath,
-        localesPath,
-        schemasDir,
+        validate,
         logPath,
     }) => {
-        const firstResult = schemaValidator.validate(
-            platformsPath,
-            schemasDir,
-            { localesPath, requiredLocales: ['en', 'de'], logPath },
-        );
-
-        expect(firstResult).toBe(true);
+        expect(validate({ requiredLocales: ['en', 'de'], logPath })).toBe(true);
 
         // The log file must be closed: a later message must not reach it.
         logger.warn('logged after validation');
@@ -584,13 +540,7 @@ describe('json validator', () => {
         expect(logAfterFirstCall).not.toContain('logged after validation');
 
         createPlatform(platformsPath, 'second', createFiltersMetadata(), createFiltersI18n());
-        const secondResult = schemaValidator.validate(
-            platformsPath,
-            schemasDir,
-            { localesPath, requiredLocales: ['en', 'de'] },
-        );
-
-        expect(secondResult).toBe(true);
+        expect(validate({ requiredLocales: ['en', 'de'] })).toBe(true);
         expect(fs.readFileSync(logPath, 'utf8')).toBe(logAfterFirstCall);
     }));
 
@@ -599,20 +549,11 @@ describe('json validator', () => {
         platform: 'test',
         filtersMetadata: createFiltersMetadata(),
         filtersI18n: createFiltersI18n({ includeDe: false }),
-    }, ({
-        platformsPath,
-        localesPath,
-        schemasDir,
-        root,
-    }) => {
+    }, ({ root, validate }) => {
         const logPath = path.join(root, 'log-directory');
         fs.mkdirSync(logPath);
 
-        expect(() => schemaValidator.validate(
-            platformsPath,
-            schemasDir,
-            { localesPath, requiredLocales: ['en'], logPath },
-        )).toThrow();
+        expect(() => validate({ requiredLocales: ['en'], logPath })).toThrow();
     }));
 
     it('writes validation errors to the log file as text', () => withValidationFixture({
@@ -627,28 +568,40 @@ describe('json validator', () => {
         platform: 'test',
         filtersMetadata: createFiltersMetadata(),
         filtersI18n: createFiltersI18n({ deGroup: { name: 42 } }),
-    }, ({
-        platformsPath,
-        localesPath,
-        schemasDir,
-        logPath,
-    }) => {
-        const result = schemaValidator.validate(
-            platformsPath,
-            schemasDir,
-            { localesPath, requiredLocales: ['en'], logPath },
-        );
-
-        expect(result).toBe(false);
+    }, ({ logPath, validate }) => {
+        expect(validate({ requiredLocales: ['en'], logPath })).toBe(false);
 
         const log = fs.readFileSync(logPath, 'utf8');
         expect(log).toContain('must be string');
         expect(log).not.toContain('[object Object]');
     }));
 
+    it('logs an error when the platforms directory cannot be read', () => withValidationFixture({
+        locales: { en: createEnglishLocales() },
+    }, ({
+        platformsPath,
+        localesPath,
+        schemasDir,
+    }) => {
+        const errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => {});
+
+        const result = schemaValidator.validate(
+            path.join(platformsPath, 'missing'),
+            schemasDir,
+            { localesPath, requiredLocales: ['en'] },
+        );
+
+        expect(result).toBe(false);
+        expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('ENOENT'));
+    }));
+
     it('uses the frozen schema for legacy mac platforms', () => withValidationFixture({
         locales: { en: createEnglishLocales() },
-    }, ({ platformsPath, localesPath, schemasDir }) => {
+    }, ({
+        platformsPath,
+        schemasDir,
+        validate,
+    }) => {
         writeJson(path.join(schemasDir, 'mac', 'filters_i18n.schema.json'), {
             type: 'object',
             required: ['legacy'],
@@ -658,13 +611,7 @@ describe('json validator', () => {
         });
         writeJson(path.join(platformsPath, 'mac', 'filters_i18n.json'), { legacy: 'ok' });
 
-        const result = schemaValidator.validate(
-            platformsPath,
-            schemasDir,
-            { localesPath, requiredLocales: ['en'] },
-        );
-
-        expect(result).toBe(true);
+        expect(validate({ requiredLocales: ['en'] })).toBe(true);
     }));
 
     it('builds the real platform tree and validates it with the shipped schema and legacy fixtures', async () => {
