@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Extracted one shared helper for the repeated locale parsing loops in
+  `loadLocales()` of the platform generator. The helper loads groups, tags,
+  and filters. No behaviour change.
+
 ### Deprecated
 
 ### Removed
