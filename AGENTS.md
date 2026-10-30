@@ -422,8 +422,10 @@ wins and this section MUST be fixed.
 - **Bare URLs**: Bare URLs are permitted and do not need to be wrapped in
   angle brackets (MD034 is disabled, `no-bare-urls`).
 - **Table formatting**: Align table columns with padding (MD060, `style` is
-  `aligned`). This applies to the separator row as well: write `| --- |`, not
-  `|--|`. If a table is too wide to align readably, wrap it in
+  `aligned`). Every row, including the separator row, must use the same pipe
+  positions, so the separator cells span the column width: `| ------ |`
+  matching the header, and never a short `|--|` or `| --- |` in a wider
+  column. If a table is too wide to align readably, wrap it in
   `<!-- markdownlint-disable MD060 -->` and
   `<!-- markdownlint-enable MD060 -->` comments; the linter skips MD060
   inside that block. See the Layers table in "Architecture" for an example.
