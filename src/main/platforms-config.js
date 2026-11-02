@@ -584,6 +584,8 @@ export const CSS_GENERIC_RULES_PATTERNS = [
     '^#\\$#',
 ];
 
+/* eslint-enable max-len */
+
 export const platformsConfig = {
     'WINDOWS': {
         'platform': 'windows',
