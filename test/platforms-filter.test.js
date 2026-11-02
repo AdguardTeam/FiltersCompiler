@@ -428,12 +428,15 @@ describe('platforms filter', () => {
         const notMatchRules = [
             'example.com##.sidebar_list > .widget_text:has(a[title = "ads"])',
             '##div:has(> .ad)',
+            'example.com##div:has(> .a):has(> .b)',
         ];
         const matchRules = [
             'example.com#?#div:has(> .ad)',
             'example.com#?#div:has-text(ad)',
             'example.com##div:contains(ad)',
             'example.com##div:-abp-has(.ad)',
+            'example.com##article:has(header:has(.ct-sponsored))',
+            'example.com##div > [style]:has([style]:has([href*="&utm"]))',
         ];
 
         const after = cleanupRules([...notMatchRules, ...matchRules], config, 0);

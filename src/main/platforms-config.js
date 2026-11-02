@@ -504,6 +504,7 @@ const EXTENDED_CSS_RULES_PATTERNS = [
     ':matches-css-after\\(',
     ':-abp-has\\(',
     ':-abp-contains\\(',
+    ':has\\([^)]*:has\\(',
     '#\\?#',
     '#\\$\\?#',
     '#@\\?#',
