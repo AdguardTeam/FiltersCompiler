@@ -56,3 +56,5 @@ example.com##div.grid_1[class$="app"]
 ||example.com^$script,redirect-rule=noopjs
 *$redirect-rule=noopjs,xmlhttprequest,domain=example.com
 !
+!+ NOT_CONVERT
+! [excluded by #%#//scriptlet('trusted-] example.com#%#//scriptlet( 'trusted-set-cookie', 'a', 'b')

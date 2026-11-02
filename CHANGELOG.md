@@ -20,6 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Trust-level exclusions were bypassed by rules kept as-is with the `!+ NOT_CONVERT` hint when such
+  a rule used a non-canonical spelling (e.g. `#%#//scriptlet( 'trusted-...')` with a space)
+  The canonical AdGuard form is now checked against the exclusions as well [#269].
 - `cap_html_filtering` directive not working: the define was missing from the platforms configuration,
   so rules inside `!#if (cap_html_filtering)` were dropped on every platform. It is now set for
   Windows, Mac, Mac v2, Mac v3, Android and CLI [#270].
