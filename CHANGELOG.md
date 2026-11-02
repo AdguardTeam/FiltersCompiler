@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The MV3 extension platforms now share `CHROMIUM_MV3_BASED_EXTENSION_PATTERNS`
+  instead of repeating the same `removeRulePatterns`. No behaviour change.
+
 ### Deprecated
 
 ### Removed
