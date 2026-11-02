@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Cosmetic rules with non-basic `$path`, `$domain`, or `$url` modifiers are no
+  longer kept for the `ext_android_cb` platform, as AdGuard Content Blocker
+  cannot enforce them.
+
 ### Security
 
 ## [3.4.3] - 2026-10-21

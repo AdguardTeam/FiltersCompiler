@@ -5,6 +5,7 @@ import {
     vi,
 } from 'vitest';
 
+import { platformsConfig } from '../src/main/platforms-config';
 import { cleanupAndOptimizeRules, cleanupRules } from '../src/main/platforms/filter';
 
 // Mock log to hide error messages
@@ -418,6 +419,25 @@ describe('platforms filter', () => {
         const after = cleanupRules(before, config, 0);
 
         expect(after).toBeDefined();
+        expect(after).toEqual(notMatchRules);
+    });
+
+    it('removes cosmetic rules with unsupported non-basic modifiers for Android Content Blocker', () => {
+        const config = platformsConfig.EXTENSION_ANDROID_CONTENT_BLOCKER;
+
+        const notMatchRules = [
+            'example.com##.ad',
+            '||example.com^$domain=example.org',
+        ];
+        const matchRules = [
+            '[$path=/foren]cad.de##tr.ad',
+            '[$domain=example.com]##.textad',
+            '[$url=||example.com/content/*]##div.textad',
+            '[$path]example.com##.main',
+        ];
+
+        const after = cleanupRules([...notMatchRules, ...matchRules], config, 0);
+
         expect(after).toEqual(notMatchRules);
     });
 });
