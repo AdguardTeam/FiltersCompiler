@@ -482,6 +482,11 @@ const UNBLOCKING_IMPORTANT_RULES_PATTERNS = [
 /**
  * Pattern to detect Extended CSS rules
  *
+ * Plain `:has(` is deliberately absent: it is a native CSS selector supported
+ * by all platforms. `:-abp-has(` is different — it is the Extended CSS alias of
+ * `:has()` and is never native, so it is still removed. Nested `:has()` is not
+ * valid native CSS either, hence it has its own pattern below.
+ *
  * @example
  * ```xup.in#?##xupab```
  * @example
@@ -504,6 +509,7 @@ const EXTENDED_CSS_RULES_PATTERNS = [
     ':matches-css-after\\(',
     ':-abp-has\\(',
     ':-abp-contains\\(',
+    // Nested `:has()` is not valid native CSS, so it needs Extended CSS.
     ':has\\([^)]*:has\\(',
     '#\\?#',
     '#\\$\\?#',
