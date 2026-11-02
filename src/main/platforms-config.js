@@ -535,6 +535,15 @@ const CHROMIUM_BASED_EXTENSION_PATTERNS = [
 ];
 
 /**
+ * Used for `EXTENSION_CHROMIUM_MV3`, `EXTENSION_EDGE_MV3`, and
+ * `EXTENSION_OPERA_MV3` platforms.
+ */
+const CHROMIUM_MV3_BASED_EXTENSION_PATTERNS = [
+    ...CHROMIUM_BASED_EXTENSION_PATTERNS,
+    ...REDIRECT_RULE_MODIFIER_PATTERNS,
+];
+
+/**
  * Used for `EXTENSION_SAFARI` and `IOS` platforms.
  */
 const SAFARI_BASED_EXTENSION_PATTERNS = [
@@ -688,10 +697,7 @@ export const platformsConfig = {
         'path': 'extension/chromium-mv3',
         'expires': '10 days',
         'configuration': {
-            'removeRulePatterns': [
-                ...CHROMIUM_BASED_EXTENSION_PATTERNS,
-                ...REDIRECT_RULE_MODIFIER_PATTERNS,
-            ],
+            'removeRulePatterns': CHROMIUM_MV3_BASED_EXTENSION_PATTERNS,
             'replacements': null,
             'ignoreRuleHints': false,
         },
@@ -720,10 +726,7 @@ export const platformsConfig = {
         'path': 'extension/edge-mv3',
         'expires': '10 days',
         'configuration': {
-            'removeRulePatterns': [
-                ...CHROMIUM_BASED_EXTENSION_PATTERNS,
-                ...REDIRECT_RULE_MODIFIER_PATTERNS,
-            ],
+            'removeRulePatterns': CHROMIUM_MV3_BASED_EXTENSION_PATTERNS,
             'replacements': null,
             'ignoreRuleHints': false,
         },
@@ -753,10 +756,7 @@ export const platformsConfig = {
         'path': 'extension/opera-mv3',
         'expires': '10 days',
         'configuration': {
-            'removeRulePatterns': [
-                ...CHROMIUM_BASED_EXTENSION_PATTERNS,
-                ...REDIRECT_RULE_MODIFIER_PATTERNS,
-            ],
+            'removeRulePatterns': CHROMIUM_MV3_BASED_EXTENSION_PATTERNS,
             'replacements': null,
             'ignoreRuleHints': false,
         },
