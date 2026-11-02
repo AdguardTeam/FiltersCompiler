@@ -20,7 +20,7 @@ import {
 } from '@adguard/tsurlfilter';
 import { getErrorMessage } from '@adguard/logger';
 
-import { RuleMasks } from './rule/rule-masks';
+import { hasHint, NOT_CONVERT_HINT, NOT_VALIDATE_HINT } from './rule/rule-masks';
 import { logger } from './utils/log';
 import { validateCssSelector } from './utils/extended-css-validator';
 
@@ -30,9 +30,6 @@ import { validateCssSelector } from './utils/extended-css-validator';
 
 const AFFINITY_DIRECTIVE = '!#safari_cb_affinity'; // used as closing directive
 const AFFINITY_DIRECTIVE_OPEN = `${AFFINITY_DIRECTIVE}(`;
-
-const NOT_VALIDATE_HINT = 'NOT_VALIDATE';
-const SPACE = ' ';
 
 /**
  * Push rule with warning message to excluded
@@ -148,7 +145,6 @@ class RuleValidator {
                             && !DomainUtils.isValidDomainOrHostname(domain),
                     );
                     if (invalidDomain) {
-                        // eslint-disable-next-line max-len
                         throw new Error(`'${invalidDomain.value}' is not a valid domain name or regexp pattern`);
                     }
 
@@ -213,16 +209,11 @@ export const validateAndFilterRules = (list, excluded, invalid = [], filterName)
         }
 
         const previousRule = index > 0 ? array[index - 1] : null;
-        // Skip validation if "ruleText" is preceded by "NOT_VALIDATE" hint
-        // https://github.com/AdguardTeam/FiltersCompiler/issues/245
+        // Skip validation if "ruleText" is preceded by a hint that makes it
+        // intentionally non-standard.
         if (
-            previousRule
-            && previousRule.startsWith(RuleMasks.MASK_HINT)
-            && (
-                previousRule.includes(`${SPACE}${NOT_VALIDATE_HINT}${SPACE}`)
-                || previousRule.endsWith(`${SPACE}${NOT_VALIDATE_HINT}`)
-            )
-
+            hasHint(previousRule, NOT_VALIDATE_HINT)
+            || hasHint(previousRule, NOT_CONVERT_HINT)
         ) {
             return true;
         }

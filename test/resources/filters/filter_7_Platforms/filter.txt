@@ -25,6 +25,8 @@ somesite.com##.main-banner
 !+ NOT_CONVERT
 ||convert1.test^$1p
 ||convert2.test^$~third-party
+!+ NOT_CONVERT
+example.com#%#//scriptlet('new-scriptlet')
 !+ NOT_VALIDATE PLATFORM(mac, windows)
 ||example.org^$newmodifier
 !#safari_cb_affinity(security)
