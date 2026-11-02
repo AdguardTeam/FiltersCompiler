@@ -46,3 +46,5 @@ test.com#@#script:inject(abort-on-property-read.js, some.prop)
 example.com#%#//scriptlet('trusted-set-local-storage-item', 'iName', 'iValue')
 ! example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue") is excluded by "#%#//scriptlet("trusted-" in exclusions-high.txt
 example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")
+! example.com#%#//scriptlet( 'trusted-set-cookie', 'a', 'b') is excluded by "#%#//scriptlet('trusted-" in exclusions-high.txt
+example.com#%#//scriptlet( 'trusted-set-cookie', 'a', 'b')

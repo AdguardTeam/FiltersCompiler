@@ -5,12 +5,12 @@ import md5 from 'md5';
 
 import { FiltersDownloader } from '@adguard/filters-downloader';
 import { Version } from './utils/version';
-import { convertRulesToAdgSyntax } from './converter';
+import { convertRulesToAdgSyntax, getCanonicalRuleTexts } from './converter';
 import { validateAndFilterRules, checkAffinityDirectives } from './validator';
 import { init, generate } from './platforms/generator';
 import { logger } from './utils/log';
 import { skipFilter, addFilter, create } from './utils/report';
-import { RuleMasks } from './rule/rule-masks';
+import { RuleMasks, hasHint, NOT_CONVERT_HINT } from './rule/rule-masks';
 import { fixVersionComments, removeAdblockVersion } from './utils/workaround';
 import { downloadFile } from './utils/webutils';
 import { getFilterIdFromDirName } from './utils/utils';
@@ -131,6 +131,7 @@ const addNotOptimizedHints = function (lines) {
 
     return result;
 };
+
 /**
  * Adds or updates modifiers in each line of the given array of lines.
  *
@@ -175,7 +176,7 @@ const addModifiers = (lines, modifiersStr) => {
  * @return {boolean}
  */
 const scriptletException = (line, exclusion) => (exclusion === '#%#' && line.includes('#%#//scriptlet'))
-        || (exclusion === '#@%#' && line.includes('#@%#//scriptlet'));
+    || (exclusion === '#@%#' && line.includes('#@%#//scriptlet'));
 
 /**
  * Checks if line is excluded with specified set of exclusions
@@ -184,8 +185,10 @@ const scriptletException = (line, exclusion) => (exclusion === '#%#' && line.inc
  * @param exclusions
  * @param excluded
  * @param reason
+ * @param {string[]} [additionalLines] Alternative representations of the line (e.g. canonical
+ * AdGuard syntax) which are checked against the exclusions as well.
  */
-const isExcluded = function (line, exclusions, excluded, reason) {
+const isExcluded = function (line, exclusions, excluded, reason, additionalLines = []) {
     // eslint-disable-next-line no-restricted-syntax
     for (let exclusion of exclusions) {
         exclusion = exclusion.trim();
@@ -193,10 +196,15 @@ const isExcluded = function (line, exclusions, excluded, reason) {
         if (exclusion && !exclusion.startsWith(RuleMasks.MASK_COMMENT)) {
             const message = `${line} is excluded by "${exclusion}" in ${reason}`;
 
-            const isExcludedByRegexp = exclusion.endsWith(SLASH) && exclusion.startsWith(SLASH)
-                && line.match(new RegExp(exclusion.substring(1, exclusion.length - 1)));
+            const matches = [line, ...additionalLines].some((candidate) => {
+                const isExcludedByRegexp = exclusion.endsWith(SLASH) && exclusion.startsWith(SLASH)
+                    && new RegExp(exclusion.substring(1, exclusion.length - 1)).test(candidate);
 
-            if ((isExcludedByRegexp || line.includes(exclusion)) && !scriptletException(line, exclusion)) {
+                return (isExcludedByRegexp || candidate.includes(exclusion))
+                    && !scriptletException(candidate, exclusion);
+            });
+
+            if (matches) {
                 logger.info(message);
                 excluded.push(`${RuleMasks.MASK_COMMENT}${SPACE}${message}`);
                 excluded.push(line);
@@ -214,9 +222,11 @@ const isExcluded = function (line, exclusions, excluded, reason) {
  * @param lines
  * @param exclusionsFile
  * @param excluded
+ * @param {string} [previousLine] Line preceding the first line of `lines`, so that a hint
+ * on a separate line is honored when the lines are processed on their own.
  * @returns {*}
  */
-const exclude = function (lines, exclusionsFile, excluded) {
+const exclude = function (lines, exclusionsFile, excluded, previousLine = undefined) {
     logger.info('Applying exclusions..');
 
     let exclusions = readFile(exclusionsFile);
@@ -230,9 +240,13 @@ const exclude = function (lines, exclusionsFile, excluded) {
     const result = [];
 
     lines.forEach((line, pos) => {
-        const exclusion = isExcluded(line, exclusions, excluded, exclusionsFileName);
+        const hintLine = pos > 0 ? lines[pos - 1] : previousLine;
+        const canonicalLines = hasHint(hintLine, NOT_CONVERT_HINT) ? getCanonicalRuleTexts(line) : [];
+        const exclusion = isExcluded(line, exclusions, excluded, exclusionsFileName, canonicalLines);
+
         if (exclusion) {
-            if (pos > 0 && lines[pos - 1].startsWith(RuleMasks.MASK_HINT)) {
+            const isHinted = Boolean(hintLine && hintLine.startsWith(RuleMasks.MASK_HINT));
+            if (isHinted) {
                 result.push(`${RuleMasks.MASK_COMMENT} [excluded by ${exclusion}] ${line}`);
             }
         } else {
@@ -578,7 +592,7 @@ const compile = async function (filterDir, filterName, templateContent, trustLev
             );
 
             logger.info('Applying trust-level exclusions to inline template.txt rules...');
-            inlineRules = exclude(inlineRules, trustLevelSettings, excluded);
+            inlineRules = exclude(inlineRules, trustLevelSettings, excluded, previousLine);
 
             // 'for' loop is used in purpose instead of spread operator
             // to avoid 'Maximum call stack size exceeded' error on large number of rules

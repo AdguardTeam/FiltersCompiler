@@ -100,6 +100,27 @@ export const convertRulesToAdgSyntax = (rulesList, excluded = [], invalidRules =
     return result;
 };
 
+/**
+ * Returns canonical AdGuard representation of a single rule without reporting anything.
+ *
+ * Needed to check exclusions against rules kept as-is due to the `NOT_CONVERT` hint:
+ * such rules may be written in a form that bypasses substring exclusions
+ * (e.g. `#%#//scriptlet( 'trusted-set-cookie', ...)` with a space), while their canonical
+ * form does not.
+ *
+ * @param {string} rule Rule to convert.
+ *
+ * @returns {string[]} Converted rule texts, or an empty array if the rule cannot be parsed.
+ */
+export const getCanonicalRuleTexts = (rule) => {
+    try {
+        const ruleNode = RuleParser.parse(rule);
+        return RuleConverter.convertToAdg(ruleNode).result.map((r) => RuleGenerator.generate(r));
+    } catch {
+        return [];
+    }
+};
+
 const SINGLE_QUOTE = "'";
 const DOUBLE_QUOTE = '"';
 
