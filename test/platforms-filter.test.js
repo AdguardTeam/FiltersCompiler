@@ -422,7 +422,7 @@ describe('platforms filter', () => {
         expect(after).toEqual(notMatchRules);
     });
 
-    it('keeps native :has() rules and removes #?# rules for Android Content Blocker', () => {
+    it('keeps native :has() rules and removes extended CSS rules for Android Content Blocker', () => {
         const config = platformsConfig.EXTENSION_ANDROID_CONTENT_BLOCKER;
 
         const notMatchRules = [
@@ -432,7 +432,7 @@ describe('platforms filter', () => {
         ];
         const matchRules = [
             'example.com#?#div:has(> .ad)',
-            'example.com#?#div:has-text(ad)',
+            'example.com##div:has-text(ad)',
             'example.com##div:contains(ad)',
             'example.com##div:-abp-has(.ad)',
             'example.com##article:has(header:has(.ct-sponsored))',
