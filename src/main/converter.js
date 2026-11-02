@@ -28,7 +28,9 @@ export const excludeRule = (rule, excluded, message) => {
 };
 
 /**
- * Converts rules to AdGuard syntax
+ * Converts rules to AdGuard syntax.
+ *
+ * Rules preceded by the `!+ NOT_CONVERT` hint are kept as-is.
  *
  * @param {string[]} rulesList Input rules.
  * @param {string[]} [excluded=[]] Rules to exclude.
@@ -36,7 +38,7 @@ export const excludeRule = (rule, excluded, message) => {
  * @param {string} [previousLine] Line preceding the first rule of `rulesList`, so that a hint
  * on a separate line (e.g. `!+ NOT_CONVERT`) is honored when the rules are converted one by one.
  *
- * @return {string[]} Rules converted to AdGuard syntax.
+ * @return {string[]} Rules converted to AdGuard syntax, except for the ones kept as-is.
  */
 export const convertRulesToAdgSyntax = (rulesList, excluded = [], invalidRules = [], previousLine = undefined) => {
     const result = [];
@@ -45,6 +47,9 @@ export const convertRulesToAdgSyntax = (rulesList, excluded = [], invalidRules =
         const rule = rulesList[i];
 
         if (hasHint(i > 0 ? rulesList[i - 1] : previousLine, NOT_CONVERT_HINT)) {
+            const message = `Rule "${rule}" is kept as-is due to the NOT_CONVERT hint`;
+            logger.info(message);
+            excludeRule(rule, excluded, message);
             result.push(rule);
             continue;
         }
