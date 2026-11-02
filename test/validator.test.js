@@ -589,6 +589,34 @@ describe('validator', () => {
         });
     });
 
+    describe('hint NOT_CONVERT', () => {
+        const newScriptletRule = "example.com#%#//scriptlet('new-scriptlet')";
+
+        it('keeps a rule with a not-yet-known scriptlet when preceded by the hint', () => {
+            const rules = ['!+ NOT_CONVERT', newScriptletRule];
+            expect(validateAndFilterRules(rules)).toEqual(rules);
+        });
+
+        it('drops the same rule without the hint', () => {
+            expect(validateAndFilterRules([newScriptletRule])).toHaveLength(0);
+        });
+
+        it('keeps the hinted rule when the hint is combined with other hints', () => {
+            const rules = ['!+ PLATFORM(windows) NOT_CONVERT', newScriptletRule];
+            expect(validateAndFilterRules(rules)).toEqual(rules);
+        });
+
+        it('keeps uBO-specific syntax when preceded by the hint', () => {
+            const rules = ['!+ NOT_CONVERT', 'example.com##+js(new-scriptlet)'];
+            expect(validateAndFilterRules(rules)).toEqual(rules);
+        });
+
+        it('applies only to the rule right after the hint', () => {
+            const rules = ['!+ NOT_CONVERT', newScriptletRule, '||example.org^'];
+            expect(validateAndFilterRules(rules)).toEqual(rules);
+        });
+    });
+
     describe('validate redirect rules', () => {
         describe('valid', () => {
             const validRules = [

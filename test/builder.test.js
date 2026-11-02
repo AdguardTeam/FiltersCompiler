@@ -1252,6 +1252,14 @@ describe('Test builder', async () => {
                 expect(filterLines.includes('||convert1.test^$1p')).toBeTruthy();
                 expect(filterLines.includes('||convert2.test^$~third-party')).toBeTruthy();
             });
+
+            it('platform/mac ships a hinted rule with a not-yet-known scriptlet', async () => {
+                const filterContent = await readFile(path.join(platformsDir, 'mac', 'filters', '7.txt'));
+                expect(filterContent).toBeTruthy();
+
+                const filterLines = filterContent.split(/\r?\n/);
+                expect(filterLines.includes("example.com#%#//scriptlet('new-scriptlet')")).toBeTruthy();
+            });
         });
 
         it('removing scriptlet rules in local_script_rules.json', async () => {
