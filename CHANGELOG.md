@@ -22,6 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Native `:has()` cosmetic rules (`##`) are no longer removed from the
   `ext_android_cb` platform [#233].
+- Cosmetic rules with non-basic `$path`, `$domain`, or `$url` modifiers are no
+  longer kept for the `ext_android_cb` platform, as AdGuard Content Blocker
+  cannot enforce them.
 
 ### Security
 

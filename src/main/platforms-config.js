@@ -518,6 +518,22 @@ const EXTENDED_CSS_RULES_PATTERNS = [
 ];
 
 /**
+ * Pattern to detect cosmetic rules with non-basic modifiers unsupported by
+ * AdGuard Content Blocker.
+ *
+ * `$path`, `$domain`, and `$url` restrict a cosmetic rule to certain URLs or
+ * domains, and Content Blocker cannot enforce them.
+ *
+ * @example
+ * ```[$path=/foren]cad.de##tr.ad```
+ * @example
+ * ```[$domain=example.com]##.textad```
+ */
+const NON_BASIC_MODIFIER_PATTERNS = [
+    '^\\[\\$[^\\]]*(path|domain|url)(=|,|\\])',
+];
+
+/**
  * Used for `EXTENSION_CHROMIUM`, `EXTENSION_CHROMIUM_MV3`, `EXTENSION_EDGE`,
  * `EXTENSION_EDGE_MV3`, `EXTENSION_OPERA`, and `EXTENSION_OPERA_MV3` platforms.
  */
@@ -822,6 +838,7 @@ export const platformsConfig = {
         'configuration': {
             'removeRulePatterns': [
                 ...DOMAIN_WITH_REGEXPS_PATTERNS,
+                ...NON_BASIC_MODIFIER_PATTERNS,
                 ...HTML_FILTERING_MODIFIER_PATTERNS,
                 ...EXTENSION_MODIFIER_PATTERNS,
                 ...REMOVEPARAM_MODIFIER_PATTERNS,
