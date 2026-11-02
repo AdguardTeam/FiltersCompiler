@@ -17,10 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Native `:has()` cosmetic rules (`##`) are no longer removed from the Android Content Blocker platform.
-  [#233](https://github.com/AdguardTeam/FiltersCompiler/issues/233)
+- Native `:has()` cosmetic rules (`##`) are no longer removed from the
+  `ext_android_cb` platform [#233].
 
 ### Security
+
+[#233]: https://github.com/AdguardTeam/FiltersCompiler/issues/233
 
 ## [3.4.3] - 2026-10-21
 
