@@ -76,24 +76,35 @@ describe('converter', () => {
         expect(c[0]).toBe('example.com.pl$$iframe[name]:not([class]):not([id]):not([src])[style="display:none"]');
     });
 
-    // TODO: add more rules under this section
     describe('hint NOT_CONVERT', () => {
         const rule = 'example.com##h1:style(background-color: blue !important)';
         const converted = 'example.com#$#h1 { background-color: blue !important }';
 
         it('keeps the rule preceded by the hint as is', () => {
-            const [, converted] = convertRulesToAdgSyntax(['!+ NOT_CONVERT', rule]);
-            expect(converted).toBe(rule);
+            const [, actual] = convertRulesToAdgSyntax(['!+ NOT_CONVERT', rule]);
+            expect(actual).toBe(rule);
         });
 
         it('keeps the rule when the hint is combined with other hints', () => {
-            const [, converted] = convertRulesToAdgSyntax(['!+ PLATFORM(windows) NOT_CONVERT', rule]);
-            expect(converted).toBe(rule);
+            const [, actual] = convertRulesToAdgSyntax(['!+ PLATFORM(windows) NOT_CONVERT', rule]);
+            expect(actual).toBe(rule);
         });
 
         it('keeps the invalid-looking rule as is instead of reporting an error', () => {
-            const [, converted] = convertRulesToAdgSyntax(['!+ NOT_CONVERT', 'example.com#%#//scriptlet('], []);
-            expect(converted).toBe('example.com#%#//scriptlet(');
+            const excluded = [];
+            const invalidRules = [];
+            const [, actual] = convertRulesToAdgSyntax(
+                ['!+ NOT_CONVERT', 'example.com#%#//scriptlet('],
+                excluded,
+                invalidRules,
+            );
+
+            expect(actual).toBe('example.com#%#//scriptlet(');
+            expect(invalidRules).toEqual([]);
+            // The kept rule is recorded for the diff, not reported as an error.
+            expect(excluded).toHaveLength(2);
+            expect(excluded[0]).toContain('kept as-is due to the NOT_CONVERT hint');
+            expect(excluded[1]).toBe('example.com#%#//scriptlet(');
         });
 
         it('applies only to the rule right after the hint', () => {
@@ -103,6 +114,7 @@ describe('converter', () => {
         });
     });
 
+    // TODO: add more rules under this section
     describe('convert rules with no change', () => {
         it.each([
             '##div > span',
