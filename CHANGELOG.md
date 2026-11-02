@@ -21,6 +21,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Hints no longer leak to the next rule when validation or `/optimizeDomainBlockingRules` drops the
+  rule they modify, and `/notOptimized` keeps existing hints (e.g. `PLATFORM` or `NOT_CONVERT`)
+  attached to their rule.
 - Trust-level exclusions were bypassed by rules kept as-is with the `!+ NOT_CONVERT` hint when such
   a rule used a non-canonical spelling (e.g. `#%#//scriptlet( 'trusted-...')` with a space)
   The canonical AdGuard form is now checked against the exclusions as well [#269].

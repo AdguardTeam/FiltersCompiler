@@ -615,6 +615,15 @@ describe('validator', () => {
             const rules = ['!+ NOT_CONVERT', newScriptletRule, '||example.org^'];
             expect(validateAndFilterRules(rules)).toEqual(rules);
         });
+
+        it('drops hints attached to a dropped rule', () => {
+            const rules = [
+                '!+ PLATFORM(ios)',
+                'example.com#@%#//scriptlet("abort-on--property-write", "adblock.check")',
+                '||example.org^',
+            ];
+            expect(validateAndFilterRules(rules)).toEqual(['||example.org^']);
+        });
     });
 
     describe('validate redirect rules', () => {
