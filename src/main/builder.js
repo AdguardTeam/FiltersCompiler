@@ -10,7 +10,12 @@ import { validateAndFilterRules, checkAffinityDirectives } from './validator';
 import { init, generate } from './platforms/generator';
 import { logger } from './utils/log';
 import { skipFilter, addFilter, create } from './utils/report';
-import { RuleMasks, hasHint, NOT_CONVERT_HINT } from './rule/rule-masks';
+import {
+    RuleMasks,
+    hasHint,
+    isHint,
+    NOT_CONVERT_HINT,
+} from './rule/rule-masks';
 import { fixVersionComments, removeAdblockVersion } from './utils/workaround';
 import { downloadFile } from './utils/webutils';
 import { getFilterIdFromDirName } from './utils/utils';
@@ -41,7 +46,8 @@ const EXCLUDE_OPTION = 'exclude';
 const ADD_MODIFIERS_OPTION = 'addModifiers';
 const IGNORE_TRUST_LEVEL_OPTION = 'ignoreTrustLevel';
 
-const NOT_OPTIMIZED_HINT = '!+ NOT_OPTIMIZED';
+const NOT_OPTIMIZED_HINT_NAME = 'NOT_OPTIMIZED';
+const NOT_OPTIMIZED_HINT = `${RuleMasks.MASK_HINT}${SPACE}${NOT_OPTIMIZED_HINT_NAME}`;
 
 /**
  * Filter header tag for diff path which is needed for patch updates.
@@ -122,8 +128,15 @@ const addNotOptimizedHints = function (lines) {
             return;
         }
 
-        if (!v.startsWith(RuleMasks.MASK_COMMENT) && !v.startsWith(`${RuleMasks.MASK_HINT}${SPACE}`)) {
-            result.push(NOT_OPTIMIZED_HINT);
+        if (!v.startsWith(RuleMasks.MASK_COMMENT) && !isHint(v)) {
+            const previous = result[result.length - 1];
+            if (isHint(previous)) {
+                // Append to the hint that modifies this rule, otherwise it would no longer
+                // apply to the rule.
+                result[result.length - 1] = `${previous}${SPACE}${NOT_OPTIMIZED_HINT_NAME}`;
+            } else {
+                result.push(NOT_OPTIMIZED_HINT);
+            }
         }
 
         result.push(v);

@@ -21,6 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `!+` hints are no longer detached from the rule they modify: when validation or the
+  `/optimizeDomainBlockingRules` include option drops a rule, the preceding hint is dropped with it
+  instead of applying to the next rule, and `/notOptimized` appends `NOT_OPTIMIZED` to the existing
+  hint line, so `PLATFORM(...)` and `NOT_CONVERT` keep working (AG-61597).
 - Trust-level exclusions were bypassed by rules kept as-is with the `!+ NOT_CONVERT` hint when such
   a rule used a non-canonical spelling (e.g. `#%#//scriptlet( 'trusted-...')` with a space)
   The canonical AdGuard form is now checked against the exclusions as well [#269].
