@@ -21,6 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
       automatically. Set `NODE_USE_ENV_PROXY=1` to enable them.
     - `ALL_PROXY` is no longer used, even with `NODE_USE_ENV_PROXY=1`.
       Set `HTTP_PROXY` or `HTTPS_PROXY` instead.
+- **BREAKING:** The package now ships a single ES module (`dist/index.js`)
+  instead of dual ESM + CJS builds. The `require` export condition resolves to
+  the ESM artifact via Node.js `require(ESM)`, and `dist/index.cjs` is no
+  longer published.
 
 ### Deprecated
 
@@ -29,9 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - `require('@adguard/filters-compiler')` failing with `MODULE_NOT_FOUND`.
-  The package now ships a single ESM build (`dist/index.js`) and relies on
-  Node.js `require(ESM)` support, so both `import` and `require` load the same
-  artifact.
+  Both `import` and `require` now load the same ESM artifact.
 - The compiler no longer fails with `TypeError: filter.trim is not a function`
   when a remote `!#include` response body looks like JSON. The downloader keeps
   such a body as text, for example `[]` or `{"a":1}`.
