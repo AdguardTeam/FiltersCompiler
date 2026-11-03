@@ -80,7 +80,7 @@ pnpm install
 pnpm build
 ```
 
-Build output goes to `dist/` (ESM: `dist/index.js`, CJS: `dist/index.cjs`).
+Build output goes to `dist/` as a single ES module (`dist/index.js`).
 Rollup also copies JSON schemas and trust-level files into `dist/`.
 
 ### 4. Run Tests
@@ -337,7 +337,9 @@ try {
 **Problem**: Build or tests fail with unexpected errors.
 
 **Solution**: Ensure you use a supported Node.js version. `package.json`
-declares `^22.21.0 || >=24.0.0`:
+declares `^22.21.0 || >=24.0.0`. The `require` entry point relies on
+`require(ESM)`, which Node.js enables by default from version 22.12, so every
+supported version can use both `import` and `require`:
 
 ```bash
 node --version  # Should be v22.21+ on 22.x, or v24+
