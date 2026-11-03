@@ -119,4 +119,11 @@ describe('Bundle smoke tests', () => {
             expect(existsSync(filePath)).toBe(true);
         });
     });
+
+    describe('Type declarations', () => {
+        it('test declarations should not be bundled', () => {
+            const filePath = path.join(distDir, 'types', 'test');
+            expect(existsSync(filePath)).toBe(false);
+        });
+    });
 });

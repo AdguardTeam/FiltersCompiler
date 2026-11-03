@@ -67,6 +67,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   a bare JSON parse error.
 - Importing the package no longer installs a process-wide
   `unhandledRejection` listener.
+- The npm package no longer ships TypeScript declarations for the test suite
+  (`dist/types/test`).
 
 ### Security
 
