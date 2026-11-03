@@ -156,6 +156,12 @@ describe('filters i18n schema generator', () => {
         ]);
     });
 
+    it.each([null, [], 'text', 42])('returns no fallbacks when the document is not an object', (json) => {
+        const schema = buildSchema(['en', 'de']);
+
+        expect(collectMissingFallbacks(json, schema)).toEqual([]);
+    });
+
     it('keeps requiredLocales required and validates all available locales', () => withTempDir(
         'filters-i18n-schema-',
         (tempDir) => {

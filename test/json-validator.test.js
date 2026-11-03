@@ -479,6 +479,18 @@ describe('json validator', () => {
         );
     }));
 
+    it('reports a null document as invalid instead of throwing', () => withValidationFixture({
+        locales: { en: createEnglishLocales() },
+        platform: 'test',
+        filtersMetadata: createFiltersMetadata(),
+        filtersI18n: createFiltersI18n({ includeDe: false }),
+    }, ({ platformsPath, validate }) => {
+        fs.writeFileSync(path.join(platformsPath, 'test', 'filters_i18n.json'), 'null');
+        vi.spyOn(logger, 'error').mockImplementation(() => {});
+
+        expect(validate({ requiredLocales: ['en'] })).toBe(false);
+    }));
+
     it('writes fallback warnings to the log file', () => withValidationFixture({
         locales: {
             en: createEnglishLocales(),

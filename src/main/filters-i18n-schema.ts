@@ -437,10 +437,16 @@ export const buildFiltersI18nSchema = (
  * @param json Parsed filters_i18n.json.
  * @param schema Generated filters_i18n schema.
  *
- * @returns Missing fields with their fallback values.
+ * @returns Missing fields with their fallback values. The result is empty when
+ * `json` is not an object, so that validation reports the document as invalid.
  */
 export const collectMissingFallbacks = (json: unknown, schema: FiltersI18nSchema): MissingFallback[] => {
     const fallbacks: MissingFallback[] = [];
+
+    if (!json || typeof json !== 'object' || Array.isArray(json)) {
+        return fallbacks;
+    }
+
     const data = json as Record<string, Record<string, Record<string, Record<string, string>>>>;
 
     ENTITY_KINDS.forEach((kind) => {
