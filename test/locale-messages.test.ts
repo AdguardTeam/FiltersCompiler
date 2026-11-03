@@ -40,4 +40,15 @@ describe('locale message parser', () => {
             new TypeError(`Locale file ${LOCALE_PATH} must contain an array of message objects`),
         );
     });
+
+    it.each([
+        [[null]],
+        [['filter.1.name']],
+        [[42]],
+        [[[]]],
+    ])('names the locale file when a message is not an object: %j', (messages) => {
+        expect(() => parseLocaleMessages(messages, 'filter', LOCALE_PATH)).toThrow(
+            new TypeError(`Locale file ${LOCALE_PATH} must contain an array of message objects`),
+        );
+    });
 });

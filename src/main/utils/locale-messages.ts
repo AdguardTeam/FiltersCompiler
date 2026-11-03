@@ -74,7 +74,10 @@ export const parseLocaleMessages = (
         return data;
     }
 
-    if (!Array.isArray(messages)) {
+    if (
+        !Array.isArray(messages)
+        || messages.some((message) => !message || typeof message !== 'object' || Array.isArray(message))
+    ) {
         throw new TypeError(`Locale file ${sourcePath} must contain an array of message objects`);
     }
 
