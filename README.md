@@ -428,9 +428,27 @@ Log levels:
 
 ### Environment variables
 
-| Variable | Default           | Purpose                                                                                           |
-| -------- | ----------------- | ------------------------------------------------------------------------------------------------- |
-| `TLS`    | (system defaults) | Set to `insecure` to bypass TLS certificate verification when downloading external filter sources |
+| Variable             | Default           | Purpose                                                                                |
+| -------------------- | ----------------- | -------------------------------------------------------------------------------------- |
+| `TLS`                | (system defaults) | Set to `insecure` to make `curl` skip TLS certificate verification                     |
+| `NODE_USE_ENV_PROXY` | (unset)           | Set to `1` to let Node.js `fetch` use proxy variables for remote `!#include` downloads |
+
+`TLS=insecure` applies only to `curl` downloads: `@include` files and
+optimization data. Remote `!#include` downloads use `fetch`, which follows the
+Node.js TLS settings. To trust a private CA, set `NODE_EXTRA_CA_CERTS` to the
+CA file. To disable certificate verification, set
+`NODE_TLS_REJECT_UNAUTHORIZED=0`. This disables verification for the whole
+process.
+
+`NODE_USE_ENV_PROXY=1` makes remote `!#include` downloads use a proxy from
+the environment. Node.js reads `HTTP_PROXY` or `http_proxy`, `HTTPS_PROXY` or
+`https_proxy`, and `NO_PROXY` or `no_proxy`. Without this variable, `fetch`
+does not use a proxy. `ALL_PROXY` is not supported.
+
+`curl` downloads read the same names, except the uppercase `HTTP_PROXY`, and
+also `ALL_PROXY` as a fallback. `http_proxy` applies only to `http://` URLs.
+`@include` sources are usually `https://`, so set `https_proxy` or
+`HTTPS_PROXY` to proxy them.
 
 ## Supported platforms
 
