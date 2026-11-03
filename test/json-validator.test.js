@@ -430,6 +430,28 @@ describe('json validator', () => {
         });
     });
 
+    it('defaults requiredLocales to every available locale', () => withValidationFixture({
+        locales: {
+            en: createEnglishLocales(),
+            de: createGermanLocales(),
+        },
+        platform: 'test',
+        filtersMetadata: createFiltersMetadata(),
+        filtersI18n: createFiltersI18n(),
+    }, ({ platformsPath, validate }) => {
+        vi.spyOn(logger, 'warn').mockImplementation(() => {});
+        vi.spyOn(logger, 'error').mockImplementation(() => {});
+
+        expect(validate()).toBe(true);
+
+        writeJson(
+            path.join(platformsPath, 'test', 'filters_i18n.json'),
+            createFiltersI18n({ includeDe: false }),
+        );
+
+        expect(validate()).toBe(false);
+    }));
+
     it('validates locales outside requiredLocales', () => withValidationFixture({
         locales: {
             en: createEnglishLocales(),
