@@ -495,8 +495,9 @@ const removeRedundantFiltersMetadata = (metadata, platform) => {
  * @returns {void}
  */
 const loadLocaleMessages = (localeDir, localeName, fileName, keyPrefix, target) => {
-    const entries = readJsonOrNull(path.join(localeDir, fileName));
-    const messages = parseLocaleMessages(entries, keyPrefix);
+    const localePath = path.join(localeDir, fileName);
+    const entries = readJsonOrNull(localePath);
+    const messages = parseLocaleMessages(entries, keyPrefix, localePath);
 
     Object.entries(messages).forEach(([id, fields]) => {
         target[id] = target[id] || {};

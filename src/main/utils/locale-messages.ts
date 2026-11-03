@@ -47,11 +47,6 @@ export type LocaleEntry = Partial<Record<LocaleField, string>>;
 export type LocaleFileData = Record<string, LocaleEntry>;
 
 /**
- * Messages of one locale file: an array of dotted key-value objects.
- */
-export type LocaleMessages = Record<string, string>[];
-
-/**
  * Parses the messages of one locale file into entity data keyed by id.
  *
  * A key must match `<prefix>.<numeric id>.<name|description>`. Other keys are
@@ -61,21 +56,31 @@ export type LocaleMessages = Record<string, string>[];
  * @param messages Parsed locale file contents, or `null` when the file is
  * missing.
  * @param keyPrefix Entity key prefix, for example `filter`.
+ * @param sourcePath Path to the locale file, used in the error message.
  *
  * @returns Locale data keyed by entity id.
  *
- * @throws {TypeError} When the locale file contents are not an array.
+ * @throws {TypeError} When the locale file contents are neither `null` nor an
+ * array of message objects.
  */
-export const parseLocaleMessages = (messages: LocaleMessages | null, keyPrefix: string): LocaleFileData => {
+export const parseLocaleMessages = (
+    messages: unknown,
+    keyPrefix: string,
+    sourcePath: string,
+): LocaleFileData => {
     const data: LocaleFileData = {};
 
-    if (!messages) {
+    if (messages === null || messages === undefined) {
         return data;
+    }
+
+    if (!Array.isArray(messages)) {
+        throw new TypeError(`Locale file ${sourcePath} must contain an array of message objects`);
     }
 
     const keyPattern = new RegExp(`^${keyPrefix}\\.(\\d+)\\.(${LOCALE_FIELDS.join('|')})$`);
 
-    messages.forEach((message) => {
+    messages.forEach((message: Record<string, string>) => {
         Object.entries(message).forEach(([key, value]) => {
             const match = keyPattern.exec(key);
             if (!match) {

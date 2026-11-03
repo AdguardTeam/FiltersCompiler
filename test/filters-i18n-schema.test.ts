@@ -40,9 +40,9 @@ const createEnglishData = (): Record<EntityKind, LocaleFileData> => {
     const messages = createEnglishLocales();
 
     return {
-        groups: parseLocaleMessages(messages.groups, 'group'),
-        tags: parseLocaleMessages(messages.tags, 'tag'),
-        filters: parseLocaleMessages(messages.filters, 'filter'),
+        groups: parseLocaleMessages(messages.groups, 'group', '/locales/en/groups.json'),
+        tags: parseLocaleMessages(messages.tags, 'tag', '/locales/en/tags.json'),
+        filters: parseLocaleMessages(messages.filters, 'filter', '/locales/en/filters.json'),
     };
 };
 
@@ -256,6 +256,22 @@ describe('filters i18n schema generator', () => {
 
             expect(() => generateSchema(localesPath)).toThrow(
                 /Cannot parse .*locales[\\/]en[\\/]groups\.json/,
+            );
+        },
+    ));
+
+    it('reports the locale file path when a locale file is not an array', () => withTempDir(
+        'filters-i18n-schema-',
+        (tempDir) => {
+            const localesPath = path.join(tempDir, 'locales');
+
+            createLocales(localesPath, {
+                en: createEnglishLocales(),
+            });
+            fs.writeFileSync(path.join(localesPath, 'en', 'groups.json'), '{}');
+
+            expect(() => generateSchema(localesPath)).toThrow(
+                /Locale file .*locales[\\/]en[\\/]groups\.json must contain an array/,
             );
         },
     ));

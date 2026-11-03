@@ -9,7 +9,6 @@ import {
     type EntityKind,
     type LocaleEntry,
     type LocaleFileData,
-    type LocaleMessages,
 } from './utils/locale-messages';
 import { readJson } from './utils/read-json';
 
@@ -136,9 +135,9 @@ export interface MissingFallback {
  * @returns Locale data keyed by entity id.
  */
 const parseLocaleFile = (filePath: string, kind: EntityKind): LocaleFileData => {
-    const messages = readJson<LocaleMessages>(filePath);
+    const messages = readJson<unknown>(filePath);
 
-    return parseLocaleMessages(messages, KEY_PREFIXES[kind]);
+    return parseLocaleMessages(messages, KEY_PREFIXES[kind], filePath);
 };
 
 /**
