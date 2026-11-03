@@ -76,13 +76,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The platform generator reports the path of a malformed locale file instead of
   a bare JSON parse error, and names the file when its contents are not an
   array of message objects.
-- Importing the package no longer installs a process-wide
-  `unhandledRejection` listener.
 - The npm package no longer ships TypeScript declarations for the test suite
   (`dist/types/test`).
 - The compiler no longer fails with `TypeError: filter.trim is not a function`
   when a remote `!#include` response body looks like JSON. The downloader keeps
   such a body as text, for example `[]` or `{"a":1}`.
+- The package no longer installs a global `unhandledRejection` process
+  listener on import. The listener leaked into the host process and could
+  crash it. Removing it is safe because Node.js already treats unhandled
+  rejections as uncaught exceptions by default.
 
 ### Security
 
