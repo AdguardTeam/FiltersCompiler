@@ -31,6 +31,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The compiler no longer fails with `TypeError: filter.trim is not a function`
   when a remote `!#include` response body looks like JSON. The downloader keeps
   such a body as text, for example `[]` or `{"a":1}`.
+- The package no longer installs a global `unhandledRejection` process
+  listener on import. The listener leaked into the host process and could
+  crash it. Removing it is safe because Node.js already treats unhandled
+  rejections as uncaught exceptions by default.
 
 ### Security
 
