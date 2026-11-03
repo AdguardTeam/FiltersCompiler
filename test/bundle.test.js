@@ -98,6 +98,8 @@ describe('Bundle smoke tests', () => {
         });
 
         it('should load the package via require() and expose the public API', () => {
+            // Loading the package pulls in the whole compiler. Under a full
+            // parallel run that can exceed the 5 s default.
             const api = requireCjs('@adguard/filters-compiler');
 
             expect(Object.keys(api).sort()).toEqual([
@@ -112,6 +114,6 @@ describe('Bundle smoke tests', () => {
             expect(typeof api.validateLocales).toBe('function');
             expect(typeof api.localOptimizationStatistics).toBe('object');
             expect(typeof api.OptimizationStatsError).toBe('function');
-        });
+        }, 15000);
     });
 });
