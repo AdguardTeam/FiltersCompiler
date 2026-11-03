@@ -11,6 +11,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Updated [@adguard/filters-downloader] to v3.0.1. This version
+  removes the vulnerable `axios` dependency and uses native `fetch`.
+- **BREAKING:** `engines.node` is now `^22.21.0 || >=24.0.0`. Node.js
+  22.0–22.20 and 23.x are not supported.
+- **BREAKING:** Remote `!#include` downloads now use native `fetch`, which
+  changes transport behaviour:
+    - `HTTP_PROXY`, `HTTPS_PROXY`, and `NO_PROXY` are no longer used
+      automatically. Set `NODE_USE_ENV_PROXY=1` to enable them.
+    - `ALL_PROXY` is no longer used, even with `NODE_USE_ENV_PROXY=1`.
+      Set `HTTP_PROXY` or `HTTPS_PROXY` instead.
+
 ### Deprecated
 
 ### Removed
@@ -20,7 +31,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `require('@adguard/filters-compiler')` failing with `MODULE_NOT_FOUND`.
   The package now ships a single ESM build (`dist/index.js`) and relies on
   Node.js `require(ESM)` support, so both `import` and `require` load the same
-  artifact. The `engines.node` floor is now `>=22.12`.
+  artifact.
+- The compiler no longer fails with `TypeError: filter.trim is not a function`
+  when a remote `!#include` response body looks like JSON. The downloader keeps
+  such a body as text, for example `[]` or `{"a":1}`.
+- The package no longer installs a global `unhandledRejection` process
+  listener on import. The listener leaked into the host process and could
+  crash it. Removing it is safe because Node.js already treats unhandled
+  rejections as uncaught exceptions by default.
 
 ### Security
 

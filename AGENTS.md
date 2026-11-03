@@ -28,7 +28,7 @@ The library exposes four public API functions: `compile`, `validateJSONSchema`,
 
 ## Technical Context
 
-- **Language**: JavaScript (ES2022 modules), Node.js >=22.12
+- **Language**: JavaScript (ES2022 modules), Node.js ^22.21.0 || >=24.0.0
 - **Package Manager**: pnpm >=10.33.4 and <11
 - **Bundler**: Rollup (single ESM output; `require()` relies on Node.js
   `require(ESM)`, enabled by default since Node.js 22.12)
@@ -240,7 +240,7 @@ project's layers, from top to bottom:
 | Public API | Entry point, export surface | `src/index.js` |
 | Core Pipeline | Compilation orchestration, include resolution | `src/main/builder.js` |
 | Platform Generator | Platform-specific output, `!#if` resolution | `src/main/platforms/generator.js` |
-| Supporting Modules | Rule conversion, validation, optimization | `converter.js`, `validator.js`, `optimization.js`, etc. |
+| Supporting Modules | Rule conversion, validation, optimization | `converter.js`, `validator.js`, `optimization.ts`, etc. |
 | Utilities | Logging, reporting, versioning, workarounds | `src/main/utils/*` |
 <!-- markdownlint-enable MD060 -->
 
@@ -368,7 +368,8 @@ supply chain risks, and long-term maintenance costs.
 
 - **Runtime configuration**: The library is configured at compile time via
   the `customPlatformsConfig` parameter passed to `compile()`. There is no
-  runtime config file or environment variable mechanism.
+  runtime config file. The library reads `TLS`, and Node.js reads
+  `NODE_USE_ENV_PROXY` for remote `!#include` downloads.
 - **Platform definitions**: Static configuration is defined in
   `src/main/platforms-config.js`. This file defines all 16 platform
   configurations with their `removeRulePatterns`, `defines`, and metadata.
