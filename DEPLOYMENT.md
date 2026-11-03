@@ -89,21 +89,24 @@ queue dependencies. The only infrastructure requirement is:
 ## Logging
 
 The compiler uses `@adguard/logger` with a custom file writer
-(`src/main/utils/log.js`). Logging is file-based and initialized when the
-consumer passes a `logPath` to the `compile()` function.
+(`src/main/utils/log.ts`). Messages always go to the console. When a
+`logPath` is provided to `compile()`, or `options.logPath` to
+`validateJSONSchema()`, messages are also written to that file.
 
-| Aspect        | Details                                                 |
-| ------------- | ------------------------------------------------------- |
-| **Framework** | `@adguard/logger` with custom `CompilerLogger` subclass |
-| **Output**    | Local file only (`logPath` argument to `compile()`)     |
-| **Format**    | `[timestamp] [LEVEL]: message` (plain text)             |
-| **Levels**    | `INFO`, `WARN`, `ERROR`                                 |
-| **File mode** | Truncate on open, append for subsequent writes          |
+| Aspect        | Details                                                                                                |
+| ------------- | ------------------------------------------------------------------------------------------------------ |
+| **Framework** | `@adguard/logger` with custom `CompilerLogger` subclass                                                |
+| **Output**    | Console, plus a local file when `logPath`/`options.logPath` is set                                     |
+| **Format**    | `[timestamp] [LEVEL]: message` (plain text)                                                            |
+| **Levels**    | `INFO`, `WARN`, `ERROR`                                                                                |
+| **File mode** | `compile()` truncates on open; `validateJSONSchema()` appends and closes the file when validation ends |
 
-If `logPath` is not provided, no log file is written and a console warning
-is emitted. The parent directory is created automatically if it does not
-exist. There is **no log rotation** and **no remote log shipping** — logs
-are written exclusively to local disk.
+If `compile()` gets no `logPath`, no log file is written and it emits a
+`Log file is not specified` console warning. If `validateJSONSchema()` gets
+no `options.logPath`, it uses the console only and does not reuse a file
+opened by an earlier call. The parent directory is created automatically if
+it does not exist. There is **no log rotation** and **no remote log
+shipping** — log files stay on local disk.
 
 ## Integrations
 
