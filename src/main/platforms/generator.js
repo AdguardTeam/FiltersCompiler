@@ -19,7 +19,7 @@ import {
 import { convertToUbo } from '../converter';
 import { getOptimizationStatistics } from '../optimization';
 import { RuleMasks } from '../rule/rule-masks';
-import { LEGACY_PLATFORMS } from '../platforms-config';
+import { LEGACY_PLATFORMS, MAC_V1_PLATFORM, MAC_V2_PLATFORM } from '../platforms-config';
 import { ENTITY_KINDS, KEY_PREFIXES, parseLocaleMessages } from '../utils/locale-messages';
 import { readJsonOrNull } from '../utils/read-json';
 import {
@@ -39,10 +39,6 @@ let metadataFilterIdsPool = [];
 // override its entries in place, which must not change this behaviour.
 const OPTIMIZED_PLATFORMS_LIST = ['ext_safari', 'android', 'ios', 'ext_android_cb'];
 const UBLOCK_PLATFORM = 'ext_ublock';
-
-// Single source of truth for the legacy macOS platform keys
-// (see `LEGACY_PLATFORMS` in `../platforms-config`).
-const [MAC_V1_PLATFORM, MAC_V2_PLATFORM] = LEGACY_PLATFORMS;
 
 const PLATFORM_FILTERS_DIR = 'filters';
 
