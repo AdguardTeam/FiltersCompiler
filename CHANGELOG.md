@@ -31,6 +31,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the platform actually builds, and the required locales and English fallback
   strings come from FiltersRegistry. Every locale directory in `localesPath`
   is validated, even when `requiredLocales` contains a subset.
+- Updated [@adguard/filters-downloader] to v3.0.1. This version
+  removes the vulnerable `axios` dependency and uses native `fetch`.
+- **BREAKING:** `engines.node` is now `^22.21.0 || >=24.0.0`. Node.js
+  22.0–22.20 and 23.x are not supported.
+- **BREAKING:** Remote `!#include` downloads now use native `fetch`, which
+  changes transport behaviour:
+    - `HTTP_PROXY`, `HTTPS_PROXY`, and `NO_PROXY` are no longer used
+      automatically. Set `NODE_USE_ENV_PROXY=1` to enable them.
+    - `ALL_PROXY` is no longer used, even with `NODE_USE_ENV_PROXY=1`.
+      Set `HTTP_PROXY` or `HTTPS_PROXY` instead.
 
 ### Deprecated
 
@@ -70,6 +80,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `unhandledRejection` listener.
 - The npm package no longer ships TypeScript declarations for the test suite
   (`dist/types/test`).
+- The compiler no longer fails with `TypeError: filter.trim is not a function`
+  when a remote `!#include` response body looks like JSON. The downloader keeps
+  such a body as text, for example `[]` or `{"a":1}`.
 
 ### Security
 
