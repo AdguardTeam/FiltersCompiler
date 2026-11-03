@@ -81,25 +81,6 @@ describe('optimizeDomainBlockingRules options of include directive', () => {
         });
     });
 
-    it('Drops hints attached to optimized-out rules', async () => {
-        const lines = [
-            '!+ PLATFORM(ios)',
-            '||sub.example.com^',
-            '||example.com^',
-        ];
-        const result = await optimizeDomainBlockingRules(lines);
-        expect(result).toEqual(['||example.com^']);
-    });
-
-    it('Keeps hints attached to retained rules', async () => {
-        const lines = [
-            '!+ PLATFORM(ios)',
-            '||example.com^',
-        ];
-        const result = await optimizeDomainBlockingRules(lines);
-        expect(result).toEqual(lines);
-    });
-
     it('one more test', async () => {
         const lines = [
             '||0031.lookinews.com^',

@@ -42,50 +42,6 @@ export const NOT_VALIDATE_HINT = 'NOT_VALIDATE';
 export const NOT_CONVERT_HINT = 'NOT_CONVERT';
 
 /**
- * Checks whether a line is a hint line, e.g. `!+ PLATFORM(windows)`.
- *
- * @param {string} line Line to check.
- *
- * @returns {boolean} `true` if the line starts with the hint mask.
- */
-export const isHint = (line) => Boolean(line && line.startsWith(RuleMasks.MASK_HINT));
-
-/**
- * Filters lines while keeping hints attached to the lines they modify.
- *
- * A hint modifies only the next non-hint line. If that line is filtered out, the hints are
- * dropped with it instead of leaking to the following line.
- *
- * @param {string[]} lines Lines to filter.
- * @param {(line: string, index: number, lines: string[]) => boolean} shouldKeep
- * Predicate for non-hint lines.
- *
- * @returns {string[]} Filtered lines.
- */
-export const filterWithHints = (lines, shouldKeep) => {
-    const result = [];
-    let pendingHints = [];
-
-    lines.forEach((line, index) => {
-        if (isHint(line)) {
-            pendingHints.push(line);
-            return;
-        }
-
-        if (shouldKeep(line, index, lines)) {
-            result.push(...pendingHints, line);
-        }
-
-        pendingHints = [];
-    });
-
-    // Trailing hints modify nothing, so they are kept as-is.
-    result.push(...pendingHints);
-
-    return result;
-};
-
-/**
  * Checks whether a hint line contains the specified hint.
  *
  * @param {string|null|undefined} hintLine Line which may start with the hint mask,

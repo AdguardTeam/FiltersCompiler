@@ -139,7 +139,7 @@ describe('Test builder', async () => {
             it('Should filter "platforms/edge" with "12.txt"', async () => {
                 const filterContent = await readFile(path.join(platformsDir, 'edge', 'filters', '12.txt'));
                 const filterLines = filterContent.split(/\r?\n/);
-                expect(filterLines.length).toEqual(35);
+                expect(filterLines.length).toEqual(33);
                 // Ensure that the file is not empty
                 expect(filterContent).toBeTruthy();
                 const filterRules = filterLines.filter((line) => line.length > 0 && !line.startsWith('!'));
@@ -161,13 +161,8 @@ describe('Test builder', async () => {
                     expect(filterRules.includes(rule)).toBeTruthy();
                 });
                 // Check that the number of hints is equal to the number of rules
-                const filterHints = filterLines.filter(
-                    (line) => line.startsWith('!+') && line.includes('NOT_OPTIMIZED'),
-                );
+                const filterHints = filterLines.filter((line) => line === '!+ NOT_OPTIMIZED');
                 expect(filterRules.length).toEqual(filterHints.length);
-                // The hint modifying the rule must stay adjacent to it
-                expect(filterLines.includes('!+ PLATFORM(ext_edge) NOT_OPTIMIZED')).toBeTruthy();
-                expect(filterLines.includes('||edge-only-example.com^')).toBeTruthy();
             });
         });
 

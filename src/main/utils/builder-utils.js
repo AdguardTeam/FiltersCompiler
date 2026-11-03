@@ -1,6 +1,6 @@
 import { parse } from 'tldts';
 
-import { RuleMasks, filterWithHints } from '../rule/rule-masks';
+import { RuleMasks } from '../rule/rule-masks';
 
 const DOT = '.';
 
@@ -130,7 +130,7 @@ export const optimizeDomainBlockingRules = async (lines) => {
     });
 
     // return lines in the order they were given
-    return filterWithHints(lines, (line) => {
+    return lines.filter((line) => {
         if (linesToSkipOptimization.has(line)) {
             return true;
         }

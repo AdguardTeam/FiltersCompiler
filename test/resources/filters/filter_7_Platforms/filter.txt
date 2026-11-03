@@ -18,6 +18,7 @@ example.com#%#//scriptlet('set-constant', 'test123', '123')
 ||example.com^$third-party
 !+ NOT_VALIDATE
 ||test.org^$newmodifier
+!+ NOT_VALIDATE_TYPO
 !+ PLATFORM(mac, windows) NOT_VALIDATE
 ||foo.bar^$newmodifier
 somesite.com##.main-banner

@@ -19,5 +19,3 @@
 ||ssl-express.met.vgwort.de^
 ||met.vgwort.de^
 ||intense.vgwort.de^
-!+ PLATFORM(ext_edge)
-||edge-only-example.com^

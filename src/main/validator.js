@@ -20,12 +20,7 @@ import {
 } from '@adguard/tsurlfilter';
 import { getErrorMessage } from '@adguard/logger';
 
-import {
-    hasHint,
-    filterWithHints,
-    NOT_CONVERT_HINT,
-    NOT_VALIDATE_HINT,
-} from './rule/rule-masks';
+import { hasHint, NOT_CONVERT_HINT, NOT_VALIDATE_HINT } from './rule/rule-masks';
 import { logger } from './utils/log';
 import { validateCssSelector } from './utils/extended-css-validator';
 
@@ -208,7 +203,7 @@ export const validateAndFilterRules = (list, excluded, invalid = [], filterName)
         return [];
     }
 
-    return filterWithHints(list, (ruleText, index, array) => {
+    return list.filter((ruleText, index, array) => {
         if (CommentParser.isCommentRule(ruleText)) {
             return true;
         }
