@@ -612,8 +612,13 @@ describe('validator', () => {
         });
 
         it('applies only to the rule right after the hint', () => {
-            const rules = ['!+ NOT_CONVERT', newScriptletRule, '||example.org^'];
-            expect(validateAndFilterRules(rules)).toEqual(rules);
+            const anotherNewScriptletRule = "example.com#%#//scriptlet('another-new-scriptlet')";
+            const rules = ['!+ NOT_CONVERT', newScriptletRule, anotherNewScriptletRule];
+
+            const result = validateAndFilterRules(rules);
+
+            expect(result).toContain(newScriptletRule);
+            expect(result).not.toContain(anotherNewScriptletRule);
         });
 
         it('warns that the rule is not validated', () => {
