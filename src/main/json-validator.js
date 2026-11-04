@@ -88,13 +88,15 @@ const validateDir = (dir, validator, schemas, oldSchemas, filtersRequiredAmount)
                 const valid = validate(json);
 
                 // json can be updated with default values
-                fs.writeFileSync(item, JSON.stringify(json, null, '\t'));
+                const content = JSON.stringify(json, null, '\t');
+
+                fs.writeFileSync(item, content);
 
                 // duplicate to .js file as well
                 const jsFileName = `${fileName}.js`;
                 fs.writeFileSync(
                     path.join(path.dirname(item), jsFileName),
-                    JSON.stringify(json, null, '\t'),
+                    content,
                 );
 
                 if (!valid) {

@@ -42,11 +42,11 @@ running tests, and contributing code to the AdGuard Filters Compiler.
 
 ### Required Tools
 
-| Tool                           | Version            | Notes                        |
-| ------------------------------ | ------------------ | ---------------------------- |
-| [Node.js](https://nodejs.org/) | 22                 | Use [nvm] to manage versions |
-| [pnpm](https://pnpm.io/)       | >=10.33.4 and <11  | Package manager              |
-| [Git](https://git-scm.com/)    | Latest             | Version control              |
+| Tool                           | Version              | Notes                        |
+| ------------------------------ | -------------------- | ---------------------------- |
+| [Node.js](https://nodejs.org/) | 22.21+ (22.x) or 24+ | Use [nvm] to manage versions |
+| [pnpm](https://pnpm.io/)       | >=10.33.4 and <11    | Package manager              |
+| [Git](https://git-scm.com/)    | Latest               | Version control              |
 
 > **Note**: Development is tested on macOS and Linux. Windows users should use
 > WSL or a virtual machine. The repository must still be checkable out on
@@ -80,7 +80,7 @@ pnpm install
 pnpm build
 ```
 
-Build output goes to `dist/` (ESM: `dist/index.js`, CJS: `dist/index.cjs`).
+Build output goes to `dist/` as a single ES module (`dist/index.js`).
 Rollup also copies JSON schemas and trust-level files into `dist/`.
 
 ### 4. Run Tests
@@ -336,13 +336,16 @@ try {
 
 **Problem**: Build or tests fail with unexpected errors.
 
-**Solution**: Ensure you are using Node.js 22:
+**Solution**: Ensure you use a supported Node.js version. `package.json`
+declares `^22.21.0 || >=24.0.0`. The `require` entry point relies on
+`require(ESM)`, which Node.js enables by default from version 22.12, so every
+supported version can use both `import` and `require`:
 
 ```bash
-node --version  # Should be v22.x.x
+node --version  # Should be v22.21+ on 22.x, or v24+
 ```
 
-If using nvm:
+If using nvm, install the latest 22.x to match CI and the Docker image:
 
 ```bash
 nvm install 22

@@ -16,7 +16,9 @@ import {
     loadFilterMetadata,
     init,
     postProcessUrls,
+    generate,
 } from '../src/main/platforms/generator';
+import { disableOptimization } from '../src/main/optimization';
 
 describe('generator', () => {
     it('sortMetadataFilters', () => {
@@ -309,6 +311,127 @@ describe('generator', () => {
                 .toBe(`${SERVER_URL}extension/android-content-blocker/filters/1_optimized.txt`);
             expect(result.filters[0].subscriptionUrl)
                 .toBe('https://example.org/custom/filter.txt');
+        });
+    });
+
+    describe('generate locales', () => {
+        let tmpDir;
+        let filtersDir;
+        let platformsDir;
+
+        const writeJson = (filePath, data) => fs.writeFile(filePath, JSON.stringify(data));
+
+        beforeEach(async () => {
+            disableOptimization();
+
+            tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'generator-locales-test-'));
+            filtersDir = path.join(tmpDir, 'filters');
+            platformsDir = path.join(tmpDir, 'platforms');
+
+            const filterDir = path.join(filtersDir, 'filter_1_Test');
+            const localesDir = path.join(tmpDir, 'locales');
+
+            await fs.mkdir(filterDir, { recursive: true });
+            await fs.mkdir(path.join(tmpDir, 'groups'), { recursive: true });
+            await fs.mkdir(path.join(tmpDir, 'tags'), { recursive: true });
+            await fs.mkdir(path.join(localesDir, 'en'), { recursive: true });
+            await fs.mkdir(path.join(localesDir, 'ru'), { recursive: true });
+            await fs.mkdir(path.join(localesDir, 'ko'), { recursive: true });
+
+            await writeJson(path.join(filterDir, 'metadata.json'), {
+                filterId: 1,
+                name: 'Test filter',
+                description: 'Test filter description',
+                timeAdded: 1404115015843,
+                expires: '2 days',
+                groupId: 1,
+                subscriptionUrl: 'https://example.org/filters/1.txt',
+                tags: ['purpose:ads'],
+            });
+            await writeJson(path.join(filterDir, 'revision.json'), {
+                version: '1.0.0.0',
+                timeUpdated: 1578671260906,
+            });
+            await fs.writeFile(path.join(filterDir, 'filter.txt'), '||example.com^\r\n');
+
+            await writeJson(path.join(tmpDir, 'groups', 'metadata.json'), [
+                { groupId: 1, groupName: 'Test group' },
+            ]);
+            await writeJson(path.join(tmpDir, 'tags', 'metadata.json'), [
+                { tagId: 1, keyword: 'purpose:ads' },
+            ]);
+
+            await writeJson(path.join(localesDir, 'en', 'groups.json'), [
+                { 'group.1.name': 'Group name' },
+            ]);
+            await writeJson(path.join(localesDir, 'en', 'tags.json'), [
+                { 'tag.1.name': 'Tag name' },
+            ]);
+            await writeJson(path.join(localesDir, 'en', 'filters.json'), [
+                { 'filter.1.name': 'Filter name', 'filter.1.description': 'Filter description' },
+            ]);
+
+            await writeJson(path.join(localesDir, 'ru', 'groups.json'), [
+                { 'group.1.name': 'Group name RU' },
+            ]);
+            // No tags.json for this locale: the missing file must be skipped.
+            await writeJson(path.join(localesDir, 'ru', 'filters.json'), [
+                { 'filter.1.name': 'Filter name RU' },
+            ]);
+
+            // An entry without an id must be skipped.
+            await writeJson(path.join(localesDir, 'ko', 'groups.json'), [
+                { 'group..name': 'Broken' },
+                { 'group.1.name': 'Group name KO' },
+            ]);
+            await writeJson(path.join(localesDir, 'ko', 'tags.json'), []);
+            await writeJson(path.join(localesDir, 'ko', 'filters.json'), []);
+
+            init('filter.txt', 'metadata.json', 'revision.json', {
+                TEST: {
+                    platform: 'ext_ublock',
+                    path: 'test',
+                    configuration: {
+                        removeRulePatterns: false,
+                        ignoreRuleHints: false,
+                        adbHeader: '![Adblock Plus 2.0]',
+                    },
+                    defines: {
+                        adguard: true,
+                        ublock: true,
+                    },
+                },
+            }, 'https://example.org/');
+        });
+
+        afterEach(async () => {
+            await fs.rm(tmpDir, { recursive: true, force: true });
+        });
+
+        it('loads groups, tags, and filters with their locales', async () => {
+            await generate(filtersDir, platformsDir);
+
+            const content = await fs.readFile(path.join(platformsDir, 'test', 'filters_i18n.json'), 'utf-8');
+            const i18n = JSON.parse(content);
+
+            expect(i18n.groups).toEqual({
+                1: {
+                    en: { name: 'Group name' },
+                    ru: { name: 'Group name RU' },
+                    ko: { name: 'Group name KO' },
+                },
+            });
+            expect(i18n.tags).toEqual({
+                1: {
+                    en: { name: 'Tag name' },
+                },
+            });
+            expect(i18n.filters).toEqual({
+                1: {
+                    en: { name: 'Filter name', description: 'Filter description' },
+                    ru: { name: 'Filter name RU' },
+                },
+            });
         });
     });
 });
