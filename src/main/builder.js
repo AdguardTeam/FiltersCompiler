@@ -15,6 +15,7 @@ import {
     hasHint,
     isHint,
     NOT_CONVERT_HINT,
+    NOT_OPTIMIZED_HINT,
 } from './rule/rule-masks';
 import { fixVersionComments, removeAdblockVersion } from './utils/workaround';
 import { downloadFile } from './utils/webutils';
@@ -46,8 +47,7 @@ const EXCLUDE_OPTION = 'exclude';
 const ADD_MODIFIERS_OPTION = 'addModifiers';
 const IGNORE_TRUST_LEVEL_OPTION = 'ignoreTrustLevel';
 
-const NOT_OPTIMIZED_HINT_NAME = 'NOT_OPTIMIZED';
-const NOT_OPTIMIZED_HINT = `${RuleMasks.MASK_HINT}${SPACE}${NOT_OPTIMIZED_HINT_NAME}`;
+const NOT_OPTIMIZED_HINT_LINE = `${RuleMasks.MASK_HINT}${SPACE}${NOT_OPTIMIZED_HINT}`;
 
 /**
  * Filter header tag for diff path which is needed for patch updates.
@@ -133,7 +133,7 @@ const addNotOptimizedHints = function (lines) {
             if (isHint(previous)) {
                 // Append to the hint that modifies this rule, otherwise it would no longer
                 // apply to the rule.
-                result[result.length - 1] = `${previous}${SPACE}${NOT_OPTIMIZED_HINT_NAME}`;
+                result[result.length - 1] = `${previous}${SPACE}${NOT_OPTIMIZED_HINT_LINE}`;
             } else {
                 result.push(NOT_OPTIMIZED_HINT);
             }

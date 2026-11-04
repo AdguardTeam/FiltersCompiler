@@ -31,6 +31,17 @@ export const RuleMasks = {
 };
 
 /**
+ * Opening of a hint line: the hint mask plus the space that separates it from
+ * the hint name, e.g. `!+ ` in `!+ PLATFORM(windows)`.
+ */
+export const HINT_MASK = `${RuleMasks.MASK_HINT} `;
+
+/**
+ * Hint that excludes the next rule from optimization.
+ */
+export const NOT_OPTIMIZED_HINT = 'NOT_OPTIMIZED';
+
+/**
  * Hint that skips validation of the next rule.
  * https://github.com/AdguardTeam/FiltersCompiler/issues/245
  */
@@ -45,11 +56,14 @@ export const NOT_CONVERT_HINT = 'NOT_CONVERT';
 /**
  * Checks whether a line is a hint line, e.g. `!+ PLATFORM(windows)`.
  *
- * @param {string} line Line to check.
+ * Only `!+` followed by a space is treated as a hint, matching the platform
+ * stage; malformed lines like `!+NOT_CONVERT` are ordinary lines.
+ *
+ * @param {string|null|undefined} line Line to check.
  *
  * @returns {boolean} `true` if the line starts with the hint mask.
  */
-export const isHint = (line) => Boolean(line && line.startsWith(RuleMasks.MASK_HINT));
+export const isHint = (line) => Boolean(line?.startsWith(HINT_MASK));
 
 /**
  * Filters lines while keeping hints attached to the lines they modify.

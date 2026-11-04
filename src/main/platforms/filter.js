@@ -11,16 +11,17 @@
 
 import { logger } from '../utils/log';
 import { overrideRule } from '../utils/workaround';
-import { RuleMasks, hasHint } from '../rule/rule-masks';
+import {
+    HINT_MASK,
+    NOT_OPTIMIZED_HINT,
+    hasHint,
+} from '../rule/rule-masks';
 import { skipRuleWithOptimization } from '../optimization';
 
-const HINT_MASK = `${RuleMasks.MASK_HINT} `;
 const COMMENT_REGEXP = '^\\!($|[^#])';
 
 const PLATFORM_HINT_REGEXP = /(^| )PLATFORM\(([^)]+)\)/g;
 const NOT_PLATFORM_HINT_REGEXP = /(.*)NOT_PLATFORM\(([^)]+)\)/g;
-
-const NOT_OPTIMIZED_HINT = 'NOT_OPTIMIZED';
 
 /**
  * Platform hint aliases, each of which stands for several platforms,
