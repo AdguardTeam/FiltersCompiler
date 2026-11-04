@@ -68,8 +68,10 @@ export const isHint = (line) => Boolean(line?.startsWith(HINT_MASK));
 /**
  * Filters lines while keeping hints attached to the lines they modify.
  *
- * A hint modifies only the next non-hint line. If that line is filtered out, the hints are
- * dropped with it instead of leaking to the following line.
+ * Only the last hint line of a run applies: consumers look at the immediately
+ * preceding line, so earlier hint lines have no effect. If the modified line is
+ * filtered out, the hint lines are dropped with it instead of leaking to the
+ * following line.
  *
  * @param {string[]} lines Lines to filter.
  * @param {(line: string, index: number, lines: string[]) => boolean} shouldKeep

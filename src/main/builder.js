@@ -47,7 +47,8 @@ const EXCLUDE_OPTION = 'exclude';
 const ADD_MODIFIERS_OPTION = 'addModifiers';
 const IGNORE_TRUST_LEVEL_OPTION = 'ignoreTrustLevel';
 
-const NOT_OPTIMIZED_HINT_LINE = `${RuleMasks.MASK_HINT}${SPACE}${NOT_OPTIMIZED_HINT}`;
+const NOT_OPTIMIZED_SUFFIX = `${SPACE}${NOT_OPTIMIZED_HINT}`;
+const NOT_OPTIMIZED_HINT_LINE = `${RuleMasks.MASK_HINT}${NOT_OPTIMIZED_SUFFIX}`;
 
 /**
  * Filter header tag for diff path which is needed for patch updates.
@@ -114,32 +115,46 @@ const stripComments = function (lines) {
 };
 
 /**
- * Adds not optimized hints
+ * Adds not optimized hints.
  *
- * @param lines
+ * A hint applies only to the immediately preceding line, so the token is
+ * appended to an existing hint line only when that line directly precedes the
+ * rule. A blank line or a comment between them detaches the hint, and a
+ * separate hint line is inserted instead.
+ *
+ * Exported for unit tests.
+ *
+ * @param {string[]} lines Lines to process.
+ *
+ * @returns {string[]} Lines with the hints added.
  */
-const addNotOptimizedHints = function (lines) {
+export const addNotOptimizedHints = function (lines) {
     logger.info('Adding hints..');
 
     const result = [];
+    let previousLine = null;
 
-    lines.forEach((v) => {
-        if (!v) {
+    lines.forEach((line) => {
+        if (!line) {
+            previousLine = line;
             return;
         }
 
-        if (!v.startsWith(RuleMasks.MASK_COMMENT) && !isHint(v)) {
-            const previous = result[result.length - 1];
-            if (isHint(previous)) {
-                // Append to the hint that modifies this rule, otherwise it would no longer
-                // apply to the rule.
-                result[result.length - 1] = `${previous}${SPACE}${NOT_OPTIMIZED_HINT_LINE}`;
-            } else {
-                result.push(NOT_OPTIMIZED_HINT);
+        const isRule = !line.startsWith(RuleMasks.MASK_COMMENT);
+        const isHinted = isHint(previousLine);
+        const alreadyMarked = isHinted && hasHint(previousLine, NOT_OPTIMIZED_HINT);
+
+        if (isRule) {
+            if (!isHinted) {
+                result.push(NOT_OPTIMIZED_HINT_LINE);
+            } else if (!alreadyMarked) {
+                const hintLineWithNotOptimized = `${previousLine}${NOT_OPTIMIZED_SUFFIX}`;
+                result[result.length - 1] = hintLineWithNotOptimized;
             }
         }
 
-        result.push(v);
+        result.push(line);
+        previousLine = line;
     });
 
     return result;

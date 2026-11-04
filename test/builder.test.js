@@ -15,7 +15,7 @@ import path from 'path';
 import { promises as fs, existsSync } from 'fs';
 
 import { disableOptimization } from '../src/main/optimization';
-import { build, include } from '../src/main/builder';
+import { addNotOptimizedHints, build, include } from '../src/main/builder';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
@@ -1568,5 +1568,66 @@ describe('Invalid rules collection in report', () => {
         // only the genuinely invalid rule is collected in the diff
         expect(diffLines[0]).toContain('Error: Unable to convert rule to AdGuard syntax');
         expect(diffLines[1]).toContain('filter14.example.com#$#selector:style()');
+    });
+});
+
+describe('addNotOptimizedHints', () => {
+    it('Adds a hint line before a rule without a hint', () => {
+        const lines = ['||a.com^', '||b.com^'];
+        expect(addNotOptimizedHints(lines)).toEqual([
+            '!+ NOT_OPTIMIZED',
+            '||a.com^',
+            '!+ NOT_OPTIMIZED',
+            '||b.com^',
+        ]);
+    });
+
+    it('Appends the token to the hint that directly precedes the rule', () => {
+        const lines = ['!+ PLATFORM(ios)', '||a.com^'];
+        expect(addNotOptimizedHints(lines)).toEqual([
+            '!+ PLATFORM(ios) NOT_OPTIMIZED',
+            '||a.com^',
+        ]);
+    });
+
+    it('Keeps a hint separated by a blank line detached', () => {
+        const lines = ['!+ PLATFORM(ios)', '', '||a.com^'];
+        expect(addNotOptimizedHints(lines)).toEqual([
+            '!+ PLATFORM(ios)',
+            '!+ NOT_OPTIMIZED',
+            '||a.com^',
+        ]);
+    });
+
+    it('Keeps a hint separated by a comment detached', () => {
+        const lines = ['!+ PLATFORM(ios)', '! comment', '||a.com^'];
+        expect(addNotOptimizedHints(lines)).toEqual([
+            '!+ PLATFORM(ios)',
+            '! comment',
+            '!+ NOT_OPTIMIZED',
+            '||a.com^',
+        ]);
+    });
+
+    it('Does not duplicate an existing token', () => {
+        const lines = ['!+ NOT_OPTIMIZED', '||a.com^'];
+        expect(addNotOptimizedHints(lines)).toEqual(lines);
+
+        const linesWithPlatform = ['!+ PLATFORM(ios) NOT_OPTIMIZED', '||a.com^'];
+        expect(addNotOptimizedHints(linesWithPlatform)).toEqual(linesWithPlatform);
+    });
+
+    it('Treats a malformed hint as an ordinary line', () => {
+        const lines = ['!+NOT_CONVERT', '||a.com^'];
+        expect(addNotOptimizedHints(lines)).toEqual([
+            '!+NOT_CONVERT',
+            '!+ NOT_OPTIMIZED',
+            '||a.com^',
+        ]);
+    });
+
+    it('Does not add hints to comment lines', () => {
+        const lines = ['! comment'];
+        expect(addNotOptimizedHints(lines)).toEqual(lines);
     });
 });
