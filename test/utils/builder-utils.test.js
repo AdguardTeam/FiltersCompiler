@@ -6,7 +6,7 @@ import {
 } from 'vitest';
 import { optimizeDomainBlockingRules } from '../../src/main/utils/builder-utils';
 
-vi.mock('../../main/utils/log');
+vi.mock('../../src/main/utils/log');
 
 describe('optimizeDomainBlockingRules options of include directive', () => {
     it('Properly removes redundant rules', async () => {
