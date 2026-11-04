@@ -15,7 +15,9 @@ import {
 import {
     convertRulesToAdgSyntax,
     convertToUbo,
+    getCanonicalRuleTexts,
 } from '../src/main/converter';
+import { logger } from '../src/main/utils/log';
 import { CORE_LIBS_PCRE2_QUANTIFIER_LIMIT } from '../src/main/utils/workaround';
 
 // Mock log to hide error messages
@@ -111,6 +113,15 @@ describe('converter', () => {
             const result = convertRulesToAdgSyntax(['!+ NOT_CONVERT', rule, rule]);
             expect(result[1]).toBe(rule);
             expect(result[2]).toBe(converted);
+        });
+    });
+
+    describe('getCanonicalRuleTexts', () => {
+        it('returns an empty array and logs when the rule cannot be parsed', () => {
+            expect(getCanonicalRuleTexts('example.com#%#//scriptlet(')).toEqual([]);
+            expect(logger.info).toHaveBeenCalledWith(
+                expect.stringContaining('Unable to compute canonical form of'),
+            );
         });
     });
 

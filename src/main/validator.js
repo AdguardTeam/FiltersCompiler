@@ -211,10 +211,15 @@ export const validateAndFilterRules = (list, excluded, invalid = [], filterName)
         const previousRule = index > 0 ? array[index - 1] : null;
         // Skip validation if "ruleText" is preceded by a hint that makes it
         // intentionally non-standard.
-        if (
-            hasHint(previousRule, NOT_VALIDATE_HINT)
-            || hasHint(previousRule, NOT_CONVERT_HINT)
-        ) {
+        if (hasHint(previousRule, NOT_VALIDATE_HINT)) {
+            return true;
+        }
+
+        // A rule kept as-is by the `NOT_CONVERT` hint cannot be validated against
+        // the canonical syntax either, so it reaches the build output unchecked.
+        // Unlike `NOT_VALIDATE`, which is an explicit opt-out, report such rules.
+        if (hasHint(previousRule, NOT_CONVERT_HINT)) {
+            logger.warn(`Rule "${ruleText}" is kept as-is by the NOT_CONVERT hint and is not validated`);
             return true;
         }
 
