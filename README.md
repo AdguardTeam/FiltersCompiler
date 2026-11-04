@@ -291,7 +291,9 @@ filter lists from shared fragments.
 
     - `/stripComments` — removes AdBlock-style comment lines (starting
       with `!`) from the included file.
-    - `/notOptimized` — adds a `!+ NOT_OPTIMIZED` hint to the rules.
+    - `/notOptimized` — adds a `!+ NOT_OPTIMIZED` hint to the rules. If
+      a rule is directly preceded by a hint line, the token is appended
+      to it, e.g. `!+ PLATFORM(ios) NOT_OPTIMIZED`.
     - `/exclude="<filepath>"` — excludes rules listed in the exception
       file at `filepath`.
     - `/addModifiers="<modifiers>"` — appends the given modifiers (as
@@ -350,6 +352,10 @@ example.org$script
 !+ NOT_OPTIMIZED
 example.org$script
 ```
+
+If a rule already has a hint line directly above it, the token is
+appended to that line instead of adding a separate one, so the existing
+hint keeps applying to the rule.
 
 **4. `/stripComments`** removes comment lines:
 
