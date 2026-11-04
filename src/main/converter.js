@@ -177,8 +177,16 @@ export const convertToUbo = (rules) => {
 
                     const scriptletName = trimQuotes(scriptletNameString);
 
+                    // The uBO-compatible spelling keeps the `ubo-` prefix
+                    // (e.g. `ubo-trusted-set-cookie`), so drop it before checking
+                    // for a trusted scriptlet.
+                    const normalizedScriptletName = scriptletName
+                        .startsWith(RuleMasks.MASK_UBO_SCRIPTLET_PREFIX)
+                        ? scriptletName.slice(RuleMasks.MASK_UBO_SCRIPTLET_PREFIX.length)
+                        : scriptletName;
+
                     // TODO: move this check to AGTree AG-41266
-                    if (scriptletName.startsWith(RuleMasks.MASK_TRUSTED_SCRIPTLET)) {
+                    if (normalizedScriptletName.startsWith(RuleMasks.MASK_TRUSTED_SCRIPTLET)) {
                         // https://github.com/AdguardTeam/Scriptlets#trusted-scriptlets-restriction
                         // does not work in other blockers
                         const message = `Trusted scriptlets should not be converted to uBO syntax. Rule: "${rule}"`;
