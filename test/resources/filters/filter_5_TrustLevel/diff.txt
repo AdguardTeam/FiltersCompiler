@@ -46,6 +46,10 @@ test.com#@#script:inject(abort-on-property-read.js, some.prop)
 example.com#%#//scriptlet('trusted-set-local-storage-item', 'iName', 'iValue')
 ! example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue") is excluded by "#%#//scriptlet("trusted-" in exclusions-high.txt
 example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")
+! example.com#%#//scriptlet('ubo-trusted-set-cookie', 'a', 'b') is excluded by "#%#//scriptlet('ubo-trusted-" in exclusions-high.txt
+example.com#%#//scriptlet('ubo-trusted-set-cookie', 'a', 'b')
+! example.com#%#//scriptlet("ubo-trusted-set-cookie", "a", "b") is excluded by "#%#//scriptlet("ubo-trusted-" in exclusions-high.txt
+example.com#%#//scriptlet("ubo-trusted-set-cookie", "a", "b")
 ! Rule "example.com#%#//scriptlet( 'trusted-set-cookie', 'a', 'b')" is kept as-is due to the NOT_CONVERT hint
 example.com#%#//scriptlet( 'trusted-set-cookie', 'a', 'b')
 ! example.com#%#//scriptlet( 'trusted-set-cookie', 'a', 'b') is excluded by "#%#//scriptlet('trusted-" in exclusions-high.txt

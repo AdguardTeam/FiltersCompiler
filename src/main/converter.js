@@ -106,7 +106,10 @@ export const convertRulesToAdgSyntax = (rulesList, excluded = [], invalidRules =
 };
 
 /**
- * Returns canonical AdGuard representation of a single rule without reporting anything.
+ * Returns canonical AdGuard representation of a single rule.
+ *
+ * Unlike `convertRulesToAdgSyntax`, a rule that cannot be parsed is not reported
+ * as an error: the failure is logged and an empty array is returned.
  *
  * Needed to check exclusions against rules kept as-is due to the `NOT_CONVERT` hint:
  * such rules may be written in a form that bypasses substring exclusions
@@ -121,7 +124,8 @@ export const getCanonicalRuleTexts = (rule) => {
     try {
         const ruleNode = RuleParser.parse(rule);
         return RuleConverter.convertToAdg(ruleNode).result.map((r) => RuleGenerator.generate(r));
-    } catch {
+    } catch (e) {
+        logger.info(`Unable to compute canonical form of "${rule}": ${getErrorMessage(e)}`);
         return [];
     }
 };
@@ -177,8 +181,16 @@ export const convertToUbo = (rules) => {
 
                     const scriptletName = trimQuotes(scriptletNameString);
 
+                    // The uBO-compatible spelling keeps the `ubo-` prefix
+                    // (e.g. `ubo-trusted-set-cookie`), so drop it before checking
+                    // for a trusted scriptlet.
+                    const normalizedScriptletName = scriptletName
+                        .startsWith(RuleMasks.MASK_UBO_SCRIPTLET_PREFIX)
+                        ? scriptletName.slice(RuleMasks.MASK_UBO_SCRIPTLET_PREFIX.length)
+                        : scriptletName;
+
                     // TODO: move this check to AGTree AG-41266
-                    if (scriptletName.startsWith(RuleMasks.MASK_TRUSTED_SCRIPTLET)) {
+                    if (normalizedScriptletName.startsWith(RuleMasks.MASK_TRUSTED_SCRIPTLET)) {
                         // https://github.com/AdguardTeam/Scriptlets#trusted-scriptlets-restriction
                         // does not work in other blockers
                         const message = `Trusted scriptlets should not be converted to uBO syntax. Rule: "${rule}"`;

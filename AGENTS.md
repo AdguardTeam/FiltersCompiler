@@ -28,9 +28,10 @@ The library exposes four public API functions: `compile`, `validateJSONSchema`,
 
 ## Technical Context
 
-- **Language**: JavaScript (ES2022 modules), Node.js >=22
+- **Language**: JavaScript (ES2022 modules), Node.js ^22.21.0 || >=24.0.0
 - **Package Manager**: pnpm >=10.33.4 and <11
-- **Bundler**: Rollup (dual ESM + CJS output)
+- **Bundler**: Rollup (single ESM output; `require()` relies on Node.js
+  `require(ESM)`, enabled by default since Node.js 22.12)
 - **Testing**: Vitest (node environment, `test/*.test.{js,ts}`)
 - **Code Linting**: ESLint 10, native flat config (`eslint.config.js`) — a
   one-time port of the project's former ESLint 8 + airbnb-base rule set, no
@@ -239,7 +240,7 @@ project's layers, from top to bottom:
 | Public API | Entry point, export surface | `src/index.js` |
 | Core Pipeline | Compilation orchestration, include resolution | `src/main/builder.js` |
 | Platform Generator | Platform-specific output, `!#if` resolution | `src/main/platforms/generator.js` |
-| Supporting Modules | Rule conversion, validation, optimization | `converter.js`, `validator.js`, `optimization.js`, etc. |
+| Supporting Modules | Rule conversion, validation, optimization | `converter.js`, `validator.js`, `optimization.ts`, etc. |
 | Utilities | Logging, reporting, versioning, workarounds | `src/main/utils/*` |
 <!-- markdownlint-enable MD060 -->
 
@@ -367,7 +368,8 @@ supply chain risks, and long-term maintenance costs.
 
 - **Runtime configuration**: The library is configured at compile time via
   the `customPlatformsConfig` parameter passed to `compile()`. There is no
-  runtime config file or environment variable mechanism.
+  runtime config file. The library reads `TLS`, and Node.js reads
+  `NODE_USE_ENV_PROXY` for remote `!#include` downloads.
 - **Platform definitions**: Static configuration is defined in
   `src/main/platforms-config.js`. This file defines all 16 platform
   configurations with their `removeRulePatterns`, `defines`, and metadata.
@@ -387,33 +389,48 @@ supply chain risks, and long-term maintenance costs.
 
 ### Markdown Formatting
 
-All Markdown files MUST follow these formatting rules:
+All Markdown files MUST follow these formatting rules. `.markdownlint.json`
+is authoritative: if this section and the linter ever disagree, the linter
+wins and this section MUST be fixed.
 
-- **Line length**: Keep lines at most 80 characters, but don't overwrap the
-  lines artificially short just to hit the limit, keep them close to 80
-  characters where possible. This is not a hard lint gate, but SHOULD be
-  followed for readability. Lines inside fenced code blocks are exempt from
-  this limit.
-- **Unordered lists**: Use dashes (`-`) for bullet points. Indent nested list
-  items by 4 spaces.
+- **Line length**: Keep prose lines at most 80 characters. 80 is a
+  readability target, not the lint limit: the hard lint limit is 120
+  characters (MD013, `line_length`). MD013 also checks fenced code blocks
+  (`code_blocks` is `true`), so wrap a long sample or disable the rule around
+  it — see the `@include` example in README.md. Table rows are exempt
+  (`tables` is `false`). Long lines without spaces, such as a bare URL, are
+  exempt (`stern` is `true`). Do not wrap lines artificially short just to
+  hit 80; keep them close to 80 where possible.
+- **Fenced code blocks**: Always specify a language (MD040).
+- **Unordered lists**: Use dashes (`-`) for bullet points (MD004). Indent
+  nested list items by 4 spaces (MD007).
 - **Continuation lines**: When a list item wraps to the next line, align the
-  continuation with the first character of the item text, not the list marker.
-  This applies to all list types (ordered and unordered).
-- **Emphasis**: Use asterisks (`*`) for emphasis (`*italic*`, `**bold**`). Do
-  NOT use underscores.
+  continuation with the first character of the item text, not the list
+  marker. This applies to all list types (ordered and unordered). The linter
+  does not check this alignment, but MD005 and MD007 enforce list
+  indentation.
+- **Emphasis**: Use asterisks (`*`) for emphasis (`*italic*`, `**bold**`).
+  Do NOT use underscores. MD049 and MD050 require one consistent style per
+  file.
 - **Headings**: Duplicate heading names are allowed only among sibling
-  headings (same parent level). Avoid duplicates across different levels.
-- **Inline HTML**: Avoid raw HTML in Markdown. The only allowed elements are
-  `<a>`, `<p>`, `<details>`, `<summary>`, and `<img>`.
-- **Trailing spaces**: Do NOT leave trailing whitespace on any line. Do NOT
-  use two-space line breaks — use a blank line instead.
+  headings (same parent level) (MD024, `siblings_only`). Avoid duplicates
+  across different levels.
+- **Inline HTML**: Avoid raw HTML in Markdown. `<a>` is the only permitted
+  element (MD033, `allowed_elements`), because the repository uses it for
+  explicit anchors, e.g. `<a name="include-directive"></a>` in README.md.
+  All other elements fail the linter.
+- **Trailing spaces**: Do NOT leave trailing whitespace on any line (MD009).
+  Do NOT use two-space line breaks — use a blank line instead.
 - **Bare URLs**: Bare URLs are permitted and do not need to be wrapped in
-  angle brackets.
-- **Table formatting**: Align table columns with padding when the table fits
-  within 80 characters. If the table exceeds 80 characters or triggers an MD060
-  linter warning, switch to a compact format using single spaces only. This
-  applies to the separator row as well — it should be written as `| --- |`, not
-  `|--|`.
+  angle brackets (MD034 is disabled, `no-bare-urls`).
+- **Table formatting**: Align table columns with padding (MD060, `style` is
+  `aligned`). Every row, including the separator row, must use the same pipe
+  positions, so the separator cells span the column width: `| ------ |`
+  matching the header, and never a short `|--|` or `| --- |` in a wider
+  column. If a table is too wide to align readably, wrap it in
+  `<!-- markdownlint-disable MD060 -->` and
+  `<!-- markdownlint-enable MD060 -->` comments; the linter skips MD060
+  inside that block. See the Layers table in "Architecture" for an example.
 
   Example of correct layout:
 
@@ -423,11 +440,10 @@ All Markdown files MUST follow these formatting rules:
   | Value1 | Value2 |
   ```
 
-  Do NOT use extra padding or alignment characters beyond single spaces.
-
 **Rationale**: Uniform Markdown formatting improves readability for both
 humans and AI agents that consume project documentation. The project's
-markdownlint configuration enforces these rules (see `.markdownlint.json`).
+markdownlint configuration (`.markdownlint.json`) is the source of truth and
+`pnpm lint:md` enforces it in CI.
 
 [code-guidelines]: https://github.com/AdguardTeam/CodeGuidelines/blob/master/JavaScript/Javascript.md
 [FiltersRegistry]: https://github.com/AdguardTeam/FiltersRegistry/

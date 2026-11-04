@@ -16,10 +16,6 @@ setConfiguration({ compatibility: CompatibilityTypes.Corelibs });
 
 const jsonSchemasConfigDir = path.join(__dirname, './schemas/');
 
-process.on('unhandledRejection', (error) => {
-    throw error;
-});
-
 export const compile = (
     path,
     logPath,

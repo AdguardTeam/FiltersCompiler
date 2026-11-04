@@ -611,7 +611,6 @@ export const platformsConfig = {
             'adguard': true,
             'adguard_app_mac': true,
             'apps_corelibs': true,
-            'cap_html_filtering': true,
         },
     },
     'MAC_V2': {

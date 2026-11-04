@@ -16,3 +16,7 @@
 declare module '*/rule/rule-masks.js' {
     export const RuleMasks: Record<string, string>;
 }
+
+declare module '*/platforms-config.js' {
+    export const platformsConfig: Record<string, { defines: Record<string, true | undefined> }>;
+}
