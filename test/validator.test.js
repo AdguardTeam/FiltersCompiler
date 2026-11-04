@@ -616,13 +616,26 @@ describe('validator', () => {
             expect(validateAndFilterRules(rules)).toEqual(rules);
         });
 
-        it('drops hints attached to a dropped rule', () => {
-            const rules = [
-                '!+ PLATFORM(ios)',
-                'example.com#@%#//scriptlet("abort-on--property-write", "adblock.check")',
-                '||example.org^',
-            ];
-            expect(validateAndFilterRules(rules)).toEqual(['||example.org^']);
+        it('warns that the rule is not validated', () => {
+            const warn = vi.spyOn(logger, 'warn').mockImplementation(() => { });
+
+            validateAndFilterRules(['!+ NOT_CONVERT', newScriptletRule]);
+
+            expect(warn).toHaveBeenCalledWith(
+                `Rule "${newScriptletRule}" is kept as-is by the NOT_CONVERT hint and is not validated`,
+            );
+
+            warn.mockRestore();
+        });
+
+        it('does not warn for the explicit NOT_VALIDATE hint', () => {
+            const warn = vi.spyOn(logger, 'warn').mockImplementation(() => { });
+
+            validateAndFilterRules(['!+ NOT_VALIDATE', 'example.com##.ad']);
+
+            expect(warn).not.toHaveBeenCalled();
+
+            warn.mockRestore();
         });
     });
 
