@@ -27,6 +27,7 @@ export const RuleMasks = {
     MASK_SCRIPTLET: '#%#//scriptlet',
     MASK_SCRIPTLET_EXCEPTION: '#@%#//scriptlet',
     MASK_TRUSTED_SCRIPTLET: 'trusted-',
+    MASK_UBO_SCRIPTLET_PREFIX: 'ubo-',
 };
 
 /**

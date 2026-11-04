@@ -315,6 +315,15 @@ describe('converter', () => {
         expected = '';
         expect(actual[0]).toBe(expected);
 
+        // trusted scriptlets with the uBO-compatible `ubo-` prefix
+        actual = convertToUbo(["example.com#%#//scriptlet('ubo-trusted-set-cookie', 'a', 'b')"]);
+        expected = '';
+        expect(actual[0]).toBe(expected);
+
+        actual = convertToUbo(['example.com#%#//scriptlet("ubo-trusted-set-cookie", "a", "b")']);
+        expected = '';
+        expect(actual[0]).toBe(expected);
+
         // scriptlet with two arguments
         actual = convertToUbo(["example.org#%#//scriptlet('set-constant', 'firstConst', 'false')"]);
         expected = 'example.org##+js(set-constant, firstConst, false)';
