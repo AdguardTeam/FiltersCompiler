@@ -3,17 +3,10 @@ import typescript from '@rollup/plugin-typescript';
 
 export default {
     input: 'src/index.js',
-    output: [
-        {
-            file: 'dist/index.js',
-            format: 'esm',
-        },
-        {
-            file: 'dist/index.cjs',
-            format: 'cjs',
-            exports: 'auto',
-        },
-    ],
+    output: {
+        file: 'dist/index.js',
+        format: 'esm',
+    },
     plugins: [
         typescript(),
         copy({

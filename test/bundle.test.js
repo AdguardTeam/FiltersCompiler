@@ -12,9 +12,11 @@ import {
 } from 'vitest';
 import path from 'path';
 import { existsSync, readFileSync } from 'fs';
+import { createRequire } from 'module';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const distDir = path.join(__dirname, '../dist');
+const requireCjs = createRequire(import.meta.url);
 
 describe('Bundle smoke tests', () => {
     describe('Trust-level exclusion files', () => {
@@ -91,9 +93,27 @@ describe('Bundle smoke tests', () => {
             expect(existsSync(filePath)).toBe(true);
         });
 
-        it('dist/index.cjs (CommonJS) should exist', () => {
-            const filePath = path.join(distDir, 'index.cjs');
-            expect(existsSync(filePath)).toBe(true);
+        it('should resolve require() to the single ESM entry point', () => {
+            expect(requireCjs.resolve('@adguard/filters-compiler')).toBe(path.join(distDir, 'index.js'));
         });
+
+        it('should load the package via require() and expose the public API', () => {
+            // Loading the package pulls in the whole compiler. Under a full
+            // parallel run that can exceed the 5 s default.
+            const api = requireCjs('@adguard/filters-compiler');
+
+            expect(Object.keys(api).sort()).toEqual([
+                'OptimizationStatsError',
+                'compile',
+                'localOptimizationStatistics',
+                'validateJSONSchema',
+                'validateLocales',
+            ]);
+            expect(typeof api.compile).toBe('function');
+            expect(typeof api.validateJSONSchema).toBe('function');
+            expect(typeof api.validateLocales).toBe('function');
+            expect(typeof api.localOptimizationStatistics).toBe('object');
+            expect(typeof api.OptimizationStatsError).toBe('function');
+        }, 15000);
     });
 });
