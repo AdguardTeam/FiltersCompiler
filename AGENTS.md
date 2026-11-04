@@ -306,7 +306,8 @@ Public API layer.
 
 - **Framework**: Vitest with `node` environment.
 - **Test file placement**: All tests live in `test/`. The test runner includes
-  `test/*.test.{js,ts}`.
+  `test/**/*.test.{js,ts}`, so tests may live in subdirectories such as
+  `test/utils/`.
 - **Test resources**: Place test fixtures in `test/resources/` (filter files,
   platform configs, expected outputs). Some resources are gitignored (generated
   during tests).
