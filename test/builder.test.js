@@ -1625,6 +1625,23 @@ describe('addNotOptimizedHints', () => {
         ]);
     });
 
+    it('Appends the token to an indented hint', () => {
+        const lines = ['  !+ PLATFORM(ios)', '  ||a.com^'];
+        expect(addNotOptimizedHints(lines)).toEqual([
+            '  !+ PLATFORM(ios) NOT_OPTIMIZED',
+            '  ||a.com^',
+        ]);
+    });
+
+    it('Treats a whitespace-only line as a blank line', () => {
+        const lines = ['!+ PLATFORM(ios)', '   ', '||a.com^'];
+        expect(addNotOptimizedHints(lines)).toEqual([
+            '!+ PLATFORM(ios)',
+            '!+ NOT_OPTIMIZED',
+            '||a.com^',
+        ]);
+    });
+
     it('Does not add hints to comment lines', () => {
         const lines = ['! comment'];
         expect(addNotOptimizedHints(lines)).toEqual(lines);

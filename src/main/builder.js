@@ -123,6 +123,10 @@ const stripComments = function (lines) {
  * line or a comment between them detaches the hint, and a separate hint line
  * is inserted instead.
  *
+ * Lines are classified by their trimmed text: this runs on included lines that
+ * `compile()` trims only later, so indentation must not hide a hint or a blank
+ * line.
+ *
  * Exported for unit tests.
  *
  * @param {string[]} lines Lines to process.
@@ -136,12 +140,14 @@ export const addNotOptimizedHints = function (lines) {
     let previousLine = null;
 
     lines.forEach((line) => {
-        if (!line) {
-            previousLine = line;
+        const trimmedLine = line.trim();
+
+        if (!trimmedLine) {
+            previousLine = trimmedLine;
             return;
         }
 
-        const isRule = !line.startsWith(RuleMasks.MASK_COMMENT);
+        const isRule = !trimmedLine.startsWith(RuleMasks.MASK_COMMENT);
         const isHinted = isHint(previousLine);
         const alreadyMarked = isHinted && hasHint(previousLine, NOT_OPTIMIZED_HINT);
 
@@ -149,13 +155,13 @@ export const addNotOptimizedHints = function (lines) {
             if (!isHinted) {
                 result.push(NOT_OPTIMIZED_HINT_LINE);
             } else if (!alreadyMarked) {
-                const hintLineWithNotOptimized = `${previousLine}${NOT_OPTIMIZED_SUFFIX}`;
-                result[result.length - 1] = hintLineWithNotOptimized;
+                const hintIndex = result.length - 1;
+                result[hintIndex] = `${result[hintIndex]}${NOT_OPTIMIZED_SUFFIX}`;
             }
         }
 
         result.push(line);
-        previousLine = line;
+        previousLine = trimmedLine;
     });
 
     return result;
