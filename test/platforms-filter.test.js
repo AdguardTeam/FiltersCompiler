@@ -446,4 +446,24 @@ describe('platforms filter', () => {
 
         expect(after).toEqual(notMatchRules);
     });
+
+    it('keeps cosmetic rules whose non-basic modifier list contains `$path`, `$domain` or `$url`', () => {
+        const config = platformsConfig.EXTENSION_CHROMIUM;
+
+        const notMatchRules = [
+            '[$url=||example.com/?app=1]##.ad',
+            '[$url=||example.com/?protobuf=1]##.ad',
+            '[$path =/x?app=1]##.ad',
+            '[$domain=example.com]#@#.textad',
+        ];
+        const matchRules = [
+            '||example.com^$app=org.example.app',
+            '||example.com^$protobuf',
+            '||example.com^$content,hls=/x/',
+        ];
+
+        const after = cleanupRules([...notMatchRules, ...matchRules], config, 0);
+
+        expect(after).toEqual(notMatchRules);
+    });
 });
