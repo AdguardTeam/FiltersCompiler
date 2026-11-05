@@ -162,6 +162,28 @@ describe('platforms filter', () => {
         expect(config.configuration.removeRulePatterns).toEqual(['^zzz-']);
     });
 
+    it('Handles stateful RegExp removal patterns', () => {
+        const config = {
+            'platform': 'test',
+            'path': 'hints',
+            'configuration': {
+                'removeRulePatterns': [/^zzz-/g],
+                'ignoreRuleHints': false,
+            },
+        };
+
+        const before = [
+            'zzz-1',
+            'zzz-2',
+            'zzz-3',
+            'zzz-4',
+        ];
+
+        const after = cleanupRules(before, config, 1);
+
+        expect(after).toEqual([]);
+    });
+
     it('Test remove rule patterns', () => {
         const config = {
             'platform': 'test',

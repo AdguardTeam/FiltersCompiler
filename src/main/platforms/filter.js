@@ -181,6 +181,10 @@ const shouldOmitRule = function (rule, config, filterId, removeRulePatterns) {
 
     // eslint-disable-next-line no-restricted-syntax
     for (const { pattern, regexp } of removeRulePatterns) {
+        // A pattern passed as a `RegExp` with the `g` or `y` flag keeps
+        // `lastIndex` between `test()` calls, so the shared regexp would skip
+        // every other match. Reset it to match each rule from the start.
+        regexp.lastIndex = 0;
         if (regexp.test(ruleText)) {
             // eslint-disable-next-line max-len
             logger.info(`${ruleText} removed with removeRulePattern ${pattern} in filter ${filterId} for ${config.platform} platform`);
