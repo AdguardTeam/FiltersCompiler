@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   instead of repeating the same `removeRulePatterns`. No behaviour change.
 - `cleanupAndOptimizeRules()` no longer inserts the comment pattern into the
   platform configuration, so the shared config is left untouched.
+- Rule removal patterns are compiled once per platform cleanup instead of once
+  per rule.
 
 ### Deprecated
 
