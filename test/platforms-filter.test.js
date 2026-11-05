@@ -122,6 +122,46 @@ describe('platforms filter', () => {
         expect(after.indexOf('!#safari_cb_affinity')).toBeGreaterThanOrEqual(0);
     });
 
+    it('Does not modify the platform configuration', () => {
+        const config = {
+            'platform': 'test',
+            'path': 'hints',
+            'configuration': {
+                'removeRulePatterns': ['^zzz-'],
+                'ignoreRuleHints': false,
+            },
+        };
+
+        const optimizationConfig = {
+            'groups': [
+                {
+                    'config': {
+                        'type': 'ELEMHIDE',
+                        'scope': 'DOMAIN',
+                        'hits': 10,
+                    },
+                    'rules': {
+                        'example.com': 0,
+                    },
+                },
+            ],
+            'percent': 100,
+            'minPercent': 100,
+            'maxPercent': 100,
+            'strict': true,
+        };
+
+        // A strict optimization mismatch throws in the middle of the cleanup.
+        expect(() => cleanupAndOptimizeRules(
+            ['example.com', 'ad-banner.com'],
+            config,
+            optimizationConfig,
+            0,
+        )).toThrow();
+
+        expect(config.configuration.removeRulePatterns).toEqual(['^zzz-']);
+    });
+
     it('Test remove rule patterns', () => {
         const config = {
             'platform': 'test',

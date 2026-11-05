@@ -148,9 +148,10 @@ const isOptimizationSupported = function (rule) {
  * @param rule
  * @param config
  * @param filterId
+ * @param removeRulePatterns Patterns to remove rules with
  * @returns {boolean}
  */
-const shouldOmitRule = function (rule, config, filterId) {
+const shouldOmitRule = function (rule, config, filterId, removeRulePatterns) {
     const ruleText = rule.rule;
 
     if (!ruleText) {
@@ -163,9 +164,9 @@ const shouldOmitRule = function (rule, config, filterId) {
         return true;
     }
 
-    if (config.configuration.removeRulePatterns) {
+    if (removeRulePatterns) {
         // eslint-disable-next-line no-restricted-syntax
-        for (const pattern of config.configuration.removeRulePatterns) {
+        for (const pattern of removeRulePatterns) {
             if (ruleText.match(new RegExp(pattern))) {
                 // eslint-disable-next-line max-len
                 logger.info(`${ruleText} removed with removeRulePattern ${pattern} in filter ${filterId} for ${config.platform} platform`);
@@ -250,7 +251,9 @@ const isOptimizationCorrect = function (filterId, rules, optimizedRules, optimiz
 export const cleanupRules = (rules, config, filterId) => {
     const ruleLines = splitRuleHintLines(rules, config.platform);
 
-    const filtered = ruleLines.filter((r) => !shouldOmitRule(r, config, filterId));
+    const { removeRulePatterns } = config.configuration;
+
+    const filtered = ruleLines.filter((r) => !shouldOmitRule(r, config, filterId, removeRulePatterns));
 
     return joinRuleHintLines(filtered);
 };
@@ -264,12 +267,17 @@ export const cleanupRules = (rules, config, filterId) => {
  * @param filterId
  */
 export const cleanupAndOptimizeRules = function (rules, config, optimizationConfig, filterId) {
-    config.configuration.removeRulePatterns = config.configuration.removeRulePatterns || [];
-    config.configuration.removeRulePatterns.push(COMMENT_REGEXP);
+    // Do not push the comment pattern into the platform configuration: the very
+    // same object is shared between platforms, so mutating it leaks into other
+    // builds, and an exception below would leave the pattern there for good.
+    const removeRulePatterns = [
+        ...(config.configuration.removeRulePatterns || []),
+        COMMENT_REGEXP,
+    ];
 
     const ruleLines = splitRuleHintLines(rules, config.platform);
 
-    const filtered = ruleLines.filter((r) => !shouldOmitRule(r, config, filterId));
+    const filtered = ruleLines.filter((r) => !shouldOmitRule(r, config, filterId, removeRulePatterns));
 
     const optimized = filtered.filter((r) => !shouldOmitRuleWithOptimization(r, optimizationConfig));
 
@@ -284,6 +292,5 @@ export const cleanupAndOptimizeRules = function (rules, config, optimizationConf
         result = joinRuleHintLines(optimized);
     }
 
-    config.configuration.removeRulePatterns.pop();
     return result;
 };
