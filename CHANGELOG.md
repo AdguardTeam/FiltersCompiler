@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The MV3 extension platforms now share `CHROMIUM_MV3_BASED_EXTENSION_PATTERNS`
   instead of repeating the same `removeRulePatterns`. No behaviour change.
+- `cleanupAndOptimizeRules()` no longer inserts the comment pattern into the
+  platform configuration, so the shared config is left untouched.
 
 ### Deprecated
 
