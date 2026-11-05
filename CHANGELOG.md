@@ -65,6 +65,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `require('@adguard/filters-compiler')` failing with `MODULE_NOT_FOUND`.
+  Both `import` and `require` now load the same ESM artifact.
+- Stale and missing English defaults in the generated `filters_i18n` schema.
+  Groups, tags, and filters now use the current `locales/en` strings. Filters
+  25, 26, and 27 are now validated for non-legacy platforms; the frozen
+  `mac`/`mac_v2` schemas are unchanged.
+- For non-legacy platforms, `filters_i18n.json` now keeps only the filters
+  listed in `filters.json`: localizations without matching metadata are
+  dropped. The generator cannot add a missing localization, so a filter in
+  `filters.json` without a `filters_i18n.json` entry still fails validation.
+  The legacy `mac` and `mac_v2` platforms keep their current output.
+- Validation errors written to `logPath` are formatted as text instead of
+  `[object Object]`.
+- The validation log file is closed when `validateJSONSchema()` finishes, so a
+  later call without `logPath` does not append to it. The compiler logger also
+  closes the file when `initialize()` is called without a path.
+- `validateJSONSchema()` reports the path of a malformed JSON file instead of a
+  bare JSON parse error.
+- `validateJSONSchema()` logs a failed platform directory read as an error, not
+  as information.
+- The platform generator reports the path of a malformed locale file instead of
+  a bare JSON parse error, and names the file when its contents are not an
+  array of message objects.
+- The npm package no longer ships TypeScript declarations for the test suite
+  (`dist/types/test`).
+- The compiler no longer fails with `TypeError: filter.trim is not a function`
+  when a remote `!#include` response body looks like JSON. The downloader keeps
+  such a body as text, for example `[]` or `{"a":1}`.
+- The package no longer installs a global `unhandledRejection` process
+  listener on import. The listener leaked into the host process and could
+  crash it. Removing it is safe because Node.js already treats unhandled
+  rejections as uncaught exceptions by default.
 - Native `:has()` cosmetic rules (`##`) are no longer removed from the
   `ext_android_cb` platform [#233].
 
