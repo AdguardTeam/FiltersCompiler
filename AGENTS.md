@@ -270,9 +270,9 @@ Public API layer.
 
 **Known exclusions** (architecture debt to be fixed):
 
-- `src/main/builder.js` (~950 lines) is a god object — it handles file I/O,
-  include directive resolution, conversion orchestration, validation, and the
-  main build loop. Should be split into focused modules.
+- `src/main/builder.js` is a god object — it handles file I/O, include
+  directive resolution, conversion orchestration, validation, and the main
+  build loop. Should be split into focused modules.
 - `src/main/utils/workaround.js` mixes platform-specific hacks with core
   compilation logic (header rewriting, EasyList filtering, rule filtering).
   Violates Single Responsibility Principle.
