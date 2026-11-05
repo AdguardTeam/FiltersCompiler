@@ -26,6 +26,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   are no longer kept for the `ext_android_cb` platform, as AdGuard Content
   Blocker cannot enforce them. The check now matches the `[$` modifier list
   prefix, so it also catches variants such as `[$path =/x]e.com##.a`.
+- Modifier patterns no longer mistake a `$url`-only modifier list for a rule
+  modifier, so a rule like `[$url=||example.com/?app=1]##.ad` is no longer
+  dropped.
 
 ### Security
 

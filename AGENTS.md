@@ -302,6 +302,8 @@ Public API layer.
   category, match its single anchored prefix (for example `^\[\$` for the
   non-basic modifier list) instead of enumerating member names. An enumeration
   misses variants that the parser accepts, such as whitespace around `=`.
+- **Shared regex fragments**: One fragment, one constant. Define a reused
+  fragment once as a named constant and interpolate it everywhere.
 - **TypeScript for new code**: New source files should be written in TypeScript
   (`.ts`) under `src/`. Existing `.js` files are not migrated yet.
 
