@@ -117,10 +117,11 @@ const stripComments = function (lines) {
 /**
  * Adds not optimized hints.
  *
- * A hint applies only to the immediately preceding line, so the token is
- * appended to an existing hint line only when that line directly precedes the
- * rule. A blank line or a comment between them detaches the hint, and a
- * separate hint line is inserted instead.
+ * A hint applies only to the line that immediately follows it, so consumers
+ * read it from the line right before the rule. The token is appended to an
+ * existing hint line only when that line directly precedes the rule: a blank
+ * line or a comment between them detaches the hint, and a separate hint line
+ * is inserted instead.
  *
  * Exported for unit tests.
  *

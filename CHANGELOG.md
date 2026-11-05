@@ -51,7 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   hint line, so `PLATFORM(...)` and `NOT_CONVERT` keep working.
 - Trust-level exclusions were bypassed by rules kept as-is with the `!+ NOT_CONVERT` hint when such
   a rule used a non-canonical spelling (e.g. `#%#//scriptlet( 'trusted-...')` with a space)
-  The canonical AdGuard form is now checked against the exclusions as well.
+  The canonical AdGuard form is now checked against the exclusions as well [#269].
 - Trusted scriptlets written with the uBO-compatible `ubo-` prefix (e.g.
   `#%#//scriptlet('ubo-trusted-set-cookie', ...)`) were not recognized as trusted: they passed the
   high trust-level exclusions and, on the `ext_ublock` platform, were converted to
