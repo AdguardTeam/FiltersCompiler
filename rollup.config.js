@@ -8,7 +8,9 @@ export default {
         format: 'esm',
     },
     plugins: [
-        typescript(),
+        // Test files are type-checked by `pnpm lint:types` (tsc), but their
+        // declarations must not ship in the npm package.
+        typescript({ exclude: ['test/**'] }),
         copy({
             targets: [
                 { src: 'schemas/*', dest: 'dist/schemas' },

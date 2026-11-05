@@ -14,9 +14,14 @@ import path from 'path';
 import { existsSync, readFileSync } from 'fs';
 import { createRequire } from 'module';
 
+import { LEGACY_PLATFORM_PATHS } from '../src/main/platforms-config';
+
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const distDir = path.join(__dirname, '../dist');
 const requireCjs = createRequire(import.meta.url);
+
+// Directory names of the legacy macOS platform builds.
+const legacyPlatformDirs = LEGACY_PLATFORM_PATHS;
 
 describe('Bundle smoke tests', () => {
     describe('Trust-level exclusion files', () => {
@@ -81,9 +86,27 @@ describe('Bundle smoke tests', () => {
             expect(existsSync(filePath)).toBe(true);
         });
 
-        it('filters_i18n.schema.json should exist', () => {
+        it('filters_i18n.schema.json should not be bundled', () => {
             const filePath = path.join(schemasDir, 'filters_i18n.schema.json');
-            expect(existsSync(filePath)).toBe(true);
+            expect(existsSync(filePath)).toBe(false);
+        });
+
+        legacyPlatformDirs.forEach((platform) => {
+            describe(`${platform} legacy schemas`, () => {
+                const platformDir = path.join(schemasDir, platform);
+
+                it('directory should exist', () => {
+                    expect(existsSync(platformDir)).toBe(true);
+                });
+
+                it('filters.schema.json should exist', () => {
+                    expect(existsSync(path.join(platformDir, 'filters.schema.json'))).toBe(true);
+                });
+
+                it('filters_i18n.schema.json should exist', () => {
+                    expect(existsSync(path.join(platformDir, 'filters_i18n.schema.json'))).toBe(true);
+                });
+            });
         });
     });
 
@@ -115,5 +138,12 @@ describe('Bundle smoke tests', () => {
             expect(typeof api.localOptimizationStatistics).toBe('object');
             expect(typeof api.OptimizationStatsError).toBe('function');
         }, 15000);
+    });
+
+    describe('Type declarations', () => {
+        it('test declarations should not be bundled', () => {
+            const filePath = path.join(distDir, 'types', 'test');
+            expect(existsSync(filePath)).toBe(false);
+        });
     });
 });

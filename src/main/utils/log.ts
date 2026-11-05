@@ -4,6 +4,28 @@ import path from 'node:path';
 import { Logger } from '@adguard/logger';
 
 /**
+ * Formats a log message for the log file.
+ *
+ * Non-string values (for example Ajv error arrays) would otherwise be written
+ * as `[object Object]`.
+ *
+ * @param message Message to format.
+ *
+ * @returns Message as text.
+ */
+const formatMessage = (message: unknown): string => {
+    if (typeof message === 'string') {
+        return message;
+    }
+
+    if (message instanceof Error) {
+        return message.stack ?? message.message;
+    }
+
+    return JSON.stringify(message, null, 2) ?? String(message);
+};
+
+/**
  * Extend logger implementation
  */
 class CompilerLogger extends Logger {
@@ -15,11 +37,6 @@ class CompilerLogger extends Logger {
     #fd: number | null = null;
 
     /**
-     * Log file path, set after successful initialization.
-     */
-    logFile: string | undefined;
-
-    /**
      * Helper to append message to log file
      */
     #append(message: unknown, level: 'INFO' | 'WARN' | 'ERROR'): void {
@@ -27,7 +44,7 @@ class CompilerLogger extends Logger {
             return;
         }
 
-        const line = `[${new Date().toLocaleTimeString()}] [${level}]: ${message}${os.EOL}`;
+        const line = `[${new Date().toLocaleTimeString()}] [${level}]: ${formatMessage(message)}${os.EOL}`;
 
         // Using appendFileSync with an fd ensures atomic append semantics.
         fs.appendFileSync(this.#fd, line, 'utf8');
@@ -55,11 +72,19 @@ class CompilerLogger extends Logger {
      * Initializes logger
      *
      * @param logFilePath - log file path
+     * @param append - append to the file instead of truncating it
      *
-     * The log file is opened with 'w' (truncate/create). Subsequent writes are appended.
+     * By default, the log file is opened with 'w' (truncate/create). With
+     * `append`, it is opened with 'a' (create/append). Subsequent writes are
+     * appended in both modes.
+     *
+     * When `logFilePath` is omitted, the file opened by an earlier call is
+     * closed, so later messages go to the console only.
      */
-    initialize(logFilePath: string | undefined): void {
+    initialize(logFilePath: string | undefined, append = false): void {
         if (!logFilePath) {
+            // Do not keep writing to a file opened by an earlier call.
+            this.close();
             /* eslint-disable no-console */
             console.warn('Log file is not specified');
             return;
@@ -70,18 +95,10 @@ class CompilerLogger extends Logger {
         fs.mkdirSync(dir, { recursive: true });
 
         // Close any previous descriptor to avoid leaks
-        if (this.#fd != null) {
-            try {
-                fs.closeSync(this.#fd);
-            } catch {
-                /* noop */
-            }
-            this.#fd = null;
-        }
+        this.close();
 
-        // Open (truncate) now; we'll append to the same fd later.
-        this.#fd = fs.openSync(logFilePath, 'w');
-        this.logFile = logFilePath;
+        // Open now; we'll append to the same fd later.
+        this.#fd = fs.openSync(logFilePath, append ? 'a' : 'w');
     }
 
     /**
@@ -91,6 +108,8 @@ class CompilerLogger extends Logger {
         if (this.#fd != null) {
             try {
                 fs.closeSync(this.#fd);
+            } catch {
+                /* noop */
             } finally {
                 this.#fd = null;
             }

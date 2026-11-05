@@ -9,8 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `validateJSONSchema()` now accepts a `ValidateJSONSchemaOptions` object with
+  `localesPath`, `requiredLocales`, and `logPath`. Missing fields in existing
+  locale objects are filled with the base (`en`) value and logged as warnings.
+  With `logPath`, the warnings are appended to the specified file, which is
+  closed when validation finishes.
+
 ### Changed
 
+- **Breaking:** `validateJSONSchema()` drops the `requiredFiltersAmount`
+  parameter. It only applied to `filters.json` files directly under
+  `platformsPath`, and platform metadata always lives in subdirectories, so
+  it was never enforced for real platform trees. The check did run when
+  `platformsPath` pointed at a single platform directory: callers that used
+  it that way need their own minimum-count check now. The FiltersRegistry
+  caller no longer passes it.
+- **Breaking:** `validateJSONSchema()` now requires the `options` argument.
+  The `filters_i18n` schema is generated at runtime from the platform's
+  `filters.json` and the FiltersRegistry `locales` directory instead of a
+  bundled static schema. The required entity IDs now match the filters that
+  the platform actually builds, and the required locales and English fallback
+  strings come from FiltersRegistry. Every locale directory in `localesPath`
+  is validated, even when `requiredLocales` contains a subset.
 - Updated [@adguard/filters-downloader] to v3.0.1. This version
   removes the vulnerable `axios` dependency and uses native `fetch`.
 - **BREAKING:** `engines.node` is now `^22.21.0 || >=24.0.0`. Node.js
@@ -30,10 +50,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- `schemas/filters_i18n.schema.json` (4.3 MB), its generation scripts, and the
+  hardcoded `filters-i18n-defaults.js` data. The npm package no longer contains
+  the root `filters_i18n` schema. The frozen `mac` and `mac_v2` schemas are
+  still shipped.
+- Hardcoded `SUPPORTED_LOCALES` and `NON_REQUIRED_FILTER_IDS` lists from the
+  schema generation scripts.
+
 ### Fixed
 
 - `require('@adguard/filters-compiler')` failing with `MODULE_NOT_FOUND`.
   Both `import` and `require` now load the same ESM artifact.
+- Stale and missing English defaults in the generated `filters_i18n` schema.
+  Groups, tags, and filters now use the current `locales/en` strings. Filters
+  25, 26, and 27 are now validated for non-legacy platforms; the frozen
+  `mac`/`mac_v2` schemas are unchanged.
+- For non-legacy platforms, `filters_i18n.json` now keeps only the filters
+  listed in `filters.json`: localizations without matching metadata are
+  dropped. The generator cannot add a missing localization, so a filter in
+  `filters.json` without a `filters_i18n.json` entry still fails validation.
+  The legacy `mac` and `mac_v2` platforms keep their current output.
+- Validation errors written to `logPath` are formatted as text instead of
+  `[object Object]`.
+- The validation log file is closed when `validateJSONSchema()` finishes, so a
+  later call without `logPath` does not append to it. The compiler logger also
+  closes the file when `initialize()` is called without a path.
+- `validateJSONSchema()` reports the path of a malformed JSON file instead of a
+  bare JSON parse error.
+- `validateJSONSchema()` logs a failed platform directory read as an error, not
+  as information.
+- The platform generator reports the path of a malformed locale file instead of
+  a bare JSON parse error, and names the file when its contents are not an
+  array of message objects.
+- The npm package no longer ships TypeScript declarations for the test suite
+  (`dist/types/test`).
 - The compiler no longer fails with `TypeError: filter.trim is not a function`
   when a remote `!#include` response body looks like JSON. The downloader keeps
   such a body as text, for example `[]` or `{"a":1}`.

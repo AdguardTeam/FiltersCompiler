@@ -56,7 +56,7 @@ The library exposes four public API functions: `compile`, `validateJSONSchema`,
 
 ```text
 ├── src/
-│   ├── index.js                       # Public API entry point (4 exports)
+│   ├── index.js                       # Public API entry point
 │   ├── index.d.ts                     # Hand-written type declarations
 │   └── main/
 │       ├── builder.js                 # Core compilation pipeline orchestrator
@@ -64,6 +64,7 @@ The library exposes four public API functions: `compile`, `validateJSONSchema`,
 │       ├── validator.js               # Filter rule validation
 │       ├── optimization.ts            # Hit-count-based rule optimization
 │       ├── platforms-config.js        # Platform definitions and configuration
+│       ├── filters-i18n-schema.ts     # Runtime filters_i18n schema generation
 │       ├── json-validator.js          # JSON schema validation for built filters
 │       ├── locales-validator.js       # Locale files completeness validation
 │       ├── platforms/
@@ -73,6 +74,9 @@ The library exposes four public API functions: `compile`, `validateJSONSchema`,
 │       │   └── rule-masks.js          # Rule mask string constants
 │       └── utils/
 │           ├── log.ts                 # CompilerLogger (wraps @adguard/logger)
+│           ├── locale-messages.ts     # Locale file parsing shared by generator and schema
+│           ├── metadata-file-names.ts  # Metadata output file names
+│           ├── read-json.ts           # JSON file reading with parse error context
 │           ├── report.js              # Compilation report builder
 │           ├── builder-utils.js       # Helper functions (domain optimization)
 │           ├── extended-css-validator.js  # CSS selector validation
@@ -86,15 +90,13 @@ The library exposes four public API functions: `compile`, `validateJSONSchema`,
 │   ├── resources/                     # Test fixtures and filter data
 │   └── utils/                         # Test utilities
 ├── schemas/                           # JSON schemas for validating built filters
-│   ├── filters.schema.json            # Filters metadata schema
-│   ├── filters_i18n.schema.json       # Filters i18n metadata schema
+│   ├── filters.schema.json            # Filters metadata schema (generated)
 │   ├── mac/                           # Legacy macOS v1 schemas (do not modify)
 │   └── mac_v2/                        # macOS v2 schemas (do not modify)
 ├── tasks/
-│   └── build-schemas/                 # Schema generation scripts
+│   └── build-schemas/                 # filters.schema.json generation scripts
 ├── .github/
 │   └── workflows/                     # GitHub Actions CI/CD pipelines
-├── index.js                           # Development entry point (unbundled)
 ├── package.json                       # Project metadata and scripts
 ├── rollup.config.js                   # Rollup bundler configuration
 ├── vitest.config.js                   # Vitest test configuration
@@ -120,7 +122,7 @@ The library exposes four public API functions: `compile`, `validateJSONSchema`,
 | `pnpm lint:code`     | Run ESLint                                            |
 | `pnpm lint:types`    | Run TypeScript type checker (`tsc --noEmit`)          |
 | `pnpm lint:md`       | Lint markdown files                                   |
-| `pnpm build-schemas` | Regenerate JSON schemas from `tasks/build-schemas/`   |
+| `pnpm build-schemas` | Regenerate filters schema from `tasks/build-schemas/` |
 | `pnpm tgz`           | Pack release tarball (`filters-compiler.tgz`)         |
 
 `pnpm tgz` requires a `version` field in `package.json`, which is
@@ -173,8 +175,14 @@ or use the Docker build with the `VERSION` build arg (see DEPLOYMENT.md).
 - After completing a task, verify that the code you've written follows the Code
   Guidelines in this file.
 
-- **Never edit JSON schemas in `schemas/` manually.** Edit the generation
+- **Never edit `schemas/filters.schema.json` manually.** Edit the generation
   scripts in `tasks/build-schemas/` and run `pnpm build-schemas` to regenerate.
+
+- `schemas/filters_i18n.schema.json` does not exist in the repository. For
+  non-legacy platforms, `validateJSONSchema()` generates the `filters_i18n`
+  schema at runtime from the platform's `filters.json` and the FiltersRegistry
+  `locales` directory. Do not add hardcoded filter, group, or tag text to the
+  compiler.
 
 - Legacy schemas in `schemas/mac/` and `schemas/mac_v2/` must not be changed.
 
@@ -371,11 +379,13 @@ supply chain risks, and long-term maintenance costs.
   runtime config file. The library reads `TLS`, and Node.js reads
   `NODE_USE_ENV_PROXY` for remote `!#include` downloads.
 - **Platform definitions**: Static configuration is defined in
-  `src/main/platforms-config.js`. This file defines all 16 platform
+  `src/main/platforms-config.js`. This file defines the platform
   configurations with their `removeRulePatterns`, `defines`, and metadata.
-- **Schema generation**: JSON schemas in `schemas/` are generated by scripts
-  in `tasks/build-schemas/`. Never edit schema files directly — always modify
-  the generation scripts and run `pnpm build-schemas`.
+- **Schema generation**: `schemas/filters.schema.json` is generated by scripts
+  in `tasks/build-schemas/`. Never edit it directly — modify the generation
+  scripts and run `pnpm build-schemas`. For non-legacy platforms, the
+  `filters_i18n` schema is generated at runtime by `validateJSONSchema()` from
+  FiltersRegistry data; it is not a repository file.
 - **Legacy schemas**: `schemas/mac/` and `schemas/mac_v2/` are legacy and must
   not be modified. No new metadata fields should be added for these platforms.
 - **Documentation files that MUST be updated when code changes**:

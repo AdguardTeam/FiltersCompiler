@@ -6,11 +6,10 @@ import {
 
 const ENTRY_POINTS = [
     '../src/index.js',
-    '../index.js',
 ];
 
 describe('package entry points', () => {
-    // The entry points load the whole compiler. Under a full parallel run that
+    // The entry point loads the whole compiler. Under a full parallel run that
     // can exceed the 5 s default.
     it.each(ENTRY_POINTS)('does not install an unhandledRejection listener on import: %s', async (entryPoint) => {
         // The entry point must be imported dynamically so the listener list can
