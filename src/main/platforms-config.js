@@ -599,6 +599,26 @@ export const CSS_GENERIC_RULES_PATTERNS = [
     '^#\\$#',
 ];
 
+/**
+ * Platform config key of the legacy macOS v1 build.
+ */
+export const MAC_V1_PLATFORM = 'MAC';
+
+/**
+ * Platform config key of the legacy macOS v2 build.
+ */
+export const MAC_V2_PLATFORM = 'MAC_V2';
+
+/**
+ * Platform config keys of the legacy macOS builds.
+ *
+ * These builds keep the frozen `mac`/`mac_v2` schemas and the old metadata
+ * format; the runtime `filters_i18n` schema generation is not used for them.
+ * The directory names are `platformsConfig[key].path`. The array is a set:
+ * code that needs one of the keys imports it by name.
+ */
+export const LEGACY_PLATFORMS = [MAC_V1_PLATFORM, MAC_V2_PLATFORM];
+
 /* eslint-enable max-len */
 
 export const platformsConfig = {
@@ -892,3 +912,11 @@ export const platformsConfig = {
         },
     },
 };
+
+/**
+ * Directory names of the legacy macOS platform builds.
+ *
+ * Derived from the platform config keys so that the JSON validator and the
+ * tests use the same names.
+ */
+export const LEGACY_PLATFORM_PATHS = LEGACY_PLATFORMS.map((key) => platformsConfig[key].path);

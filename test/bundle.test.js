@@ -12,9 +12,16 @@ import {
 } from 'vitest';
 import path from 'path';
 import { existsSync, readFileSync } from 'fs';
+import { createRequire } from 'module';
+
+import { LEGACY_PLATFORM_PATHS } from '../src/main/platforms-config';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const distDir = path.join(__dirname, '../dist');
+const requireCjs = createRequire(import.meta.url);
+
+// Directory names of the legacy macOS platform builds.
+const legacyPlatformDirs = LEGACY_PLATFORM_PATHS;
 
 describe('Bundle smoke tests', () => {
     describe('Trust-level exclusion files', () => {
@@ -79,9 +86,27 @@ describe('Bundle smoke tests', () => {
             expect(existsSync(filePath)).toBe(true);
         });
 
-        it('filters_i18n.schema.json should exist', () => {
+        it('filters_i18n.schema.json should not be bundled', () => {
             const filePath = path.join(schemasDir, 'filters_i18n.schema.json');
-            expect(existsSync(filePath)).toBe(true);
+            expect(existsSync(filePath)).toBe(false);
+        });
+
+        legacyPlatformDirs.forEach((platform) => {
+            describe(`${platform} legacy schemas`, () => {
+                const platformDir = path.join(schemasDir, platform);
+
+                it('directory should exist', () => {
+                    expect(existsSync(platformDir)).toBe(true);
+                });
+
+                it('filters.schema.json should exist', () => {
+                    expect(existsSync(path.join(platformDir, 'filters.schema.json'))).toBe(true);
+                });
+
+                it('filters_i18n.schema.json should exist', () => {
+                    expect(existsSync(path.join(platformDir, 'filters_i18n.schema.json'))).toBe(true);
+                });
+            });
         });
     });
 
@@ -91,9 +116,34 @@ describe('Bundle smoke tests', () => {
             expect(existsSync(filePath)).toBe(true);
         });
 
-        it('dist/index.cjs (CommonJS) should exist', () => {
-            const filePath = path.join(distDir, 'index.cjs');
-            expect(existsSync(filePath)).toBe(true);
+        it('should resolve require() to the single ESM entry point', () => {
+            expect(requireCjs.resolve('@adguard/filters-compiler')).toBe(path.join(distDir, 'index.js'));
+        });
+
+        it('should load the package via require() and expose the public API', () => {
+            // Loading the package pulls in the whole compiler. Under a full
+            // parallel run that can exceed the 5 s default.
+            const api = requireCjs('@adguard/filters-compiler');
+
+            expect(Object.keys(api).sort()).toEqual([
+                'OptimizationStatsError',
+                'compile',
+                'localOptimizationStatistics',
+                'validateJSONSchema',
+                'validateLocales',
+            ]);
+            expect(typeof api.compile).toBe('function');
+            expect(typeof api.validateJSONSchema).toBe('function');
+            expect(typeof api.validateLocales).toBe('function');
+            expect(typeof api.localOptimizationStatistics).toBe('object');
+            expect(typeof api.OptimizationStatsError).toBe('function');
+        }, 15000);
+    });
+
+    describe('Type declarations', () => {
+        it('test declarations should not be bundled', () => {
+            const filePath = path.join(distDir, 'types', 'test');
+            expect(existsSync(filePath)).toBe(false);
         });
     });
 });

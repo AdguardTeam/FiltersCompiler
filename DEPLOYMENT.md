@@ -65,13 +65,29 @@ prevent redundant CI runs when a new push arrives for the same ref.
 
 - **Required:** No
 - **Default:** (system defaults)
-- **Purpose:** Set to `insecure` to bypass TLS certificate verification
-  when downloading external filter sources via `curl`. Only affects
-  `src/main/utils/webutils.js`.
+- **Purpose:** Set to `insecure` to make `curl` skip TLS certificate
+  verification. Only affects `src/main/utils/webutils.ts`. Remote
+  `!#include` downloads use `fetch` and follow the Node.js TLS settings:
+  `NODE_EXTRA_CA_CERTS` adds a CA, and `NODE_TLS_REJECT_UNAUTHORIZED=0`
+  disables verification.
 
-This is the only environment variable read at runtime. All CI/CD configuration
-(such as npm publish tokens, Octopass, and Slack webhooks) is handled by the
-shared workflows and does not require per-project configuration.
+### `NODE_USE_ENV_PROXY`
+
+- **Required:** No
+- **Default:** (unset)
+- **Purpose:** Set to `1` to let remote `!#include` downloads use a proxy
+  from the environment. Node.js reads `HTTP_PROXY` or `http_proxy`,
+  `HTTPS_PROXY` or `https_proxy`, and `NO_PROXY` or `no_proxy`. Without
+  this variable, `fetch` does not use a proxy. `ALL_PROXY` is not
+  supported. `curl` downloads read the same names, except the uppercase
+  `HTTP_PROXY`, and also `ALL_PROXY` as a fallback. `http_proxy` applies
+  only to `http://` URLs.
+
+`TLS` is the only environment variable that the compiler reads directly.
+`NODE_USE_ENV_PROXY` is read by Node.js for `fetch` proxy support. All
+CI/CD configuration (such as npm publish tokens, Octopass, and Slack
+webhooks) is handled by the shared workflows and does not require
+per-project configuration.
 
 ## Infrastructure Dependencies
 
@@ -83,27 +99,30 @@ queue dependencies. The only infrastructure requirement is:
 | **curl**   | Yes      | Downloading external filter sources via shell-out  |
 
 `curl` is invoked synchronously via `child_process.execFileSync` from
-`src/main/utils/webutils.js`. The Docker base image
+`src/main/utils/webutils.ts`. The Docker base image
 (`adguard/node-ssh:22.22--0`) includes `curl` by default.
 
 ## Logging
 
 The compiler uses `@adguard/logger` with a custom file writer
-(`src/main/utils/log.js`). Logging is file-based and initialized when the
-consumer passes a `logPath` to the `compile()` function.
+(`src/main/utils/log.ts`). Messages always go to the console. When a
+`logPath` is provided to `compile()`, or `options.logPath` to
+`validateJSONSchema()`, messages are also written to that file.
 
-| Aspect        | Details                                                 |
-| ------------- | ------------------------------------------------------- |
-| **Framework** | `@adguard/logger` with custom `CompilerLogger` subclass |
-| **Output**    | Local file only (`logPath` argument to `compile()`)     |
-| **Format**    | `[timestamp] [LEVEL]: message` (plain text)             |
-| **Levels**    | `INFO`, `WARN`, `ERROR`                                 |
-| **File mode** | Truncate on open, append for subsequent writes          |
+| Aspect        | Details                                                                                                |
+| ------------- | ------------------------------------------------------------------------------------------------------ |
+| **Framework** | `@adguard/logger` with custom `CompilerLogger` subclass                                                |
+| **Output**    | Console, plus a local file when `logPath`/`options.logPath` is set                                     |
+| **Format**    | `[timestamp] [LEVEL]: message` (plain text)                                                            |
+| **Levels**    | `INFO`, `WARN`, `ERROR`                                                                                |
+| **File mode** | `compile()` truncates on open; `validateJSONSchema()` appends and closes the file when validation ends |
 
-If `logPath` is not provided, no log file is written and a console warning
-is emitted. The parent directory is created automatically if it does not
-exist. There is **no log rotation** and **no remote log shipping** — logs
-are written exclusively to local disk.
+If `compile()` gets no `logPath`, no log file is written and it emits a
+`Log file is not specified` console warning. If `validateJSONSchema()` gets
+no `options.logPath`, it uses the console only and does not reuse a file
+opened by an earlier call. The parent directory is created automatically if
+it does not exist. There is **no log rotation** and **no remote log
+shipping** — log files stay on local disk.
 
 ## Integrations
 
@@ -117,16 +136,23 @@ are written exclusively to local disk.
 
 ### External Filter Sources
 
-The compiler downloads filter lists and optimization data at runtime via `curl`:
+The compiler downloads external data at runtime:
 
-| URL                                              | Purpose                                  | Consumer                   |
-| ------------------------------------------------ | ---------------------------------------- | -------------------------- |
-| `https://filters.adtidy.org/`                    | Base URL for filter list downloads       | `src/main/builder.js`      |
-| `https://chrome.adtidy.org/optimization_config/` | Optimization percentage and stats config | `src/main/optimization.js` |
+| Source                                                       | Purpose                 | Transport | Consumer                   |
+| ------------------------------------------------------------ | ----------------------- | --------- | -------------------------- |
+| `@include` URLs in filter templates                          | Filter sources          | `curl`    | `src/main/builder.js`      |
+| `!#include` URLs in filter or `@include` content             | Filter sources          | `fetch`   | `src/main/builder.js`      |
+| `https://chrome.adtidy.org/optimization_config/percent.json` | Optimization percentage | `curl`    | `src/main/optimization.ts` |
+| `https://chrome.adtidy.org/filters/<filterId>/stats.json`    | Optimization statistics | `curl`    | `src/main/optimization.ts` |
 
-Both services must be reachable at runtime. The `TLS` environment variable
-can be set to `insecure` to bypass certificate validation if needed
-(see [Environment Variables](#environment-variables)).
+All sources must be reachable at runtime. `https://filters.adtidy.org/` is
+not a download source. `src/main/builder.js` uses it only to build the
+`downloadUrl` and `subscriptionUrl` fields in the platform metadata.
+
+`TLS=insecure` skips certificate validation for `curl` downloads only. The
+`fetch` transport follows the Node.js TLS settings. Set
+`NODE_USE_ENV_PROXY=1` to let `fetch` use an HTTP proxy (see
+[Environment Variables](#environment-variables)).
 
 ## Error Reporting
 
@@ -141,7 +167,7 @@ The `Dockerfile` uses multi-stage builds based on `adguard/node-ssh:22.22--0`:
 
 | Stage                    | Purpose           | Key Steps                                                                    |
 | ------------------------ | ----------------- | ---------------------------------------------------------------------------- |
-| `base`                   | Shared foundation | Node.js 22, pnpm 10.33.4 (from base image)                                   |
+| `base`                   | Shared foundation | Node.js 22.22, pnpm 10.33.4 (from base image)                                |
 | `deps`                   | Dependency cache  | `pnpm install --frozen-lockfile --ignore-scripts`                            |
 | `source`                 | Full source       | Copies project files over `deps`                                             |
 | `test-output`            | CI validation     | `pnpm lint && pnpm build && pnpm test`                                       |
