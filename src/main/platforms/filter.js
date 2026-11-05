@@ -148,8 +148,8 @@ const isOptimizationSupported = function (rule) {
  * Compiling once per cleanup call instead of once per rule and pattern keeps
  * the cost proportional to the number of patterns, not to rules x patterns.
  *
- * @param {string[]} patterns Rule removal patterns
- * @returns {Array<{pattern: string, regexp: RegExp}>} Compiled patterns
+ * @param {Array<string | RegExp>} patterns Rule removal patterns
+ * @returns {Array<{pattern: string | RegExp, regexp: RegExp}>} Compiled patterns
  */
 const compileRulePatterns = (patterns) => patterns.map((pattern) => ({
     pattern,
@@ -162,7 +162,7 @@ const compileRulePatterns = (patterns) => patterns.map((pattern) => ({
  * @param rule
  * @param config
  * @param filterId
- * @param {Array<{pattern: string, regexp: RegExp}>} removeRulePatterns
+ * @param {Array<{pattern: string | RegExp, regexp: RegExp}>} removeRulePatterns
  * Compiled patterns to remove rules with
  * @returns {boolean}
  */
@@ -181,6 +181,10 @@ const shouldOmitRule = function (rule, config, filterId, removeRulePatterns) {
 
     // eslint-disable-next-line no-restricted-syntax
     for (const { pattern, regexp } of removeRulePatterns) {
+        // A pattern passed as a `RegExp` with the `g` or `y` flag keeps
+        // `lastIndex` between `test()` calls, so the shared regexp would skip
+        // every other match. Reset it to match each rule from the start.
+        regexp.lastIndex = 0;
         if (regexp.test(ruleText)) {
             // eslint-disable-next-line max-len
             logger.info(`${ruleText} removed with removeRulePattern ${pattern} in filter ${filterId} for ${config.platform} platform`);
