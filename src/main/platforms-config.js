@@ -510,7 +510,7 @@ const EXTENDED_CSS_RULES_PATTERNS = [
     ':-abp-has\\(',
     ':-abp-contains\\(',
     // Nested `:has()` is not valid native CSS, so it needs Extended CSS.
-    ':has\\([^)]*:has\\(',
+    ':has\\((?:[^)]|\\([^()]*\\))*:has\\(',
     '#\\?#',
     '#\\$\\?#',
     '#@\\?#',

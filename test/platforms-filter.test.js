@@ -429,6 +429,7 @@ describe('platforms filter', () => {
             'example.com##.sidebar_list > .widget_text:has(a[title = "ads"])',
             '##div:has(> .ad)',
             'example.com##div:has(> .a):has(> .b)',
+            'example.com##div:has(a:not(.b)):has(.c)',
         ];
         const matchRules = [
             'example.com#?#div:has(> .ad)',
@@ -437,6 +438,9 @@ describe('platforms filter', () => {
             'example.com##div:-abp-has(.ad)',
             'example.com##article:has(header:has(.ct-sponsored))',
             'example.com##div > [style]:has([style]:has([href*="&utm"]))',
+            'example.com##article:has(header:not(.organic):has(.ct-sponsored))',
+            'example.com##div:has(:is(.a, .b):has(.c))',
+            'example.com##div:has(> li:nth-child(2):has(.c))',
         ];
 
         const after = cleanupRules([...notMatchRules, ...matchRules], config, 0);
