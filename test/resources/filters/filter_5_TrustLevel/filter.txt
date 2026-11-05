@@ -57,4 +57,8 @@ example.com##div.grid_1[class$="app"]
 *$redirect-rule=noopjs,xmlhttprequest,domain=example.com
 !
 !+ NOT_CONVERT
+! [excluded by #%#//scriptlet('ubo-trusted-] example.com#%#//scriptlet('ubo-trusted-set-cookie', 'a', 'b')
+!+ NOT_CONVERT
+! [excluded by #%#//scriptlet("ubo-trusted-] example.com#%#//scriptlet("ubo-trusted-set-cookie", "a", "b")
+!+ NOT_CONVERT
 ! [excluded by #%#//scriptlet('trusted-] example.com#%#//scriptlet( 'trusted-set-cookie', 'a', 'b')

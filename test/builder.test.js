@@ -288,7 +288,7 @@ describe('Test builder', async () => {
         it('platforms/test filters 5.txt', async () => {
             const filterContent = await readFile(path.join(__dirname, 'resources/platforms/test', 'filters', '5.txt'));
             const filterLines = filterContent.split(/\r?\n/);
-            expect(filterLines.length).toEqual(57);
+            expect(filterLines.length).toEqual(59);
             const presentRules = [
                 '||adsnet.com/*/700x350.gif$domain=example.com',
                 'example.com##+js(set-constant, ads, false)',
@@ -316,6 +316,8 @@ describe('Test builder', async () => {
                 '||example.com^$urltransform=/firstpath/secondpath/',
                 'example.com#%#//scriptlet(\'trusted-set-local-storage-item\', \'iName\', \'iValue\')',
                 'example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")',
+                'example.com#%#//scriptlet(\'ubo-trusted-set-cookie\', \'a\', \'b\')',
+                'example.com#%#//scriptlet("ubo-trusted-set-cookie", "a", "b")',
                 "example.com#%#//scriptlet( 'trusted-set-cookie', 'a', 'b')",
             ];
             absentRules.forEach((rule) => {
@@ -326,7 +328,7 @@ describe('Test builder', async () => {
         it('platforms/test2 filters 5.txt', async () => {
             const filterContent = await readFile(path.join(__dirname, 'resources/platforms/test2', 'filters', '5.txt'));
             const filterLines = filterContent.split(/\r?\n/);
-            expect(filterLines.length).toEqual(58);
+            expect(filterLines.length).toEqual(62);
 
             const presentRules = [
                 'test.com#%#//scriptlet(\'abp-abort-on-property-read\', \'adsShown\')',
@@ -348,6 +350,8 @@ describe('Test builder', async () => {
             const absentRules = [
                 'example.com#%#//scriptlet(\'trusted-set-local-storage-item\', \'iName\', \'iValue\')',
                 'example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")',
+                'example.com#%#//scriptlet(\'ubo-trusted-set-cookie\', \'a\', \'b\')',
+                'example.com#%#//scriptlet("ubo-trusted-set-cookie", "a", "b")',
                 "example.com#%#//scriptlet( 'trusted-set-cookie', 'a', 'b')",
             ];
             absentRules.forEach((rule) => {
@@ -358,7 +362,7 @@ describe('Test builder', async () => {
         it('platforms/ios filters 5.txt', async () => {
             const filterContent = await readFile(path.join(__dirname, 'resources/platforms/ios', 'filters', '5.txt'));
             const filterLines = filterContent.split(/\r?\n/);
-            expect(filterLines.length).toEqual(44);
+            expect(filterLines.length).toEqual(48);
 
             const presentRules = [
                 '||example.com/images/*.mp4',
@@ -1004,7 +1008,7 @@ describe('Test builder', async () => {
                 expect(filterContent).toBeTruthy();
 
                 const filterLines = filterContent.split(/\r?\n/);
-                expect(filterLines.length).toEqual(57);
+                expect(filterLines.length).toEqual(61);
                 expect(filterLines.includes('||example.com^$script,redirect=noopjs')).toBeTruthy();
                 expect(filterLines.includes('||example.com/banner$image,redirect=1x1-transparent.gif')).toBeTruthy();
                 expect(filterLines.includes("example.com#%#//scriptlet( 'trusted-set-cookie', 'a', 'b')"))
