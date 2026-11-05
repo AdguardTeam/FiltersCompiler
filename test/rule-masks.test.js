@@ -17,9 +17,12 @@ describe('isHint', () => {
         expect(isHint('!+ NOT_OPTIMIZED')).toBe(true);
     });
 
-    it('Rejects malformed hint lines', () => {
-        expect(isHint('!+NOT_CONVERT')).toBe(false);
-        expect(isHint('!+\tNOT_CONVERT')).toBe(false);
+    it('Accepts hints without the separator space', () => {
+        expect(isHint('!+NOT_CONVERT')).toBe(true);
+        expect(isHint('!+\tNOT_CONVERT')).toBe(true);
+    });
+
+    it('Rejects non-hint lines', () => {
         expect(isHint('! comment')).toBe(false);
         expect(isHint('||example.com^')).toBe(false);
     });
@@ -58,6 +61,12 @@ describe('filterWithHints', () => {
 
     it('Drops every hint of a run with the dropped rule', () => {
         const lines = ['!+ PLATFORM(ios)', '!+ NOT_OPTIMIZED', '||a.com^', '||b.com^'];
+        const result = filterWithHints(lines, (line) => line !== '||a.com^');
+        expect(result).toEqual(['||b.com^']);
+    });
+
+    it('Drops a hint without the separator space with its rule', () => {
+        const lines = ['!+PLATFORM(ios)', '||a.com^', '||b.com^'];
         const result = filterWithHints(lines, (line) => line !== '||a.com^');
         expect(result).toEqual(['||b.com^']);
     });

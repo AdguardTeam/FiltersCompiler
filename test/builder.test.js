@@ -1617,11 +1617,10 @@ describe('addNotOptimizedHints', () => {
         expect(addNotOptimizedHints(linesWithPlatform)).toEqual(linesWithPlatform);
     });
 
-    it('Treats a malformed hint as an ordinary line', () => {
+    it('Appends the token to a hint without the separator space', () => {
         const lines = ['!+NOT_CONVERT', '||a.com^'];
         expect(addNotOptimizedHints(lines)).toEqual([
-            '!+NOT_CONVERT',
-            '!+ NOT_OPTIMIZED',
+            '!+NOT_CONVERT NOT_OPTIMIZED',
             '||a.com^',
         ]);
     });
