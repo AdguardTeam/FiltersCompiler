@@ -17,9 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Cosmetic rules with non-basic `$path`, `$domain`, or `$url` modifiers are no
-  longer kept for the `ext_android_cb` platform, as AdGuard Content Blocker
-  cannot enforce them.
+- Cosmetic rules with non-basic modifiers (`$app`, `$domain`, `$path`, `$url`)
+  are no longer kept for the `ext_android_cb` platform, as AdGuard Content
+  Blocker cannot enforce them. The check now matches the `[$` modifier list
+  prefix, so it also catches variants such as `[$path =/x]e.com##.a`.
 
 ### Security
 

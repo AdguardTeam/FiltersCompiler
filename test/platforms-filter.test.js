@@ -434,6 +434,12 @@ describe('platforms filter', () => {
             '[$domain=example.com]##.textad',
             '[$url=||example.com/content/*]##div.textad',
             '[$path]example.com##.main',
+            '[$path =/x]e.com##.a',
+            '[$domain =example.com]##.textad',
+            '[$url =||example.com/content/*]##div.textad',
+            '[$app=org.example.app]example.com##.textad',
+            '[$path=/newsletter]spiegel.de#@#a[href^="/newsletter/"]',
+            '[$domain=example.com]#@#.textad',
         ];
 
         const after = cleanupRules([...notMatchRules, ...matchRules], config, 0);

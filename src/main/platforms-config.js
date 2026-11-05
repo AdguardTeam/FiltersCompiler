@@ -515,16 +515,21 @@ const EXTENDED_CSS_RULES_PATTERNS = [
  * Pattern to detect cosmetic rules with non-basic modifiers unsupported by
  * AdGuard Content Blocker.
  *
- * `$path`, `$domain`, and `$url` restrict a cosmetic rule to certain URLs or
- * domains, and Content Blocker cannot enforce them.
+ * AdGuard Content Blocker supports no non-basic modifiers (`$app`,
+ * `$domain`, `$path`, `$url`), so matching the modifier list prefix `[$` is
+ * enough, and no modifier name must be told apart. `$app` rules are also
+ * removed by `APP_MODIFIER_PATTERNS`.
+ *
+ * Matching the prefix instead of the names also catches variants that the
+ * parser accepts, such as whitespace around `=`.
  *
  * @example
  * ```[$path=/foren]cad.de##tr.ad```
  * @example
- * ```[$domain=example.com]##.textad```
+ * ```[$path =/x]e.com##.a```
  */
 const NON_BASIC_MODIFIER_PATTERNS = [
-    '^\\[\\$[^\\]]*(path|domain|url)(=|,|\\])',
+    '^\\[\\$',
 ];
 
 /**
