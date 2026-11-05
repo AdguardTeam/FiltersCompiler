@@ -32,7 +32,7 @@ The library exposes four public API functions: `compile`, `validateJSONSchema`,
 - **Package Manager**: pnpm >=10.33.4 and <11
 - **Bundler**: Rollup (single ESM output; `require()` relies on Node.js
   `require(ESM)`, enabled by default since Node.js 22.12)
-- **Testing**: Vitest (node environment, `test/*.test.{js,ts}`)
+- **Testing**: Vitest (node environment, `test/**/*.test.{js,ts}`)
 - **Code Linting**: ESLint 10, native flat config (`eslint.config.js`) — a
   one-time port of the project's former ESLint 8 + airbnb-base rule set, no
   airbnb dependency (4-space indent, 120 char max line length). See
