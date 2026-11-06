@@ -534,6 +534,26 @@ const isDiffPathHeaderTag = (line) => {
 };
 
 /**
+ * Returns the last line that is not empty or whitespace-only.
+ *
+ * Included files usually end with a newline, which adds an empty last line.
+ * Such a line must not hide a hint at the end of the included file.
+ *
+ * @param {string[]} lines Lines to inspect.
+ *
+ * @returns {string|undefined} Last non-empty line, or `undefined` if there is none.
+ */
+const getLastNotEmptyLine = (lines) => {
+    for (let i = lines.length - 1; i >= 0; i -= 1) {
+        if (lines[i].trim()) {
+            return lines[i];
+        }
+    }
+
+    return undefined;
+};
+
+/**
  * @typedef {object} CompileResult
  * @property {string[]} lines Compiled rules.
  * @property {string[]} excluded Excluded rules.
@@ -562,6 +582,8 @@ const compile = async function (filterDir, filterName, templateContent, trustLev
     let previousLine;
     // eslint-disable-next-line no-restricted-syntax
     for (const line of lines) {
+        let lastEmittedLine = line.trim();
+
         if (line.startsWith(INCLUDE_DIRECTIVE)) {
             // eslint-disable-next-line no-await-in-loop
             const { includedLines, shouldIgnoreTrustLevel } = await include(filterDir, line, excluded);
@@ -577,13 +599,14 @@ const compile = async function (filterDir, filterName, templateContent, trustLev
                 includedRules,
                 excluded,
                 invalid,
+                previousLine,
             );
 
             if (shouldIgnoreTrustLevel) {
                 logger.info(`Ignoring trust level for ${filterName} due to @include directive: ${line}`);
             } else {
                 logger.info(`Applying trust-level exclusions to ${filterName} @include directive: ${line}`);
-                includedRules = exclude(includedRules, trustLevelSettings, excluded);
+                includedRules = exclude(includedRules, trustLevelSettings, excluded, previousLine);
             }
 
             // 'for' loop is used in purpose instead of spread operator
@@ -591,6 +614,8 @@ const compile = async function (filterDir, filterName, templateContent, trustLev
             for (let i = 0; i < includedRules.length; i += 1) {
                 result.push(includedRules[i]);
             }
+
+            lastEmittedLine = getLastNotEmptyLine(includedRules) ?? lastEmittedLine;
         } else {
             let inlineRules = [line.trim()];
 
@@ -612,9 +637,11 @@ const compile = async function (filterDir, filterName, templateContent, trustLev
             for (let i = 0; i < inlineRules.length; i += 1) {
                 result.push(inlineRules[i]);
             }
+
+            lastEmittedLine = getLastNotEmptyLine(inlineRules) ?? lastEmittedLine;
         }
 
-        previousLine = line.trim();
+        previousLine = lastEmittedLine;
     }
 
     result = result.filter((line) => !isDiffPathHeaderTag(line));
