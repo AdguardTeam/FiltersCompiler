@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [4.0.0-beta.0] - 2026-11-06
+
+### Added
+
 - `validateJSONSchema()` now accepts a `ValidateJSONSchemaOptions` object with
   `localesPath`, `requiredLocales`, and `logPath`. Missing fields in existing
   locale objects are filled with the base (`en`) value and logged as warnings.
@@ -45,8 +59,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   instead of dual ESM + CJS builds. The `require` export condition resolves to
   the ESM artifact via Node.js `require(ESM)`, and `dist/index.cjs` is no
   longer published.
-
-### Deprecated
 
 ### Removed
 
@@ -91,8 +103,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   listener on import. The listener leaked into the host process and could
   crash it. Removing it is safe because Node.js already treats unhandled
   rejections as uncaught exceptions by default.
-
-### Security
 
 ## [3.4.3] - 2026-10-21
 
@@ -1146,7 +1156,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [@adguard/tsurlfilter]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/tsurlfilter/CHANGELOG.md
 [@adguard/logger]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/logger/CHANGELOG.md
 
-[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.4.3...HEAD
+[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v4.0.0-beta.0...HEAD
+[4.0.0-beta.0]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.4.3...v4.0.0-beta.0
 [3.4.3]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.4.2...v3.4.3
 [3.4.2]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.4.2-beta.1...v3.4.2
 [3.4.2-beta.1]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.4.1...v3.4.2-beta.1
