@@ -316,9 +316,8 @@ describe('Test builder', async () => {
                 '||example.com^$urltransform=/firstpath/secondpath/',
                 'example.com#%#//scriptlet(\'trusted-set-local-storage-item\', \'iName\', \'iValue\')',
                 'example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")',
-                'example.com#%#//scriptlet(\'ubo-trusted-set-cookie\', \'a\', \'b\')',
-                'example.com#%#//scriptlet("ubo-trusted-set-cookie", "a", "b")',
-                "example.com#%#//scriptlet( 'trusted-set-cookie', 'a', 'b')",
+                // a leaked trusted scriptlet must not reach the uBO form
+                'example.com##+js(trusted-set-cookie, a, b)',
             ];
             absentRules.forEach((rule) => {
                 expect(filterLines.includes(rule)).toBeFalsy();
