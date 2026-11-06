@@ -1,3 +1,7 @@
+! Rule "||convert-head.test^$1p" is kept as-is due to the NOT_CONVERT hint
+||convert-head.test^$1p
+! Rule "||convert-tail.test^$1p" is kept as-is due to the NOT_CONVERT hint
+||convert-tail.test^$1p
 ! example.com#$#.additional { color: red; } is excluded by "#$#" in exclusions-low.txt
 example.com#$#.additional { color: red; }
 ! ||example.com$replace=/"additional"/"__additional"/ is excluded by "$replace" in exclusions-low.txt

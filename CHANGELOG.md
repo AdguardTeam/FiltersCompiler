@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `apps_corelibs` directive and hint alias matching all CoreLibs-based apps (Windows, Mac, Android and CLI) [#272]
 - Support for `!+ NOT_CONVERT` hint, which disables conversion to AdGuard syntax
-  for the next rule [#269].
+  for the next rule, including rules at `@include` boundaries [#269].
 
 ### Changed
 

@@ -3,6 +3,9 @@
 !
 !#if (adguard_app_mac)
 @include ./additional-rules.txt /ignoreTrustLevel
+!+ NOT_CONVERT
+@include ./not-convert-rules.txt /ignoreTrustLevel
+||convert-tail.test^$1p
 !#endif
 !#if (adguard_app_ios)
 @include ./additional-rules.txt
