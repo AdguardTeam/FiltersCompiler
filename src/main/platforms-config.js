@@ -2,7 +2,7 @@
  * @file Platforms configuration.
  *
  * It shall be overridden by custom configuration:
- * @see {@link https://github.com/AdguardTeam/FiltersRegistry/blob/master/scripts/build/custom_platforms.js}
+ * @see {@link https://github.com/AdguardTeam/FiltersRegistry/blob/master/scripts/build/custom_platforms.ts}
  *
  * IMPORTANT: During making any changes in this file,
  * the custom_platforms.js should also be updated through PR on GitHub.
@@ -615,12 +615,14 @@ export const platformsConfig = {
         'defines': {
             'adguard': true,
             'adguard_app_windows': true,
+            'cap_html_filtering': true,
         },
     },
     'MAC': {
         'platform': 'mac',
         'path': 'mac',
         'configuration': {
+            'removeRulePatterns': HTML_FILTERING_MODIFIER_PATTERNS,
             'ignoreRuleHints': false,
             'replacements': null,
         },
@@ -640,6 +642,7 @@ export const platformsConfig = {
         'defines': {
             'adguard': true,
             'adguard_app_mac': true,
+            'cap_html_filtering': true,
         },
     },
     'MAC_V3': {
@@ -653,6 +656,7 @@ export const platformsConfig = {
         'defines': {
             'adguard': true,
             'adguard_app_mac': true,
+            'cap_html_filtering': true,
         },
     },
     'ANDROID': {
@@ -665,6 +669,7 @@ export const platformsConfig = {
         'defines': {
             'adguard': true,
             'adguard_app_android': true,
+            'cap_html_filtering': true,
         },
     },
     'CLI': {
@@ -678,6 +683,7 @@ export const platformsConfig = {
         'defines': {
             'adguard': true,
             'adguard_app_cli': true,
+            'cap_html_filtering': true,
         },
     },
     'EXTENSION_CHROMIUM': {
@@ -783,7 +789,6 @@ export const platformsConfig = {
         'expires': '10 days',
         'configuration': {
             'removeRulePatterns': [
-                ...HTML_FILTERING_MODIFIER_PATTERNS,
                 ...APP_MODIFIER_PATTERNS,
                 ...NETWORK_MODIFIER_PATTERNS,
                 ...PROTOBUF_MODIFIER_PATTERNS,
@@ -799,6 +804,7 @@ export const platformsConfig = {
         'defines': {
             'adguard': true,
             'adguard_ext_firefox': true,
+            'cap_html_filtering': true,
         },
     },
     'EXTENSION_SAFARI': {
