@@ -89,15 +89,14 @@ const HTML_FILTERING_MODIFIER_PATTERNS = [
  * Regex fragment that matches a non-basic modifier list, e.g. `[$path=/page]`.
  *
  * A cosmetic rule restricts itself to certain pages with the non-basic modifiers
- * `$domain`, `$path`, and `$url`. The list ends at the last `]` before the domain
- * part, so `.*]` is greedy on purpose: it also skips a `]` inside a regexp value
- * like `[$domain=/example[0-9]\.com/]`. `\s*` accepts whitespace before `=`,
- * which the parser allows.
+ * `$domain`, `$path`, and `$url`. The fragment only matches a list at the start
+ * of a rule: a network rule can also contain `$domain=` followed by a `]` in a
+ * later modifier value, and must not be mistaken for a cosmetic rule.
+ * Whitespace before `=` is tolerated, as the parser accepts it.
  *
- * The modifier patterns below reuse this fragment in a negative lookahead.
- * Without it, a modifier inside such a list, for example
- * `[$path=...]##.textad,[app="ads"]`, matches the rule modifier pattern, and the
- * rule is removed.
+ * The modifier patterns below reuse this fragment to skip the `$` that opens a
+ * `$path`, `$domain`, or `$url` list. Otherwise the `$app` pattern starts there
+ * and matches `app=` in `[$path=...]##.textad,[app="ads"]`, removing the rule.
  *
  * `$app` is deliberately absent, see `APP_MODIFIER_PATTERNS` for its removal.
  *
@@ -106,7 +105,7 @@ const HTML_FILTERING_MODIFIER_PATTERNS = [
  * @example
  * ```[$path =/x]e.com##.a```
  */
-const NON_BASIC_MODIFIER_LIST_GUARD = '(path|domain|url)\\s*=.*]';
+const NON_BASIC_MODIFIER_LIST_GUARD = '(?<=^\\[\\$)(path|domain|url)\\s*=.*]';
 
 /**
  * Pattern to check if rule contains `$protobuf` modifier

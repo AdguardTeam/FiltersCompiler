@@ -457,6 +457,8 @@ describe('platforms filter', () => {
             '[$domain=example.com]#@#.textad',
         ];
         const removedRules = [
+            // eslint-disable-next-line max-len
+            '||ads.adfox.ru/*/getCode?p1=$domain=auth.wi-fi.ru,replace=/(<VAST[\\s\\S]*?>)[\\s\\S]*<\\/VAST>/\\$1<\\/VAST>/,important',
             '||example.com^$app=org.example.app',
             '||example.com^$protobuf',
             '||example.com^$content,hls=/x/',

@@ -24,6 +24,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Modifier patterns no longer mistake a `$url`-only modifier list for a rule
   modifier, so a rule like `[$url=||example.com/?app=1]##.ad` is no longer
   dropped.
+- The non-basic modifier list guard is now tied to the `[$` prefix, so a
+  network rule with `$domain=` and a later `]` is no longer mistaken for a
+  cosmetic rule. Such rules are removed again on platforms that do not support
+  their modifiers.
 
 ### Security
 
