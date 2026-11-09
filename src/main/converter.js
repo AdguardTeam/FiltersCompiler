@@ -45,8 +45,9 @@ export const convertRulesToAdgSyntax = (rulesList, excluded = [], invalidRules =
 
     for (let i = 0; i < rulesList.length; i += 1) {
         const rule = rulesList[i];
+        const hintLine = i > 0 ? rulesList[i - 1] : previousLine;
 
-        if (hasHint(i > 0 ? rulesList[i - 1] : previousLine, NOT_CONVERT_HINT)) {
+        if (!rule.startsWith(RuleMasks.MASK_COMMENT) && hasHint(hintLine, NOT_CONVERT_HINT)) {
             const message = `Rule "${rule}" is kept as-is due to the NOT_CONVERT hint`;
             logger.info(message);
             excludeRule(rule, excluded, message);

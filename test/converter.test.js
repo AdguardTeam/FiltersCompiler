@@ -114,6 +114,40 @@ describe('converter', () => {
             expect(result[1]).toBe(rule);
             expect(result[2]).toBe(converted);
         });
+
+        it('does not record a comment following the hint in the diff', () => {
+            const excluded = [];
+            const result = convertRulesToAdgSyntax(['!+ NOT_CONVERT', '! ordinary comment'], excluded);
+
+            expect(result[0]).toBe('!+ NOT_CONVERT');
+            expect(result[1]).toBe('! ordinary comment');
+            expect(excluded).toEqual([]);
+        });
+
+        it('does not record an include exclusion comment in the diff', () => {
+            const excluded = [];
+            const comment = '! [excluded by example.com] ||example.com^';
+            const result = convertRulesToAdgSyntax(['!+ NOT_CONVERT', comment], excluded);
+
+            expect(result[0]).toBe('!+ NOT_CONVERT');
+            expect(result[1]).toBe(comment);
+            expect(excluded).toEqual([]);
+        });
+
+        it('does not apply the hint to a rule after a comment', () => {
+            const result = convertRulesToAdgSyntax(['!+ NOT_CONVERT', '! ordinary comment', rule]);
+            expect(result[0]).toBe('!+ NOT_CONVERT');
+            expect(result[2]).toBe(converted);
+
+            // The rule after the comment needs no conversion, so nothing
+            // reaches the diff at all.
+            const excluded = [];
+            convertRulesToAdgSyntax(
+                ['!+ NOT_CONVERT', '! ordinary comment', "example.com#%#//scriptlet('new-scriptlet')"],
+                excluded,
+            );
+            expect(excluded).toEqual([]);
+        });
     });
 
     describe('getCanonicalRuleTexts', () => {
