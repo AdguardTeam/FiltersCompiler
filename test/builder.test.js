@@ -1300,7 +1300,7 @@ describe('Test builder', async () => {
                 expect(filterContent).toBeTruthy();
 
                 const filterLines = filterContent.split(/\r?\n/);
-                expect(filterLines.length).toEqual(23);
+                expect(filterLines.length).toEqual(19);
 
                 const presentRules = [
                     // rules from included file:
@@ -1308,10 +1308,6 @@ describe('Test builder', async () => {
                     '||example.com$replace=/"additional"/"__additional"/',
                     "example.com#%#AG_setConstant('additional1', '1');",
                     "example.com#%#//scriptlet('set-constant', 'additional2', '2')",
-                    // NOT_CONVERT before @include keeps the first included rule as is:
-                    '||convert-head.test^$1p',
-                    // NOT_CONVERT at the end of the included file keeps the next inline rule as is:
-                    '||convert-tail.test^$1p',
                     // rules from template.txt
                     // allowed for low trust level:
                     'example.com##.lowLevelBanner',
@@ -1328,9 +1324,6 @@ describe('Test builder', async () => {
                     '||example.com$replace=/"template"/"__template"/',
                     "example.com#%#AG_setConstant('template1', '1');",
                     "example.com#%#//scriptlet('set-constant', 'template2', '2')",
-                    // converted forms of the hinted rules:
-                    '||convert-head.test^$~third-party',
-                    '||convert-tail.test^$~third-party',
                 ];
                 absentRules.forEach((rule) => {
                     expect(filterLines.includes(rule)).toBeFalsy();

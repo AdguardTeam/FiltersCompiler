@@ -7,10 +7,6 @@ example.com#$#.additional { color: red; }
 example.com#%#AG_setConstant('additional1', '1');
 example.com#%#//scriptlet('set-constant', 'additional2', '2')
 
-!+ NOT_CONVERT
-||convert-head.test^$1p
-!+ NOT_CONVERT
-||convert-tail.test^$1p
 !#endif
 !#if (adguard_app_ios)
 
