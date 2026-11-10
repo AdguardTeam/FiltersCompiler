@@ -557,6 +557,7 @@ const SAFARI_BASED_EXTENSION_PATTERNS = [
 ];
 
 /* eslint-disable max-len */
+
 /**
  * Pattern to detect Extended CSS `:matches-property()` rules
  *
@@ -630,7 +631,6 @@ export const platformsConfig = {
         'defines': {
             'adguard': true,
             'adguard_app_mac': true,
-            'apps_corelibs': true,
         },
     },
     'MAC_V2': {
