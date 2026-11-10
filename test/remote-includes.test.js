@@ -23,6 +23,7 @@ vi.mock('../src/main/utils/webutils', () => ({
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 const REMOTE_RULE = '||remote.example^';
+const MISSING_LOCAL_INCLUDE = 'non-existing-local.txt';
 const MISSING_INCLUDE_PATH = '/missing.txt';
 const PROTECTED_INCLUDE_PATH = '/protected.txt';
 const USERNAME = 'user';
@@ -119,5 +120,13 @@ describe('remote !#include in an @include body', () => {
         await expect(include(__dirname, `@include "${parentUrl}"`, []))
             .rejects
             .toThrow(/Failed to resolve the include directive.*\b401\b/s);
+    });
+});
+
+describe('local @include', () => {
+    it('reports the missing include path instead of undefined', async () => {
+        await expect(include(__dirname, `@include ${MISSING_LOCAL_INCLUDE}`, []))
+            .rejects
+            .toThrow(/^(?!.*undefined).*non-existing-local\.txt/);
     });
 });

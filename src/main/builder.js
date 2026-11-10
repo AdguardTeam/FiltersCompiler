@@ -420,7 +420,7 @@ export const include = async (filterDir, directiveLine, excluded) => {
 
         includedLines = fixVersionComments(includedLines);
     } else {
-        throw new Error(`Error handling include from: ${options.url}`);
+        throw new Error(`Error handling include from: ${url}`);
     }
 
     logger.info(`Inclusion lines: ${includedLines.length}`);
