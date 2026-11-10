@@ -1241,6 +1241,8 @@ describe('Test builder', async () => {
                 const filterLines = filterContent.split(/\r?\n/);
                 expect(filterLines.includes('||test.org^$newmodifier')).toBeTruthy();
                 expect(filterLines.includes('||example.org^$newmodifier')).toBeFalsy();
+
+                expect(filterLines.includes('!+ NOT_VALIDATE_TYPO')).toBeFalsy();
                 expect(filterLines.includes('||test.org^$unsupported')).toBeFalsy();
             });
 
@@ -1252,6 +1254,8 @@ describe('Test builder', async () => {
                 expect(filterLines.includes('||test.org^$newmodifier')).toBeTruthy();
                 expect(filterLines.includes('||example.org^$newmodifier')).toBeTruthy();
                 expect(filterLines.includes('||foo.bar^$newmodifier')).toBeTruthy();
+
+                expect(filterLines.includes('!+ NOT_VALIDATE_TYPO')).toBeFalsy();
                 expect(filterLines.includes('||test.org^$unsupported')).toBeFalsy();
             });
         });
