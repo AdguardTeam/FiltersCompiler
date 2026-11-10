@@ -19,7 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `cap_html_filtering` directive not working: the define was missing from the platforms configuration,
   so rules inside `!#if (cap_html_filtering)` were dropped on every platform. It is now set for
-  Windows, Mac v2, Mac v3, Android, FireFox, CLI [#270].
+  Windows, Mac v2, Mac v3, Android, CLI and Firefox [#270]. Firefox also keeps HTML filtering rules
+  (`$$`, `$@$`) outside `!#if (cap_html_filtering)` now, while legacy Mac (v1) no longer gets them.
 
 ### Security
 
