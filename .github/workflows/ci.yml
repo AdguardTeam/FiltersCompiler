@@ -19,3 +19,24 @@ jobs:
     uses: AdGuardSoftwareLimited/ext-shared-actions/.github/workflows/test-and-build.yml@master
     with:
       package_file: filters-compiler.tgz
+
+  # The shared Docker-based workflow above only covers Node.js 22.22: the
+  # Dockerfile is pinned to `adguard/node-ssh:22.22--0` (no Node.js 24 image
+  # exists) and the shared workflow has no Node-version input. Run the same
+  # checks directly on a Node.js 24 toolchain instead, on the same runner.
+  test-node24:
+    name: Lint, test, build (Node.js 24)
+    runs-on: team-extensions
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.4
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Lint, build, and test
+        run: pnpm lint && pnpm build && pnpm test

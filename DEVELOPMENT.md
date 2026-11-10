@@ -353,11 +353,18 @@ supported version can use both `import` and `require`:
 node --version  # Should be v22.21+ on 22.x, or v24+
 ```
 
-If using nvm, install the latest 22.x to match CI and the Docker image:
+CI validates both Node.js 22.22 (the Docker `test-output` target) and
+Node.js 24 (a separate CI job), so a change must pass on both. Either version
+works for local development. If using nvm, install either:
 
 ```bash
+# Node.js 22.22 — matches the Docker-based CI job
 nvm install 22
 nvm use 22
+
+# Node.js 24 — matches the Node.js 24 CI job
+nvm install 24
+nvm use 24
 ```
 
 ### Schema Validation Errors After Manual Edit
