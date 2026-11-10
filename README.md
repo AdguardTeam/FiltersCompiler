@@ -56,6 +56,8 @@ the [FiltersRegistry README][filters-metadata].
 npm install @adguard/filters-compiler
 ```
 
+Requires Node.js 22.21+ (22.x) or 24+.
+
 Also available via pnpm or yarn:
 
 ```bash
@@ -64,8 +66,8 @@ pnpm add @adguard/filters-compiler
 yarn add @adguard/filters-compiler
 ```
 
-The package ships as dual ESM + CJS, so both `import` and `require`
-work out of the box.
+The package ships as a single ES module. Use `import`, or use `require` with
+a supported Node.js version, which loads the same artifact via `require(ESM)`.
 
 ## Quick Start
 
@@ -124,26 +126,64 @@ writes the results to `platformsPath`.
 ### `validateJSONSchema(...)`
 
 ```ts
+interface ValidateJSONSchemaOptions {
+    localesPath: string;
+    requiredLocales?: string[];
+    logPath?: string;
+}
+
 function validateJSONSchema(
     platformsPath: string,
-    requiredFiltersAmount: number,
+    options: ValidateJSONSchemaOptions,
 ): boolean;
 ```
 
-Recursively validates the built JSON files in `platformsPath` against
-the schemas bundled with the library (`filters.schema.json` and
-`filters_i18n.schema.json`). `requiredFiltersAmount` is the minimum
-number of filters expected in each platform's `filters.json`.
+Recursively validates the built JSON files in `platformsPath`.
+
+The `filters_i18n` schema is generated at runtime for every non-legacy
+platform from its `filters.json` and the FiltersRegistry locale data in
+`localesPath`. The entity IDs come from `filters.json`. The required
+locales and the English fallback strings come from the locale
+directory. The compiler does not keep a copy of filter, group, or tag
+text. The legacy `mac` and `mac_v2` platforms use their frozen schemas.
+
+- `localesPath` — path to the FiltersRegistry `locales` directory.
+- `requiredLocales` — locales that must be present for every group,
+  tag, and filter. Defaults to all locale subdirectories of
+  `localesPath`. The schema validates every locale directory in
+  `localesPath`, even when this list contains a subset.
+- `logPath` — optional validation log file. The file is appended to and
+  closed when validation finishes. When omitted, messages go to the
+  console only; a log file opened by an earlier call is not reused.
+
+Missing fields in an existing locale object are filled with the base
+(`en`) value, and each fallback is logged as a warning. A locale object
+that is missing entirely for an entity is not filled: it fails
+validation when the locale is required. A built entity with no English
+localization, or a missing required locale, fails validation.
+
+The validator writes the filled `filters_i18n.json` back to disk, plus a
+`.js` copy, even when validation fails.
+
+`requiredLocales` and the English fallback apply only to the generated
+schema used for non-legacy platforms. The frozen `mac` and `mac_v2`
+schemas ignore `requiredLocales`, fill their own defaults, and log no
+fallbacks.
+
+The `filters.schema.json` and the legacy `mac`/`mac_v2` schemas remain
+static and are bundled with the library.
 
 Returns `true` when all files are valid. On validation failure it logs
 the errors and returns `false` instead of throwing, so callers must
-check the return value.
+check the return value. It throws when `options` or
+`options.localesPath` is missing, when `options.logPath` cannot be
+opened, or when a built JSON file cannot be parsed.
 
 ### `validateLocales(...)`
 
 ```ts
 function validateLocales(
-    localesDirPath: string,
+    localesPath: string,
     requiredLocales: string[],
     logFormat?: 'text' | 'markdown',
 ): ValidateLocalesResult;
@@ -155,7 +195,7 @@ interface ValidateLocalesResult {
 }
 ```
 
-Validates that the locale files in `localesDirPath` are complete — that
+Validates that the locale files in `localesPath` are complete — that
 every filter, group, and tag has a translated name and description for
 all locales listed in `requiredLocales`.
 
@@ -247,13 +287,15 @@ await compile(
 
 ### Validating built filters
 
-After compiling, validate the built output against the bundled schemas:
+After compiling, validate the built output:
 
 ```js
 import { validateJSONSchema } from '@adguard/filters-compiler';
 
-// Each platform build must contain at least 50 filters
-const valid = validateJSONSchema('./platforms', 50);
+const valid = validateJSONSchema('./platforms', {
+    localesPath: './locales',
+    logPath: './json-validation.log',
+});
 if (!valid) {
     throw new Error('Schema validation failed, see log for details');
 }
@@ -420,6 +462,10 @@ The compiler writes a timestamped log file when `logPath` is passed to
 `compile()`. If `logPath` is omitted, no log file is written. The parent
 directory is created automatically when it does not exist.
 
+`validateJSONSchema()` accepts the same `logPath` in its options object. It
+appends to the file and closes it when validation finishes. A later call
+without `logPath` does not reuse it.
+
 Log levels:
 
 - `INFO` — general information about the process
@@ -428,9 +474,27 @@ Log levels:
 
 ### Environment variables
 
-| Variable | Default           | Purpose                                                                                           |
-| -------- | ----------------- | ------------------------------------------------------------------------------------------------- |
-| `TLS`    | (system defaults) | Set to `insecure` to bypass TLS certificate verification when downloading external filter sources |
+| Variable             | Default           | Purpose                                                                                |
+| -------------------- | ----------------- | -------------------------------------------------------------------------------------- |
+| `TLS`                | (system defaults) | Set to `insecure` to make `curl` skip TLS certificate verification                     |
+| `NODE_USE_ENV_PROXY` | (unset)           | Set to `1` to let Node.js `fetch` use proxy variables for remote `!#include` downloads |
+
+`TLS=insecure` applies only to `curl` downloads: `@include` files and
+optimization data. Remote `!#include` downloads use `fetch`, which follows the
+Node.js TLS settings. To trust a private CA, set `NODE_EXTRA_CA_CERTS` to the
+CA file. To disable certificate verification, set
+`NODE_TLS_REJECT_UNAUTHORIZED=0`. This disables verification for the whole
+process.
+
+`NODE_USE_ENV_PROXY=1` makes remote `!#include` downloads use a proxy from
+the environment. Node.js reads `HTTP_PROXY` or `http_proxy`, `HTTPS_PROXY` or
+`https_proxy`, and `NO_PROXY` or `no_proxy`. Without this variable, `fetch`
+does not use a proxy. `ALL_PROXY` is not supported.
+
+`curl` downloads read the same names, except the uppercase `HTTP_PROXY`, and
+also `ALL_PROXY` as a fallback. `http_proxy` applies only to `http://` URLs.
+`@include` sources are usually `https://`, so set `https_proxy` or
+`HTTPS_PROXY` to proxy them.
 
 ## Supported platforms
 

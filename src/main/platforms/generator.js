@@ -19,6 +19,15 @@ import {
 import { convertToUbo } from '../converter';
 import { getOptimizationStatistics } from '../optimization';
 import { RuleMasks } from '../rule/rule-masks';
+import { LEGACY_PLATFORMS, MAC_V1_PLATFORM, MAC_V2_PLATFORM } from '../platforms-config';
+import { ENTITY_KINDS, KEY_PREFIXES, parseLocaleMessages } from '../utils/locale-messages';
+import { readJsonOrNull } from '../utils/read-json';
+import {
+    FILTERS_I18N_METADATA_FILE_JS,
+    FILTERS_I18N_METADATA_FILE_JSON,
+    FILTERS_METADATA_FILE_JS,
+    FILTERS_METADATA_FILE_JSON,
+} from '../utils/metadata-file-names';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -32,12 +41,6 @@ const OPTIMIZED_PLATFORMS_LIST = ['ext_safari', 'android', 'ios', 'ext_android_c
 const UBLOCK_PLATFORM = 'ext_ublock';
 
 const PLATFORM_FILTERS_DIR = 'filters';
-const FILTERS_METADATA_FILE_JSON = 'filters.json';
-const FILTERS_I18N_METADATA_FILE_JSON = 'filters_i18n.json';
-
-// AG-20175
-const FILTERS_METADATA_FILE_JS = 'filters.js';
-const FILTERS_I18N_METADATA_FILE_JS = 'filters_i18n.js';
 
 /**
  * Tag id for obsolete filters.
@@ -426,7 +429,44 @@ export const postProcessUrls = (metadata, config) => {
 };
 
 /**
- * Removes redundant metadata for included or excluded filters for the current platform
+ * Checks whether the filter should be built for the specified platform.
+ *
+ * @param {object} metadata Filter metadata.
+ * @param {string} platform Platform.
+ *
+ * @returns True if
+ * - both `platformsIncluded` and `platformsExcluded` properties are not defined in the `metadata`,
+ * - `platformsExcluded` does not contain the specified `platform`,
+ * - `platformsIncluded` contains the specified `platform`.
+ *
+ * @throws {Error} If both `platformsIncluded` and `platformsExcluded` are defined.
+ */
+export const shouldBuildFilterForPlatform = (metadata, platform) => {
+    const { filterId, platformsExcluded, platformsIncluded } = metadata;
+
+    if (platformsExcluded && platformsIncluded) {
+        let errorMessage = 'Both platformsIncluded and platformsExcluded cannot be defined simultaneously';
+        if (filterId) {
+            errorMessage += ` for filter ${filterId}`;
+        }
+        throw new Error(errorMessage);
+    }
+
+    if (platformsExcluded && platformsExcluded.includes(platform)) {
+        return false;
+    }
+
+    if (!platformsIncluded) {
+        return true;
+    }
+
+    return platformsIncluded.includes(platform);
+};
+
+/**
+ * Removes the metadata of filters that the platform does not build.
+ *
+ * Uses `shouldBuildFilterForPlatform`.
  *
  * @param metadata
  * @param platform
@@ -434,31 +474,32 @@ export const postProcessUrls = (metadata, config) => {
  * @returns {object} Metadata with filtered `filters` array due to the `platform`.
  */
 const removeRedundantFiltersMetadata = (metadata, platform) => {
-    // leaves only included filters metadata
-    metadata.filters = metadata.filters.filter((filter) => !filter.platformsIncluded
-        || (filter.platformsIncluded && filter.platformsIncluded.includes(platform)));
-    // removes excluded filters metadata
-    metadata.filters = metadata.filters.filter((filter) => !filter.platformsExcluded
-        || (filter.platformsExcluded && !filter.platformsExcluded.includes(platform)));
+    // Keep only the metadata of the filters built for this platform
+    metadata.filters = metadata.filters.filter((filter) => shouldBuildFilterForPlatform(filter, platform));
 
     return metadata;
 };
 
 /**
- * Parses object info
- * Splits string {mask}{id}.{message} like "group.1.name" etc.
+ * Loads messages for one entity kind from a locale file and adds them to the target collection.
  *
- * @param string
- * @param mask
- * @returns {{id: *, message: *}}
+ * @param {string} localeDir - The directory that contains the locale file.
+ * @param {string} localeName - The locale name used as a key in the target collection.
+ * @param {string} fileName - The name of the JSON file to load.
+ * @param {string} keyPrefix - The message key prefix, for example `group`.
+ * @param {Object} target - The collection to add the messages to.
+ * @returns {void}
  */
-const parseInfo = (string, mask) => {
-    const searchIndex = string.indexOf(mask) + mask.length;
+const loadLocaleMessages = (localeDir, localeName, fileName, keyPrefix, target) => {
+    const localePath = path.join(localeDir, fileName);
+    const entries = readJsonOrNull(localePath);
+    const messages = parseLocaleMessages(entries, keyPrefix, localePath);
 
-    return {
-        id: string.substring(searchIndex, string.indexOf('.', searchIndex)),
-        message: string.substring(string.lastIndexOf('.') + 1),
-    };
+    Object.entries(messages).forEach(([id, fields]) => {
+        target[id] = target[id] || {};
+        target[id][localeName] = target[id][localeName] || {};
+        Object.assign(target[id][localeName], fields);
+    });
 };
 
 /**
@@ -479,62 +520,9 @@ const loadLocales = function (dir) {
     for (const directory of locales) {
         const localeDir = path.join(dir, directory);
         if (fs.lstatSync(localeDir).isDirectory()) {
-            const groups = JSON.parse(readFile(path.join(localeDir, 'groups.json')));
-            if (groups) {
-                // eslint-disable-next-line no-restricted-syntax
-                for (const group of groups) {
-                    // eslint-disable-next-line guard-for-in,no-restricted-syntax
-                    for (const p in group) {
-                        const info = parseInfo(p, 'group.');
-                        if (!info || !info.id) {
-                            continue;
-                        }
-
-                        const { id } = info;
-                        result.groups[id] = result.groups[id] || {};
-                        result.groups[id][directory] = result.groups[id][directory] || {};
-                        result.groups[id][directory][info.message] = group[p];
-                    }
-                }
-            }
-
-            const tags = JSON.parse(readFile(path.join(localeDir, 'tags.json')));
-            if (tags) {
-                // eslint-disable-next-line no-restricted-syntax
-                for (const tag of tags) {
-                    // eslint-disable-next-line guard-for-in,no-restricted-syntax
-                    for (const p in tag) {
-                        const info = parseInfo(p, 'tag.');
-                        if (!info || !info.id) {
-                            continue;
-                        }
-
-                        const { id } = info;
-                        result.tags[id] = result.tags[id] || {};
-                        result.tags[id][directory] = result.tags[id][directory] || {};
-                        result.tags[id][directory][info.message] = tag[p];
-                    }
-                }
-            }
-
-            const filters = JSON.parse(readFile(path.join(localeDir, 'filters.json')));
-            if (filters) {
-                // eslint-disable-next-line no-restricted-syntax
-                for (const filter of filters) {
-                    // eslint-disable-next-line guard-for-in,no-restricted-syntax
-                    for (const p in filter) {
-                        const info = parseInfo(p, 'filter.');
-                        if (!info || !info.id) {
-                            continue;
-                        }
-
-                        const { id } = info;
-                        result.filters[id] = result.filters[id] || {};
-                        result.filters[id][directory] = result.filters[id][directory] || {};
-                        result.filters[id][directory][info.message] = filter[p];
-                    }
-                }
-            }
+            ENTITY_KINDS.forEach((kind) => {
+                loadLocaleMessages(localeDir, directory, `${kind}.json`, KEY_PREFIXES[kind], result[kind]);
+            });
         }
     }
 
@@ -567,6 +555,22 @@ const removeObsoleteFilters = (metadata) => {
 };
 
 /**
+ * Selects the filter localizations for the filters that the platform builds.
+ *
+ * Localizations without matching metadata are dropped. The function cannot add
+ * a missing localization, so a filter without one still fails validation.
+ *
+ * @param {object} localizationsFilters Filter localizations keyed by filter id.
+ * @param {Set<string>} platformFilterIds Ids of the filters listed in filters.json.
+ * @returns {object} Selected localizations keyed by filter id.
+ */
+export const selectLocalizedFilters = (localizationsFilters, platformFilterIds) => {
+    return Object.fromEntries(
+        Object.entries(localizationsFilters).filter(([filterId]) => platformFilterIds.has(filterId)),
+    );
+};
+
+/**
  * Sorts metadata's filters by `filterId` property.
  *
  * @param {object} metadata Metadata to sort filters for.
@@ -576,41 +580,6 @@ export const sortMetadataFilters = (metadata) => {
     const result = { ...metadata };
     result.filters.sort((a, b) => a.filterId - b.filterId);
     return result;
-};
-
-/**
- * Checks whether the filter should be built for the specified platform.
- *
- * @param {object} metadata Filter metadata.
- * @param {string} platform Platform.
- *
- * @returns True if
- * - both `platformsIncluded` and `platformsExcluded` properties are not defined in the `metadata`,
- * - `platformsExcluded` does not contain the specified `platform`,
- * - `platformsIncluded` contains the specified `platform`.
- *
- * @throws An error if both `platformsIncluded` and `platformsExcluded` are defined.
- */
-export const shouldBuildFilterForPlatform = (metadata, platform) => {
-    const { filterId, platformsExcluded, platformsIncluded } = metadata;
-
-    if (platformsExcluded && platformsIncluded) {
-        let errorMessage = 'Both platformsIncluded and platformsExcluded cannot be defined simultaneously';
-        if (filterId) {
-            errorMessage += ` for filter ${filterId}`;
-        }
-        throw new Error(errorMessage);
-    }
-
-    if (platformsExcluded && platformsExcluded.includes(platform)) {
-        return false;
-    }
-
-    if (!platformsIncluded) {
-        return true;
-    }
-
-    return platformsIncluded.includes(platform);
 };
 
 /**
@@ -692,9 +661,9 @@ const writeFiltersMetadata = function (platformsPath, filtersDir, filtersMetadat
         metadata = postProcessUrls(metadata, config);
         metadata = removeRedundantFiltersMetadata(metadata, config.platform);
 
-        if (platform === 'MAC') {
+        if (platform === MAC_V1_PLATFORM) {
             metadata = rewriteMetadataForOldMacV1(metadata);
-        } else if (platform === 'MAC_V2') {
+        } else if (platform === MAC_V2_PLATFORM) {
             metadata = rewriteMetadataForOldMacV2(metadata);
             metadata = removeObsoleteFilters(metadata);
         } else {
@@ -710,21 +679,35 @@ const writeFiltersMetadata = function (platformsPath, filtersDir, filtersMetadat
         const filtersI18nFileJson = path.join(platformDir, FILTERS_I18N_METADATA_FILE_JSON);
         const filtersI18nFileJs = path.join(platformDir, FILTERS_I18N_METADATA_FILE_JS);
 
-        let localizedFilters = { ...localizations.filters };
+        let localizedFilters;
 
-        filtersMetadata.forEach((metadata) => {
-            if (!shouldBuildFilterForPlatform(metadata, config.platform)) {
-                const { filterId } = metadata;
-                // eslint-disable-next-line max-len
-                logger.info(`Adding localization for filter ${filterId} skipped for platform '${config.platform}' due to platformsExcluded or platformsIncluded`);
-                delete localizedFilters[filterId];
+        if (LEGACY_PLATFORMS.includes(platform)) {
+            // Legacy platforms keep their current behavior: every localization
+            // that is not excluded for the platform stays, including ids that
+            // have no matching metadata (the frozen schemas require them).
+            localizedFilters = { ...localizations.filters };
+
+            filtersMetadata.forEach((filterMetadata) => {
+                if (!shouldBuildFilterForPlatform(filterMetadata, config.platform)) {
+                    const { filterId } = filterMetadata;
+                    // eslint-disable-next-line max-len
+                    logger.info(`Adding localization for filter ${filterId} skipped for platform '${config.platform}' due to platformsExcluded or platformsIncluded`);
+                    delete localizedFilters[filterId];
+                }
+            });
+
+            // MAC_V2 additionally drops the localizations of obsolete filters;
+            // MAC_V1 keeps them.
+            if (platform === MAC_V2_PLATFORM) {
+                localizedFilters = excludeObsoleteFilters(localizedFilters, obsoleteFilters);
             }
-        });
-
-        // old MAC platform may not support absence some filters i18n metadata,
-        // for all other platforms we can exclude obsolete filters
-        if (platform !== 'MAC') {
-            localizedFilters = excludeObsoleteFilters(localizedFilters, obsoleteFilters);
+        } else {
+            // Non-legacy platforms: keep the localizations of exactly the
+            // filters listed in `filters.json`. The runtime filters_i18n schema
+            // requires the `filters.json` ids, so a filter missing its
+            // localization still fails validation.
+            const platformFilterIds = new Set(metadata.filters.map((filter) => String(filter.filterId)));
+            localizedFilters = selectLocalizedFilters(localizations.filters, platformFilterIds);
         }
 
         const i18nMetadata = {
@@ -736,7 +719,7 @@ const writeFiltersMetadata = function (platformsPath, filtersDir, filtersMetadat
         let i18nGroups = localizations.groups;
 
         // no new fields should be added for old 'MAC' platform
-        if (platform === 'MAC') {
+        if (platform === MAC_V1_PLATFORM) {
             delete i18nMetadata.tags;
             i18nGroups = removeGroupDescriptions(localizations.groups);
         }

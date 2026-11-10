@@ -3,19 +3,14 @@ import typescript from '@rollup/plugin-typescript';
 
 export default {
     input: 'src/index.js',
-    output: [
-        {
-            file: 'dist/index.js',
-            format: 'esm',
-        },
-        {
-            file: 'dist/index.cjs',
-            format: 'cjs',
-            exports: 'auto',
-        },
-    ],
+    output: {
+        file: 'dist/index.js',
+        format: 'esm',
+    },
     plugins: [
-        typescript(),
+        // Test files are type-checked by `pnpm lint:types` (tsc), but their
+        // declarations must not ship in the npm package.
+        typescript({ exclude: ['test/**'] }),
         copy({
             targets: [
                 { src: 'schemas/*', dest: 'dist/schemas' },

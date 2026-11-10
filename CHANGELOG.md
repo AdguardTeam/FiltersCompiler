@@ -28,6 +28,100 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   network rule with `$domain=` and a later `]` is no longer mistaken for a
   cosmetic rule. Such rules are removed again on platforms that do not support
   their modifiers.
+- `cap_html_filtering` directive not working: the define was missing from the platforms configuration,
+  so rules inside `!#if (cap_html_filtering)` were dropped on every platform. It is now set for
+  Windows, Mac v2, Mac v3, Android and CLI [#270].
+
+### Security
+
+[#270]: https://github.com/AdguardTeam/FiltersCompiler/issues/270
+
+## [4.0.0] - 2026-11-06
+
+## [4.0.0-beta.0] - 2026-11-06
+
+### Added
+
+- `validateJSONSchema()` now accepts a `ValidateJSONSchemaOptions` object with
+  `localesPath`, `requiredLocales`, and `logPath`. Missing fields in existing
+  locale objects are filled with the base (`en`) value and logged as warnings.
+  With `logPath`, the warnings are appended to the specified file, which is
+  closed when validation finishes.
+
+### Changed
+
+- **Breaking:** `validateJSONSchema()` drops the `requiredFiltersAmount`
+  parameter. It only applied to `filters.json` files directly under
+  `platformsPath`, and platform metadata always lives in subdirectories, so
+  it was never enforced for real platform trees. The check did run when
+  `platformsPath` pointed at a single platform directory: callers that used
+  it that way need their own minimum-count check now. The FiltersRegistry
+  caller no longer passes it.
+- **Breaking:** `validateJSONSchema()` now requires the `options` argument.
+  The `filters_i18n` schema is generated at runtime from the platform's
+  `filters.json` and the FiltersRegistry `locales` directory instead of a
+  bundled static schema. The required entity IDs now match the filters that
+  the platform actually builds, and the required locales and English fallback
+  strings come from FiltersRegistry. Every locale directory in `localesPath`
+  is validated, even when `requiredLocales` contains a subset.
+- Updated [@adguard/filters-downloader] to v3.0.1. This version
+  removes the vulnerable `axios` dependency and uses native `fetch`.
+- **BREAKING:** `engines.node` is now `^22.21.0 || >=24.0.0`. Node.js
+  22.0–22.20 and 23.x are not supported.
+- **BREAKING:** Remote `!#include` downloads now use native `fetch`, which
+  changes transport behaviour:
+    - `HTTP_PROXY`, `HTTPS_PROXY`, and `NO_PROXY` are no longer used
+      automatically. Set `NODE_USE_ENV_PROXY=1` to enable them.
+    - `ALL_PROXY` is no longer used, even with `NODE_USE_ENV_PROXY=1`.
+      Set `HTTP_PROXY` or `HTTPS_PROXY` instead.
+- **BREAKING:** The package now ships a single ES module (`dist/index.js`)
+  instead of dual ESM + CJS builds. The `require` export condition resolves to
+  the ESM artifact via Node.js `require(ESM)`, and `dist/index.cjs` is no
+  longer published.
+
+### Removed
+
+- `schemas/filters_i18n.schema.json` (4.3 MB), its generation scripts, and the
+  hardcoded `filters-i18n-defaults.js` data. The npm package no longer contains
+  the root `filters_i18n` schema. The frozen `mac` and `mac_v2` schemas are
+  still shipped.
+- Hardcoded `SUPPORTED_LOCALES` and `NON_REQUIRED_FILTER_IDS` lists from the
+  schema generation scripts.
+
+### Fixed
+
+- `require('@adguard/filters-compiler')` failing with `MODULE_NOT_FOUND`.
+  Both `import` and `require` now load the same ESM artifact.
+- Stale and missing English defaults in the generated `filters_i18n` schema.
+  Groups, tags, and filters now use the current `locales/en` strings. Filters
+  25, 26, and 27 are now validated for non-legacy platforms; the frozen
+  `mac`/`mac_v2` schemas are unchanged.
+- For non-legacy platforms, `filters_i18n.json` now keeps only the filters
+  listed in `filters.json`: localizations without matching metadata are
+  dropped. The generator cannot add a missing localization, so a filter in
+  `filters.json` without a `filters_i18n.json` entry still fails validation.
+  The legacy `mac` and `mac_v2` platforms keep their current output.
+- Validation errors written to `logPath` are formatted as text instead of
+  `[object Object]`.
+- The validation log file is closed when `validateJSONSchema()` finishes, so a
+  later call without `logPath` does not append to it. The compiler logger also
+  closes the file when `initialize()` is called without a path.
+- `validateJSONSchema()` reports the path of a malformed JSON file instead of a
+  bare JSON parse error.
+- `validateJSONSchema()` logs a failed platform directory read as an error, not
+  as information.
+- The platform generator reports the path of a malformed locale file instead of
+  a bare JSON parse error, and names the file when its contents are not an
+  array of message objects.
+- The npm package no longer ships TypeScript declarations for the test suite
+  (`dist/types/test`).
+- The compiler no longer fails with `TypeError: filter.trim is not a function`
+  when a remote `!#include` response body looks like JSON. The downloader keeps
+  such a body as text, for example `[]` or `{"a":1}`.
+- The package no longer installs a global `unhandledRejection` process
+  listener on import. The listener leaked into the host process and could
+  crash it. Removing it is safe because Node.js already treats unhandled
+  rejections as uncaught exceptions by default.
 
 ### Security
 
@@ -1083,7 +1177,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [@adguard/tsurlfilter]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/tsurlfilter/CHANGELOG.md
 [@adguard/logger]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/logger/CHANGELOG.md
 
-[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.4.3...HEAD
+[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v4.0.0...HEAD
+[4.0.0]: https://github.com/AdguardTeam/FiltersCompiler/compare/v4.0.0-beta.0...v4.0.0
+[4.0.0-beta.0]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.4.3...v4.0.0-beta.0
 [3.4.3]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.4.2...v3.4.3
 [3.4.2]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.4.2-beta.1...v3.4.2
 [3.4.2-beta.1]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.4.1...v3.4.2-beta.1

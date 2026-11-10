@@ -21,7 +21,7 @@ running tests, and contributing code to the AdGuard Filters Compiler.
     - [Before Committing](#before-committing)
     - [Branching Strategy](#branching-strategy)
 - [Common Tasks](#common-tasks)
-    - [Updating JSON Schemas](#updating-json-schemas)
+    - [Updating the Filters Schema](#updating-the-filters-schema)
     - [Updating Scriptlets and Redirects](#updating-scriptlets-and-redirects)
     - [Building a Release](#building-a-release)
 - [Testing](#testing)
@@ -42,11 +42,11 @@ running tests, and contributing code to the AdGuard Filters Compiler.
 
 ### Required Tools
 
-| Tool                           | Version            | Notes                        |
-| ------------------------------ | ------------------ | ---------------------------- |
-| [Node.js](https://nodejs.org/) | 22                 | Use [nvm] to manage versions |
-| [pnpm](https://pnpm.io/)       | >=10.33.4 and <11  | Package manager              |
-| [Git](https://git-scm.com/)    | Latest             | Version control              |
+| Tool                           | Version              | Notes                        |
+| ------------------------------ | -------------------- | ---------------------------- |
+| [Node.js](https://nodejs.org/) | 22.21+ (22.x) or 24+ | Use [nvm] to manage versions |
+| [pnpm](https://pnpm.io/)       | >=10.33.4 and <11    | Package manager              |
+| [Git](https://git-scm.com/)    | Latest               | Version control              |
 
 > **Note**: Development is tested on macOS and Linux. Windows users should use
 > WSL or a virtual machine. The repository must still be checkable out on
@@ -80,7 +80,7 @@ pnpm install
 pnpm build
 ```
 
-Build output goes to `dist/` (ESM: `dist/index.js`, CJS: `dist/index.cjs`).
+Build output goes to `dist/` as a single ES module (`dist/index.js`).
 Rollup also copies JSON schemas and trust-level files into `dist/`.
 
 ### 4. Run Tests
@@ -108,7 +108,7 @@ pnpm lint
 | `pnpm lint:code`     | Run ESLint                                            |
 | `pnpm lint:types`    | Run TypeScript type checker (`tsc --noEmit`)          |
 | `pnpm lint:md`       | Lint markdown files                                   |
-| `pnpm build-schemas` | Regenerate JSON schemas from `tasks/build-schemas/`   |
+| `pnpm build-schemas` | Regenerate filters schema from `tasks/build-schemas/` |
 | `pnpm tgz`           | Pack release tarball (`filters-compiler.tgz`)         |
 
 > **Note**: `pnpm tgz` requires a temporary `version` field in
@@ -260,14 +260,22 @@ automatically.
 
 ## Common Tasks
 
-### Updating JSON Schemas
+### Updating the Filters Schema
 
-Schemas in `schemas/` are generated — **never edit them directly**. Edit the
-generation scripts in `tasks/build-schemas/` instead:
+`schemas/filters.schema.json` is generated — **never edit it directly**. Edit
+the generation scripts in `tasks/build-schemas/` instead:
 
 ```bash
 pnpm build-schemas
 ```
+
+For non-legacy platforms, the `filters_i18n` schema is not a repository file:
+`validateJSONSchema()` generates it at runtime from the platform's
+`filters.json` and the FiltersRegistry `locales` directory. Do not add filter,
+group, or tag text to the compiler. The generated-schema tests are in
+`test/filters-i18n-schema.test.ts`. The legacy `mac` and `mac_v2`
+platforms keep their frozen `filters_i18n.schema.json` files in `schemas/mac/`
+and `schemas/mac_v2/`.
 
 > **Important**: Legacy schemas in `schemas/mac/` and `schemas/mac_v2/` must not
 > be changed.
@@ -336,13 +344,16 @@ try {
 
 **Problem**: Build or tests fail with unexpected errors.
 
-**Solution**: Ensure you are using Node.js 22:
+**Solution**: Ensure you use a supported Node.js version. `package.json`
+declares `^22.21.0 || >=24.0.0`. The `require` entry point relies on
+`require(ESM)`, which Node.js enables by default from version 22.12, so every
+supported version can use both `import` and `require`:
 
 ```bash
-node --version  # Should be v22.x.x
+node --version  # Should be v22.21+ on 22.x, or v24+
 ```
 
-If using nvm:
+If using nvm, install the latest 22.x to match CI and the Docker image:
 
 ```bash
 nvm install 22
@@ -351,9 +362,9 @@ nvm use 22
 
 ### Schema Validation Errors After Manual Edit
 
-**Problem**: Tests fail after directly editing files in `schemas/`.
+**Problem**: Tests fail after directly editing `schemas/filters.schema.json`.
 
-**Solution**: Never edit schemas manually. Revert your changes and use the
+**Solution**: Never edit the schema manually. Revert your changes and use the
 generation scripts:
 
 ```bash
