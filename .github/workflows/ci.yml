@@ -24,14 +24,27 @@ jobs:
   # Dockerfile is pinned to `adguard/node-ssh:22.22--0` (no Node.js 24 image
   # exists) and the shared workflow has no Node-version input. Run the same
   # checks directly on a Node.js 24 toolchain instead, on the same runner.
+  #
+  # pnpm is installed through Corepack rather than `pnpm/action-setup`: the
+  # org Actions allowlist does not include that action, and a disallowed
+  # `uses:` makes GitHub reject the whole run at startup with no jobs.
   test-node24:
     name: Lint, test, build (Node.js 24)
     runs-on: team-extensions
+    env:
+      # Keep Corepack from adding a `packageManager` field to package.json.
+      COREPACK_ENABLE_AUTO_PIN: '0'
     steps:
       - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
         with:
-          version: 10.33.4
+          node-version: '24'
+      - name: Enable pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.33.4 --activate
+      # setup-node needs pnpm on PATH to configure the pnpm cache, so run it
+      # once more after Corepack has provided the shim.
       - uses: actions/setup-node@v6
         with:
           node-version: '24'
