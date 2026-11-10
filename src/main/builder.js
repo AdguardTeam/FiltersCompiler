@@ -258,8 +258,7 @@ const exclude = function (lines, exclusionsFile, excluded, previousLine = undefi
         const exclusion = isExcluded(line, exclusions, excluded, exclusionsFileName, canonicalLines);
 
         if (exclusion) {
-            const isHinted = Boolean(hintLine && hintLine.startsWith(RuleMasks.MASK_HINT));
-            if (isHinted) {
+            if (isHint(hintLine)) {
                 result.push(`${RuleMasks.MASK_COMMENT} [excluded by ${exclusion}] ${line}`);
             }
         } else {
