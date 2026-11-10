@@ -1,5 +1,6 @@
 import {
     AdblockSyntax,
+    CommentParser,
     RuleConverter,
     RuleParser,
     RuleGenerator,
@@ -47,7 +48,8 @@ export const convertRulesToAdgSyntax = (rulesList, excluded = [], invalidRules =
         const rule = rulesList[i];
         const hintLine = i > 0 ? rulesList[i - 1] : previousLine;
 
-        if (!rule.startsWith(RuleMasks.MASK_COMMENT) && hasHint(hintLine, NOT_CONVERT_HINT)) {
+        // An empty line or a `#` comment is not a rule, so the hint must not keep it as-is.
+        if (rule && !CommentParser.isCommentRule(rule) && hasHint(hintLine, NOT_CONVERT_HINT)) {
             const message = `Rule "${rule}" is kept as-is due to the NOT_CONVERT hint`;
             logger.info(message);
             excludeRule(rule, excluded, message);

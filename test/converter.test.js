@@ -134,6 +134,26 @@ describe('converter', () => {
             expect(excluded).toEqual([]);
         });
 
+        it('does not keep an empty line as is', () => {
+            const excluded = [];
+            const result = convertRulesToAdgSyntax(['!+ NOT_CONVERT', ''], excluded);
+
+            expect(result[0]).toBe('!+ NOT_CONVERT');
+            expect(result[1]).toBe('');
+            expect(excluded).toEqual([]);
+        });
+
+        it('converts a `#` comment instead of keeping it as is', () => {
+            const excluded = [];
+            const result = convertRulesToAdgSyntax(['!+ NOT_CONVERT', '# comment'], excluded);
+
+            expect(result[0]).toBe('!+ NOT_CONVERT');
+            expect(result[1]).toBe('! # comment');
+            expect(excluded).toHaveLength(2);
+            expect(excluded[0]).toContain('converted to: "! # comment"');
+            expect(excluded[1]).toBe('# comment');
+        });
+
         it('does not apply the hint to a rule after a comment', () => {
             const result = convertRulesToAdgSyntax(['!+ NOT_CONVERT', '! ordinary comment', rule]);
             expect(result[0]).toBe('!+ NOT_CONVERT');
