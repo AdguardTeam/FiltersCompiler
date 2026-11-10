@@ -142,7 +142,7 @@ unchanged.
 
 #### Writing Tests in TypeScript
 
-Create test files as `test/*.test.ts`. Vitest discovers both `.test.js` and
+Create test files as `test/**/*.test.ts`. Vitest discovers both `.test.js` and
 `.test.ts` files automatically.
 
 #### Policy
@@ -314,7 +314,7 @@ pnpm test
 
 - **Framework**: Vitest with node environment
 - **Config**: `vitest.config.js`
-- **Test files**: `test/*.test.{js,ts}`
+- **Test files**: `test/**/*.test.{js,ts}`
 
 ### Test Resources
 
