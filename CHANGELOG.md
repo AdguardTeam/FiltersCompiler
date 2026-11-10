@@ -20,6 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `cap_html_filtering` directive not working: the define was missing from the platforms configuration,
   so rules inside `!#if (cap_html_filtering)` were dropped on every platform. It is now set for
   Windows, Mac v2, Mac v3, Android and CLI [#270].
+- A remote `!#include` in a filter template now resolves. If a remote include
+  cannot be resolved, the build fails with an error that names the include URL
+  and the reason instead of silently dropping the directive.
 
 ### Security
 

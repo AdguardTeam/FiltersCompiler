@@ -8,12 +8,15 @@ import {
     beforeAll,
     afterAll,
     beforeEach,
+    afterEach,
     vi,
 } from 'vitest';
 import http from 'node:http';
 import path from 'node:path';
+import fs from 'node:fs';
+import os from 'node:os';
 
-import { include } from '../src/main/builder';
+import { build, include } from '../src/main/builder';
 import { downloadFile } from '../src/main/utils/webutils';
 
 vi.mock('../src/main/utils/webutils', () => ({
@@ -119,5 +122,83 @@ describe('remote !#include in an @include body', () => {
         await expect(include(__dirname, `@include "${parentUrl}"`, []))
             .rejects
             .toThrow(/Failed to resolve the include directive.*\b401\b/s);
+    });
+});
+
+describe('remote !#include in a filter template', () => {
+    const FILTER_DIR_NAME = 'filter_1_RemoteInclude';
+
+    let server;
+    let remoteBaseUrl;
+    let filtersDir;
+    let filterDir;
+
+    const createFilter = (templateContent) => {
+        filtersDir = fs.mkdtempSync(path.join(os.tmpdir(), 'remote-includes-'));
+        filterDir = path.join(filtersDir, FILTER_DIR_NAME);
+        fs.mkdirSync(filterDir);
+        fs.writeFileSync(path.join(filterDir, 'template.txt'), templateContent);
+        fs.writeFileSync(path.join(filterDir, 'metadata.json'), JSON.stringify({
+            filterId: 1,
+            name: 'Remote Include Test Filter',
+            description: 'Remote include test filter',
+            timeAdded: 1404115015843,
+            homepage: 'https://example.org/',
+            expires: '2 days',
+            displayNumber: 101,
+            groupId: 2,
+            subscriptionUrl: 'https://example.org/filter.txt',
+            tags: ['purpose:ads'],
+            trustLevel: 'low',
+        }));
+    };
+
+    beforeAll(async () => {
+        server = http.createServer((req, res) => {
+            if (req.url === '/rules.txt') {
+                res.writeHead(200, { 'Content-Type': 'text/plain' });
+                res.end(REMOTE_RULE);
+                return;
+            }
+
+            res.writeHead(404, { 'Content-Type': 'text/plain' });
+            res.end('Not Found');
+        });
+
+        await new Promise((resolve) => {
+            server.listen(0, '127.0.0.1', resolve);
+        });
+
+        const { port } = server.address();
+        remoteBaseUrl = `http://127.0.0.1:${port}`;
+    });
+
+    afterAll(async () => {
+        await new Promise((resolve) => {
+            server.close(resolve);
+        });
+    });
+
+    afterEach(() => {
+        if (filtersDir) {
+            fs.rmSync(filtersDir, { recursive: true, force: true });
+        }
+    });
+
+    it('resolves an absolute remote !#include from template.txt', async () => {
+        createFilter(`! Title: Remote Include Test\n!#include ${remoteBaseUrl}/rules.txt\n`);
+
+        await build(filtersDir, null, null, null, {}, null, null);
+
+        const filterContent = fs.readFileSync(path.join(filterDir, 'filter.txt'), 'utf8');
+        expect(filterContent.split(/\r?\n/)).toContain(REMOTE_RULE);
+    });
+
+    it('rejects when a remote !#include from template.txt returns 404', async () => {
+        createFilter(`! Title: Remote Include Test\n!#include ${remoteBaseUrl}${MISSING_INCLUDE_PATH}\n`);
+
+        await expect(build(filtersDir, null, null, null, {}, null, null))
+            .rejects
+            .toThrow(new RegExp(`${MISSING_INCLUDE_PATH}.*\\b404\\b`, 's'));
     });
 });

@@ -22,6 +22,7 @@ import { RuleMasks } from '../rule/rule-masks';
 import { LEGACY_PLATFORMS, MAC_V1_PLATFORM, MAC_V2_PLATFORM } from '../platforms-config';
 import { ENTITY_KINDS, KEY_PREFIXES, parseLocaleMessages } from '../utils/locale-messages';
 import { readJsonOrNull } from '../utils/read-json';
+import { resolveIncludes } from '../utils/include-resolver';
 import {
     FILTERS_I18N_METADATA_FILE_JS,
     FILTERS_I18N_METADATA_FILE_JSON,
@@ -1002,7 +1003,7 @@ const buildFilter = async (filterDir, platformsPath, includedFilterIds, excluded
         // if there is a bad include after resolving conditions, the generator should be terminated
         // https://github.com/AdguardTeam/FiltersCompiler/issues/84
         // eslint-disable-next-line no-await-in-loop
-        rules = await FiltersDownloader.resolveIncludes(rules, filterDir, config.defines);
+        rules = await resolveIncludes(rules, filterDir, config.defines);
 
         rules = cleanupRules(rules, config, filterId);
         rules = removeRuleDuplicates(rules);

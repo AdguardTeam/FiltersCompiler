@@ -15,6 +15,7 @@ import { fixVersionComments, removeAdblockVersion } from './utils/workaround';
 import { downloadFile } from './utils/webutils';
 import { getFilterIdFromDirName } from './utils/utils';
 import { optimizeDomainBlockingRules } from './utils/builder-utils';
+import { RemoteIncludeError, resolveIncludes } from './utils/include-resolver';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -381,7 +382,7 @@ export const include = async (filterDir, directiveLine, excluded) => {
             ? FiltersDownloader.getFilterUrlOrigin(url)
             : filterDir;
 
-        includedLines = await FiltersDownloader.resolveIncludes(includedLines, originUrl);
+        includedLines = await resolveIncludes(includedLines, originUrl);
 
         includedLines = removeAdblockVersion(includedLines);
 
@@ -445,15 +446,19 @@ export const include = async (filterDir, directiveLine, excluded) => {
  * @throws {Error} Throws an error if unable to resolve `!#include` directives.
  */
 const getResolvedPreprocessorIncludes = async function (filterDir, filterName, lines) {
-    let rules = lines;
-    // bad includes are ignored here because they'll be handled in generator after resolving conditions
-    // https://github.com/AdguardTeam/FiltersCompiler/issues/84
     try {
-        rules = await FiltersDownloader.resolveIncludes(lines, filterDir);
+        return await resolveIncludes(lines, filterDir);
     } catch (e) {
+        // remote includes must fail the build: an unresolved directive would be
+        // dropped by the converter and never reach the generator
+        if (e instanceof RemoteIncludeError) {
+            throw new Error(`Error resolving includes in ${filterName}: ${e.message}`, { cause: e });
+        }
+        // bad local includes are ignored here because they'll be handled in generator after resolving conditions
+        // https://github.com/AdguardTeam/FiltersCompiler/issues/84
         logger.error(`Error resolving includes in ${filterName}: ${e.message}`);
+        return lines;
     }
-    return rules;
 };
 
 /**
