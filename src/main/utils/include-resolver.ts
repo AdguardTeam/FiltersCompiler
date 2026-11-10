@@ -12,6 +12,11 @@ const INCLUDE_DIRECTIVE = '!#include';
 const ABSOLUTE_EXTERNAL_URL = /^(?!file)[a-z]+:\/\//i;
 
 /**
+ * Absolute URL with a scheme. Used to detect a remote default origin.
+ */
+const ABSOLUTE_URL = /^[a-z]+:\/\//i;
+
+/**
  * Userinfo component of an URL, used to keep credentials out of error messages.
  */
 const URL_CREDENTIALS = /\/\/[^/?#@]+@/;
@@ -68,10 +73,11 @@ export const getRemoteIncludeUrl = (line: string): string | null => {
 /**
  * Resolves preprocessor `!#include` directives.
  *
- * An absolute external include uses its own origin, so the include validation
- * accepts it and relative nested includes resolve against the remote directory.
- * All other lines use the default origin, so local and relative includes keep
- * their existing behavior.
+ * When the default origin is a local path, an absolute external include uses
+ * its own origin, so the include validation accepts it and relative nested
+ * includes resolve against the remote directory. All other lines use the
+ * default origin. When the default origin is a remote URL, the directives are
+ * delegated unchanged, so the downloader keeps its same-origin validation.
  *
  * @param lines Lines with rules and preprocessor directives.
  * @param defaultOrigin Origin for local and relative includes.
@@ -79,13 +85,17 @@ export const getRemoteIncludeUrl = (line: string): string | null => {
  *
  * @returns Resolved lines in the original order.
  *
- * @throws {RemoteIncludeError} If a remote include cannot be resolved.
+ * @throws {RemoteIncludeError} If a local-path remote include cannot be resolved.
  */
 export const resolveIncludes = async (
     lines: string[],
     defaultOrigin: string,
     definedExpressions?: DefinedExpressions,
 ): Promise<string[]> => {
+    if (ABSOLUTE_URL.test(defaultOrigin)) {
+        return FiltersDownloader.resolveIncludes(lines, defaultOrigin, definedExpressions);
+    }
+
     let result: string[] = [];
     let batch: string[] = [];
 

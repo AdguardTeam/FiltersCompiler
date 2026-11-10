@@ -123,6 +123,14 @@ describe('remote !#include in an @include body', () => {
             .rejects
             .toThrow(/Failed to resolve the include directive.*\b401\b/s);
     });
+
+    it('rejects an absolute nested !#include from another origin', async () => {
+        downloadFile.mockResolvedValue('!#include http://other.example/rules.txt');
+
+        await expect(include(__dirname, `@include "${parentUrl}"`, []))
+            .rejects
+            .toThrow(/Include url is rejected with origin/);
+    });
 });
 
 describe('remote !#include in a filter template', () => {
