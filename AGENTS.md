@@ -83,6 +83,7 @@ The library exposes four public API functions: `compile`, `validateJSONSchema`,
 │           ├── concurrent.ts          # Bounded-concurrency task runner
 │           ├── version.ts             # Version parsing and incrementing
 │           ├── webutils.ts            # HTTP download via curl
+│           ├── url.ts                 # URL credential stripping for logs and errors
 │           ├── workaround.js          # Platform-specific hacks and workarounds
 │           ├── utils.js               # General utility functions
 │           └── trust-levels/          # Filter-list trust-level exclusion files

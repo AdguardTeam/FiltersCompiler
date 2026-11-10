@@ -23,6 +23,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+- Removed credentials from `@include` URLs in log messages and error
+  messages.
+
 [#270]: https://github.com/AdguardTeam/FiltersCompiler/issues/270
 
 ## [4.0.0] - 2026-11-06

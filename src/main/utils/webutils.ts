@@ -1,6 +1,7 @@
 import { createRequire } from 'module';
 
 import { logger } from './log';
+import { stripUrlCredentials, stripUrlCredentialsFromText } from './url';
 
 const require = createRequire(import.meta.url);
 
@@ -33,6 +34,32 @@ const tryDownloadFile = async function (url: string, retryNum = 0) {
 };
 
 /**
+ * Removes URL credentials from an error message and stack.
+ *
+ * A failed `execFileSync` call includes the full `curl` command line in the
+ * error text, so the error can contain the URL with credentials.
+ *
+ * @param error Error or value to sanitize.
+ *
+ * @returns Sanitized error or value.
+ */
+const sanitizeError = (error: unknown): unknown => {
+    if (error instanceof Error) {
+        error.message = stripUrlCredentialsFromText(error.message);
+        if (error.stack) {
+            error.stack = stripUrlCredentialsFromText(error.stack);
+        }
+        return error;
+    }
+
+    if (typeof error === 'string') {
+        return stripUrlCredentialsFromText(error);
+    }
+
+    return error;
+};
+
+/**
  * Number of times to retry downloading after the first failed attempt for `downloadFile` function.
  */
 export const RETRY_NUM = 5;
@@ -44,7 +71,7 @@ export const RETRY_NUM = 5;
  * @returns raw content of the file
  */
 export const downloadFile = async (url: string) => {
-    logger.info(`Downloading: ${url}`);
+    logger.info(`Downloading: ${stripUrlCredentials(url)}`);
 
     // 5 times to retry after first fail attempt:
     // 1 sec for first time, double for every forthcoming attempts
@@ -54,8 +81,12 @@ export const downloadFile = async (url: string) => {
     try {
         return await tryDownloadFile(url);
     } catch (e) {
-        logger.warn(e);
-        logger.warn(`Retry downloading: ${url}`);
-        return tryDownloadFile(url, RETRY_NUM);
+        logger.warn(sanitizeError(e));
+        logger.warn(`Retry downloading: ${stripUrlCredentials(url)}`);
+        try {
+            return await tryDownloadFile(url, RETRY_NUM);
+        } catch (retryError) {
+            throw sanitizeError(retryError);
+        }
     }
 };

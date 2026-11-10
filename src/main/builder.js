@@ -13,6 +13,7 @@ import { skipFilter, addFilter, create } from './utils/report';
 import { RuleMasks } from './rule/rule-masks';
 import { fixVersionComments, removeAdblockVersion } from './utils/workaround';
 import { downloadFile } from './utils/webutils';
+import { stripUrlCredentials, stripUrlCredentialsFromText } from './utils/url';
 import { getFilterIdFromDirName } from './utils/utils';
 import { optimizeDomainBlockingRules } from './utils/builder-utils';
 
@@ -331,7 +332,9 @@ const checkRedirects = function (lines, url) {
     // eslint-disable-next-line no-restricted-syntax
     for (const line of lines) {
         if (/^!\s?[Rr]edirect:/.test(line)) {
-            throw new Error(`Error: include ${url} contains redirect directive: ${line}`);
+            throw new Error(stripUrlCredentialsFromText(
+                `Error: include ${url} contains redirect directive: ${line}`,
+            ));
         }
     }
 };
@@ -363,7 +366,7 @@ export const include = async (filterDir, directiveLine, excluded) => {
         return includedLines;
     }
 
-    logger.info(`Applying inclusion from: ${url}`);
+    logger.info(`Applying inclusion from: ${stripUrlCredentials(url)}`);
 
     const externalInclude = url.includes(':');
 
@@ -409,7 +412,7 @@ export const include = async (filterDir, directiveLine, excluded) => {
                 case IGNORE_TRUST_LEVEL_OPTION:
                     if (externalInclude) {
                         // eslint-disable-next-line max-len
-                        throw new Error(`Trust level ignoring option is not supported for external includes: ${directiveLine}`);
+                        throw new Error(stripUrlCredentialsFromText(`Trust level ignoring option is not supported for external includes: ${directiveLine}`));
                     }
                     shouldIgnoreTrustLevel = true;
                     break;
@@ -420,7 +423,7 @@ export const include = async (filterDir, directiveLine, excluded) => {
 
         includedLines = fixVersionComments(includedLines);
     } else {
-        throw new Error(`Error handling include from: ${options.url}`);
+        throw new Error(`Error handling include from: ${stripUrlCredentials(url)}`);
     }
 
     logger.info(`Inclusion lines: ${includedLines.length}`);
@@ -451,7 +454,7 @@ const getResolvedPreprocessorIncludes = async function (filterDir, filterName, l
     try {
         rules = await FiltersDownloader.resolveIncludes(lines, filterDir);
     } catch (e) {
-        logger.error(`Error resolving includes in ${filterName}: ${e.message}`);
+        logger.error(stripUrlCredentialsFromText(`Error resolving includes in ${filterName}: ${e.message}`));
     }
     return rules;
 };
@@ -550,9 +553,13 @@ const compile = async function (filterDir, filterName, templateContent, trustLev
             );
 
             if (shouldIgnoreTrustLevel) {
-                logger.info(`Ignoring trust level for ${filterName} due to @include directive: ${line}`);
+                logger.info(stripUrlCredentialsFromText(
+                    `Ignoring trust level for ${filterName} due to @include directive: ${line}`,
+                ));
             } else {
-                logger.info(`Applying trust-level exclusions to ${filterName} @include directive: ${line}`);
+                logger.info(stripUrlCredentialsFromText(
+                    `Applying trust-level exclusions to ${filterName} @include directive: ${line}`,
+                ));
                 includedRules = exclude(includedRules, trustLevelSettings, excluded);
             }
 
