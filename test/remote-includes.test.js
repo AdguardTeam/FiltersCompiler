@@ -194,6 +194,16 @@ describe('remote !#include in a filter template', () => {
         expect(filterContent.split(/\r?\n/)).toContain(REMOTE_RULE);
     });
 
+    it('resolves an absolute remote !#include in a local @include body', async () => {
+        createFilter('! Title: Remote Include Test\n@include "body.txt"\n');
+        fs.writeFileSync(path.join(filterDir, 'body.txt'), `!#include ${remoteBaseUrl}/rules.txt\n`);
+
+        await build(filtersDir, null, null, null, {}, null, null);
+
+        const filterContent = fs.readFileSync(path.join(filterDir, 'filter.txt'), 'utf8');
+        expect(filterContent.split(/\r?\n/)).toContain(REMOTE_RULE);
+    });
+
     it('rejects when a remote !#include from template.txt returns 404', async () => {
         createFilter(`! Title: Remote Include Test\n!#include ${remoteBaseUrl}${MISSING_INCLUDE_PATH}\n`);
 
