@@ -454,6 +454,7 @@ describe('platforms filter', () => {
             '[$url=||example.com/?app=1]##.ad',
             '[$url=||example.com/?protobuf=1]##.ad',
             '[$path =/x?app=1]##.ad',
+            '[$path]example.com##.content',
             '[$domain=example.com]#@#.textad',
         ];
         const removedRules = [

@@ -28,6 +28,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   network rule with `$domain=` and a later `]` is no longer mistaken for a
   cosmetic rule. Such rules are removed again on platforms that do not support
   their modifiers.
+- A valueless non-basic modifier list such as `[$path]example.com##.content`
+  is no longer treated as having no list, so the rule is not dropped by the
+  modifier patterns that scan the rest of the line.
 - `cap_html_filtering` directive not working: the define was missing from the platforms configuration,
   so rules inside `!#if (cap_html_filtering)` were dropped on every platform. It is now set for
   Windows, Mac v2, Mac v3, Android and CLI [#270].

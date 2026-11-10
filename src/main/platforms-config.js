@@ -92,7 +92,7 @@ const HTML_FILTERING_MODIFIER_PATTERNS = [
  * `$domain`, `$path`, and `$url`. The fragment only matches a list at the start
  * of a rule: a network rule can also contain `$domain=` followed by a `]` in a
  * later modifier value, and must not be mistaken for a cosmetic rule.
- * Whitespace before `=` is tolerated, as the parser accepts it.
+ * A list can have no value or whitespace before `=`, as the parser allows both.
  *
  * The modifier patterns below reuse this fragment to skip the `$` that opens a
  * `$path`, `$domain`, or `$url` list. Otherwise the `$app` pattern starts there
@@ -104,8 +104,10 @@ const HTML_FILTERING_MODIFIER_PATTERNS = [
  * ```[$url=||example.com/?app=1]##.ad```
  * @example
  * ```[$path =/x]e.com##.a```
+ * @example
+ * ```[$path]example.com##.content```
  */
-const NON_BASIC_MODIFIER_LIST_GUARD = '(?<=^\\[\\$)(path|domain|url)\\s*=.*]';
+const NON_BASIC_MODIFIER_LIST_GUARD = '(?<=^\\[\\$)(path|domain|url)\\b.*]';
 
 /**
  * Pattern to check if rule contains `$protobuf` modifier
