@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `cap_html_filtering` directive not working: the define was missing from the platforms configuration,
   so rules inside `!#if (cap_html_filtering)` were dropped on every platform. It is now set for
-  Windows, Mac v2, Mac v3, Android and CLI [#270].
+  Windows, Mac v2, Mac v3, Android, FireFox, CLI [#270].
 
 ### Security
 
@@ -111,8 +111,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   listener on import. The listener leaked into the host process and could
   crash it. Removing it is safe because Node.js already treats unhandled
   rejections as uncaught exceptions by default.
-
-### Security
 
 ## [3.4.3] - 2026-10-21
 
