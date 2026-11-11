@@ -17,8 +17,8 @@ import { skipRuleWithOptimization } from '../optimization';
 const HINT_MASK = `${RuleMasks.MASK_HINT} `;
 const COMMENT_REGEXP = '^\\!($|[^#])';
 
-const PLATFORM_HINT_REGEXP = /(^| )PLATFORM\(([^)]+)\)/g;
-const NOT_PLATFORM_HINT_REGEXP = /(^| )NOT_PLATFORM\(([^)]+)\)/g;
+const PLATFORM_HINT_REGEXP = /(^|\s)PLATFORM\(([^)]+)\)/g;
+const NOT_PLATFORM_HINT_REGEXP = /(^|\s)NOT_PLATFORM\(([^)]+)\)/g;
 
 const NOT_OPTIMIZED_HINT = 'NOT_OPTIMIZED';
 

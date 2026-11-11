@@ -68,6 +68,27 @@ describe('platforms filter', () => {
         expect(clean('ios')).toEqual(['!+ NOT_PLATFORM(corelibs)', 'not corelibs']);
     });
 
+    it('Test tab-separated hint clauses', () => {
+        const rule = 'rule';
+        const clean = (hint, platform) => cleanupRules([hint, rule], {
+            platform,
+            path: platform,
+            configuration: { removeRulePatterns: false, ignoreRuleHints: false },
+        }, 0);
+
+        const notPlatformHint = '!+ NOT_PLATFORM(windows)\tNOT_PLATFORM(android)';
+
+        expect(clean(notPlatformHint, 'windows')).toEqual([]);
+        expect(clean(notPlatformHint, 'android')).toEqual([]);
+        expect(clean(notPlatformHint, 'mac')).toEqual([notPlatformHint, rule]);
+
+        const platformHint = '!+ PLATFORM(windows)\tPLATFORM(android)';
+
+        expect(clean(platformHint, 'windows')).toEqual([platformHint, rule]);
+        expect(clean(platformHint, 'android')).toEqual([platformHint, rule]);
+        expect(clean(platformHint, 'mac')).toEqual([]);
+    });
+
     it('Test optimization hints', () => {
         const config = {
             'platform': 'test',
@@ -438,5 +459,26 @@ describe('platforms filter', () => {
 
         expect(after).toBeDefined();
         expect(after).toEqual(notMatchRules);
+    });
+
+    it('Test tab-separated hint clauses', () => {
+        const rule = 'rule';
+        const clean = (hint, platform) => cleanupRules([hint, rule], {
+            platform,
+            path: platform,
+            configuration: { removeRulePatterns: false, ignoreRuleHints: false },
+        }, 0);
+
+        const notPlatformHint = '!+ NOT_PLATFORM(windows)\tNOT_PLATFORM(android)';
+
+        expect(clean(notPlatformHint, 'windows')).toEqual([]);
+        expect(clean(notPlatformHint, 'android')).toEqual([]);
+        expect(clean(notPlatformHint, 'mac')).toEqual([notPlatformHint, rule]);
+
+        const platformHint = '!+ PLATFORM(windows)\tPLATFORM(android)';
+
+        expect(clean(platformHint, 'windows')).toEqual([platformHint, rule]);
+        expect(clean(platformHint, 'android')).toEqual([platformHint, rule]);
+        expect(clean(platformHint, 'mac')).toEqual([]);
     });
 });
