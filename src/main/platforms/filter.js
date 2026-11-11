@@ -24,12 +24,12 @@ const NOT_OPTIMIZED_HINT = 'NOT_OPTIMIZED';
 
 /**
  * Platform hint aliases, each of which stands for several platforms,
- * e.g. `!+ PLATFORM(apps_corelibs)` is the same as `!+ PLATFORM(windows, mac, cli, android)`.
+ * e.g. `!+ PLATFORM(corelibs)` is the same as `!+ PLATFORM(windows, mac, cli, android)`.
  *
- * `apps_corelibs` matches all CoreLibs-based apps.
+ * `corelibs` matches all CoreLibs-based apps.
  */
 const PLATFORM_HINT_ALIASES = {
-    apps_corelibs: ['windows', 'mac', 'cli', 'android'],
+    corelibs: ['windows', 'mac', 'cli', 'android'],
 };
 
 /**

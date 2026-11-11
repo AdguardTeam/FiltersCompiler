@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `apps_corelibs` directive and hint alias matching all CoreLibs-based apps (Windows, Mac, Android and CLI) [#272]
+- `adguard_corelibs` directive and `corelibs` hint alias matching all CoreLibs-based apps (Windows, Mac,
+  Android and CLI) [#272]
 
 ### Changed
 

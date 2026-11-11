@@ -21,18 +21,18 @@ describe('production platformsConfig defines', () => {
             },
         );
     });
-    describe('apps_corelibs', () => {
+    describe('adguard_corelibs', () => {
         it.each(CORELIBS_PLATFORMS)(
             'defines for %s, which support CoreLibs',
             (name) => {
-                expect(platformsConfig[name].defines.apps_corelibs).toBe(true);
+                expect(platformsConfig[name].defines.adguard_corelibs).toBe(true);
             },
         );
 
         it.each(Object.keys(platformsConfig).filter((name) => !CORELIBS_PLATFORMS.includes(name)))(
             'does not define for %s, which do not support CoreLibs',
             (name) => {
-                expect(platformsConfig[name].defines.apps_corelibs).toBeUndefined();
+                expect(platformsConfig[name].defines.adguard_corelibs).toBeUndefined();
             },
         );
     });
