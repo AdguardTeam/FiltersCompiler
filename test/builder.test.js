@@ -1435,6 +1435,14 @@ describe('check include directive function', () => {
             include(path.dirname(__filename), actual, []),
         ).rejects.toThrow(/Trust level ignoring option is not supported for external includes/);
     });
+
+    it('reports the include path for a missing local @include', async () => {
+        const missingInclude = 'non-existing-local.txt';
+
+        await expect(
+            include(__dirname, `@include ${missingInclude}`, []),
+        ).rejects.toThrow(`Error handling include from: ${missingInclude}`);
+    });
 });
 
 describe('apply platformsExcluded directive during limited filters list build', () => {
