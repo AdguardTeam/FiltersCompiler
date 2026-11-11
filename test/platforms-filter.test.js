@@ -6,6 +6,7 @@ import {
 } from 'vitest';
 
 import { cleanupAndOptimizeRules, cleanupRules } from '../src/main/platforms/filter';
+import { platformsConfig } from '../src/main/platforms-config';
 
 // Mock log to hide error messages
 vi.mock('../src/main/utils/log');
@@ -49,7 +50,7 @@ describe('platforms filter', () => {
         expect(after.indexOf('invalid_hint')).toBeGreaterThanOrEqual(0);
     });
 
-    it('Test corelibs hint alias', () => {
+    it('Test whether corelibs hint alias items match the adguard_corelibs directive', () => {
         const rules = [
             '!+ PLATFORM(corelibs)',
             'corelibs only',
@@ -62,10 +63,45 @@ describe('platforms filter', () => {
             configuration: { removeRulePatterns: false, ignoreRuleHints: false },
         }, 0);
 
-        ['windows', 'mac', 'cli', 'android'].forEach((platform) => {
+        const configs = Object.values(platformsConfig);
+        const corelibsPlatforms = [...new Set(
+            configs.filter((config) => config.defines.adguard_corelibs).map((config) => config.platform),
+        )];
+        const nonCorelibsPlatforms = configs.map((config) => config.platform)
+            .filter((platform) => !corelibsPlatforms.includes(platform));
+
+        expect(corelibsPlatforms.toSorted()).toEqual(['android', 'cli', 'mac', 'windows']);
+
+        corelibsPlatforms.forEach((platform) => {
             expect(clean(platform)).toEqual(['!+ PLATFORM(corelibs)', 'corelibs only']);
         });
-        expect(clean('ios')).toEqual(['!+ NOT_PLATFORM(corelibs)', 'not corelibs']);
+        nonCorelibsPlatforms.forEach((platform) => {
+            expect(clean(platform)).toEqual(['!+ NOT_PLATFORM(corelibs)', 'not corelibs']);
+        });
+    });
+
+    it('Test multiple NOT_PLATFORM clauses with different orderings', () => {
+        const rule = 'rule';
+        const clean = (hint, platform) => cleanupRules([hint, rule], {
+            platform,
+            path: platform,
+            configuration: { removeRulePatterns: false, ignoreRuleHints: false },
+        }, 0);
+
+        const ordered = '!+ NOT_PLATFORM(windows) NOT_PLATFORM(android)';
+        const reversed = '!+ NOT_PLATFORM(android) NOT_PLATFORM(windows)';
+
+        [ordered, reversed].forEach((hint) => {
+            expect(clean(hint, 'windows')).toEqual([]);
+            expect(clean(hint, 'android')).toEqual([]);
+            expect(clean(hint, 'mac')).toEqual([hint, rule]);
+        });
+
+        const aliased = '!+ NOT_PLATFORM(corelibs) NOT_PLATFORM(ios)';
+
+        expect(clean(aliased, 'windows')).toEqual([]);
+        expect(clean(aliased, 'ios')).toEqual([]);
+        expect(clean(aliased, 'ext_ff')).toEqual([aliased, rule]);
     });
 
     it('Test tab-separated hint clauses', () => {
@@ -87,6 +123,22 @@ describe('platforms filter', () => {
         expect(clean(platformHint, 'windows')).toEqual([platformHint, rule]);
         expect(clean(platformHint, 'android')).toEqual([platformHint, rule]);
         expect(clean(platformHint, 'mac')).toEqual([]);
+    });
+
+    it('Test Object.prototype names in platform hints are handled safely', () => {
+        const rule = 'rule';
+        const clean = (hint) => cleanupRules([hint, rule], {
+            platform: 'test',
+            path: 'test',
+            configuration: { removeRulePatterns: false, ignoreRuleHints: false },
+        }, 0);
+
+        ['constructor', 'toString', '__proto__'].forEach((name) => {
+            expect(() => clean(`!+ PLATFORM(${name})`)).not.toThrow();
+            expect(() => clean(`!+ NOT_PLATFORM(${name})`)).not.toThrow();
+            expect(clean(`!+ PLATFORM(${name})`)).toEqual([]);
+            expect(clean(`!+ NOT_PLATFORM(${name})`)).toEqual([`!+ NOT_PLATFORM(${name})`, rule]);
+        });
     });
 
     it('Test optimization hints', () => {
@@ -459,26 +511,5 @@ describe('platforms filter', () => {
 
         expect(after).toBeDefined();
         expect(after).toEqual(notMatchRules);
-    });
-
-    it('Test tab-separated hint clauses', () => {
-        const rule = 'rule';
-        const clean = (hint, platform) => cleanupRules([hint, rule], {
-            platform,
-            path: platform,
-            configuration: { removeRulePatterns: false, ignoreRuleHints: false },
-        }, 0);
-
-        const notPlatformHint = '!+ NOT_PLATFORM(windows)\tNOT_PLATFORM(android)';
-
-        expect(clean(notPlatformHint, 'windows')).toEqual([]);
-        expect(clean(notPlatformHint, 'android')).toEqual([]);
-        expect(clean(notPlatformHint, 'mac')).toEqual([notPlatformHint, rule]);
-
-        const platformHint = '!+ PLATFORM(windows)\tPLATFORM(android)';
-
-        expect(clean(platformHint, 'windows')).toEqual([platformHint, rule]);
-        expect(clean(platformHint, 'android')).toEqual([platformHint, rule]);
-        expect(clean(platformHint, 'mac')).toEqual([]);
     });
 });
