@@ -40,6 +40,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Only the last `NOT_PLATFORM()` clause in a rule hint was applied, so
   `!+ NOT_PLATFORM(windows) NOT_PLATFORM(android)` still kept the rule on Windows. Every
   `NOT_PLATFORM()` clause in the hint is now honored.
+- The hint separator pattern now matches `\s` instead of a space, so the second clause in
+  `!+ NOT_PLATFORM(windows)\tNOT_PLATFORM(android)` is no longer ignored.
 
 ### Security
 
