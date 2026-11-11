@@ -307,6 +307,12 @@ Public API layer.
   the linter (see [style guide][code-guidelines]).
 - **ES module syntax**: Always use `import`/`export` (`"type": "module"` in
   `package.json`).
+- **Platform rule patterns**: When a platform supports none of a rule
+  category, match its single anchored prefix (for example `^\[\$` for the
+  non-basic modifier list) instead of enumerating member names. An enumeration
+  misses variants that the parser accepts, such as whitespace around `=`.
+- **Shared regex fragments**: One fragment, one constant. Define a reused
+  fragment once as a named constant and interpolate it everywhere.
 - **TypeScript for new code**: New source files should be written in TypeScript
   (`.ts`) under `src/`. Existing `.js` files are not migrated yet.
 

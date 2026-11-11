@@ -32,10 +32,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   platform, were converted to `##+js(trusted-set-cookie, ...)`. The prefix is
   now stripped before the trusted-scriptlet check, and `exclusions-high.txt`
   lists the `ubo-trusted-` spellings.
-- `cap_html_filtering` directive not working: the define was missing from the
-  platforms configuration, so rules inside `!#if (cap_html_filtering)` were
-  dropped on every platform. It is now set for Windows, Mac v2, Mac v3, Android
-  and CLI [#270].
+- `cap_html_filtering` directive not working: the define was missing from the platforms configuration,
+  so rules inside `!#if (cap_html_filtering)` were dropped on every platform. It is now set for
+  Windows, Mac v2, Mac v3, Android, CLI and Firefox [#270]. Firefox also keeps HTML filtering rules
+  (`$$`, `$@$`) outside `!#if (cap_html_filtering)` now, while legacy Mac (v1) no longer gets them.
 
 ### Security
 
@@ -128,8 +128,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   listener on import. The listener leaked into the host process and could
   crash it. Removing it is safe because Node.js already treats unhandled
   rejections as uncaught exceptions by default.
-
-### Security
 
 ## [3.4.3] - 2026-10-21
 

@@ -5,6 +5,7 @@ import {
     vi,
 } from 'vitest';
 
+import { platformsConfig } from '../src/main/platforms-config';
 import { cleanupAndOptimizeRules, cleanupRules } from '../src/main/platforms/filter';
 
 // Mock log to hide error messages
@@ -151,7 +152,7 @@ describe('platforms filter', () => {
             },
         };
 
-        const notMatchRules = [
+        const keptRules = [
             '! Comment',
             'example.com',
             'example.com,content-examples.com###ad3',
@@ -159,7 +160,7 @@ describe('platforms filter', () => {
             '@@||example.org^$domain=example.com,elemhide',
             'apkpure.com#%#//scriptlet("set-constant", "$$.analytics.send", "noopFunc")',
         ];
-        const matchRules = [
+        const removedRules = [
             '@@||example.com$stealth',
             'javarchive.com##.sidebar_list > .widget_text:has(a[title = "ads"])',
             "aranzulla.it##body > div[id][class][-ext-has=\"a[href^='/locked-no-script.php']\"]",
@@ -178,14 +179,14 @@ describe('platforms filter', () => {
         ];
 
         const before = [
-            ...notMatchRules,
-            ...matchRules,
+            ...keptRules,
+            ...removedRules,
         ];
 
         const after = cleanupRules(before, config, 0);
 
         expect(after).toBeDefined();
-        expect(after).toEqual(notMatchRules);
+        expect(after).toEqual(keptRules);
     });
 
     it('Test remove urltransform modifier patterns', () => {
@@ -200,7 +201,7 @@ describe('platforms filter', () => {
             },
         };
 
-        const notMatchRules = [
+        const keptRules = [
             '! Comment',
             'example.com',
             'example.com,content-examples.com###ad3',
@@ -211,21 +212,21 @@ describe('platforms filter', () => {
             // `$removeparam=urltransform` should not be treated as `$urltransform`
             '||example.com^$removeparam=urltransform',
         ];
-        const matchRules = [
+        const removedRules = [
             '||example.com^$urltransform=/firstpath/secondpath/',
             '@@||example.com^$urltransform=/firstpath/secondpath/',
             '||example.com^$third-party,urltransform=/firstpath/secondpath/',
         ];
 
         const before = [
-            ...notMatchRules,
-            ...matchRules,
+            ...keptRules,
+            ...removedRules,
         ];
 
         const after = cleanupRules(before, config, 0);
 
         expect(after).toBeDefined();
-        expect(after).toEqual(notMatchRules);
+        expect(after).toEqual(keptRules);
     });
 
     it('Test remove generic CSS rule patterns', () => {
@@ -240,7 +241,7 @@ describe('platforms filter', () => {
             },
         };
 
-        const notMatchRules = [
+        const keptRules = [
             'example.com',
             'example.com###ad3',
             '||example.org^$domain=example.com',
@@ -249,21 +250,21 @@ describe('platforms filter', () => {
             'example.com#$#.advert { display: none !important; }',
             'example.com#$#.cookie { position: absolute !important; left: -9999px !important; }',
         ];
-        const matchRules = [
+        const removedRules = [
             '#$#div[class="adsbygoogle"][id="ad-detector"] { display: block !important; }',
             '#$#.adsbygoogle[style] { position: absolute !important; left: -9999px !important; }',
             '#$#.pub_728x90.text-ad.textAd.text_ad.text_ads.text-ads.text-ad-links { display: block !important; }',
         ];
 
         const before = [
-            ...notMatchRules,
-            ...matchRules,
+            ...keptRules,
+            ...removedRules,
         ];
 
         const after = cleanupRules(before, config, 0);
 
         expect(after).toBeDefined();
-        expect(after).toEqual(notMatchRules);
+        expect(after).toEqual(keptRules);
     });
 
     it('Test remove CSS rule patterns', () => {
@@ -279,14 +280,14 @@ describe('platforms filter', () => {
             },
         };
 
-        const notMatchRules = [
+        const keptRules = [
             'example.com',
             'example.com###ad3',
             '||example.org^$domain=example.com',
             '@@||example.org^$domain=example.com,elemhide',
             'apkpure.com#%#//scriptlet("set-constant", "$$.analytics.send", "noopFunc")',
         ];
-        const matchRules = [
+        const removedRules = [
             'example.com#@$#.ads { display: none !important; }',
             'example.com#$#.advert { display: none !important; }',
             'example.com#$#.cookie { position: absolute !important; left: -9999px !important; }',
@@ -296,14 +297,14 @@ describe('platforms filter', () => {
         ];
 
         const before = [
-            ...notMatchRules,
-            ...matchRules,
+            ...keptRules,
+            ...removedRules,
         ];
 
         const after = cleanupRules(before, config, 0);
 
         expect(after).toBeDefined();
-        expect(after).toEqual(notMatchRules);
+        expect(after).toEqual(keptRules);
     });
 
     it('Test removing `redirect-rule=` modifier', () => {
@@ -319,7 +320,7 @@ describe('platforms filter', () => {
             },
         };
 
-        const notMatchRules = [
+        const keptRules = [
             '! Comment',
             'example.com',
             'example.com,content-examples.com###ad3',
@@ -329,21 +330,21 @@ describe('platforms filter', () => {
             'example.com##.sidebar_list > .widget_text:has(a[title = "content"])',
             '||dai.google.com/ondemand/hls/content/*.m3u8$hls=/redirector\.googlevideo\.com\/,domain=sbs.com.au',
         ];
-        const matchRules = [
+        const removedRules = [
             '||example.com/script.json$xmlhttprequest,redirect-rule=noopjson',
             '||example.com/script.js$script,redirect-rule=noopjs',
             '*$redirect-rule=noopjs,xmlhttprequest,domain=example.com',
         ];
 
         const before = [
-            ...notMatchRules,
-            ...matchRules,
+            ...keptRules,
+            ...removedRules,
         ];
 
         const after = cleanupRules(before, config, 0);
 
         expect(after).toBeDefined();
-        expect(after).toEqual(notMatchRules);
+        expect(after).toEqual(keptRules);
     });
 
     it('Test removing of single content modifier', () => {
@@ -358,7 +359,7 @@ describe('platforms filter', () => {
             },
         };
 
-        const notMatchRules = [
+        const keptRules = [
             '! Comment',
             'example.com',
             'example.com,content-examples.com###ad3',
@@ -369,19 +370,19 @@ describe('platforms filter', () => {
             'example.com##.sidebar_list > .widget_text:has(a[title = "content"])',
             '||dai.google.com/ondemand/hls/content/*.m3u8$hls=/redirector\.googlevideo\.com\/,domain=sbs.com.au',
         ];
-        const matchRules = [
+        const removedRules = [
             '@@||example.com^$content',
         ];
 
         const before = [
-            ...notMatchRules,
-            ...matchRules,
+            ...keptRules,
+            ...removedRules,
         ];
 
         const after = cleanupRules(before, config, 0);
 
         expect(after).toBeDefined();
-        expect(after).toEqual(notMatchRules);
+        expect(after).toEqual(keptRules);
     });
 
     it('Allowlist basic rules with important for ubo', () => {
@@ -396,14 +397,14 @@ describe('platforms filter', () => {
             },
         };
 
-        const notMatchRules = [
+        const keptRules = [
             '! Comment',
             'example.com',
             '@@||important.com^$document',
             'example.com###.ad,.important',
             '||example.com^$important',
         ];
-        const matchRules = [
+        const removedRules = [
             '@@||example.com^$important',
             '@@example.com^$script,important',
             '@@||example.com^$important',
@@ -411,13 +412,61 @@ describe('platforms filter', () => {
         ];
 
         const before = [
-            ...notMatchRules,
-            ...matchRules,
+            ...keptRules,
+            ...removedRules,
         ];
 
         const after = cleanupRules(before, config, 0);
 
         expect(after).toBeDefined();
-        expect(after).toEqual(notMatchRules);
+        expect(after).toEqual(keptRules);
+    });
+
+    it('removes cosmetic rules with unsupported non-basic modifiers for Android Content Blocker', () => {
+        const config = platformsConfig.EXTENSION_ANDROID_CONTENT_BLOCKER;
+
+        const keptRules = [
+            'example.com##.ad',
+            '||example.com^$domain=example.org',
+        ];
+        const removedRules = [
+            '[$path=/foren]cad.de##tr.ad',
+            '[$domain=example.com]##.textad',
+            '[$url=||example.com/content/*]##div.textad',
+            '[$path]example.com##.main',
+            '[$path =/x]e.com##.a',
+            '[$domain =example.com]##.textad',
+            '[$url =||example.com/content/*]##div.textad',
+            '[$app=org.example.app]example.com##.textad',
+            '[$path=/newsletter]spiegel.de#@#a[href^="/newsletter/"]',
+            '[$domain=example.com]#@#.textad',
+        ];
+
+        const after = cleanupRules([...keptRules, ...removedRules], config, 0);
+
+        expect(after).toEqual(keptRules);
+    });
+
+    it('keeps cosmetic rules whose non-basic modifier list contains `$path`, `$domain` or `$url`', () => {
+        const config = platformsConfig.EXTENSION_CHROMIUM;
+
+        const keptRules = [
+            '[$url=||example.com/?app=1]##.ad',
+            '[$url=||example.com/?protobuf=1]##.ad',
+            '[$path =/x?app=1]##.ad',
+            '[$path]example.com##.content',
+            '[$domain=example.com]#@#.textad',
+        ];
+        const removedRules = [
+            // eslint-disable-next-line max-len
+            '||ads.adfox.ru/*/getCode?p1=$domain=auth.wi-fi.ru,replace=/(<VAST[\\s\\S]*?>)[\\s\\S]*<\\/VAST>/\\$1<\\/VAST>/,important',
+            '||example.com^$app=org.example.app',
+            '||example.com^$protobuf',
+            '||example.com^$content,hls=/x/',
+        ];
+
+        const after = cleanupRules([...keptRules, ...removedRules], config, 0);
+
+        expect(after).toEqual(keptRules);
     });
 });
