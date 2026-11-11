@@ -99,7 +99,7 @@ const parsePlatforms = function (hint, pattern) {
         // eslint-disable-next-line no-restricted-syntax
         for (let s of split) {
             s = s.trim();
-            result.push(...(PLATFORM_HINT_ALIASES[s] || [s]));
+            result.push(...(Object.hasOwn(PLATFORM_HINT_ALIASES, s) ? PLATFORM_HINT_ALIASES[s] : [s]));
         }
 
         match = pattern.exec(hint);
