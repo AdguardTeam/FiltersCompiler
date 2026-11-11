@@ -535,13 +535,13 @@ describe('platforms filter', () => {
     it('keeps native :has() rules and removes extended CSS rules for Android Content Blocker', () => {
         const config = platformsConfig.EXTENSION_ANDROID_CONTENT_BLOCKER;
 
-        const notMatchRules = [
+        const keptRules = [
             'example.com##.sidebar_list > .widget_text:has(a[title = "ads"])',
             '##div:has(> .ad)',
             'example.com##div:has(> .a):has(> .b)',
             'example.com##div:has(a:not(.b)):has(.c)',
         ];
-        const matchRules = [
+        const removedRules = [
             'example.com#?#div:has(> .ad)',
             'example.com##div:has-text(ad)',
             'example.com##div:contains(ad)',
@@ -553,8 +553,8 @@ describe('platforms filter', () => {
             'example.com##div:has(> li:nth-child(2):has(.c))',
         ];
 
-        const after = cleanupRules([...notMatchRules, ...matchRules], config, 0);
+        const after = cleanupRules([...keptRules, ...removedRules], config, 0);
 
-        expect(after).toEqual(notMatchRules);
+        expect(after).toEqual(keptRules);
     });
 });
