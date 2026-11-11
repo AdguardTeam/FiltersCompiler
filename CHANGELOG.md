@@ -26,6 +26,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   inserting a line between them. When a blank line separates a hint from its
   rule, the rule gets its own `!+ NOT_OPTIMIZED` line and the hint stays
   detached, so the rule ships on every platform as before.
+- Cosmetic rules with non-basic modifiers (`$app`, `$domain`, `$path`, `$url`)
+  are no longer kept for the `ext_android_cb` platform, as AdGuard Content
+  Blocker cannot enforce them. The check now matches the `[$` modifier list
+  prefix, so it also catches variants such as `[$path =/x]e.com##.a`.
+- Modifier patterns no longer mistake a `$url`-only modifier list for a rule
+  modifier, so a rule like `[$url=||example.com/?app=1]##.ad` is no longer
+  dropped.
+- The non-basic modifier list guard is now tied to the `[$` prefix, so a
+  network rule with `$domain=` and a later `]` is no longer mistaken for a
+  cosmetic rule. Such rules are removed again on platforms that do not support
+  their modifiers.
+- A valueless non-basic modifier list such as `[$path]example.com##.content`
+  is no longer treated as having no list, so the rule is not dropped by the
+  modifier patterns that scan the rest of the line.
 - Trusted scriptlets written with the uBO-compatible `ubo-` prefix (e.g.
   `#%#//scriptlet('ubo-trusted-set-cookie', ...)`) were not recognized as
   trusted: they passed the high trust-level exclusions and, on the `ext_ublock`
@@ -224,17 +238,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `OptimizationStatsError`
     - **BREAKING:** Its constructor now takes a required third positional
-    parameter, `reason: 'retrieval' | 'validation'`, before `options`.
-    Update call sites to `new OptimizationStatsError(filterId,
-    sourcePath, 'retrieval', { cause })` (or `'validation'`).
+      parameter, `reason: 'retrieval' | 'validation'`, before `options`.
+      Update call sites to `new OptimizationStatsError(filterId,
+sourcePath, 'retrieval', { cause })` (or `'validation'`).
     - `getOptimizationStatistics()` now throws it for validation failures
-    too, not only retrieval failures, carrying `filterId` and `sourcePath`
-    either way. Its `code` is `OPTIMIZATION_STATS_INVALID` for validation
-    failures and `OPTIMIZATION_STATS_UNAVAILABLE` for retrieval failures,
-    so callers can branch on the failure kind.
+      too, not only retrieval failures, carrying `filterId` and `sourcePath`
+      either way. Its `code` is `OPTIMIZATION_STATS_INVALID` for validation
+      failures and `OPTIMIZATION_STATS_UNAVAILABLE` for retrieval failures,
+      so callers can branch on the failure kind.
     - Its `message` now folds in `cause.message` when the cause is an
-    `Error`, so the specific reason survives for callers that log only
-    `error.message` and never walk the `cause` chain.
+      `Error`, so the specific reason survives for callers that log only
+      `error.message` and never walk the `cause` chain.
 - `assertValidStats()` now throws a `TypeError` (previously a bare `Error`),
   built through a single shared helper so every check — non-object stats,
   missing/empty `groups`, and malformed group entries — gets the same
@@ -1172,7 +1186,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated [@adguard/scriptlets] to v1.7.3
 
 [1.1.63]: https://github.com/AdguardTeam/FiltersCompiler/compare/v1.1.61...v1.1.63
-
 [@adguard/agtree]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/agtree/CHANGELOG.md
 [@adguard/ecss-tree]: https://github.com/AdguardTeam/ecsstree/blob/master/CHANGELOG.md
 [@adguard/extended-css]: https://github.com/AdguardTeam/ExtendedCss/blob/master/CHANGELOG.md
@@ -1180,7 +1193,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [@adguard/scriptlets]: https://github.com/AdguardTeam/Scriptlets/blob/master/CHANGELOG.md
 [@adguard/tsurlfilter]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/tsurlfilter/CHANGELOG.md
 [@adguard/logger]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/logger/CHANGELOG.md
-
 [Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v4.0.0...HEAD
 [4.0.0]: https://github.com/AdguardTeam/FiltersCompiler/compare/v4.0.0-beta.0...v4.0.0
 [4.0.0-beta.0]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.4.3...v4.0.0-beta.0
@@ -1197,5 +1209,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [3.2.11]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.2.10...v3.2.11
 [3.2.10]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.2.10-beta.0...v3.2.10
 [3.2.10-beta.0]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.2.9...v3.2.10-beta.0
-
 [tsurlfilter#96]: https://github.com/AdguardTeam/tsurlfilter/issues/96
