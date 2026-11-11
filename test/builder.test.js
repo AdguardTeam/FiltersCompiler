@@ -15,12 +15,12 @@ import path from 'path';
 import { promises as fs, existsSync } from 'fs';
 
 import { disableOptimization } from '../src/main/optimization';
-import { build, include } from '../src/main/builder';
+import { addNotOptimizedHints, build, include } from '../src/main/builder';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 // Mock log to hide error messages
-vi.mock('../main/utils/log');
+vi.mock('../src/main/utils/log');
 
 const readFile = (path) => {
     try {
@@ -53,6 +53,52 @@ const cleanup = async () => {
         await fs.rm(platformsDir, { recursive: true, force: true });
     }
 };
+
+describe('addNotOptimizedHints', () => {
+    const hint = '!+ NOT_OPTIMIZED';
+
+    it('adds a hint line before a rule', () => {
+        expect(addNotOptimizedHints(['||example.com^'])).toEqual([hint, '||example.com^']);
+    });
+
+    it('appends to a hint that directly precedes the rule', () => {
+        expect(addNotOptimizedHints(['!+ PLATFORM(ios)', '||shop.example.com^']))
+            .toEqual(['!+ PLATFORM(ios) NOT_OPTIMIZED', '||shop.example.com^']);
+    });
+
+    it('inserts a separate hint line when a blank line separates the rule from its hint', () => {
+        const lines = ['!+ PLATFORM(ios)', '', '||shop.example.com^'];
+
+        expect(addNotOptimizedHints(lines)).toEqual(['!+ PLATFORM(ios)', hint, '||shop.example.com^']);
+    });
+
+    it('treats a whitespace-only line as a blank line', () => {
+        const lines = ['!+ PLATFORM(ios)', '   ', '||shop.example.com^'];
+
+        expect(addNotOptimizedHints(lines)).toEqual(['!+ PLATFORM(ios)', hint, '||shop.example.com^']);
+    });
+
+    it('does not duplicate the hint token', () => {
+        expect(addNotOptimizedHints([hint, '||example.com^'])).toEqual([hint, '||example.com^']);
+        expect(addNotOptimizedHints(['!+ NOT_OPTIMIZED PLATFORM(ios)', '||example.com^']))
+            .toEqual(['!+ NOT_OPTIMIZED PLATFORM(ios)', '||example.com^']);
+    });
+
+    it('classifies indented lines by their trimmed text', () => {
+        expect(addNotOptimizedHints(['  !+ PLATFORM(ios)', '  ||shop.example.com^']))
+            .toEqual(['  !+ PLATFORM(ios) NOT_OPTIMIZED', '  ||shop.example.com^']);
+    });
+
+    it('does not add hints to comment lines', () => {
+        expect(addNotOptimizedHints(['! comment', '! another comment']))
+            .toEqual(['! comment', '! another comment']);
+    });
+
+    it('does not treat a comment as the hint for the following rule', () => {
+        expect(addNotOptimizedHints(['!+ PLATFORM(ios)', '! comment', '||example.com^']))
+            .toEqual(['!+ PLATFORM(ios)', '! comment', hint, '||example.com^']);
+    });
+});
 
 describe('Test builder', async () => {
     beforeAll(async () => {

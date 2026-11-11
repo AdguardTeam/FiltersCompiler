@@ -22,8 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Hints no longer leak to the next rule when validation or
   `/optimizeDomainBlockingRules` drops the rule they modify, and `/notOptimized`
-  keeps existing hints (e.g. `PLATFORM` or `NOT_CONVERT`) attached to their
-  rule.
+  appends `NOT_OPTIMIZED` to a hint that directly precedes a rule instead of
+  inserting a line between them. When a blank line separates a hint from its
+  rule, the rule gets its own `!+ NOT_OPTIMIZED` line and the hint stays
+  detached, so the rule ships on every platform as before.
 - Trusted scriptlets written with the uBO-compatible `ubo-` prefix (e.g.
   `#%#//scriptlet('ubo-trusted-set-cookie', ...)`) were not recognized as
   trusted: they passed the high trust-level exclusions and, on the `ext_ublock`

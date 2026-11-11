@@ -114,32 +114,55 @@ const stripComments = function (lines) {
 };
 
 /**
- * Adds not optimized hints
+ * Adds not optimized hints.
  *
- * @param lines
+ * A hint applies only to the line that immediately follows it, so consumers
+ * read it from the line right before the rule. The token is appended to an
+ * existing hint line only when that line directly precedes the rule: a blank
+ * line or a comment between them detaches the hint, and a separate hint line
+ * is inserted instead.
+ *
+ * Lines are classified by their trimmed text: this runs on included lines that
+ * `compile()` trims only later, so indentation must not hide a hint or a blank
+ * line.
+ *
+ * Exported for unit tests.
+ *
+ * @param {string[]} lines Lines to process.
+ *
+ * @returns {string[]} Lines with the hints added.
  */
-const addNotOptimizedHints = function (lines) {
+export const addNotOptimizedHints = function (lines) {
     logger.info('Adding hints..');
 
     const result = [];
+    let previousLine = null;
 
-    lines.forEach((v) => {
-        if (!v) {
+    lines.forEach((line) => {
+        const trimmedLine = line.trim();
+
+        if (!trimmedLine) {
+            previousLine = trimmedLine;
             return;
         }
 
-        if (!v.startsWith(RuleMasks.MASK_COMMENT) && !isHint(v)) {
-            const previous = result[result.length - 1];
-            if (isHint(previous)) {
+        const isRule = !trimmedLine.startsWith(RuleMasks.MASK_COMMENT);
+        const isHinted = isHint(previousLine);
+        const alreadyMarked = isHinted && hasHint(previousLine, NOT_OPTIMIZED_HINT_NAME);
+
+        if (isRule) {
+            if (!isHinted) {
+                result.push(NOT_OPTIMIZED_HINT);
+            } else if (!alreadyMarked) {
                 // Append to the hint that modifies this rule, otherwise it would no longer
                 // apply to the rule.
-                result[result.length - 1] = `${previous}${SPACE}${NOT_OPTIMIZED_HINT_NAME}`;
-            } else {
-                result.push(NOT_OPTIMIZED_HINT);
+                const hintIndex = result.length - 1;
+                result[hintIndex] = `${result[hintIndex]}${SPACE}${NOT_OPTIMIZED_HINT_NAME}`;
             }
         }
 
-        result.push(v);
+        result.push(line);
+        previousLine = trimmedLine;
     });
 
     return result;
