@@ -355,14 +355,18 @@ node --version  # Should be v22.21+ on 22.x, or v24+
 
 CI validates both Node.js 22.22 (the Docker `test-output` target) and
 Node.js 24 (a separate CI job), so a change must pass on both. Either version
-works for local development. If using nvm, install either:
+works for local development. If using nvm, install one of them:
 
 ```bash
-# Node.js 22.22 — matches the Docker-based CI job
+# Latest 22.x — the Docker-based CI job uses Node.js 22.22
 nvm install 22
 nvm use 22
+```
 
-# Node.js 24 — matches the Node.js 24 CI job
+or:
+
+```bash
+# 24.x — matches the Node.js 24 CI job
 nvm install 24
 nvm use 24
 ```

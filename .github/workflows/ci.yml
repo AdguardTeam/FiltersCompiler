@@ -31,6 +31,8 @@ jobs:
   test-node24:
     name: Lint, test, build (Node.js 24)
     runs-on: team-extensions
+    permissions:
+      contents: read
     env:
       # Keep Corepack from adding a `packageManager` field to package.json.
       COREPACK_ENABLE_AUTO_PIN: '0'
@@ -42,7 +44,12 @@ jobs:
       - name: Enable pnpm
         run: |
           corepack enable
-          corepack prepare pnpm@10.33.4 --activate
+          # Derive the pnpm version from the declared engine range so this job
+          # does not pin a third copy that can drift from package.json.
+          PNPM_VERSION="$(node -p "require('./package.json').engines.pnpm" \
+            | sed -E 's/^[^0-9]*([0-9]+\.[0-9]+\.[0-9]+).*/\1/')"
+          corepack prepare "pnpm@${PNPM_VERSION}" --activate
+          pnpm --version
       # setup-node needs pnpm on PATH to configure the pnpm cache, so run it
       # once more after Corepack has provided the shim.
       - uses: actions/setup-node@v6
