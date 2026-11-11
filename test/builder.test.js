@@ -9,7 +9,6 @@ import {
     expect,
     beforeAll,
     test,
-    vi,
 } from 'vitest';
 import path from 'path';
 import { promises as fs, existsSync } from 'fs';
@@ -19,12 +18,9 @@ import { addNotOptimizedHints, build, include } from '../src/main/builder';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
-// Mock log to hide error messages
-vi.mock('../src/main/utils/log');
-
-const readFile = (path) => {
+const readFile = async (path) => {
     try {
-        return fs.readFile(path, { encoding: 'utf-8' });
+        return await fs.readFile(path, { encoding: 'utf-8' });
     } catch {
         return null;
     }
@@ -114,6 +110,9 @@ describe('Test builder', async () => {
             const logContent = await readFile(logFile);
             expect(logContent).toBeTruthy();
             expect(logContent.length).toBeGreaterThan(0);
+            // Proves the file was written by this build and is not leftover
+            // from a previous run: `parseDirectory()` logs this per filter.
+            expect(logContent).toContain('Building filter');
         });
     });
 
