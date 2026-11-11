@@ -26,9 +26,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Native `:has()` cosmetic rules (`##`) are no longer removed from the
   `ext_android_cb` platform [#233].
+- Cosmetic rules with non-basic modifiers (`$app`, `$domain`, `$path`, `$url`)
+  are no longer kept for the `ext_android_cb` platform, as AdGuard Content
+  Blocker cannot enforce them. The check now matches the `[$` modifier list
+  prefix, so it also catches variants such as `[$path =/x]e.com##.a`.
+- Modifier patterns no longer mistake a `$url`-only modifier list for a rule
+  modifier, so a rule like `[$url=||example.com/?app=1]##.ad` is no longer
+  dropped.
+- The non-basic modifier list guard is now tied to the `[$` prefix, so a
+  network rule with `$domain=` and a later `]` is no longer mistaken for a
+  cosmetic rule. Such rules are removed again on platforms that do not support
+  their modifiers.
+- A valueless non-basic modifier list such as `[$path]example.com##.content`
+  is no longer treated as having no list, so the rule is not dropped by the
+  modifier patterns that scan the rest of the line.
 - `cap_html_filtering` directive not working: the define was missing from the platforms configuration,
   so rules inside `!#if (cap_html_filtering)` were dropped on every platform. It is now set for
-  Windows, Mac v2, Mac v3, Android and CLI [#270].
+  Windows, Mac v2, Mac v3, Android, FireFox, CLI [#270].
 
 ### Security
 
@@ -121,8 +135,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   listener on import. The listener leaked into the host process and could
   crash it. Removing it is safe because Node.js already treats unhandled
   rejections as uncaught exceptions by default.
-
-### Security
 
 ## [3.4.3] - 2026-10-21
 
