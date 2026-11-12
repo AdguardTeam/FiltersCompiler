@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- The `@include` error for a missing local file now reports the include URL
+- The `@include` error for a missing local file now reports the include path
   instead of `undefined`.
 - Cosmetic rules with non-basic modifiers (`$app`, `$domain`, `$path`, `$url`)
   are no longer kept for the `ext_android_cb` platform, as AdGuard Content
