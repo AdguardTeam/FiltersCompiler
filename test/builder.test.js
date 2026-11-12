@@ -1435,6 +1435,45 @@ describe('check include directive function', () => {
             include(path.dirname(__filename), actual, []),
         ).rejects.toThrow(/Trust level ignoring option is not supported for external includes/);
     });
+
+    it('reports the include path for a missing local @include', async () => {
+        const missingInclude = 'non-existing-local.txt';
+
+        await expect(
+            include(__dirname, `@include ${missingInclude}`, []),
+        ).rejects.toThrow(`Error handling include from: ${missingInclude}`);
+    });
+
+    it('accepts extra whitespace between the @include directive and the path', async () => {
+        const { includedLines } = await include(filtersDir, '@include  common.txt', []);
+
+        expect(includedLines).toContain('test-common-rule.com');
+    });
+
+    test.each([
+        '@include ',
+        '@include ""',
+    ])('rejects an @include directive without a target: %j', async (directive) => {
+        await expect(include(filtersDir, directive, []))
+            .rejects.toThrow(`Invalid include directive: '${directive.trim()}'`);
+    });
+
+    it('resolves a nested !#include relative to the included file directory', async () => {
+        const resourcesDir = path.join(__dirname, './resources');
+
+        const { includedLines } = await include(resourcesDir, '@include ./includes/parent.txt', []);
+
+        expect(includedLines).toContain('subdir-child-rule.com');
+        expect(includedLines).not.toContain('filter-dir-child-rule.com');
+    });
+
+    it('resolves deeper nested !#include levels relative to each included file', async () => {
+        const resourcesDir = path.join(__dirname, './resources');
+
+        const { includedLines } = await include(resourcesDir, '@include ./includes/parent-deep.txt', []);
+
+        expect(includedLines).toContain('nested-child-rule.com');
+    });
 });
 
 describe('apply platformsExcluded directive during limited filters list build', () => {

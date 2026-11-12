@@ -1,0 +1,2 @@
+parent-deep-rule.com
+!#include nested/grand.txt
