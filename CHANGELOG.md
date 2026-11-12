@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Support for `!+ NOT_CONVERT` hint, which disables conversion to AdGuard
   syntax for the next rule [#269].
+- `adguard_corelibs` directive and `corelibs` hint alias matching all CoreLibs-based apps (Windows, Mac,
+  Android and CLI) [#272]
 
 ### Changed
 
@@ -50,11 +52,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   so rules inside `!#if (cap_html_filtering)` were dropped on every platform. It is now set for
   Windows, Mac v2, Mac v3, Android, CLI and Firefox [#270]. Firefox also keeps HTML filtering rules
   (`$$`, `$@$`) outside `!#if (cap_html_filtering)` now, while legacy Mac (v1) no longer gets them.
+- Only the last `NOT_PLATFORM()` clause in a rule hint was applied, so
+  `!+ NOT_PLATFORM(windows) NOT_PLATFORM(android)` still kept the rule on Windows. Every
+  `NOT_PLATFORM()` clause in the hint is now honored.
+- `PLATFORM()` clauses after a tab were ignored:
+  `!+ PLATFORM(windows)\tPLATFORM(android)` did not apply the rule to Android.
+  `NOT_PLATFORM()` hints were unaffected, so
+  `!+ NOT_PLATFORM(windows)\tNOT_PLATFORM(android)` still dropped the rule on Android.
+  Every clause of both hints is now honored, whatever separates them.
 
 ### Security
 
 [#269]: https://github.com/AdguardTeam/FiltersCompiler/issues/269
 [#270]: https://github.com/AdguardTeam/FiltersCompiler/issues/270
+[#272]: https://github.com/AdguardTeam/FiltersCompiler/issues/272
 
 ## [4.0.0] - 2026-11-06
 
