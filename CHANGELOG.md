@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `adguard_corelibs` directive and `corelibs` hint alias matching all CoreLibs-based apps (Windows, Mac,
+  Android and CLI) [#272]
+
 ### Changed
 
 ### Deprecated
@@ -17,9 +20,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- The `@include` error for a missing local file now reports the include path
+  instead of `undefined`.
+- `!#include` directives inside a file pulled in by a local `@include` are now
+  resolved relative to that file's directory instead of the filter directory.
+- An `@include` directive with extra whitespace before its path is now
+  accepted, and a directive without a target now fails with
+  `Invalid include directive` instead of a `TypeError`.
+- Cosmetic rules with non-basic modifiers (`$app`, `$domain`, `$path`, `$url`)
+  are no longer kept for the `ext_android_cb` platform, as AdGuard Content
+  Blocker cannot enforce them. The check now matches the `[$` modifier list
+  prefix, so it also catches variants such as `[$path =/x]e.com##.a`.
+- Modifier patterns no longer mistake a `$url`-only modifier list for a rule
+  modifier, so a rule like `[$url=||example.com/?app=1]##.ad` is no longer
+  dropped.
+- The non-basic modifier list guard is now tied to the `[$` prefix, so a
+  network rule with `$domain=` and a later `]` is no longer mistaken for a
+  cosmetic rule. Such rules are removed again on platforms that do not support
+  their modifiers.
+- A valueless non-basic modifier list such as `[$path]example.com##.content`
+  is no longer treated as having no list, so the rule is not dropped by the
+  modifier patterns that scan the rest of the line.
 - `cap_html_filtering` directive not working: the define was missing from the platforms configuration,
   so rules inside `!#if (cap_html_filtering)` were dropped on every platform. It is now set for
-  Windows, Mac v2, Mac v3, Android and CLI [#270].
+  Windows, Mac v2, Mac v3, Android, CLI and Firefox [#270]. Firefox also keeps HTML filtering rules
+  (`$$`, `$@$`) outside `!#if (cap_html_filtering)` now, while legacy Mac (v1) no longer gets them.
+- Only the last `NOT_PLATFORM()` clause in a rule hint was applied, so
+  `!+ NOT_PLATFORM(windows) NOT_PLATFORM(android)` still kept the rule on Windows. Every
+  `NOT_PLATFORM()` clause in the hint is now honored.
+- `PLATFORM()` clauses after a tab were ignored:
+  `!+ PLATFORM(windows)\tPLATFORM(android)` did not apply the rule to Android.
+  `NOT_PLATFORM()` hints were unaffected, so
+  `!+ NOT_PLATFORM(windows)\tNOT_PLATFORM(android)` still dropped the rule on Android.
+  Every clause of both hints is now honored, whatever separates them.
 
 ### Security
 
@@ -27,6 +60,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   messages.
 
 [#270]: https://github.com/AdguardTeam/FiltersCompiler/issues/270
+[#272]: https://github.com/AdguardTeam/FiltersCompiler/issues/272
 
 ## [4.0.0] - 2026-11-06
 
@@ -114,8 +148,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   listener on import. The listener leaked into the host process and could
   crash it. Removing it is safe because Node.js already treats unhandled
   rejections as uncaught exceptions by default.
-
-### Security
 
 ## [3.4.3] - 2026-10-21
 
