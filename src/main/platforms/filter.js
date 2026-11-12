@@ -17,10 +17,20 @@ import { skipRuleWithOptimization } from '../optimization';
 const HINT_MASK = `${RuleMasks.MASK_HINT} `;
 const COMMENT_REGEXP = '^\\!($|[^#])';
 
-const PLATFORM_HINT_REGEXP = /(^| )PLATFORM\(([^)]+)\)/g;
-const NOT_PLATFORM_HINT_REGEXP = /(.*)NOT_PLATFORM\(([^)]+)\)/g;
+const PLATFORM_HINT_REGEXP = /(^|\s)PLATFORM\(([^)]+)\)/g;
+const NOT_PLATFORM_HINT_REGEXP = /(^|\s)NOT_PLATFORM\(([^)]+)\)/g;
 
 const NOT_OPTIMIZED_HINT = 'NOT_OPTIMIZED';
+
+/**
+ * Platform hint aliases, each of which stands for several platforms,
+ * e.g. `!+ PLATFORM(corelibs)` is the same as `!+ PLATFORM(windows, mac, cli, android)`.
+ *
+ * `corelibs` matches all CoreLibs-based apps.
+ */
+const PLATFORM_HINT_ALIASES = {
+    corelibs: ['windows', 'mac', 'cli', 'android'],
+};
 
 /**
  * Parses rule hints
@@ -89,7 +99,7 @@ const parsePlatforms = function (hint, pattern) {
         // eslint-disable-next-line no-restricted-syntax
         for (let s of split) {
             s = s.trim();
-            result.push(s);
+            result.push(...(Object.hasOwn(PLATFORM_HINT_ALIASES, s) ? PLATFORM_HINT_ALIASES[s] : [s]));
         }
 
         match = pattern.exec(hint);

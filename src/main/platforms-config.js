@@ -602,6 +602,7 @@ const SAFARI_BASED_EXTENSION_PATTERNS = [
 ];
 
 /* eslint-disable max-len */
+
 /**
  * Pattern to detect Extended CSS `:matches-property()` rules
  *
@@ -660,6 +661,7 @@ export const platformsConfig = {
         'defines': {
             'adguard': true,
             'adguard_app_windows': true,
+            'adguard_corelibs': true,
             'cap_html_filtering': true,
         },
     },
@@ -687,6 +689,7 @@ export const platformsConfig = {
         'defines': {
             'adguard': true,
             'adguard_app_mac': true,
+            'adguard_corelibs': true,
             'cap_html_filtering': true,
         },
     },
@@ -701,6 +704,7 @@ export const platformsConfig = {
         'defines': {
             'adguard': true,
             'adguard_app_mac': true,
+            'adguard_corelibs': true,
             'cap_html_filtering': true,
         },
     },
@@ -714,6 +718,7 @@ export const platformsConfig = {
         'defines': {
             'adguard': true,
             'adguard_app_android': true,
+            'adguard_corelibs': true,
             'cap_html_filtering': true,
         },
     },
@@ -728,6 +733,7 @@ export const platformsConfig = {
         'defines': {
             'adguard': true,
             'adguard_app_cli': true,
+            'adguard_corelibs': true,
             'cap_html_filtering': true,
         },
     },
