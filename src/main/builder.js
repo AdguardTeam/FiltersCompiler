@@ -297,8 +297,8 @@ const getOptionValue = (attribute) => {
  * @returns {ParsedIncludeData} Parsed result containing the URL and options.
  */
 const parseIncludeDirective = function (lineWithDirective) {
-    const parts = lineWithDirective.trim().split(SPACE);
-    let url = parts[1].trim();
+    const parts = lineWithDirective.trim().split(/\s+/);
+    let url = (parts[1] ?? '').trim();
     url = stripEndQuotes(url);
     // Initialize an options array to store the parsed options.
     const options = [];
@@ -360,8 +360,7 @@ export const include = async (filterDir, directiveLine, excluded) => {
     const { url, options } = parseIncludeDirective(directiveLine);
 
     if (!url) {
-        logger.warn('Invalid include url');
-        return includedLines;
+        throw new Error(`Invalid include directive: '${directiveLine.trim()}'`);
     }
 
     logger.info(`Applying inclusion from: ${url}`);
@@ -380,7 +379,7 @@ export const include = async (filterDir, directiveLine, excluded) => {
         // resolved `@include` directive url
         const originUrl = externalInclude
             ? FiltersDownloader.getFilterUrlOrigin(url)
-            : filterDir;
+            : path.dirname(path.join(filterDir, url));
 
         includedLines = await resolveIncludes(includedLines, originUrl);
 
@@ -421,7 +420,7 @@ export const include = async (filterDir, directiveLine, excluded) => {
 
         includedLines = fixVersionComments(includedLines);
     } else {
-        throw new Error(`Error handling include from: ${options.url}`);
+        throw new Error(`Error handling include from: ${url}`);
     }
 
     logger.info(`Inclusion lines: ${includedLines.length}`);
