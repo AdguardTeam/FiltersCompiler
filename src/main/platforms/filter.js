@@ -151,14 +151,30 @@ const isOptimizationSupported = function (rule) {
 };
 
 /**
+ * Compiles rule removal patterns.
+ *
+ * Compiling once per cleanup call instead of once per rule and pattern keeps
+ * the cost proportional to the number of patterns, not to rules x patterns.
+ *
+ * @param {Array<string | RegExp>} patterns Rule removal patterns
+ * @returns {Array<{pattern: string | RegExp, regexp: RegExp}>} Compiled patterns
+ */
+const compileRulePatterns = (patterns) => patterns.map((pattern) => ({
+    pattern,
+    regexp: new RegExp(pattern),
+}));
+
+/**
  * Checks if rule should be omitted with specified configuration
  *
  * @param rule
  * @param config
  * @param filterId
+ * @param {Array<{pattern: string | RegExp, regexp: RegExp}>} removeRulePatterns
+ * Compiled patterns to remove rules with
  * @returns {boolean}
  */
-const shouldOmitRule = function (rule, config, filterId) {
+const shouldOmitRule = function (rule, config, filterId, removeRulePatterns) {
     const ruleText = rule.rule;
 
     if (!ruleText) {
@@ -171,14 +187,16 @@ const shouldOmitRule = function (rule, config, filterId) {
         return true;
     }
 
-    if (config.configuration.removeRulePatterns) {
-        // eslint-disable-next-line no-restricted-syntax
-        for (const pattern of config.configuration.removeRulePatterns) {
-            if (ruleText.match(new RegExp(pattern))) {
-                // eslint-disable-next-line max-len
-                logger.info(`${ruleText} removed with removeRulePattern ${pattern} in filter ${filterId} for ${config.platform} platform`);
-                return true;
-            }
+    // eslint-disable-next-line no-restricted-syntax
+    for (const { pattern, regexp } of removeRulePatterns) {
+        // A pattern passed as a `RegExp` with the `g` or `y` flag keeps
+        // `lastIndex` between `test()` calls, so the shared regexp would skip
+        // every other match. Reset it to match each rule from the start.
+        regexp.lastIndex = 0;
+        if (regexp.test(ruleText)) {
+            // eslint-disable-next-line max-len
+            logger.info(`${ruleText} removed with removeRulePattern ${pattern} in filter ${filterId} for ${config.platform} platform`);
+            return true;
         }
     }
 
@@ -258,7 +276,10 @@ const isOptimizationCorrect = function (filterId, rules, optimizedRules, optimiz
 export const cleanupRules = (rules, config, filterId) => {
     const ruleLines = splitRuleHintLines(rules, config.platform);
 
-    const filtered = ruleLines.filter((r) => !shouldOmitRule(r, config, filterId));
+    const { removeRulePatterns } = config.configuration;
+    const compiledPatterns = removeRulePatterns ? compileRulePatterns(removeRulePatterns) : [];
+
+    const filtered = ruleLines.filter((r) => !shouldOmitRule(r, config, filterId, compiledPatterns));
 
     return joinRuleHintLines(filtered);
 };
@@ -272,12 +293,17 @@ export const cleanupRules = (rules, config, filterId) => {
  * @param filterId
  */
 export const cleanupAndOptimizeRules = function (rules, config, optimizationConfig, filterId) {
-    config.configuration.removeRulePatterns = config.configuration.removeRulePatterns || [];
-    config.configuration.removeRulePatterns.push(COMMENT_REGEXP);
+    // Do not push the comment pattern into the platform configuration: the very
+    // same object is shared between platforms, so mutating it leaks into other
+    // builds, and an exception below would leave the pattern there for good.
+    const removeRulePatterns = compileRulePatterns([
+        ...(config.configuration.removeRulePatterns || []),
+        COMMENT_REGEXP,
+    ]);
 
     const ruleLines = splitRuleHintLines(rules, config.platform);
 
-    const filtered = ruleLines.filter((r) => !shouldOmitRule(r, config, filterId));
+    const filtered = ruleLines.filter((r) => !shouldOmitRule(r, config, filterId, removeRulePatterns));
 
     const optimized = filtered.filter((r) => !shouldOmitRuleWithOptimization(r, optimizationConfig));
 
@@ -292,6 +318,5 @@ export const cleanupAndOptimizeRules = function (rules, config, optimizationConf
         result = joinRuleHintLines(optimized);
     }
 
-    config.configuration.removeRulePatterns.pop();
     return result;
 };
