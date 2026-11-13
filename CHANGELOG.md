@@ -9,8 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Support for `!+ NOT_CONVERT` hint, which disables conversion to AdGuard
-  syntax for the next rule [#269].
+- Support for the `!+ NOT_CONVERT` hint, which disables conversion to AdGuard
+  syntax for the next rule. The hint applies only to the rule right after it,
+  and a directive is not a rule: `!#include`, `!#if`, `!#else`, `!#endif`, and
+  `@include` do not receive the hint, so the first rule of an included file is
+  converted normally [#269].
 - `adguard_corelibs` directive and `corelibs` hint alias matching all CoreLibs-based apps (Windows, Mac,
   Android and CLI) [#272]
 

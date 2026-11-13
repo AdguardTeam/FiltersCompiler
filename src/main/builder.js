@@ -613,7 +613,15 @@ const compile = async function (filterDir, filterName, templateContent, trustLev
                 result.push(includedRules[i]);
             }
         } else {
-            let inlineRules = [line.trim()];
+            const trimmedLine = line.trim();
+            // A preprocessor directive is not a rule, and `!#include` expands to the rules of
+            // another file, so a hint on the line before any `!#` directive (`!#include`,
+            // `!#if`, `!#else`, `!#endif`, ...) must not apply to the lines it resolves to.
+            const inlinePreviousLine = trimmedLine.startsWith(RuleMasks.MASK_DIRECTIVES)
+                ? undefined
+                : previousLine;
+
+            let inlineRules = [trimmedLine];
 
             // eslint-disable-next-line no-await-in-loop
             inlineRules = await prepareAdgRules(
@@ -622,11 +630,11 @@ const compile = async function (filterDir, filterName, templateContent, trustLev
                 inlineRules,
                 excluded,
                 invalid,
-                previousLine,
+                inlinePreviousLine,
             );
 
             logger.info('Applying trust-level exclusions to inline template.txt rules...');
-            inlineRules = exclude(inlineRules, trustLevelSettings, excluded, previousLine);
+            inlineRules = exclude(inlineRules, trustLevelSettings, excluded, inlinePreviousLine);
 
             // 'for' loop is used in purpose instead of spread operator
             // to avoid 'Maximum call stack size exceeded' error on large number of rules

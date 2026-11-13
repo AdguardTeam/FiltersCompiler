@@ -1320,6 +1320,15 @@ describe('Test builder', async () => {
                 const filterLines = filterContent.split(/\r?\n/);
                 expect(filterLines.includes("example.com#%#//scriptlet('new-scriptlet')")).toBeTruthy();
             });
+
+            it('platform/mac does not apply the hint before a !#include to the included rules', async () => {
+                const filterContent = await readFile(path.join(platformsDir, 'mac', 'filters', '7.txt'));
+                expect(filterContent).toBeTruthy();
+
+                const filterLines = filterContent.split(/\r?\n/);
+                expect(filterLines.includes('||included.test^$~third-party')).toBeTruthy();
+                expect(filterLines.includes('||included.test^$1p')).toBeFalsy();
+            });
         });
 
         it('removing scriptlet rules in local_script_rules.json', async () => {
