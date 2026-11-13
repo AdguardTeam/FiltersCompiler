@@ -12,6 +12,13 @@
 !+ PLATFORM(mac, windows) NOT_VALIDATE
 ||foo.bar^$newmodifier
 somesite.com##.main-banner
+!+ NOT_CONVERT
+||convert1.test^$1p
+||convert2.test^$1p
+!+ NOT_CONVERT
+example.com#%#//scriptlet('new-scriptlet')
+!+ NOT_CONVERT
+!#include not-convert.txt
 !+ NOT_VALIDATE PLATFORM(mac, windows)
 ||example.org^$newmodifier
 !#safari_cb_affinity(security)

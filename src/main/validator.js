@@ -20,7 +20,12 @@ import {
 } from '@adguard/tsurlfilter';
 import { getErrorMessage } from '@adguard/logger';
 
-import { RuleMasks } from './rule/rule-masks';
+import {
+    hasHint,
+    filterWithHints,
+    NOT_CONVERT_HINT,
+    NOT_VALIDATE_HINT,
+} from './rule/rule-masks';
 import { logger } from './utils/log';
 import { validateCssSelector } from './utils/extended-css-validator';
 
@@ -30,9 +35,6 @@ import { validateCssSelector } from './utils/extended-css-validator';
 
 const AFFINITY_DIRECTIVE = '!#safari_cb_affinity'; // used as closing directive
 const AFFINITY_DIRECTIVE_OPEN = `${AFFINITY_DIRECTIVE}(`;
-
-const NOT_VALIDATE_HINT = 'NOT_VALIDATE';
-const SPACE = ' ';
 
 /**
  * Push rule with warning message to excluded
@@ -148,7 +150,6 @@ class RuleValidator {
                             && !DomainUtils.isValidDomainOrHostname(domain),
                     );
                     if (invalidDomain) {
-                        // eslint-disable-next-line max-len
                         throw new Error(`'${invalidDomain.value}' is not a valid domain name or regexp pattern`);
                     }
 
@@ -207,23 +208,23 @@ export const validateAndFilterRules = (list, excluded, invalid = [], filterName)
         return [];
     }
 
-    return list.filter((ruleText, index, array) => {
+    return filterWithHints(list, (ruleText, index, array) => {
         if (CommentParser.isCommentRule(ruleText)) {
             return true;
         }
 
         const previousRule = index > 0 ? array[index - 1] : null;
-        // Skip validation if "ruleText" is preceded by "NOT_VALIDATE" hint
-        // https://github.com/AdguardTeam/FiltersCompiler/issues/245
-        if (
-            previousRule
-            && previousRule.startsWith(RuleMasks.MASK_HINT)
-            && (
-                previousRule.includes(`${SPACE}${NOT_VALIDATE_HINT}${SPACE}`)
-                || previousRule.endsWith(`${SPACE}${NOT_VALIDATE_HINT}`)
-            )
+        // Skip validation if "ruleText" is preceded by a hint that makes it
+        // intentionally non-standard.
+        if (hasHint(previousRule, NOT_VALIDATE_HINT)) {
+            return true;
+        }
 
-        ) {
+        // A rule kept as-is by the `NOT_CONVERT` hint cannot be validated against
+        // the canonical syntax either, so it reaches the build output unchecked.
+        // Unlike `NOT_VALIDATE`, which is an explicit opt-out, report such rules.
+        if (hasHint(previousRule, NOT_CONVERT_HINT)) {
+            logger.warn(`Rule "${ruleText}" is kept as-is by the NOT_CONVERT hint and is not validated`);
             return true;
         }
 

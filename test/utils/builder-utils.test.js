@@ -6,7 +6,7 @@ import {
 } from 'vitest';
 import { optimizeDomainBlockingRules } from '../../src/main/utils/builder-utils';
 
-vi.mock('../../main/utils/log');
+vi.mock('../../src/main/utils/log');
 
 describe('optimizeDomainBlockingRules options of include directive', () => {
     it('Properly removes redundant rules', async () => {
@@ -79,6 +79,25 @@ describe('optimizeDomainBlockingRules options of include directive', () => {
         expectedOutput.forEach((rule) => {
             expect(result.includes(rule)).toBeTruthy();
         });
+    });
+
+    it('Drops hints attached to optimized-out rules', async () => {
+        const lines = [
+            '!+ PLATFORM(ios)',
+            '||sub.example.com^',
+            '||example.com^',
+        ];
+        const result = await optimizeDomainBlockingRules(lines);
+        expect(result).toEqual(['||example.com^']);
+    });
+
+    it('Keeps hints attached to retained rules', async () => {
+        const lines = [
+            '!+ PLATFORM(ios)',
+            '||example.com^',
+        ];
+        const result = await optimizeDomainBlockingRules(lines);
+        expect(result).toEqual(lines);
     });
 
     it('one more test', async () => {

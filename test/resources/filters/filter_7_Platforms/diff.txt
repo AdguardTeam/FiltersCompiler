@@ -1,2 +1,10 @@
+! Rule "||convert1.test^$1p" is kept as-is due to the NOT_CONVERT hint
+||convert1.test^$1p
+! Rule "||convert2.test^$1p" converted to: "||convert2.test^$~third-party"
+||convert2.test^$1p
+! Rule "example.com#%#//scriptlet('new-scriptlet')" is kept as-is due to the NOT_CONVERT hint
+example.com#%#//scriptlet('new-scriptlet')
+! Rule "||included.test^$1p" converted to: "||included.test^$~third-party"
+||included.test^$1p
 ! Error: "Unknown modifier: unsupported" in the rule: "||test.org^$unsupported"
 ||test.org^$unsupported

@@ -8,6 +8,8 @@
 ! The following rules should be excluded:
 #%#//scriptlet('trusted-
 #%#//scriptlet("trusted-
+#%#//scriptlet('ubo-trusted-
+#%#//scriptlet("ubo-trusted-
 $replace
 $urltransform
 #%#
