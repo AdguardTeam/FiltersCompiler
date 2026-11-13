@@ -5,12 +5,17 @@ import md5 from 'md5';
 
 import { FiltersDownloader } from '@adguard/filters-downloader';
 import { Version } from './utils/version';
-import { convertRulesToAdgSyntax } from './converter';
+import { convertRulesToAdgSyntax, getCanonicalRuleTexts } from './converter';
 import { validateAndFilterRules, checkAffinityDirectives } from './validator';
 import { init, generate } from './platforms/generator';
 import { logger } from './utils/log';
 import { skipFilter, addFilter, create } from './utils/report';
-import { RuleMasks } from './rule/rule-masks';
+import {
+    RuleMasks,
+    hasHint,
+    isHint,
+    NOT_CONVERT_HINT,
+} from './rule/rule-masks';
 import { fixVersionComments, removeAdblockVersion } from './utils/workaround';
 import { downloadFile } from './utils/webutils';
 import { getFilterIdFromDirName } from './utils/utils';
@@ -41,7 +46,8 @@ const EXCLUDE_OPTION = 'exclude';
 const ADD_MODIFIERS_OPTION = 'addModifiers';
 const IGNORE_TRUST_LEVEL_OPTION = 'ignoreTrustLevel';
 
-const NOT_OPTIMIZED_HINT = '!+ NOT_OPTIMIZED';
+const NOT_OPTIMIZED_HINT_NAME = 'NOT_OPTIMIZED';
+const NOT_OPTIMIZED_HINT = `${RuleMasks.MASK_HINT}${SPACE}${NOT_OPTIMIZED_HINT_NAME}`;
 
 /**
  * Filter header tag for diff path which is needed for patch updates.
@@ -108,29 +114,60 @@ const stripComments = function (lines) {
 };
 
 /**
- * Adds not optimized hints
+ * Adds not optimized hints.
  *
- * @param lines
+ * A hint applies only to the line that immediately follows it, so consumers
+ * read it from the line right before the rule. The token is appended to an
+ * existing hint line only when that line directly precedes the rule: a blank
+ * line or a comment between them detaches the hint, and a separate hint line
+ * is inserted instead.
+ *
+ * Lines are classified by their trimmed text: this runs on included lines that
+ * `compile()` trims only later, so indentation must not hide a hint or a blank
+ * line.
+ *
+ * Exported for unit tests.
+ *
+ * @param {string[]} lines Lines to process.
+ *
+ * @returns {string[]} Lines with the hints added.
  */
-const addNotOptimizedHints = function (lines) {
+export const addNotOptimizedHints = function (lines) {
     logger.info('Adding hints..');
 
     const result = [];
+    let previousLine = null;
 
-    lines.forEach((v) => {
-        if (!v) {
+    lines.forEach((line) => {
+        const trimmedLine = line.trim();
+
+        if (!trimmedLine) {
+            previousLine = trimmedLine;
             return;
         }
 
-        if (!v.startsWith(RuleMasks.MASK_COMMENT) && !v.startsWith(`${RuleMasks.MASK_HINT}${SPACE}`)) {
-            result.push(NOT_OPTIMIZED_HINT);
+        const isRule = !trimmedLine.startsWith(RuleMasks.MASK_COMMENT);
+        const isHinted = isHint(previousLine);
+        const alreadyMarked = isHinted && hasHint(previousLine, NOT_OPTIMIZED_HINT_NAME);
+
+        if (isRule) {
+            if (!isHinted) {
+                result.push(NOT_OPTIMIZED_HINT);
+            } else if (!alreadyMarked) {
+                // Append to the hint that modifies this rule, otherwise it would no longer
+                // apply to the rule.
+                const hintIndex = result.length - 1;
+                result[hintIndex] = `${result[hintIndex]}${SPACE}${NOT_OPTIMIZED_HINT_NAME}`;
+            }
         }
 
-        result.push(v);
+        result.push(line);
+        previousLine = trimmedLine;
     });
 
     return result;
 };
+
 /**
  * Adds or updates modifiers in each line of the given array of lines.
  *
@@ -175,7 +212,7 @@ const addModifiers = (lines, modifiersStr) => {
  * @return {boolean}
  */
 const scriptletException = (line, exclusion) => (exclusion === '#%#' && line.includes('#%#//scriptlet'))
-        || (exclusion === '#@%#' && line.includes('#@%#//scriptlet'));
+    || (exclusion === '#@%#' && line.includes('#@%#//scriptlet'));
 
 /**
  * Checks if line is excluded with specified set of exclusions
@@ -184,8 +221,10 @@ const scriptletException = (line, exclusion) => (exclusion === '#%#' && line.inc
  * @param exclusions
  * @param excluded
  * @param reason
+ * @param {string[]} [additionalLines] Alternative representations of the line (e.g. canonical
+ * AdGuard syntax) which are checked against the exclusions as well.
  */
-const isExcluded = function (line, exclusions, excluded, reason) {
+const isExcluded = function (line, exclusions, excluded, reason, additionalLines = []) {
     // eslint-disable-next-line no-restricted-syntax
     for (let exclusion of exclusions) {
         exclusion = exclusion.trim();
@@ -193,10 +232,15 @@ const isExcluded = function (line, exclusions, excluded, reason) {
         if (exclusion && !exclusion.startsWith(RuleMasks.MASK_COMMENT)) {
             const message = `${line} is excluded by "${exclusion}" in ${reason}`;
 
-            const isExcludedByRegexp = exclusion.endsWith(SLASH) && exclusion.startsWith(SLASH)
-                && line.match(new RegExp(exclusion.substring(1, exclusion.length - 1)));
+            const matches = [line, ...additionalLines].some((candidate) => {
+                const isExcludedByRegexp = exclusion.endsWith(SLASH) && exclusion.startsWith(SLASH)
+                    && new RegExp(exclusion.substring(1, exclusion.length - 1)).test(candidate);
 
-            if ((isExcludedByRegexp || line.includes(exclusion)) && !scriptletException(line, exclusion)) {
+                return (isExcludedByRegexp || candidate.includes(exclusion))
+                    && !scriptletException(candidate, exclusion);
+            });
+
+            if (matches) {
                 logger.info(message);
                 excluded.push(`${RuleMasks.MASK_COMMENT}${SPACE}${message}`);
                 excluded.push(line);
@@ -214,9 +258,11 @@ const isExcluded = function (line, exclusions, excluded, reason) {
  * @param lines
  * @param exclusionsFile
  * @param excluded
+ * @param {string} [previousLine] Line preceding the first line of `lines`, so that a hint
+ * on a separate line is honored when the lines are processed on their own.
  * @returns {*}
  */
-const exclude = function (lines, exclusionsFile, excluded) {
+const exclude = function (lines, exclusionsFile, excluded, previousLine = undefined) {
     logger.info('Applying exclusions..');
 
     let exclusions = readFile(exclusionsFile);
@@ -230,9 +276,12 @@ const exclude = function (lines, exclusionsFile, excluded) {
     const result = [];
 
     lines.forEach((line, pos) => {
-        const exclusion = isExcluded(line, exclusions, excluded, exclusionsFileName);
+        const hintLine = pos > 0 ? lines[pos - 1] : previousLine;
+        const canonicalLines = hasHint(hintLine, NOT_CONVERT_HINT) ? getCanonicalRuleTexts(line) : [];
+        const exclusion = isExcluded(line, exclusions, excluded, exclusionsFileName, canonicalLines);
+
         if (exclusion) {
-            if (pos > 0 && lines[pos - 1].startsWith(RuleMasks.MASK_HINT)) {
+            if (isHint(hintLine)) {
                 result.push(`${RuleMasks.MASK_COMMENT} [excluded by ${exclusion}] ${line}`);
             }
         } else {
@@ -463,6 +512,7 @@ const getResolvedPreprocessorIncludes = async function (filterDir, filterName, l
  * @param {string[]} lines Array of raw rules and possibly preprocessor `!#include` directives.
  * @param {string[]} excluded Array of rules to exclude.
  * @param {string[]} invalidRules Invalid rules for the report file.
+ * @param {string} [previousLine] Line preceding the first of `lines` in the template.
  *
  * @returns {Promise<string[]>} Promise which resolves to array of AdGuard syntax rules.
  */
@@ -472,9 +522,10 @@ const prepareAdgRules = async function (
     lines,
     excluded,
     invalidRules,
+    previousLine,
 ) {
     const resolvedIncludes = await getResolvedPreprocessorIncludes(filterDir, filterName, lines);
-    return convertRulesToAdgSyntax(resolvedIncludes, excluded, invalidRules);
+    return convertRulesToAdgSyntax(resolvedIncludes, excluded, invalidRules, previousLine);
 };
 
 /**
@@ -529,6 +580,7 @@ const compile = async function (filterDir, filterName, templateContent, trustLev
     const invalid = [];
 
     const lines = splitLines(templateContent);
+    let previousLine;
     // eslint-disable-next-line no-restricted-syntax
     for (const line of lines) {
         if (line.startsWith(INCLUDE_DIRECTIVE)) {
@@ -561,7 +613,15 @@ const compile = async function (filterDir, filterName, templateContent, trustLev
                 result.push(includedRules[i]);
             }
         } else {
-            let inlineRules = [line.trim()];
+            const trimmedLine = line.trim();
+            // A preprocessor directive is not a rule, and `!#include` expands to the rules of
+            // another file, so a hint on the line before any `!#` directive (`!#include`,
+            // `!#if`, `!#else`, `!#endif`, ...) must not apply to the lines it resolves to.
+            const inlinePreviousLine = trimmedLine.startsWith(RuleMasks.MASK_DIRECTIVES)
+                ? undefined
+                : previousLine;
+
+            let inlineRules = [trimmedLine];
 
             // eslint-disable-next-line no-await-in-loop
             inlineRules = await prepareAdgRules(
@@ -570,10 +630,11 @@ const compile = async function (filterDir, filterName, templateContent, trustLev
                 inlineRules,
                 excluded,
                 invalid,
+                inlinePreviousLine,
             );
 
             logger.info('Applying trust-level exclusions to inline template.txt rules...');
-            inlineRules = exclude(inlineRules, trustLevelSettings, excluded);
+            inlineRules = exclude(inlineRules, trustLevelSettings, excluded, inlinePreviousLine);
 
             // 'for' loop is used in purpose instead of spread operator
             // to avoid 'Maximum call stack size exceeded' error on large number of rules
@@ -581,6 +642,8 @@ const compile = async function (filterDir, filterName, templateContent, trustLev
                 result.push(inlineRules[i]);
             }
         }
+
+        previousLine = line.trim();
     }
 
     result = result.filter((line) => !isDiffPathHeaderTag(line));

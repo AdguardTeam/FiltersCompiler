@@ -32,7 +32,7 @@ The library exposes four public API functions: `compile`, `validateJSONSchema`,
 - **Package Manager**: pnpm >=10.33.4 and <11
 - **Bundler**: Rollup (single ESM output; `require()` relies on Node.js
   `require(ESM)`, enabled by default since Node.js 22.12)
-- **Testing**: Vitest (node environment, `test/*.test.{js,ts}`)
+- **Testing**: Vitest (node environment, `test/**/*.test.{js,ts}`)
 - **Code Linting**: ESLint 10, native flat config (`eslint.config.js`) — a
   one-time port of the project's former ESLint 8 + airbnb-base rule set, no
   airbnb dependency (4-space indent, 120 char max line length). See
@@ -325,7 +325,8 @@ Public API layer.
 
 - **Framework**: Vitest with `node` environment.
 - **Test file placement**: All tests live in `test/`. The test runner includes
-  `test/*.test.{js,ts}`.
+  `test/**/*.test.{js,ts}`, so tests may live in subdirectories such as
+  `test/utils/`.
 - **Test resources**: Place test fixtures in `test/resources/` (filter files,
   platform configs, expected outputs). Some resources are gitignored (generated
   during tests).
