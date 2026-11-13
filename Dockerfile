@@ -37,8 +37,9 @@ COPY . /compiler
 # ============================================================================
 # Stage: test-output
 # Runs lint, builds the library, and runs vitest unit tests.
-# Used as the CI validation target: `docker build --target test-output .`
-# fails if lint, build, or tests fail.
+# Used as the Node.js 22.22 CI target: `docker build --target test-output .`
+# fails if lint, build, or tests fail. The Node.js 24 job in ci.yml runs the
+# same `pnpm run ci` command directly on the runner.
 # ============================================================================
 FROM source AS test-output
 
@@ -46,9 +47,7 @@ ARG BUILD_RUN_ID=""
 
 RUN --mount=type=cache,target=/pnpm-store,id=compiler-pnpm \
     echo "${BUILD_RUN_ID}" > /tmp/.build-run-id && \
-    pnpm lint && \
-    pnpm build && \
-    pnpm test
+    pnpm run ci
 
 # ============================================================================
 # Stage: build

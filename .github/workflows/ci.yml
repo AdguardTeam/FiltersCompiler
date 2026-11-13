@@ -19,3 +19,54 @@ jobs:
     uses: AdGuardSoftwareLimited/ext-shared-actions/.github/workflows/test-and-build.yml@master
     with:
       package_file: filters-compiler.tgz
+
+  # The shared Docker-based workflow above only covers Node.js 22.22: the
+  # Dockerfile is pinned to `adguard/node-ssh:22.22--0` (no Node.js 24 image
+  # exists) and the shared workflow has no Node-version input. Run the same
+  # checks directly on a Node.js 24 toolchain instead, on the same runner.
+  #
+  # pnpm is installed through Corepack rather than `pnpm/action-setup`: the
+  # org Actions allowlist does not include that action, and a disallowed
+  # `uses:` makes GitHub reject the whole run at startup with no jobs.
+  test-node24:
+    name: Lint, test, build (Node.js 24)
+    runs-on: team-extensions
+    permissions:
+      contents: read
+    env:
+      # Keep Corepack from adding a `packageManager` field to package.json.
+      COREPACK_ENABLE_AUTO_PIN: '0'
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Enable pnpm
+        run: |
+          corepack enable
+          # Derive the pnpm version from the declared engine range so this job
+          # does not pin a third copy that can drift from package.json.
+          PNPM_VERSION="$(node -p "require('./package.json').engines.pnpm" \
+            | sed -E 's/^[^0-9]*([0-9]+\.[0-9]+\.[0-9]+).*/\1/')"
+          # Fail fast if the range has no full X.Y.Z floor: otherwise the sed
+          # passes the range through and Corepack silently resolves it to the
+          # newest matching release instead of the floor.
+          if ! printf '%s\n' "${PNPM_VERSION}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "Cannot derive a pnpm version from engines.pnpm: ${PNPM_VERSION}" >&2
+            exit 1
+          fi
+          corepack prepare "pnpm@${PNPM_VERSION}" --activate
+          pnpm --version
+      # setup-node needs pnpm on PATH to configure the pnpm cache, so run it
+      # once more after Corepack has provided the shim.
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Lint, build, and test
+        # `pnpm ci` is reserved by pnpm for a clean install, so invoke the
+        # package.json `ci` script explicitly. That script is the single
+        # definition of the check set, also used by the Dockerfile.
+        run: pnpm run ci
