@@ -213,6 +213,68 @@ describe('platforms filter', () => {
         expect(after.indexOf('!#safari_cb_affinity')).toBeGreaterThanOrEqual(0);
     });
 
+    it('Does not modify the platform configuration', () => {
+        const config = {
+            'platform': 'test',
+            'path': 'hints',
+            'configuration': {
+                'removeRulePatterns': ['^zzz-'],
+                'ignoreRuleHints': false,
+            },
+        };
+
+        const optimizationConfig = {
+            'groups': [
+                {
+                    'config': {
+                        'type': 'ELEMHIDE',
+                        'scope': 'DOMAIN',
+                        'hits': 10,
+                    },
+                    'rules': {
+                        'example.com': 0,
+                    },
+                },
+            ],
+            'percent': 100,
+            'minPercent': 100,
+            'maxPercent': 100,
+            'strict': true,
+        };
+
+        // A strict optimization mismatch throws in the middle of the cleanup.
+        expect(() => cleanupAndOptimizeRules(
+            ['example.com', 'ad-banner.com'],
+            config,
+            optimizationConfig,
+            0,
+        )).toThrow();
+
+        expect(config.configuration.removeRulePatterns).toEqual(['^zzz-']);
+    });
+
+    it('Handles stateful RegExp removal patterns', () => {
+        const config = {
+            'platform': 'test',
+            'path': 'hints',
+            'configuration': {
+                'removeRulePatterns': [/^zzz-/g],
+                'ignoreRuleHints': false,
+            },
+        };
+
+        const before = [
+            'zzz-1',
+            'zzz-2',
+            'zzz-3',
+            'zzz-4',
+        ];
+
+        const after = cleanupRules(before, config, 1);
+
+        expect(after).toEqual([]);
+    });
+
     it('Test remove rule patterns', () => {
         const config = {
             'platform': 'test',
@@ -554,6 +616,35 @@ describe('platforms filter', () => {
             '||example.com^$app=org.example.app',
             '||example.com^$protobuf',
             '||example.com^$content,hls=/x/',
+        ];
+
+        const after = cleanupRules([...keptRules, ...removedRules], config, 0);
+
+        expect(after).toEqual(keptRules);
+    });
+
+    it('keeps native :has() rules and removes extended CSS rules for Android Content Blocker', () => {
+        const config = platformsConfig.EXTENSION_ANDROID_CONTENT_BLOCKER;
+
+        const keptRules = [
+            'example.com##.sidebar_list > .widget_text:has(a[title = "ads"])',
+            '##div:has(> .ad)',
+            'example.com##div:has(> .a):has(> .b)',
+            'example.com##div:has(a:not(.b)):has(.c)',
+            'example.com##div:has([title="a)b"]:has(.c))',
+        ];
+        const removedRules = [
+            'example.com#?#div:has(> .ad)',
+            'example.com##div:has-text(ad)',
+            'example.com##div:contains(ad)',
+            'example.com##div:-abp-has(.ad)',
+            'example.com##article:has(header:has(.ct-sponsored))',
+            'example.com##div > [style]:has([style]:has([href*="&utm"]))',
+            'example.com##article:has(header:not(.organic):has(.ct-sponsored))',
+            'example.com##div:has(:is(.a, .b):has(.c))',
+            'example.com##div:has(> li:nth-child(2):has(.c))',
+            'example.com##div:has(.a:not(:is(.b, .c)):has(.d))',
+            'example.com##div:has(.a:not(:is(.b:not(.c))):has(.d))',
         ];
 
         const after = cleanupRules([...keptRules, ...removedRules], config, 0);

@@ -14,12 +14,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The MV3 extension platforms now share `CHROMIUM_MV3_BASED_EXTENSION_PATTERNS`
+  instead of repeating the same `removeRulePatterns`. No behaviour change.
+- `cleanupAndOptimizeRules()` no longer inserts the comment pattern into the
+  platform configuration, so the shared config is left untouched.
+- Rule removal patterns are compiled once per platform cleanup instead of once
+  per rule.
+
 ### Deprecated
 
 ### Removed
 
 ### Fixed
 
+- Native `:has()` cosmetic rules (`##`) are no longer removed from the
+  `ext_android_cb` platform [#233].
 - The `@include` error for a missing local file now reports the include path
   instead of `undefined`.
 - `!#include` directives inside a file pulled in by a local `@include` are now
@@ -56,6 +65,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+[#233]: https://github.com/AdguardTeam/FiltersCompiler/issues/233
 [#270]: https://github.com/AdguardTeam/FiltersCompiler/issues/270
 [#272]: https://github.com/AdguardTeam/FiltersCompiler/issues/272
 

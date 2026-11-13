@@ -5,7 +5,7 @@
  * @see {@link https://github.com/AdguardTeam/FiltersRegistry/blob/master/scripts/build/custom_platforms.ts}
  *
  * IMPORTANT: During making any changes in this file,
- * the custom_platforms.js should also be updated through PR on GitHub.
+ * the custom_platforms.ts should also be updated through PR on GitHub.
  */
 
 /**
@@ -506,6 +506,11 @@ const UNBLOCKING_IMPORTANT_RULES_PATTERNS = [
 /**
  * Pattern to detect Extended CSS rules
  *
+ * Plain `:has(` is deliberately absent: it is a native CSS selector supported
+ * by all platforms. `:-abp-has(` is different — it is the Extended CSS alias of
+ * `:has()` and is never native, so it is still removed. Nested `:has()` is not
+ * valid native CSS either, hence it has its own pattern below.
+ *
  * @example
  * ```xup.in#?##xupab```
  * @example
@@ -515,7 +520,6 @@ const UNBLOCKING_IMPORTANT_RULES_PATTERNS = [
  */
 const EXTENDED_CSS_RULES_PATTERNS = [
     '\\[-ext-',
-    ':has\\(',
     ':has-text\\(',
     ':contains\\(',
     ':matches-css\\(',
@@ -529,6 +533,12 @@ const EXTENDED_CSS_RULES_PATTERNS = [
     ':matches-css-after\\(',
     ':-abp-has\\(',
     ':-abp-contains\\(',
+    // Nested `:has()` is not valid native CSS, so it needs Extended CSS.
+    // A regex cannot count paren depth, so the fix is bounded with it
+    // crossing up to three nested levels.
+    // div:has(.a:not(:is(.b:not(:where(.c)))):has(.d)) (four closes) is
+    // still kept.
+    ':has\\((?:[^)]|\\((?:[^()]|\\((?:[^()]|\\([^()]*\\))*\\))*\\))*:has\\(',
     '#\\?#',
     '#\\$\\?#',
     '#@\\?#',
@@ -571,6 +581,15 @@ const CHROMIUM_BASED_EXTENSION_PATTERNS = [
     ...JSONPRUNE_MODIFIER_PATTERNS,
     ...REFERRERPOLICY_MODIFIER_PATTERNS,
     ...CONTENT_MODIFIER_PATTERNS,
+];
+
+/**
+ * Used for `EXTENSION_CHROMIUM_MV3`, `EXTENSION_EDGE_MV3`, and
+ * `EXTENSION_OPERA_MV3` platforms.
+ */
+const CHROMIUM_MV3_BASED_EXTENSION_PATTERNS = [
+    ...CHROMIUM_BASED_EXTENSION_PATTERNS,
+    ...REDIRECT_RULE_MODIFIER_PATTERNS,
 ];
 
 /**
@@ -648,6 +667,8 @@ export const MAC_V2_PLATFORM = 'MAC_V2';
  * code that needs one of the keys imports it by name.
  */
 export const LEGACY_PLATFORMS = [MAC_V1_PLATFORM, MAC_V2_PLATFORM];
+
+/* eslint-enable max-len */
 
 export const platformsConfig = {
     'WINDOWS': {
@@ -756,10 +777,7 @@ export const platformsConfig = {
         'path': 'extension/chromium-mv3',
         'expires': '10 days',
         'configuration': {
-            'removeRulePatterns': [
-                ...CHROMIUM_BASED_EXTENSION_PATTERNS,
-                ...REDIRECT_RULE_MODIFIER_PATTERNS,
-            ],
+            'removeRulePatterns': CHROMIUM_MV3_BASED_EXTENSION_PATTERNS,
             'replacements': null,
             'ignoreRuleHints': false,
         },
@@ -788,10 +806,7 @@ export const platformsConfig = {
         'path': 'extension/edge-mv3',
         'expires': '10 days',
         'configuration': {
-            'removeRulePatterns': [
-                ...CHROMIUM_BASED_EXTENSION_PATTERNS,
-                ...REDIRECT_RULE_MODIFIER_PATTERNS,
-            ],
+            'removeRulePatterns': CHROMIUM_MV3_BASED_EXTENSION_PATTERNS,
             'replacements': null,
             'ignoreRuleHints': false,
         },
@@ -821,10 +836,7 @@ export const platformsConfig = {
         'path': 'extension/opera-mv3',
         'expires': '10 days',
         'configuration': {
-            'removeRulePatterns': [
-                ...CHROMIUM_BASED_EXTENSION_PATTERNS,
-                ...REDIRECT_RULE_MODIFIER_PATTERNS,
-            ],
+            'removeRulePatterns': CHROMIUM_MV3_BASED_EXTENSION_PATTERNS,
             'replacements': null,
             'ignoreRuleHints': false,
         },
