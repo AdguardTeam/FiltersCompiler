@@ -37,7 +37,7 @@ describe('remote !#include in an @include body', () => {
     let remoteBaseUrl;
     let remotePort;
     let parentUrl;
-    let requestedPaths;
+    const requestedPaths = [];
 
     beforeAll(async () => {
         server = http.createServer((req, res) => {
@@ -101,7 +101,7 @@ describe('remote !#include in an @include body', () => {
 
     beforeEach(() => {
         downloadFile.mockReset();
-        requestedPaths = [];
+        requestedPaths.length = 0;
     });
 
     it('resolves an absolute nested !#include with fetch', async () => {
