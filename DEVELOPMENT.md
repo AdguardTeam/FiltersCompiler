@@ -102,6 +102,7 @@ pnpm lint
 | Command              | Description                                           |
 | -------------------- | ----------------------------------------------------- |
 | `pnpm install`       | Install dependencies                                  |
+| `pnpm run ci`        | Run the full CI check set: lint, build, and test      |
 | `pnpm build`         | Build the library (Rollup → `dist/`)                  |
 | `pnpm test`          | Run all tests (Vitest)                                |
 | `pnpm lint`          | Run ESLint, TypeScript type checker, and markdownlint |
@@ -111,6 +112,11 @@ pnpm lint
 | `pnpm build-schemas` | Regenerate filters schema from `tasks/build-schemas/` |
 | `pnpm tgz`           | Pack release tarball (`filters-compiler.tgz`)         |
 
+> **Note**: `pnpm run ci` is the single definition of the CI check set: the
+> Docker `test-output` stage and the Node.js 24 job in `ci.yml` both call it.
+> Use `pnpm run ci`, not `pnpm ci` — `ci` is pnpm's own command for a clean
+> install.
+>
 > **Note**: `pnpm tgz` requires a temporary `version` field in
 > `package.json` — the workaround is documented in
 > [AGENTS.md](AGENTS.md#build-and-test-commands). As an alternative, the Docker
@@ -138,7 +144,7 @@ unchanged.
 3. When importing a `.js` module from `.ts`, the import resolves to `any` via
    the ambient declaration in `src/types/global.d.ts`. For better type coverage,
    write a `.d.ts` shim alongside the `.js` file.
-4. Run `pnpm lint && pnpm test && pnpm build`
+4. Run `pnpm run ci` — the same lint, build, and test set CI runs
 
 #### Writing Tests in TypeScript
 
@@ -353,11 +359,22 @@ supported version can use both `import` and `require`:
 node --version  # Should be v22.21+ on 22.x, or v24+
 ```
 
-If using nvm, install the latest 22.x to match CI and the Docker image:
+CI validates both Node.js 22.22 (the Docker `test-output` target) and
+Node.js 24 (a separate CI job), so a change must pass on both. Either version
+works for local development. If using nvm, install one of them:
 
 ```bash
+# Latest 22.x — the Docker-based CI job uses Node.js 22.22
 nvm install 22
 nvm use 22
+```
+
+or:
+
+```bash
+# 24.x — matches the Node.js 24 CI job
+nvm install 24
+nvm use 24
 ```
 
 ### Schema Validation Errors After Manual Edit

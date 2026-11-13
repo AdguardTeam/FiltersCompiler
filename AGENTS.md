@@ -117,6 +117,7 @@ The library exposes four public API functions: `compile`, `validateJSONSchema`,
 | Command              | Description                                           |
 | -------------------- | ----------------------------------------------------- |
 | `pnpm install`       | Install dependencies                                  |
+| `pnpm run ci`        | Run the full CI check set: lint, build, and test      |
 | `pnpm build`         | Build the library (Rollup → `dist/`)                  |
 | `pnpm test`          | Run all tests (Vitest)                                |
 | `pnpm lint`          | Run ESLint, TypeScript type checker, and markdownlint |
@@ -125,6 +126,10 @@ The library exposes four public API functions: `compile`, `validateJSONSchema`,
 | `pnpm lint:md`       | Lint markdown files                                   |
 | `pnpm build-schemas` | Regenerate filters schema from `tasks/build-schemas/` |
 | `pnpm tgz`           | Pack release tarball (`filters-compiler.tgz`)         |
+
+`pnpm run ci` is the single definition of the CI check set: the Docker
+`test-output` stage and the Node.js 24 job in `ci.yml` both call it. Use
+`pnpm run ci`, not `pnpm ci` — `ci` is pnpm's own command for a clean install.
 
 `pnpm tgz` requires a `version` field in `package.json`, which is
 intentionally absent — set a temporary one first

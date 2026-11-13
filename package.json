@@ -17,6 +17,7 @@
         }
     },
     "scripts": {
+        "ci": "pnpm lint && pnpm build && pnpm test",
         "prebuild": "rimraf dist",
         "build": "rollup --config rollup.config.js --silent",
         "test": "vitest",
