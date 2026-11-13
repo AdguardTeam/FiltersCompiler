@@ -1,0 +1,2 @@
+parent-included-rule.com
+!#include child.txt

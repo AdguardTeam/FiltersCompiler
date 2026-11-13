@@ -40,16 +40,17 @@ In short:
 
 ## CI/CD
 
-| Workflow              | Trigger                                | Purpose                                                                 |
-| --------------------- | -------------------------------------- | ----------------------------------------------------------------------- |
-| `ci.yml`              | PRs and pushes to `master`             | Lint, test, build inside Docker; upload `filters-compiler.tgz` artifact |
-| `prepare-release.yml` | Manual (`workflow_dispatch` with tag)  | Open a release-bump PR that finalizes `CHANGELOG.md`                    |
-| `publish-release.yml` | PR merged to `master` or manual re-run | Tag, build, publish to npm, mirror, create GitHub Release, notify Slack |
-| `mirror.yml`          | Push to `master`                       | Mirror commits to `AdguardTeam/FiltersCompiler`                         |
+| Workflow              | Trigger                                | Purpose                                                                                       |
+| --------------------- | -------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `ci.yml`              | PRs and pushes to `master`             | Lint, test, build in Docker (Node.js 22.22) and on Node.js 24; uploads `filters-compiler.tgz` |
+| `prepare-release.yml` | Manual (`workflow_dispatch` with tag)  | Open a release-bump PR that finalizes `CHANGELOG.md`                                          |
+| `publish-release.yml` | PR merged to `master` or manual re-run | Tag, build, publish to npm, mirror, create GitHub Release, notify Slack                       |
+| `mirror.yml`          | Push to `master`                       | Mirror commits to `AdguardTeam/FiltersCompiler`                                               |
 
 Self-hosted jobs run on the `team-extensions` runner label; the npm publish
-job (`deploy-to-npm`) runs on `ubuntu-latest`. All workflows reuse the
-shared pipeline definitions from
+job (`deploy-to-npm`) runs on `ubuntu-latest`. Except for the Node.js 24 job
+in `ci.yml`, which runs the checks directly via `actions/setup-node`,
+workflows reuse the shared pipeline definitions from
 [AdGuardSoftwareLimited/ext-shared-actions][ext-shared-actions] and
 [AdGuardSoftwareLimited/actions][actions].
 
@@ -170,7 +171,7 @@ The `Dockerfile` uses multi-stage builds based on `adguard/node-ssh:22.22--0`:
 | `base`                   | Shared foundation | Node.js 22.22, pnpm 10.33.4 (from base image)                                |
 | `deps`                   | Dependency cache  | `pnpm install --frozen-lockfile --ignore-scripts`                            |
 | `source`                 | Full source       | Copies project files over `deps`                                             |
-| `test-output`            | CI validation     | `pnpm lint && pnpm build && pnpm test`                                       |
+| `test-output`            | Node.js 22.22 CI  | `pnpm run ci`                                                                |
 | `build` / `build-output` | Artifact creation | `pnpm build && pnpm pack --out filters-compiler.tgz`; outputs `.tgz` at root |
 
 The dependency stage is cached by `package.json` and `pnpm-lock.yaml`.
@@ -179,7 +180,7 @@ The build cache (pnpm store) is mounted at `/pnpm-store` with id `compiler-pnpm`
 ### Local Build Commands
 
 ```bash
-# Run CI validation (lint + build + test)
+# Run the Node.js 22.22 CI checks (lint + build + test)
 docker build --target test-output .
 
 # Produce the release artifact
@@ -187,6 +188,10 @@ docker build --platform linux/amd64 --target build-output \
    --build-arg VERSION=0.0.0-dev --output ./artifacts .
 # → ./artifacts/filters-compiler.tgz
 ```
+
+The `test-output` target reproduces only the Node.js 22.22 job. The Node.js 24
+job in `ci.yml` runs `pnpm run ci` directly on the runner. Both call the same
+`ci` script from `package.json`, so the check set is defined once.
 
 `package.json` intentionally has no `version` field — CI injects the release
 version before building the image, and `pnpm pack` requires one. Pass a

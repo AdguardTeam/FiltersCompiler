@@ -22,6 +22,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- The `@include` error for a missing local file now reports the include path
+  instead of `undefined`.
+- `!#include` directives inside a file pulled in by a local `@include` are now
+  resolved relative to that file's directory instead of the filter directory.
+- An `@include` directive with extra whitespace before its path is now
+  accepted, and a directive without a target now fails with
+  `Invalid include directive` instead of a `TypeError`.
 - Hints no longer leak to the next rule when validation or
   `/optimizeDomainBlockingRules` drops the rule they modify, and `/notOptimized`
   appends `NOT_OPTIMIZED` to a hint that directly precedes a rule instead of
