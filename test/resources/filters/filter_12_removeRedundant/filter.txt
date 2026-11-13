@@ -14,6 +14,8 @@
 ||pl02.owen.prolitteris.ch^$script
 ||met.vgwort.de^$script
 ||intense.vgwort.de^$script
+!+ PLATFORM(ext_edge)
+||edge-only-example.com^$script
 !#endif
 !#if (adguard_app_ios)
 ||0031.lookinews.com^
@@ -28,6 +30,8 @@
 ||pl02.owen.prolitteris.ch^
 ||met.vgwort.de^
 ||intense.vgwort.de^
+!+ PLATFORM(ext_edge)
+||edge-only-example.com^
 !#endif
 !#if (adguard_ext_edge)
 !+ NOT_OPTIMIZED
@@ -54,4 +58,6 @@
 ||met.vgwort.de^
 !+ NOT_OPTIMIZED
 ||intense.vgwort.de^
+!+ PLATFORM(ext_edge) NOT_OPTIMIZED
+||edge-only-example.com^
 !#endif

@@ -589,6 +589,70 @@ describe('validator', () => {
         });
     });
 
+    describe('hint NOT_CONVERT', () => {
+        const newScriptletRule = "example.com#%#//scriptlet('new-scriptlet')";
+
+        it('keeps a rule with a not-yet-known scriptlet when preceded by the hint', () => {
+            const rules = ['!+ NOT_CONVERT', newScriptletRule];
+            expect(validateAndFilterRules(rules)).toEqual(rules);
+        });
+
+        it('drops the same rule without the hint', () => {
+            expect(validateAndFilterRules([newScriptletRule])).toHaveLength(0);
+        });
+
+        it('keeps the hinted rule when the hint is combined with other hints', () => {
+            const rules = ['!+ PLATFORM(windows) NOT_CONVERT', newScriptletRule];
+            expect(validateAndFilterRules(rules)).toEqual(rules);
+        });
+
+        it('keeps uBO-specific syntax when preceded by the hint', () => {
+            const rules = ['!+ NOT_CONVERT', 'example.com##+js(new-scriptlet)'];
+            expect(validateAndFilterRules(rules)).toEqual(rules);
+        });
+
+        it('applies only to the rule right after the hint', () => {
+            const anotherNewScriptletRule = "example.com#%#//scriptlet('another-new-scriptlet')";
+            const rules = ['!+ NOT_CONVERT', newScriptletRule, anotherNewScriptletRule];
+
+            const result = validateAndFilterRules(rules);
+
+            expect(result).toContain(newScriptletRule);
+            expect(result).not.toContain(anotherNewScriptletRule);
+        });
+
+        it('warns that the rule is not validated', () => {
+            const warn = vi.spyOn(logger, 'warn').mockImplementation(() => { });
+
+            validateAndFilterRules(['!+ NOT_CONVERT', newScriptletRule]);
+
+            expect(warn).toHaveBeenCalledWith(
+                `Rule "${newScriptletRule}" is kept as-is by the NOT_CONVERT hint and is not validated`,
+            );
+
+            warn.mockRestore();
+        });
+
+        it('does not warn for the explicit NOT_VALIDATE hint', () => {
+            const warn = vi.spyOn(logger, 'warn').mockImplementation(() => { });
+
+            validateAndFilterRules(['!+ NOT_VALIDATE', 'example.com##.ad']);
+
+            expect(warn).not.toHaveBeenCalled();
+
+            warn.mockRestore();
+        });
+
+        it('drops hints attached to a dropped rule', () => {
+            const rules = [
+                '!+ PLATFORM(ios)',
+                'example.com#@%#//scriptlet("abort-on--property-write", "adblock.check")',
+                '||example.org^',
+            ];
+            expect(validateAndFilterRules(rules)).toEqual(['||example.org^']);
+        });
+    });
+
     describe('validate redirect rules', () => {
         describe('valid', () => {
             const validRules = [

@@ -1,5 +1,6 @@
 import {
     AdblockSyntax,
+    CommentParser,
     RuleConverter,
     RuleParser,
     RuleGenerator,
@@ -8,7 +9,7 @@ import {
 import { getErrorMessage } from '@adguard/logger';
 
 import { logger } from './utils/log';
-import { RuleMasks } from './rule/rule-masks';
+import { RuleMasks, hasHint, NOT_CONVERT_HINT } from './rule/rule-masks';
 import {
     CORE_LIBS_PCRE2_QUANTIFIER_LIMIT,
     shouldKeepHtmlRuleWithOversizedLengths,
@@ -28,19 +29,34 @@ export const excludeRule = (rule, excluded, message) => {
 };
 
 /**
- * Converts rules to AdGuard syntax
+ * Converts rules to AdGuard syntax.
+ *
+ * Rules preceded by the `!+ NOT_CONVERT` hint are kept as-is.
  *
  * @param {string[]} rulesList Input rules.
  * @param {string[]} [excluded=[]] Rules to exclude.
  * @param {string[]} [invalidRules=[]] Collected invalid rules for the report file.
+ * @param {string} [previousLine] Line preceding the first rule of `rulesList`, so that a hint
+ * on a separate line (e.g. `!+ NOT_CONVERT`) is honored when the rules are converted one by one.
  *
- * @return {string[]} Rules converted to AdGuard syntax.
+ * @return {string[]} Rules converted to AdGuard syntax, except for the ones kept as-is.
  */
-export const convertRulesToAdgSyntax = (rulesList, excluded = [], invalidRules = []) => {
+export const convertRulesToAdgSyntax = (rulesList, excluded = [], invalidRules = [], previousLine = undefined) => {
     const result = [];
 
     for (let i = 0; i < rulesList.length; i += 1) {
         const rule = rulesList[i];
+        const hintLine = i > 0 ? rulesList[i - 1] : previousLine;
+
+        // An empty line or a `#` comment is not a rule, so the hint must not keep it as-is.
+        if (rule && !CommentParser.isCommentRule(rule) && hasHint(hintLine, NOT_CONVERT_HINT)) {
+            const message = `Rule "${rule}" is kept as-is due to the NOT_CONVERT hint`;
+            logger.info(message);
+            excludeRule(rule, excluded, message);
+            result.push(rule);
+            continue;
+        }
+
         try {
             const ruleNode = RuleParser.parse(rule);
 
@@ -90,6 +106,31 @@ export const convertRulesToAdgSyntax = (rulesList, excluded = [], invalidRules =
     }
 
     return result;
+};
+
+/**
+ * Returns canonical AdGuard representation of a single rule.
+ *
+ * Unlike `convertRulesToAdgSyntax`, a rule that cannot be parsed is not reported
+ * as an error: the failure is logged and an empty array is returned.
+ *
+ * Needed to check exclusions against rules kept as-is due to the `NOT_CONVERT` hint:
+ * such rules may be written in a form that bypasses substring exclusions
+ * (e.g. `#%#//scriptlet( 'trusted-set-cookie', ...)` with a space), while their canonical
+ * form does not.
+ *
+ * @param {string} rule Rule to convert.
+ *
+ * @returns {string[]} Converted rule texts, or an empty array if the rule cannot be parsed.
+ */
+export const getCanonicalRuleTexts = (rule) => {
+    try {
+        const ruleNode = RuleParser.parse(rule);
+        return RuleConverter.convertToAdg(ruleNode).result.map((r) => RuleGenerator.generate(r));
+    } catch (e) {
+        logger.info(`Unable to compute canonical form of "${rule}": ${getErrorMessage(e)}`);
+        return [];
+    }
 };
 
 const SINGLE_QUOTE = "'";
@@ -143,8 +184,16 @@ export const convertToUbo = (rules) => {
 
                     const scriptletName = trimQuotes(scriptletNameString);
 
+                    // The uBO-compatible spelling keeps the `ubo-` prefix
+                    // (e.g. `ubo-trusted-set-cookie`), so drop it before checking
+                    // for a trusted scriptlet.
+                    const normalizedScriptletName = scriptletName
+                        .startsWith(RuleMasks.MASK_UBO_SCRIPTLET_PREFIX)
+                        ? scriptletName.slice(RuleMasks.MASK_UBO_SCRIPTLET_PREFIX.length)
+                        : scriptletName;
+
                     // TODO: move this check to AGTree AG-41266
-                    if (scriptletName.startsWith(RuleMasks.MASK_TRUSTED_SCRIPTLET)) {
+                    if (normalizedScriptletName.startsWith(RuleMasks.MASK_TRUSTED_SCRIPTLET)) {
                         // https://github.com/AdguardTeam/Scriptlets#trusted-scriptlets-restriction
                         // does not work in other blockers
                         const message = `Trusted scriptlets should not be converted to uBO syntax. Rule: "${rule}"`;

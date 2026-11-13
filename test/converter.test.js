@@ -15,7 +15,9 @@ import {
 import {
     convertRulesToAdgSyntax,
     convertToUbo,
+    getCanonicalRuleTexts,
 } from '../src/main/converter';
+import { logger } from '../src/main/utils/log';
 import { CORE_LIBS_PCRE2_QUANTIFIER_LIMIT } from '../src/main/utils/workaround';
 
 // Mock log to hide error messages
@@ -74,6 +76,107 @@ describe('converter', () => {
         // HTML filtering rules with :not() and attribute selectors — ##^ converts to $$
         c = convertRulesToAdgSyntax(['example.com.pl##^iframe[name]:not([class]):not([id]):not([src])[style="display:none"]']);
         expect(c[0]).toBe('example.com.pl$$iframe[name]:not([class]):not([id]):not([src])[style="display:none"]');
+    });
+
+    describe('hint NOT_CONVERT', () => {
+        const rule = 'example.com##h1:style(background-color: blue !important)';
+        const converted = 'example.com#$#h1 { background-color: blue !important }';
+
+        it('keeps the rule preceded by the hint as is', () => {
+            const [, actual] = convertRulesToAdgSyntax(['!+ NOT_CONVERT', rule]);
+            expect(actual).toBe(rule);
+        });
+
+        it('keeps the rule when the hint is combined with other hints', () => {
+            const [, actual] = convertRulesToAdgSyntax(['!+ PLATFORM(windows) NOT_CONVERT', rule]);
+            expect(actual).toBe(rule);
+        });
+
+        it('keeps the invalid-looking rule as is instead of reporting an error', () => {
+            const excluded = [];
+            const invalidRules = [];
+            const [, actual] = convertRulesToAdgSyntax(
+                ['!+ NOT_CONVERT', 'example.com#%#//scriptlet('],
+                excluded,
+                invalidRules,
+            );
+
+            expect(actual).toBe('example.com#%#//scriptlet(');
+            expect(invalidRules).toEqual([]);
+            // The kept rule is recorded for the diff, not reported as an error.
+            expect(excluded).toHaveLength(2);
+            expect(excluded[0]).toContain('kept as-is due to the NOT_CONVERT hint');
+            expect(excluded[1]).toBe('example.com#%#//scriptlet(');
+        });
+
+        it('applies only to the rule right after the hint', () => {
+            const result = convertRulesToAdgSyntax(['!+ NOT_CONVERT', rule, rule]);
+            expect(result[1]).toBe(rule);
+            expect(result[2]).toBe(converted);
+        });
+
+        it('does not record a comment following the hint in the diff', () => {
+            const excluded = [];
+            const result = convertRulesToAdgSyntax(['!+ NOT_CONVERT', '! ordinary comment'], excluded);
+
+            expect(result[0]).toBe('!+ NOT_CONVERT');
+            expect(result[1]).toBe('! ordinary comment');
+            expect(excluded).toEqual([]);
+        });
+
+        it('does not record an include exclusion comment in the diff', () => {
+            const excluded = [];
+            const comment = '! [excluded by example.com] ||example.com^';
+            const result = convertRulesToAdgSyntax(['!+ NOT_CONVERT', comment], excluded);
+
+            expect(result[0]).toBe('!+ NOT_CONVERT');
+            expect(result[1]).toBe(comment);
+            expect(excluded).toEqual([]);
+        });
+
+        it('does not keep an empty line as is', () => {
+            const excluded = [];
+            const result = convertRulesToAdgSyntax(['!+ NOT_CONVERT', ''], excluded);
+
+            expect(result[0]).toBe('!+ NOT_CONVERT');
+            expect(result[1]).toBe('');
+            expect(excluded).toEqual([]);
+        });
+
+        it('converts a `#` comment instead of keeping it as is', () => {
+            const excluded = [];
+            const result = convertRulesToAdgSyntax(['!+ NOT_CONVERT', '# comment'], excluded);
+
+            expect(result[0]).toBe('!+ NOT_CONVERT');
+            expect(result[1]).toBe('! # comment');
+            expect(excluded).toHaveLength(2);
+            expect(excluded[0]).toContain('converted to: "! # comment"');
+            expect(excluded[1]).toBe('# comment');
+        });
+
+        it('does not apply the hint to a rule after a comment', () => {
+            const result = convertRulesToAdgSyntax(['!+ NOT_CONVERT', '! ordinary comment', rule]);
+            expect(result[0]).toBe('!+ NOT_CONVERT');
+            expect(result[2]).toBe(converted);
+
+            // The rule after the comment needs no conversion, so nothing
+            // reaches the diff at all.
+            const excluded = [];
+            convertRulesToAdgSyntax(
+                ['!+ NOT_CONVERT', '! ordinary comment', "example.com#%#//scriptlet('new-scriptlet')"],
+                excluded,
+            );
+            expect(excluded).toEqual([]);
+        });
+    });
+
+    describe('getCanonicalRuleTexts', () => {
+        it('returns an empty array and logs when the rule cannot be parsed', () => {
+            expect(getCanonicalRuleTexts('example.com#%#//scriptlet(')).toEqual([]);
+            expect(logger.info).toHaveBeenCalledWith(
+                expect.stringContaining('Unable to compute canonical form of'),
+            );
+        });
     });
 
     // TODO: add more rules under this section
@@ -274,6 +377,15 @@ describe('converter', () => {
         expect(actual[0]).toBe(expected);
 
         actual = convertToUbo(["example.com#%#//scriptlet('trusted-replace-argument', 'Math.round', '0', '121', '/^(\d\d?|1[0-2]\d)\.\d+$/')"]);
+        expected = '';
+        expect(actual[0]).toBe(expected);
+
+        // trusted scriptlets with the uBO-compatible `ubo-` prefix
+        actual = convertToUbo(["example.com#%#//scriptlet('ubo-trusted-set-cookie', 'a', 'b')"]);
+        expected = '';
+        expect(actual[0]).toBe(expected);
+
+        actual = convertToUbo(['example.com#%#//scriptlet("ubo-trusted-set-cookie", "a", "b")']);
         expected = '';
         expect(actual[0]).toBe(expected);
 

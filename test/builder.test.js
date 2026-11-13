@@ -1,4 +1,5 @@
 /* eslint-disable max-len */
+
 /**
  * @vitest-environment jsdom
  */
@@ -8,22 +9,18 @@ import {
     expect,
     beforeAll,
     test,
-    vi,
 } from 'vitest';
 import path from 'path';
 import { promises as fs, existsSync } from 'fs';
 
 import { disableOptimization } from '../src/main/optimization';
-import { build, include } from '../src/main/builder';
+import { addNotOptimizedHints, build, include } from '../src/main/builder';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
-// Mock log to hide error messages
-vi.mock('../main/utils/log');
-
-const readFile = (path) => {
+const readFile = async (path) => {
     try {
-        return fs.readFile(path, { encoding: 'utf-8' });
+        return await fs.readFile(path, { encoding: 'utf-8' });
     } catch {
         return null;
     }
@@ -53,6 +50,52 @@ const cleanup = async () => {
     }
 };
 
+describe('addNotOptimizedHints', () => {
+    const hint = '!+ NOT_OPTIMIZED';
+
+    it('adds a hint line before a rule', () => {
+        expect(addNotOptimizedHints(['||example.com^'])).toEqual([hint, '||example.com^']);
+    });
+
+    it('appends to a hint that directly precedes the rule', () => {
+        expect(addNotOptimizedHints(['!+ PLATFORM(ios)', '||shop.example.com^']))
+            .toEqual(['!+ PLATFORM(ios) NOT_OPTIMIZED', '||shop.example.com^']);
+    });
+
+    it('inserts a separate hint line when a blank line separates the rule from its hint', () => {
+        const lines = ['!+ PLATFORM(ios)', '', '||shop.example.com^'];
+
+        expect(addNotOptimizedHints(lines)).toEqual(['!+ PLATFORM(ios)', hint, '||shop.example.com^']);
+    });
+
+    it('treats a whitespace-only line as a blank line', () => {
+        const lines = ['!+ PLATFORM(ios)', '   ', '||shop.example.com^'];
+
+        expect(addNotOptimizedHints(lines)).toEqual(['!+ PLATFORM(ios)', hint, '||shop.example.com^']);
+    });
+
+    it('does not duplicate the hint token', () => {
+        expect(addNotOptimizedHints([hint, '||example.com^'])).toEqual([hint, '||example.com^']);
+        expect(addNotOptimizedHints(['!+ NOT_OPTIMIZED PLATFORM(ios)', '||example.com^']))
+            .toEqual(['!+ NOT_OPTIMIZED PLATFORM(ios)', '||example.com^']);
+    });
+
+    it('classifies indented lines by their trimmed text', () => {
+        expect(addNotOptimizedHints(['  !+ PLATFORM(ios)', '  ||shop.example.com^']))
+            .toEqual(['  !+ PLATFORM(ios) NOT_OPTIMIZED', '  ||shop.example.com^']);
+    });
+
+    it('does not add hints to comment lines', () => {
+        expect(addNotOptimizedHints(['! comment', '! another comment']))
+            .toEqual(['! comment', '! another comment']);
+    });
+
+    it('does not treat a comment as the hint for the following rule', () => {
+        expect(addNotOptimizedHints(['!+ PLATFORM(ios)', '! comment', '||example.com^']))
+            .toEqual(['!+ PLATFORM(ios)', '! comment', hint, '||example.com^']);
+    });
+});
+
 describe('Test builder', async () => {
     beforeAll(async () => {
         const platformsConfig = await getPlatformsConfig();
@@ -67,6 +110,9 @@ describe('Test builder', async () => {
             const logContent = await readFile(logFile);
             expect(logContent).toBeTruthy();
             expect(logContent.length).toBeGreaterThan(0);
+            // Proves the file was written by this build and is not leftover
+            // from a previous run: `parseDirectory()` logs this per filter.
+            expect(logContent).toContain('Building filter');
         });
     });
 
@@ -138,7 +184,7 @@ describe('Test builder', async () => {
             it('Should filter "platforms/edge" with "12.txt"', async () => {
                 const filterContent = await readFile(path.join(platformsDir, 'edge', 'filters', '12.txt'));
                 const filterLines = filterContent.split(/\r?\n/);
-                expect(filterLines.length).toEqual(33);
+                expect(filterLines.length).toEqual(35);
                 // Ensure that the file is not empty
                 expect(filterContent).toBeTruthy();
                 const filterRules = filterLines.filter((line) => line.length > 0 && !line.startsWith('!'));
@@ -160,8 +206,13 @@ describe('Test builder', async () => {
                     expect(filterRules.includes(rule)).toBeTruthy();
                 });
                 // Check that the number of hints is equal to the number of rules
-                const filterHints = filterLines.filter((line) => line === '!+ NOT_OPTIMIZED');
+                const filterHints = filterLines.filter(
+                    (line) => line.startsWith('!+') && line.includes('NOT_OPTIMIZED'),
+                );
                 expect(filterRules.length).toEqual(filterHints.length);
+                // The hint modifying the rule must stay adjacent to it
+                expect(filterLines.includes('!+ PLATFORM(ext_edge) NOT_OPTIMIZED')).toBeTruthy();
+                expect(filterLines.includes('||edge-only-example.com^')).toBeTruthy();
             });
         });
 
@@ -282,7 +333,7 @@ describe('Test builder', async () => {
         it('platforms/test filters 5.txt', async () => {
             const filterContent = await readFile(path.join(__dirname, 'resources/platforms/test', 'filters', '5.txt'));
             const filterLines = filterContent.split(/\r?\n/);
-            expect(filterLines.length).toEqual(56);
+            expect(filterLines.length).toEqual(59);
             const presentRules = [
                 '||adsnet.com/*/700x350.gif$domain=example.com',
                 'example.com##+js(set-constant, ads, false)',
@@ -319,7 +370,7 @@ describe('Test builder', async () => {
         it('platforms/test2 filters 5.txt', async () => {
             const filterContent = await readFile(path.join(__dirname, 'resources/platforms/test2', 'filters', '5.txt'));
             const filterLines = filterContent.split(/\r?\n/);
-            expect(filterLines.length).toEqual(56);
+            expect(filterLines.length).toEqual(62);
 
             const presentRules = [
                 'test.com#%#//scriptlet(\'abp-abort-on-property-read\', \'adsShown\')',
@@ -341,6 +392,9 @@ describe('Test builder', async () => {
             const absentRules = [
                 'example.com#%#//scriptlet(\'trusted-set-local-storage-item\', \'iName\', \'iValue\')',
                 'example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")',
+                'example.com#%#//scriptlet(\'ubo-trusted-set-cookie\', \'a\', \'b\')',
+                'example.com#%#//scriptlet("ubo-trusted-set-cookie", "a", "b")',
+                "example.com#%#//scriptlet( 'trusted-set-cookie', 'a', 'b')",
             ];
             absentRules.forEach((rule) => {
                 expect(filterLines.includes(rule)).toBeFalsy();
@@ -350,7 +404,7 @@ describe('Test builder', async () => {
         it('platforms/ios filters 5.txt', async () => {
             const filterContent = await readFile(path.join(__dirname, 'resources/platforms/ios', 'filters', '5.txt'));
             const filterLines = filterContent.split(/\r?\n/);
-            expect(filterLines.length).toEqual(42);
+            expect(filterLines.length).toEqual(48);
 
             const presentRules = [
                 '||example.com/images/*.mp4',
@@ -370,6 +424,7 @@ describe('Test builder', async () => {
                 '||example.com^$script,redirect-rule=noopjs',
                 '||test.com/res/js/*.js$replace=/\\"OK\\/banners/\\"OK\\/banners__\\//',
                 '||example.com^$~script,~stylesheet,~xmlhttprequest,replace=/popunder_url/popunder_url_/',
+                "example.com#%#//scriptlet( 'trusted-set-cookie', 'a', 'b')",
                 '@@||test.com^$generichide,app=iexplore.exe',
             ];
             absentRules.forEach((rule) => {
@@ -995,9 +1050,11 @@ describe('Test builder', async () => {
                 expect(filterContent).toBeTruthy();
 
                 const filterLines = filterContent.split(/\r?\n/);
-                expect(filterLines.length).toEqual(55);
+                expect(filterLines.length).toEqual(61);
                 expect(filterLines.includes('||example.com^$script,redirect=noopjs')).toBeTruthy();
                 expect(filterLines.includes('||example.com/banner$image,redirect=1x1-transparent.gif')).toBeTruthy();
+                expect(filterLines.includes("example.com#%#//scriptlet( 'trusted-set-cookie', 'a', 'b')"))
+                    .toBeFalsy();
             });
 
             it('platform/edge filters4.txt', async () => {
@@ -1227,6 +1284,8 @@ describe('Test builder', async () => {
                 const filterLines = filterContent.split(/\r?\n/);
                 expect(filterLines.includes('||test.org^$newmodifier')).toBeTruthy();
                 expect(filterLines.includes('||example.org^$newmodifier')).toBeFalsy();
+
+                expect(filterLines.includes('!+ NOT_VALIDATE_TYPO')).toBeFalsy();
                 expect(filterLines.includes('||test.org^$unsupported')).toBeFalsy();
             });
 
@@ -1238,7 +1297,37 @@ describe('Test builder', async () => {
                 expect(filterLines.includes('||test.org^$newmodifier')).toBeTruthy();
                 expect(filterLines.includes('||example.org^$newmodifier')).toBeTruthy();
                 expect(filterLines.includes('||foo.bar^$newmodifier')).toBeTruthy();
+
+                expect(filterLines.includes('!+ NOT_VALIDATE_TYPO')).toBeFalsy();
                 expect(filterLines.includes('||test.org^$unsupported')).toBeFalsy();
+            });
+        });
+
+        describe('hint NOT_CONVERT in template.txt inline rules', () => {
+            it('platform/mac keeps uBO `$1p` as is after the hint, otherwise converts it to `$~third-party`', async () => {
+                const filterContent = await readFile(path.join(platformsDir, 'mac', 'filters', '7.txt'));
+                expect(filterContent).toBeTruthy();
+
+                const filterLines = filterContent.split(/\r?\n/);
+                expect(filterLines.includes('||convert1.test^$1p')).toBeTruthy();
+                expect(filterLines.includes('||convert2.test^$~third-party')).toBeTruthy();
+            });
+
+            it('platform/mac ships a hinted rule with a not-yet-known scriptlet', async () => {
+                const filterContent = await readFile(path.join(platformsDir, 'mac', 'filters', '7.txt'));
+                expect(filterContent).toBeTruthy();
+
+                const filterLines = filterContent.split(/\r?\n/);
+                expect(filterLines.includes("example.com#%#//scriptlet('new-scriptlet')")).toBeTruthy();
+            });
+
+            it('platform/mac does not apply the hint before a !#include to the included rules', async () => {
+                const filterContent = await readFile(path.join(platformsDir, 'mac', 'filters', '7.txt'));
+                expect(filterContent).toBeTruthy();
+
+                const filterLines = filterContent.split(/\r?\n/);
+                expect(filterLines.includes('||included.test^$~third-party')).toBeTruthy();
+                expect(filterLines.includes('||included.test^$1p')).toBeFalsy();
             });
         });
 

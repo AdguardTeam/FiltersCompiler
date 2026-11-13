@@ -64,3 +64,9 @@ example.com##div.grid_1[class$="app"]
 !
 example.com#%#//scriptlet('trusted-set-local-storage-item', 'iName', 'iValue')
 example.com#%#//scriptlet("trusted-set-cookie", "cName", "cValue")
+!+ NOT_CONVERT
+example.com#%#//scriptlet('ubo-trusted-set-cookie', 'a', 'b')
+!+ NOT_CONVERT
+example.com#%#//scriptlet("ubo-trusted-set-cookie", "a", "b")
+!+ NOT_CONVERT
+example.com#%#//scriptlet( 'trusted-set-cookie', 'a', 'b')

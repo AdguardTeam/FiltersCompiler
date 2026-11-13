@@ -11,7 +11,7 @@
 
 import { logger } from '../utils/log';
 import { overrideRule } from '../utils/workaround';
-import { RuleMasks } from '../rule/rule-masks';
+import { RuleMasks, hasHint } from '../rule/rule-masks';
 import { skipRuleWithOptimization } from '../optimization';
 
 const HINT_MASK = `${RuleMasks.MASK_HINT} `;
@@ -147,9 +147,7 @@ const isOptimizationSupported = function (rule) {
         return true;
     }
 
-    const stripped = hint.substring(HINT_MASK.length).trim();
-
-    return !stripped.includes(NOT_OPTIMIZED_HINT);
+    return !hasHint(hint, NOT_OPTIMIZED_HINT);
 };
 
 /**
