@@ -25,6 +25,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   platform configuration, so the shared config is left untouched.
 - Rule removal patterns are compiled once per platform cleanup instead of once
   per rule.
+- The hint prefix and the `NOT_OPTIMIZED` token now live in `rule-masks.js`, so
+  the builder and the platform stage no longer rebuild them. No behaviour
+  change.
 
 ### Deprecated
 
@@ -267,19 +270,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- `OptimizationStatsError`
-    - **BREAKING:** Its constructor now takes a required third positional
-      parameter, `reason: 'retrieval' | 'validation'`, before `options`.
-      Update call sites to `new OptimizationStatsError(filterId,
-sourcePath, 'retrieval', { cause })` (or `'validation'`).
-    - `getOptimizationStatistics()` now throws it for validation failures
-      too, not only retrieval failures, carrying `filterId` and `sourcePath`
-      either way. Its `code` is `OPTIMIZATION_STATS_INVALID` for validation
-      failures and `OPTIMIZATION_STATS_UNAVAILABLE` for retrieval failures,
-      so callers can branch on the failure kind.
-    - Its `message` now folds in `cause.message` when the cause is an
-      `Error`, so the specific reason survives for callers that log only
-      `error.message` and never walk the `cause` chain.
+- `OptimizationStatsError` - **BREAKING:** Its constructor now takes a required third positional
+  parameter, `reason: 'retrieval' | 'validation'`, before `options`.
+  Update call sites to `new OptimizationStatsError(filterId,
+sourcePath, 'retrieval', { cause })` (or `'validation'`). - `getOptimizationStatistics()` now throws it for validation failures
+  too, not only retrieval failures, carrying `filterId` and `sourcePath`
+  either way. Its `code` is `OPTIMIZATION_STATS_INVALID` for validation
+  failures and `OPTIMIZATION_STATS_UNAVAILABLE` for retrieval failures,
+  so callers can branch on the failure kind. - Its `message` now folds in `cause.message` when the cause is an
+  `Error`, so the specific reason survives for callers that log only
+  `error.message` and never walk the `cause` chain.
 - `assertValidStats()` now throws a `TypeError` (previously a bare `Error`),
   built through a single shared helper so every check — non-object stats,
   missing/empty `groups`, and malformed group entries — gets the same

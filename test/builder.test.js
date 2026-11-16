@@ -62,6 +62,11 @@ describe('addNotOptimizedHints', () => {
             .toEqual(['!+ PLATFORM(ios) NOT_OPTIMIZED', '||shop.example.com^']);
     });
 
+    it('appends the token to a hint without the separator space', () => {
+        expect(addNotOptimizedHints(['!+NOT_CONVERT', '||a.com^']))
+            .toEqual(['!+NOT_CONVERT NOT_OPTIMIZED', '||a.com^']);
+    });
+
     it('inserts a separate hint line when a blank line separates the rule from its hint', () => {
         const lines = ['!+ PLATFORM(ios)', '', '||shop.example.com^'];
 
@@ -78,6 +83,8 @@ describe('addNotOptimizedHints', () => {
         expect(addNotOptimizedHints([hint, '||example.com^'])).toEqual([hint, '||example.com^']);
         expect(addNotOptimizedHints(['!+ NOT_OPTIMIZED PLATFORM(ios)', '||example.com^']))
             .toEqual(['!+ NOT_OPTIMIZED PLATFORM(ios)', '||example.com^']);
+        expect(addNotOptimizedHints(['!+ PLATFORM(ios) NOT_OPTIMIZED', '||example.com^']))
+            .toEqual(['!+ PLATFORM(ios) NOT_OPTIMIZED', '||example.com^']);
     });
 
     it('classifies indented lines by their trimmed text', () => {
@@ -1666,82 +1673,5 @@ describe('Invalid rules collection in report', () => {
         // only the genuinely invalid rule is collected in the diff
         expect(diffLines[0]).toContain('Error: Unable to convert rule to AdGuard syntax');
         expect(diffLines[1]).toContain('filter14.example.com#$#selector:style()');
-    });
-});
-
-describe('addNotOptimizedHints', () => {
-    it('Adds a hint line before a rule without a hint', () => {
-        const lines = ['||a.com^', '||b.com^'];
-        expect(addNotOptimizedHints(lines)).toEqual([
-            '!+ NOT_OPTIMIZED',
-            '||a.com^',
-            '!+ NOT_OPTIMIZED',
-            '||b.com^',
-        ]);
-    });
-
-    it('Appends the token to the hint that directly precedes the rule', () => {
-        const lines = ['!+ PLATFORM(ios)', '||a.com^'];
-        expect(addNotOptimizedHints(lines)).toEqual([
-            '!+ PLATFORM(ios) NOT_OPTIMIZED',
-            '||a.com^',
-        ]);
-    });
-
-    it('Keeps a hint separated by a blank line detached', () => {
-        const lines = ['!+ PLATFORM(ios)', '', '||a.com^'];
-        expect(addNotOptimizedHints(lines)).toEqual([
-            '!+ PLATFORM(ios)',
-            '!+ NOT_OPTIMIZED',
-            '||a.com^',
-        ]);
-    });
-
-    it('Keeps a hint separated by a comment detached', () => {
-        const lines = ['!+ PLATFORM(ios)', '! comment', '||a.com^'];
-        expect(addNotOptimizedHints(lines)).toEqual([
-            '!+ PLATFORM(ios)',
-            '! comment',
-            '!+ NOT_OPTIMIZED',
-            '||a.com^',
-        ]);
-    });
-
-    it('Does not duplicate an existing token', () => {
-        const lines = ['!+ NOT_OPTIMIZED', '||a.com^'];
-        expect(addNotOptimizedHints(lines)).toEqual(lines);
-
-        const linesWithPlatform = ['!+ PLATFORM(ios) NOT_OPTIMIZED', '||a.com^'];
-        expect(addNotOptimizedHints(linesWithPlatform)).toEqual(linesWithPlatform);
-    });
-
-    it('Appends the token to a hint without the separator space', () => {
-        const lines = ['!+NOT_CONVERT', '||a.com^'];
-        expect(addNotOptimizedHints(lines)).toEqual([
-            '!+NOT_CONVERT NOT_OPTIMIZED',
-            '||a.com^',
-        ]);
-    });
-
-    it('Appends the token to an indented hint', () => {
-        const lines = ['  !+ PLATFORM(ios)', '  ||a.com^'];
-        expect(addNotOptimizedHints(lines)).toEqual([
-            '  !+ PLATFORM(ios) NOT_OPTIMIZED',
-            '  ||a.com^',
-        ]);
-    });
-
-    it('Treats a whitespace-only line as a blank line', () => {
-        const lines = ['!+ PLATFORM(ios)', '   ', '||a.com^'];
-        expect(addNotOptimizedHints(lines)).toEqual([
-            '!+ PLATFORM(ios)',
-            '!+ NOT_OPTIMIZED',
-            '||a.com^',
-        ]);
-    });
-
-    it('Does not add hints to comment lines', () => {
-        const lines = ['! comment'];
-        expect(addNotOptimizedHints(lines)).toEqual(lines);
     });
 });

@@ -14,6 +14,7 @@ import {
     RuleMasks,
     hasHint,
     isHint,
+    HINT_MASK,
     NOT_CONVERT_HINT,
     NOT_OPTIMIZED_HINT,
 } from './rule/rule-masks';
@@ -48,7 +49,7 @@ const ADD_MODIFIERS_OPTION = 'addModifiers';
 const IGNORE_TRUST_LEVEL_OPTION = 'ignoreTrustLevel';
 
 const NOT_OPTIMIZED_SUFFIX = `${SPACE}${NOT_OPTIMIZED_HINT}`;
-const NOT_OPTIMIZED_HINT_LINE = `${RuleMasks.MASK_HINT}${NOT_OPTIMIZED_SUFFIX}`;
+const NOT_OPTIMIZED_HINT_LINE = `${HINT_MASK}${NOT_OPTIMIZED_HINT}`;
 
 /**
  * Filter header tag for diff path which is needed for patch updates.
@@ -149,7 +150,7 @@ export const addNotOptimizedHints = function (lines) {
 
         const isRule = !trimmedLine.startsWith(RuleMasks.MASK_COMMENT);
         const isHinted = isHint(previousLine);
-        const alreadyMarked = isHinted && hasHint(previousLine, NOT_OPTIMIZED_HINT);
+        const alreadyMarked = hasHint(previousLine, NOT_OPTIMIZED_HINT);
 
         if (isRule) {
             if (!isHinted) {
