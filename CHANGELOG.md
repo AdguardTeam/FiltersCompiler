@@ -270,16 +270,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- `OptimizationStatsError` - **BREAKING:** Its constructor now takes a required third positional
-  parameter, `reason: 'retrieval' | 'validation'`, before `options`.
-  Update call sites to `new OptimizationStatsError(filterId,
-sourcePath, 'retrieval', { cause })` (or `'validation'`). - `getOptimizationStatistics()` now throws it for validation failures
-  too, not only retrieval failures, carrying `filterId` and `sourcePath`
-  either way. Its `code` is `OPTIMIZATION_STATS_INVALID` for validation
-  failures and `OPTIMIZATION_STATS_UNAVAILABLE` for retrieval failures,
-  so callers can branch on the failure kind. - Its `message` now folds in `cause.message` when the cause is an
-  `Error`, so the specific reason survives for callers that log only
-  `error.message` and never walk the `cause` chain.
+- `OptimizationStatsError`
+    - **BREAKING:** Its constructor now takes a required third positional
+      parameter, `reason: 'retrieval' | 'validation'`, before `options`.
+      Update call sites to `new OptimizationStatsError(filterId,
+sourcePath, 'retrieval', { cause })` (or `'validation'`).
+    - `getOptimizationStatistics()` now throws it for validation failures
+      too, not only retrieval failures, carrying `filterId` and `sourcePath`
+      either way. Its `code` is `OPTIMIZATION_STATS_INVALID` for validation
+      failures and `OPTIMIZATION_STATS_UNAVAILABLE` for retrieval failures,
+      so callers can branch on the failure kind.
+    - Its `message` now folds in `cause.message` when the cause is an
+      `Error`, so the specific reason survives for callers that log only
+      `error.message` and never walk the `cause` chain.
 - `assertValidStats()` now throws a `TypeError` (previously a bare `Error`),
   built through a single shared helper so every check — non-object stats,
   missing/empty `groups`, and malformed group entries — gets the same
