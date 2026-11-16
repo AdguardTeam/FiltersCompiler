@@ -25,6 +25,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   platform configuration, so the shared config is left untouched.
 - Rule removal patterns are compiled once per platform cleanup instead of once
   per rule.
+- The hint prefix and the `NOT_OPTIMIZED` token now live in `rule-masks.js`, so
+  the builder and the platform stage no longer rebuild them. No behaviour
+  change.
 
 ### Deprecated
 

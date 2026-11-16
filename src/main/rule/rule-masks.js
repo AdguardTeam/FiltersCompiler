@@ -31,6 +31,28 @@ export const RuleMasks = {
 };
 
 /**
+ * Space character used as the separator between the parts of a filter line: the
+ * hint mask and the hint name (`!+ PLATFORM(windows)`), two hint names
+ * (`!+ PLATFORM(windows) NOT_OPTIMIZED`), and the comment mask and the message
+ * (`! <message>`).
+ */
+export const SPACE = ' ';
+
+/**
+ * Canonical opening of a hint line: the hint mask plus the space that separates
+ * it from the hint name, e.g. `!+ ` in `!+ PLATFORM(windows)`.
+ *
+ * The converter normalizes hint lines to this form, so the platform stage can
+ * rely on it.
+ */
+export const HINT_MASK = `${RuleMasks.MASK_HINT}${SPACE}`;
+
+/**
+ * Hint that excludes the next rule from optimization.
+ */
+export const NOT_OPTIMIZED_HINT = 'NOT_OPTIMIZED';
+
+/**
  * Hint that skips validation of the next rule.
  * https://github.com/AdguardTeam/FiltersCompiler/issues/245
  */
@@ -45,17 +67,23 @@ export const NOT_CONVERT_HINT = 'NOT_CONVERT';
 /**
  * Checks whether a line is a hint line, e.g. `!+ PLATFORM(windows)`.
  *
- * @param {string} line Line to check.
+ * The space after `!+` is not required: the converter normalizes
+ * `!+PLATFORM(ios)` and `!+\tNOT_CONVERT` to the canonical `!+ ` form before
+ * the platform stage, so such lines are working hints.
+ *
+ * @param {string|null|undefined} line Line to check.
  *
  * @returns {boolean} `true` if the line starts with the hint mask.
  */
-export const isHint = (line) => Boolean(line && line.startsWith(RuleMasks.MASK_HINT));
+export const isHint = (line) => Boolean(line?.startsWith(RuleMasks.MASK_HINT));
 
 /**
  * Filters lines while keeping hints attached to the lines they modify.
  *
- * A hint modifies only the next non-hint line. If that line is filtered out, the hints are
- * dropped with it instead of leaking to the following line.
+ * Only the last hint line of a run applies: consumers look at the immediately
+ * preceding line, so earlier hint lines have no effect. If the modified line is
+ * filtered out, the hint lines are dropped with it instead of leaking to the
+ * following line.
  *
  * @param {string[]} lines Lines to filter.
  * @param {(line: string, index: number, lines: string[]) => boolean} shouldKeep
