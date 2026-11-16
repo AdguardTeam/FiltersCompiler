@@ -14,7 +14,10 @@ import {
     RuleMasks,
     hasHint,
     isHint,
+    SPACE,
+    HINT_MASK,
     NOT_CONVERT_HINT,
+    NOT_OPTIMIZED_HINT,
 } from './rule/rule-masks';
 import { fixVersionComments, removeAdblockVersion } from './utils/workaround';
 import { downloadFile } from './utils/webutils';
@@ -34,7 +37,6 @@ const ADGUARD_FILTERS_SERVER_URL = 'https://filters.adtidy.org/';
 const TRUST_LEVEL_DIR = './utils/trust-levels';
 const DEFAULT_TRUST_LEVEL = 'low';
 
-const SPACE = ' ';
 const SLASH = '/';
 const COMMA = ',';
 const EQUAL_SIGN = '=';
@@ -47,8 +49,8 @@ const EXCLUDE_OPTION = 'exclude';
 const ADD_MODIFIERS_OPTION = 'addModifiers';
 const IGNORE_TRUST_LEVEL_OPTION = 'ignoreTrustLevel';
 
-const NOT_OPTIMIZED_HINT_NAME = 'NOT_OPTIMIZED';
-const NOT_OPTIMIZED_HINT = `${RuleMasks.MASK_HINT}${SPACE}${NOT_OPTIMIZED_HINT_NAME}`;
+const NOT_OPTIMIZED_SUFFIX = `${SPACE}${NOT_OPTIMIZED_HINT}`;
+const NOT_OPTIMIZED_HINT_LINE = `${HINT_MASK}${NOT_OPTIMIZED_HINT}`;
 
 /**
  * Filter header tag for diff path which is needed for patch updates.
@@ -149,16 +151,14 @@ export const addNotOptimizedHints = function (lines) {
 
         const isRule = !trimmedLine.startsWith(RuleMasks.MASK_COMMENT);
         const isHinted = isHint(previousLine);
-        const alreadyMarked = isHinted && hasHint(previousLine, NOT_OPTIMIZED_HINT_NAME);
+        const alreadyMarked = hasHint(previousLine, NOT_OPTIMIZED_HINT);
 
         if (isRule) {
             if (!isHinted) {
-                result.push(NOT_OPTIMIZED_HINT);
+                result.push(NOT_OPTIMIZED_HINT_LINE);
             } else if (!alreadyMarked) {
-                // Append to the hint that modifies this rule, otherwise it would no longer
-                // apply to the rule.
                 const hintIndex = result.length - 1;
-                result[hintIndex] = `${result[hintIndex]}${SPACE}${NOT_OPTIMIZED_HINT_NAME}`;
+                result[hintIndex] = `${result[hintIndex]}${NOT_OPTIMIZED_SUFFIX}`;
             }
         }
 
