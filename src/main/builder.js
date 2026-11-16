@@ -14,6 +14,7 @@ import {
     RuleMasks,
     hasHint,
     isHint,
+    SPACE,
     HINT_MASK,
     NOT_CONVERT_HINT,
     NOT_OPTIMIZED_HINT,
@@ -35,7 +36,6 @@ const ADGUARD_FILTERS_SERVER_URL = 'https://filters.adtidy.org/';
 const TRUST_LEVEL_DIR = './utils/trust-levels';
 const DEFAULT_TRUST_LEVEL = 'low';
 
-const SPACE = ' ';
 const SLASH = '/';
 const COMMA = ',';
 const EQUAL_SIGN = '=';

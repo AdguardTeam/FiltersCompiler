@@ -31,13 +31,18 @@ export const RuleMasks = {
 };
 
 /**
+ * Space character used to separate the hint mask from the hint name.
+ */
+export const SPACE = ' ';
+
+/**
  * Canonical opening of a hint line: the hint mask plus the space that separates
  * it from the hint name, e.g. `!+ ` in `!+ PLATFORM(windows)`.
  *
  * The converter normalizes hint lines to this form, so the platform stage can
  * rely on it.
  */
-export const HINT_MASK = `${RuleMasks.MASK_HINT} `;
+export const HINT_MASK = `${RuleMasks.MASK_HINT}${SPACE}`;
 
 /**
  * Hint that excludes the next rule from optimization.

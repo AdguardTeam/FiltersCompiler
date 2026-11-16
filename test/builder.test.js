@@ -15,6 +15,7 @@ import { promises as fs, existsSync } from 'fs';
 
 import { disableOptimization } from '../src/main/optimization';
 import { addNotOptimizedHints, build, include } from '../src/main/builder';
+import { SPACE, HINT_MASK, NOT_OPTIMIZED_HINT } from '../src/main/rule/rule-masks';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
@@ -51,45 +52,46 @@ const cleanup = async () => {
 };
 
 describe('addNotOptimizedHints', () => {
-    const hint = '!+ NOT_OPTIMIZED';
+    const NOT_OPTIMIZED_HINT_LINE = `${HINT_MASK}${NOT_OPTIMIZED_HINT}`;
+    const NOT_OPTIMIZED_SUFFIX = `${SPACE}${NOT_OPTIMIZED_HINT}`;
 
     it('adds a hint line before a rule', () => {
-        expect(addNotOptimizedHints(['||example.com^'])).toEqual([hint, '||example.com^']);
+        expect(addNotOptimizedHints(['||example.com^'])).toEqual([NOT_OPTIMIZED_HINT_LINE, '||example.com^']);
     });
 
     it('appends to a hint that directly precedes the rule', () => {
         expect(addNotOptimizedHints(['!+ PLATFORM(ios)', '||shop.example.com^']))
-            .toEqual(['!+ PLATFORM(ios) NOT_OPTIMIZED', '||shop.example.com^']);
+            .toEqual([`!+ PLATFORM(ios)${NOT_OPTIMIZED_SUFFIX}`, '||shop.example.com^']);
     });
 
     it('appends the token to a hint without the separator space', () => {
         expect(addNotOptimizedHints(['!+NOT_CONVERT', '||a.com^']))
-            .toEqual(['!+NOT_CONVERT NOT_OPTIMIZED', '||a.com^']);
+            .toEqual([`!+NOT_CONVERT${NOT_OPTIMIZED_SUFFIX}`, '||a.com^']);
     });
 
     it('inserts a separate hint line when a blank line separates the rule from its hint', () => {
         const lines = ['!+ PLATFORM(ios)', '', '||shop.example.com^'];
 
-        expect(addNotOptimizedHints(lines)).toEqual(['!+ PLATFORM(ios)', hint, '||shop.example.com^']);
+        expect(addNotOptimizedHints(lines)).toEqual(['!+ PLATFORM(ios)', NOT_OPTIMIZED_HINT_LINE, '||shop.example.com^']);
     });
 
     it('treats a whitespace-only line as a blank line', () => {
         const lines = ['!+ PLATFORM(ios)', '   ', '||shop.example.com^'];
 
-        expect(addNotOptimizedHints(lines)).toEqual(['!+ PLATFORM(ios)', hint, '||shop.example.com^']);
+        expect(addNotOptimizedHints(lines)).toEqual(['!+ PLATFORM(ios)', NOT_OPTIMIZED_HINT_LINE, '||shop.example.com^']);
     });
 
     it('does not duplicate the hint token', () => {
-        expect(addNotOptimizedHints([hint, '||example.com^'])).toEqual([hint, '||example.com^']);
-        expect(addNotOptimizedHints(['!+ NOT_OPTIMIZED PLATFORM(ios)', '||example.com^']))
-            .toEqual(['!+ NOT_OPTIMIZED PLATFORM(ios)', '||example.com^']);
-        expect(addNotOptimizedHints(['!+ PLATFORM(ios) NOT_OPTIMIZED', '||example.com^']))
-            .toEqual(['!+ PLATFORM(ios) NOT_OPTIMIZED', '||example.com^']);
+        expect(addNotOptimizedHints([NOT_OPTIMIZED_HINT_LINE, '||example.com^'])).toEqual([NOT_OPTIMIZED_HINT_LINE, '||example.com^']);
+        expect(addNotOptimizedHints([`${NOT_OPTIMIZED_HINT_LINE} PLATFORM(ios)`, '||example.com^']))
+            .toEqual([`${NOT_OPTIMIZED_HINT_LINE} PLATFORM(ios)`, '||example.com^']);
+        expect(addNotOptimizedHints([`!+ PLATFORM(ios)${NOT_OPTIMIZED_SUFFIX}`, '||example.com^']))
+            .toEqual([`!+ PLATFORM(ios)${NOT_OPTIMIZED_SUFFIX}`, '||example.com^']);
     });
 
     it('classifies indented lines by their trimmed text', () => {
         expect(addNotOptimizedHints(['  !+ PLATFORM(ios)', '  ||shop.example.com^']))
-            .toEqual(['  !+ PLATFORM(ios) NOT_OPTIMIZED', '  ||shop.example.com^']);
+            .toEqual([`  !+ PLATFORM(ios)${NOT_OPTIMIZED_SUFFIX}`, '  ||shop.example.com^']);
     });
 
     it('does not add hints to comment lines', () => {
@@ -99,7 +101,7 @@ describe('addNotOptimizedHints', () => {
 
     it('does not treat a comment as the hint for the following rule', () => {
         expect(addNotOptimizedHints(['!+ PLATFORM(ios)', '! comment', '||example.com^']))
-            .toEqual(['!+ PLATFORM(ios)', '! comment', hint, '||example.com^']);
+            .toEqual(['!+ PLATFORM(ios)', '! comment', NOT_OPTIMIZED_HINT_LINE, '||example.com^']);
     });
 });
 
