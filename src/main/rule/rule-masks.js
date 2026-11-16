@@ -31,7 +31,10 @@ export const RuleMasks = {
 };
 
 /**
- * Space character used to separate the hint mask from the hint name.
+ * Space character used as the separator between the parts of a filter line: the
+ * hint mask and the hint name (`!+ PLATFORM(windows)`), two hint names
+ * (`!+ PLATFORM(windows) NOT_OPTIMIZED`), and the comment mask and the message
+ * (`! <message>`).
  */
 export const SPACE = ' ';
 

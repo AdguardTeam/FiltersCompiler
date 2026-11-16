@@ -51,6 +51,13 @@ const cleanup = async () => {
     }
 };
 
+describe('hint line prefix', () => {
+    it('is the hint mask followed by a single space', () => {
+        expect(SPACE).toBe(' ');
+        expect(HINT_MASK).toBe('!+ ');
+    });
+});
+
 describe('addNotOptimizedHints', () => {
     const NOT_OPTIMIZED_HINT_LINE = `${HINT_MASK}${NOT_OPTIMIZED_HINT}`;
     const NOT_OPTIMIZED_SUFFIX = `${SPACE}${NOT_OPTIMIZED_HINT}`;
