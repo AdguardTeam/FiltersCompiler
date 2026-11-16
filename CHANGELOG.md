@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [4.1.0-beta.0] - 2026-11-16
+
+### Added
+
 - Support for the `!+ NOT_CONVERT` hint, which disables conversion to AdGuard
   syntax for the next rule. The hint applies only to the rule right after it,
   and a directive is not a rule: `!#include`, `!#if`, `!#else`, `!#endif`, and
@@ -16,6 +30,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   converted normally [#269].
 - `adguard_corelibs` directive and `corelibs` hint alias matching all CoreLibs-based apps (Windows, Mac,
   Android and CLI) [#272]
+
+[#269]: https://github.com/AdguardTeam/FiltersCompiler/issues/269
+[#272]: https://github.com/AdguardTeam/FiltersCompiler/issues/272
 
 ### Changed
 
@@ -28,10 +45,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The hint prefix and the `NOT_OPTIMIZED` token now live in `rule-masks.js`, so
   the builder and the platform stage no longer rebuild them. No behaviour
   change.
-
-### Deprecated
-
-### Removed
 
 ### Fixed
 
@@ -83,12 +96,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `!+ NOT_PLATFORM(windows)\tNOT_PLATFORM(android)` still dropped the rule on Android.
   Every clause of both hints is now honored, whatever separates them.
 
-### Security
-
 [#233]: https://github.com/AdguardTeam/FiltersCompiler/issues/233
-[#269]: https://github.com/AdguardTeam/FiltersCompiler/issues/269
 [#270]: https://github.com/AdguardTeam/FiltersCompiler/issues/270
-[#272]: https://github.com/AdguardTeam/FiltersCompiler/issues/272
 
 ## [4.0.0] - 2026-11-06
 
@@ -1227,7 +1236,8 @@ sourcePath, 'retrieval', { cause })` (or `'validation'`).
 [@adguard/scriptlets]: https://github.com/AdguardTeam/Scriptlets/blob/master/CHANGELOG.md
 [@adguard/tsurlfilter]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/tsurlfilter/CHANGELOG.md
 [@adguard/logger]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/logger/CHANGELOG.md
-[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v4.0.0...HEAD
+[Unreleased]: https://github.com/AdguardTeam/FiltersCompiler/compare/v4.1.0-beta.0...HEAD
+[4.1.0-beta.0]: https://github.com/AdguardTeam/FiltersCompiler/compare/v4.0.0...v4.1.0-beta.0
 [4.0.0]: https://github.com/AdguardTeam/FiltersCompiler/compare/v4.0.0-beta.0...v4.0.0
 [4.0.0-beta.0]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.4.3...v4.0.0-beta.0
 [3.4.3]: https://github.com/AdguardTeam/FiltersCompiler/compare/v3.4.2...v3.4.3
