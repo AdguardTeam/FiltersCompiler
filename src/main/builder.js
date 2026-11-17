@@ -430,7 +430,9 @@ export const include = async (filterDir, directiveLine, excluded) => {
             ? FiltersDownloader.getFilterUrlOrigin(url)
             : path.dirname(path.join(filterDir, url));
 
-        includedLines = await resolveIncludes(includedLines, originUrl);
+        includedLines = await resolveIncludes(includedLines, originUrl, undefined, {
+            remoteOrigin: externalInclude,
+        });
 
         includedLines = removeAdblockVersion(includedLines);
 

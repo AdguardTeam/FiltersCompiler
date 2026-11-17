@@ -6,10 +6,10 @@ import { FiltersDownloader, type DefinedExpressions } from '@adguard/filters-dow
 const INCLUDE_DIRECTIVE = '!#include';
 
 /**
- * Absolute external URL. `file://` URLs are excluded because they have no
- * usable URL origin.
+ * Absolute external URL, including protocol-relative URLs. `file://` URLs are
+ * excluded because they have no usable URL origin.
  */
-const ABSOLUTE_EXTERNAL_URL = /^(?!file)[a-z]+:\/\//i;
+const ABSOLUTE_EXTERNAL_URL = /^(?!file)(?:[a-z]+:)?\/\//i;
 
 /**
  * Absolute URL with a scheme. Used to detect a remote default origin.
@@ -17,18 +17,18 @@ const ABSOLUTE_EXTERNAL_URL = /^(?!file)[a-z]+:\/\//i;
 const ABSOLUTE_URL = /^[a-z]+:\/\//i;
 
 /**
- * Userinfo component of an URL, used to keep credentials out of error messages.
+ * Credentials in the authority component of an URL.
  */
-const URL_CREDENTIALS = /\/\/[^/?#@]+@/;
+const URL_CREDENTIALS = /^((?:[a-z][a-z0-9+.-]*:)?\/\/)[^/?#\s\\]*@/i;
 
 /**
- * Removes the userinfo component from an URL.
+ * Removes credentials from the authority component of an URL.
  *
  * @param url URL to sanitize.
  *
  * @returns URL without credentials.
  */
-const stripUrlCredentials = (url: string): string => url.replace(URL_CREDENTIALS, '//');
+const stripUrlCredentials = (url: string): string => url.replace(URL_CREDENTIALS, '$1');
 
 /**
  * Error thrown when a remote preprocessor `!#include` cannot be resolved.
@@ -71,6 +71,18 @@ export const getRemoteIncludeUrl = (line: string): string | null => {
 };
 
 /**
+ * Options for include resolution.
+ */
+export interface ResolveIncludesOptions {
+    /**
+     * The default origin comes from a remote `@include` URL. The caller must
+     * set this flag because a remote URL with no path cannot be parsed into a
+     * valid origin.
+     */
+    remoteOrigin?: boolean;
+}
+
+/**
  * Resolves preprocessor `!#include` directives.
  *
  * When the default origin is a local path, an absolute external include uses
@@ -82,6 +94,7 @@ export const getRemoteIncludeUrl = (line: string): string | null => {
  * @param lines Lines with rules and preprocessor directives.
  * @param defaultOrigin Origin for local and relative includes.
  * @param definedExpressions Defined expressions for condition resolution.
+ * @param options Resolution options.
  *
  * @returns Resolved lines in the original order.
  *
@@ -91,8 +104,11 @@ export const resolveIncludes = async (
     lines: string[],
     defaultOrigin: string,
     definedExpressions?: DefinedExpressions,
+    options?: ResolveIncludesOptions,
 ): Promise<string[]> => {
-    if (ABSOLUTE_URL.test(defaultOrigin)) {
+    const isRemoteOrigin = options?.remoteOrigin ?? ABSOLUTE_URL.test(defaultOrigin);
+
+    if (isRemoteOrigin) {
         return FiltersDownloader.resolveIncludes(lines, defaultOrigin, definedExpressions);
     }
 

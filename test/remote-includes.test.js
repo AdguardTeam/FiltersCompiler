@@ -157,6 +157,14 @@ describe('remote !#include in an @include body', () => {
             .toThrow(/Include url is rejected with origin/);
     });
 
+    it('rejects a cross-origin nested !#include when the parent URL has no path', async () => {
+        downloadFile.mockResolvedValue('!#include http://other.example/rules.txt');
+
+        await expect(include(__dirname, '@include "https://example.org"', []))
+            .rejects
+            .toThrow(/Invalid url/);
+    });
+
     it('follows a redirect of a nested !#include', async () => {
         downloadFile.mockResolvedValue(`!#include ${remoteBaseUrl}${REDIRECT_INCLUDE_PATH}`);
 
@@ -182,9 +190,11 @@ describe('remote !#include in an @include body', () => {
 
 describe('remote !#include in a filter template', () => {
     const FILTER_DIR_NAME = 'filter_1_RemoteInclude';
+    const CREDENTIAL_PASSWORD = 'p@ss';
 
     let server;
     let remoteBaseUrl;
+    let remotePort;
     let filtersDir;
     let filterDir;
 
@@ -216,6 +226,12 @@ describe('remote !#include in a filter template', () => {
                 return;
             }
 
+            if (req.url === '/nested.txt') {
+                res.writeHead(200, { 'Content-Type': 'text/plain' });
+                res.end('!#include http://other.example/rules.txt');
+                return;
+            }
+
             res.writeHead(404, { 'Content-Type': 'text/plain' });
             res.end('Not Found');
         });
@@ -225,6 +241,7 @@ describe('remote !#include in a filter template', () => {
         });
 
         const { port } = server.address();
+        remotePort = port;
         remoteBaseUrl = `http://127.0.0.1:${port}`;
     });
 
@@ -265,5 +282,33 @@ describe('remote !#include in a filter template', () => {
         await expect(build(filtersDir, null, null, null, {}, null, null))
             .rejects
             .toThrow(new RegExp(`${MISSING_INCLUDE_PATH}.*\\b404\\b`, 's'));
+    });
+
+    it('rejects a cross-origin nested !#include from a remote template include', async () => {
+        createFilter(`! Title: Remote Include Test\n!#include ${remoteBaseUrl}/nested.txt\n`);
+
+        await expect(build(filtersDir, null, null, null, {}, null, null))
+            .rejects
+            .toThrow(/Include url is rejected with origin/);
+    });
+
+    it('fails loudly for a protocol-relative remote !#include', async () => {
+        createFilter('! Title: Remote Include Test\n!#include //other.example/rules.txt\n');
+
+        await expect(build(filtersDir, null, null, null, {}, null, null))
+            .rejects
+            .toThrow(/Error resolving remote include.*\/\/other\.example\/rules\.txt.*Invalid url/s);
+    });
+
+    it('does not leak remote !#include credentials in the error message', async () => {
+        const includeUrl = `http://${USERNAME}:${CREDENTIAL_PASSWORD}@127.0.0.1:${remotePort}${MISSING_INCLUDE_PATH}`;
+        createFilter(`! Title: Remote Include Test\n!#include ${includeUrl}\n`);
+
+        const error = await build(filtersDir, null, null, null, {}, null, null)
+            .then(() => null, (e) => e);
+
+        expect(error).toBeInstanceOf(Error);
+        expect(error.message).not.toContain(CREDENTIAL_PASSWORD);
+        expect(error.message).toContain(MISSING_INCLUDE_PATH);
     });
 });

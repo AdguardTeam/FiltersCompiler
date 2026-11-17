@@ -139,12 +139,15 @@ shipping** — log files stay on local disk.
 
 The compiler downloads external data at runtime:
 
-| Source                                                       | Purpose                 | Transport | Consumer                   |
-| ------------------------------------------------------------ | ----------------------- | --------- | -------------------------- |
-| `@include` URLs in filter templates                          | Filter sources          | `curl`    | `src/main/builder.js`      |
-| `!#include` URLs in filter or `@include` content             | Filter sources          | `fetch`   | `src/main/builder.js`      |
-| `https://chrome.adtidy.org/optimization_config/percent.json` | Optimization percentage | `curl`    | `src/main/optimization.ts` |
-| `https://chrome.adtidy.org/filters/<filterId>/stats.json`    | Optimization statistics | `curl`    | `src/main/optimization.ts` |
+| Source                                                       | Purpose                 | Transport | Consumer                             |
+| ------------------------------------------------------------ | ----------------------- | --------- | ------------------------------------ |
+| `@include` URLs in filter templates                          | Filter sources          | `curl`    | `src/main/builder.js`                |
+| `!#include` URLs in filter or `@include` content             | Filter sources          | `fetch`   | `src/main/utils/include-resolver.ts` |
+| `https://chrome.adtidy.org/optimization_config/percent.json` | Optimization percentage | `curl`    | `src/main/optimization.ts`           |
+| `https://chrome.adtidy.org/filters/<filterId>/stats.json`    | Optimization statistics | `curl`    | `src/main/optimization.ts`           |
+
+`src/main/builder.js` and `src/main/platforms/generator.js` delegate
+`!#include` resolution to `src/main/utils/include-resolver.ts`.
 
 All sources must be reachable at runtime. `https://filters.adtidy.org/` is
 not a download source. `src/main/builder.js` uses it only to build the

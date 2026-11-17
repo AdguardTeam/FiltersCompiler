@@ -253,6 +253,7 @@ project's layers, from top to bottom:
 | --- | --- | --- |
 | Public API | Entry point, export surface | `src/index.js` |
 | Core Pipeline | Compilation orchestration, include resolution | `src/main/builder.js` |
+| Include Resolution | Remote `!#include` resolution and same-origin validation | `src/main/utils/include-resolver.ts` |
 | Platform Generator | Platform-specific output, `!#if` resolution | `src/main/platforms/generator.js` |
 | Supporting Modules | Rule conversion, validation, optimization | `converter.js`, `validator.js`, `optimization.ts`, etc. |
 | Utilities | Logging, reporting, versioning, workarounds | `src/main/utils/*` |
@@ -269,6 +270,10 @@ converter.js  validator.js  optimization.ts  platforms/generator.js
      ↓           ↓                             ↓
   workaround  extended-css                  platforms/filter.js
   rule-masks  validator                     workaround
+
+src/main/builder.js / platforms/generator.js
+     ↓
+utils/include-resolver.ts
 ```
 
 Lower layers may never import from higher layers. No layer may import from the
