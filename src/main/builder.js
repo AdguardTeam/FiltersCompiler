@@ -385,10 +385,13 @@ const parseIncludeDirective = function (lineWithDirective) {
  *
  * The `@include` directive treats any value with a colon as an external URL
  * and passes it to curl. A scheme-less credential form, for example
- * `user:pass@example.org/filter.txt`, has a colon but is not a URL: curl reads
- * `user:` as a protocol and fails, and the value keeps the password in the log
- * and in the error. Rejecting the value before the log and the download keeps
- * the password out of both.
+ * `user:pass@example.org/filter.txt`, is not an HTTP(S) URL. Curl versions
+ * differ in how they read that form: some send the userinfo as Basic auth and
+ * download the file, while others read `user:` as a protocol and fail. The
+ * compiler accepts only HTTP(S) here, so the value is rejected before the log
+ * and the download, and the password cannot reach either. This is a
+ * deliberate behavior change: a scheme-less value that some curl versions
+ * downloaded is now rejected.
  *
  * @param {string} url Include URL.
  * @returns {boolean} `true` if the URL uses HTTP or HTTPS.
