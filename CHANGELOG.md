@@ -15,7 +15,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   package's `stripUrlCredentials()` for logs and error messages instead of a
   local helper. **Breaking:** an `!#include` path that leaves the directory of
   the file containing the directive is now ignored, as in uBO. Move the
-  included file inside the directory or use a same-origin absolute URL.
+  included file into that directory. In a remote file, a same-origin absolute
+  URL also works. The compiler logs a warning when it ignores such an
+  `!#include`.
+- An external `@include` URL must now use HTTP or HTTPS. A scheme-less value
+  such as `user:pass@example.org/filter.txt` is rejected with an error that
+  does not contain the credentials.
 
 ### Deprecated
 
@@ -26,7 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 
 - Removed credentials from `@include` URLs in log messages and error
-  messages.
+  messages, including a scheme-less external include and an invalid
+  `@include` directive.
 
 ## [4.1.0] - 2026-11-16
 
