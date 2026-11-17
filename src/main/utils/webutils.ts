@@ -1,7 +1,8 @@
 import { createRequire } from 'module';
 
+import { stripUrlCredentials } from '@adguard/filters-downloader';
+
 import { logger } from './log';
-import { stripUrlCredentials, stripUrlCredentialsFromText } from './url';
 
 const require = createRequire(import.meta.url);
 
@@ -45,15 +46,15 @@ const tryDownloadFile = async function (url: string, retryNum = 0) {
  */
 const sanitizeError = (error: unknown): unknown => {
     if (error instanceof Error) {
-        error.message = stripUrlCredentialsFromText(error.message);
+        error.message = stripUrlCredentials(error.message);
         if (error.stack) {
-            error.stack = stripUrlCredentialsFromText(error.stack);
+            error.stack = stripUrlCredentials(error.stack);
         }
         return error;
     }
 
     if (typeof error === 'string') {
-        return stripUrlCredentialsFromText(error);
+        return stripUrlCredentials(error);
     }
 
     return error;

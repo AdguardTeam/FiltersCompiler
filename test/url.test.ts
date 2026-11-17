@@ -4,8 +4,10 @@ import {
     expect,
 } from 'vitest';
 
-import { stripUrlCredentials, stripUrlCredentialsFromText } from '../src/main/utils/url';
+import { stripUrlCredentials } from '@adguard/filters-downloader';
 
+// The compiler relies on these guarantees of the dependency, so the test
+// pins them when the dependency is updated.
 describe('stripUrlCredentials', () => {
     it('removes a username and a password', () => {
         expect(stripUrlCredentials('https://user:pass@example.org/filter.txt'))
@@ -32,8 +34,10 @@ describe('stripUrlCredentials', () => {
         expect(stripUrlCredentials('./filters/common.txt')).toBe('./filters/common.txt');
     });
 
-    it('keeps malformed input unchanged', () => {
-        expect(stripUrlCredentials('https://user:pass@')).toBe('https://user:pass@');
+    it('removes credentials from malformed input', () => {
+        // The dependency removes the userinfo even when the rest of the value
+        // is not a valid URL. A leak is worse than an incomplete URL in a log.
+        expect(stripUrlCredentials('https://user:pass@')).toBe('https://');
     });
 
     it('keeps a URL without credentials unchanged', () => {
@@ -43,24 +47,24 @@ describe('stripUrlCredentials', () => {
     });
 });
 
-describe('stripUrlCredentialsFromText', () => {
+describe('stripUrlCredentials in text', () => {
     it('removes credentials from an include directive line', () => {
         const line = '@include "https://user:pass@example.org/filter.txt" /ignoreTrustLevel';
 
-        expect(stripUrlCredentialsFromText(line))
+        expect(stripUrlCredentials(line))
             .toBe('@include "https://example.org/filter.txt" /ignoreTrustLevel');
     });
 
     it('removes credentials from a curl error message', () => {
         const message = 'Command failed: curl --fail --silent -L https://user:pass@example.org/filter.txt';
 
-        expect(stripUrlCredentialsFromText(message))
+        expect(stripUrlCredentials(message))
             .toBe('Command failed: curl --fail --silent -L https://example.org/filter.txt');
     });
 
     it('keeps @ characters outside the userinfo component', () => {
         const text = 'Included https://example.org/path@name?query=user@name#fragment@name';
 
-        expect(stripUrlCredentialsFromText(text)).toBe(text);
+        expect(stripUrlCredentials(text)).toBe(text);
     });
 });

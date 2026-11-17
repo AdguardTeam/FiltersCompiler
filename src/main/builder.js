@@ -3,7 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import md5 from 'md5';
 
-import { FiltersDownloader } from '@adguard/filters-downloader';
+import { FiltersDownloader, stripUrlCredentials } from '@adguard/filters-downloader';
 import { Version } from './utils/version';
 import { convertRulesToAdgSyntax, getCanonicalRuleTexts } from './converter';
 import { validateAndFilterRules, checkAffinityDirectives } from './validator';
@@ -21,7 +21,6 @@ import {
 } from './rule/rule-masks';
 import { fixVersionComments, removeAdblockVersion } from './utils/workaround';
 import { downloadFile } from './utils/webutils';
-import { stripUrlCredentials, stripUrlCredentialsFromText } from './utils/url';
 import { getFilterIdFromDirName } from './utils/utils';
 import { optimizeDomainBlockingRules } from './utils/builder-utils';
 
@@ -381,7 +380,7 @@ const checkRedirects = function (lines, url) {
     // eslint-disable-next-line no-restricted-syntax
     for (const line of lines) {
         if (/^!\s?[Rr]edirect:/.test(line)) {
-            throw new Error(stripUrlCredentialsFromText(
+            throw new Error(stripUrlCredentials(
                 `Error: include ${url} contains redirect directive: ${line}`,
             ));
         }
@@ -460,7 +459,7 @@ export const include = async (filterDir, directiveLine, excluded) => {
                 case IGNORE_TRUST_LEVEL_OPTION:
                     if (externalInclude) {
                         // eslint-disable-next-line max-len
-                        throw new Error(stripUrlCredentialsFromText(`Trust level ignoring option is not supported for external includes: ${directiveLine}`));
+                        throw new Error(stripUrlCredentials(`Trust level ignoring option is not supported for external includes: ${directiveLine}`));
                     }
                     shouldIgnoreTrustLevel = true;
                     break;
@@ -502,7 +501,7 @@ const getResolvedPreprocessorIncludes = async function (filterDir, filterName, l
     try {
         rules = await FiltersDownloader.resolveIncludes(lines, filterDir);
     } catch (e) {
-        logger.error(stripUrlCredentialsFromText(`Error resolving includes in ${filterName}: ${e.message}`));
+        logger.error(stripUrlCredentials(`Error resolving includes in ${filterName}: ${e.message}`));
     }
     return rules;
 };
@@ -604,11 +603,11 @@ const compile = async function (filterDir, filterName, templateContent, trustLev
             );
 
             if (shouldIgnoreTrustLevel) {
-                logger.info(stripUrlCredentialsFromText(
+                logger.info(stripUrlCredentials(
                     `Ignoring trust level for ${filterName} due to @include directive: ${line}`,
                 ));
             } else {
-                logger.info(stripUrlCredentialsFromText(
+                logger.info(stripUrlCredentials(
                     `Applying trust-level exclusions to ${filterName} @include directive: ${line}`,
                 ));
                 includedRules = exclude(includedRules, trustLevelSettings, excluded);

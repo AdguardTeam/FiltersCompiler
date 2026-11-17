@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Updated [@adguard/filters-downloader] to v3.1.0. The compiler now uses the
+  package's `stripUrlCredentials()` for logs and error messages instead of a
+  local helper. **Breaking:** an `!#include` path that leaves the directory of
+  the file containing the directive is now ignored, as in uBO. Move the
+  included file inside the directory or use a same-origin absolute URL.
+
 ### Deprecated
 
 ### Removed
