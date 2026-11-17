@@ -28,6 +28,9 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const REMOTE_RULE = '||remote.example^';
 const MISSING_INCLUDE_PATH = '/missing.txt';
 const PROTECTED_INCLUDE_PATH = '/protected.txt';
+const REDIRECT_INCLUDE_PATH = '/redirect.txt';
+const REDIRECT_TARGET_PATH = '/redirect-target.txt';
+const EMPTY_INCLUDE_PATH = '/empty.txt';
 const USERNAME = 'user';
 const PASSWORD = 'pass';
 const BASIC_AUTH = `Basic ${Buffer.from(`${USERNAME}:${PASSWORD}`).toString('base64')}`;
@@ -37,12 +40,33 @@ describe('remote !#include in an @include body', () => {
     let remoteBaseUrl;
     let remotePort;
     let parentUrl;
+    const requestedPaths = [];
 
     beforeAll(async () => {
         server = http.createServer((req, res) => {
+            requestedPaths.push(req.url);
+
             if (req.url === '/remote.txt') {
                 res.writeHead(200, { 'Content-Type': 'text/plain' });
                 res.end(REMOTE_RULE);
+                return;
+            }
+
+            if (req.url === REDIRECT_INCLUDE_PATH) {
+                res.writeHead(302, { Location: `${remoteBaseUrl}${REDIRECT_TARGET_PATH}` });
+                res.end();
+                return;
+            }
+
+            if (req.url === REDIRECT_TARGET_PATH) {
+                res.writeHead(200, { 'Content-Type': 'text/plain' });
+                res.end(REMOTE_RULE);
+                return;
+            }
+
+            if (req.url === EMPTY_INCLUDE_PATH) {
+                res.writeHead(200, { 'Content-Type': 'text/plain' });
+                res.end();
                 return;
             }
 
@@ -80,6 +104,7 @@ describe('remote !#include in an @include body', () => {
 
     beforeEach(() => {
         downloadFile.mockReset();
+        requestedPaths.length = 0;
     });
 
     it('resolves an absolute nested !#include with fetch', async () => {
@@ -130,6 +155,28 @@ describe('remote !#include in an @include body', () => {
         await expect(include(__dirname, `@include "${parentUrl}"`, []))
             .rejects
             .toThrow(/Include url is rejected with origin/);
+    });
+
+    it('follows a redirect of a nested !#include', async () => {
+        downloadFile.mockResolvedValue(`!#include ${remoteBaseUrl}${REDIRECT_INCLUDE_PATH}`);
+
+        const { includedLines } = await include(__dirname, `@include "${parentUrl}"`, []);
+
+        expect(includedLines).toContain(REMOTE_RULE);
+        expect(requestedPaths).toEqual([REDIRECT_INCLUDE_PATH, REDIRECT_TARGET_PATH]);
+    });
+
+    it('resolves a nested !#include with an empty body to no rules', async () => {
+        const includeUrl = `${remoteBaseUrl}${EMPTY_INCLUDE_PATH}`;
+        downloadFile.mockResolvedValue(`!#include ${includeUrl}`);
+
+        const { includedLines } = await include(__dirname, `@include "${parentUrl}"`, []);
+
+        // @adguard/filters-downloader 3.0.1 allows a nested included filter
+        // to be empty, so it does not raise its "Response is empty" error
+        // here. A direct empty `@include` still throws in `include()`.
+        expect(includedLines.filter((line) => line.trim() !== '')).toEqual([]);
+        expect(requestedPaths).toEqual([EMPTY_INCLUDE_PATH]);
     });
 });
 
