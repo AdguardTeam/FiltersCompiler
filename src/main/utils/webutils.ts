@@ -35,26 +35,59 @@ const tryDownloadFile = async function (url: string, retryNum = 0) {
 };
 
 /**
+ * Matches a scheme-less URL with a username and a password, for example
+ * `user:pass@example.org/filter.txt`.
+ *
+ * A colon before the at sign is the userinfo separator. A local path, for
+ * example `C:\filters\file@name.txt`, has no such separator, because a
+ * separator follows the drive prefix.
+ */
+const SCHEME_LESS_CREDENTIALS_REGEXP = /^[^/\\\s@]+:[^/\\\s@]*@/;
+
+/**
+ * Removes the userinfo component from a URL, including a URL without a scheme.
+ *
+ * The dependency helper finds the userinfo only in a URL that has a scheme or
+ * starts with `//`. An external `@include` accepts a scheme-less URL, for
+ * example `user:pass@example.org/filter.txt`, because the `@include` directive
+ * treats any value with a colon as an external URL. The helper parses that
+ * form with a placeholder scheme, then removes the placeholder.
+ *
+ * @param url URL that may contain a username and a password.
+ *
+ * @returns URL without the userinfo component.
+ */
+export const sanitizeUrl = (url: string): string => {
+    const sanitizedUrl = stripUrlCredentials(url);
+
+    if (sanitizedUrl !== url || !SCHEME_LESS_CREDENTIALS_REGEXP.test(url)) {
+        return sanitizedUrl;
+    }
+
+    const placeholder = 'http://';
+
+    return stripUrlCredentials(`${placeholder}${url}`).slice(placeholder.length);
+};
+
+/**
  * Removes URL credentials from an error message and stack.
  *
  * A failed `execFileSync` call includes the full `curl` command line in the
- * error text, so the error can contain the URL with credentials.
+ * error text, so the error can contain the URL with credentials. `execFileSync`
+ * throws only `Error` instances, so any other value is returned unchanged.
  *
- * @param error Error or value to sanitize.
+ * @param error Error to sanitize.
  *
- * @returns Sanitized error or value.
+ * @returns Sanitized error or the original value when it is not an `Error`.
  */
 const sanitizeError = (error: unknown): unknown => {
-    if (error instanceof Error) {
-        error.message = stripUrlCredentials(error.message);
-        if (error.stack) {
-            error.stack = stripUrlCredentials(error.stack);
-        }
+    if (!(error instanceof Error)) {
         return error;
     }
 
-    if (typeof error === 'string') {
-        return stripUrlCredentials(error);
+    error.message = stripUrlCredentials(error.message);
+    if (error.stack) {
+        error.stack = stripUrlCredentials(error.stack);
     }
 
     return error;
@@ -72,7 +105,7 @@ export const RETRY_NUM = 5;
  * @returns raw content of the file
  */
 export const downloadFile = async (url: string) => {
-    logger.info(`Downloading: ${stripUrlCredentials(url)}`);
+    logger.info(`Downloading: ${sanitizeUrl(url)}`);
 
     // 5 times to retry after first fail attempt:
     // 1 sec for first time, double for every forthcoming attempts
@@ -83,7 +116,7 @@ export const downloadFile = async (url: string) => {
         return await tryDownloadFile(url);
     } catch (e) {
         logger.warn(sanitizeError(e));
-        logger.warn(`Retry downloading: ${stripUrlCredentials(url)}`);
+        logger.warn(`Retry downloading: ${sanitizeUrl(url)}`);
         try {
             return await tryDownloadFile(url, RETRY_NUM);
         } catch (retryError) {

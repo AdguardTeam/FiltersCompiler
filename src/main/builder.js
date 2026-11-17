@@ -20,7 +20,7 @@ import {
     NOT_OPTIMIZED_HINT,
 } from './rule/rule-masks';
 import { fixVersionComments, removeAdblockVersion } from './utils/workaround';
-import { downloadFile } from './utils/webutils';
+import { downloadFile, sanitizeUrl } from './utils/webutils';
 import { getFilterIdFromDirName } from './utils/utils';
 import { optimizeDomainBlockingRules } from './utils/builder-utils';
 
@@ -50,6 +50,16 @@ const IGNORE_TRUST_LEVEL_OPTION = 'ignoreTrustLevel';
 
 const NOT_OPTIMIZED_SUFFIX = `${SPACE}${NOT_OPTIMIZED_HINT}`;
 const NOT_OPTIMIZED_HINT_LINE = `${HINT_MASK}${NOT_OPTIMIZED_HINT}`;
+
+/**
+ * Matches a preprocessor include directive line.
+ */
+const PREPROCESSOR_INCLUDE_REGEXP = /^!#include\s+(.+)$/;
+
+/**
+ * Matches an absolute URL. Such a target has no directory that it can leave.
+ */
+const ABSOLUTE_URL_REGEXP = /^([a-z][a-z0-9+.-]*:[/\\]{2,})|^[/\\]{2,}/i;
 
 /**
  * Filter header tag for diff path which is needed for patch updates.
@@ -371,6 +381,84 @@ const parseIncludeDirective = function (lineWithDirective) {
 };
 
 /**
+ * Checks that an external include URL uses HTTP or HTTPS.
+ *
+ * The `@include` directive treats any value with a colon as an external URL
+ * and passes it to curl. A scheme-less credential form, for example
+ * `user:pass@example.org/filter.txt`, has a colon but is not a URL: curl reads
+ * `user:` as a protocol and fails, and the value keeps the password in the log
+ * and in the error. Rejecting the value before the log and the download keeps
+ * the password out of both.
+ *
+ * @param {string} url Include URL.
+ * @returns {boolean} `true` if the URL uses HTTP or HTTPS.
+ */
+const isHttpUrl = function (url) {
+    try {
+        const { protocol } = new URL(url);
+        return protocol === 'http:' || protocol === 'https:';
+    } catch {
+        return false;
+    }
+};
+
+/**
+ * Removes credentials from every URL in an include directive line.
+ *
+ * An invalid directive can contain a scheme-less URL, which the generic helper
+ * does not recognize, so each whitespace-separated part is sanitized as a URL.
+ *
+ * @param {string} line Include directive line.
+ * @returns {string} Directive line without credentials.
+ */
+const sanitizeDirectiveLine = function (line) {
+    return line
+        .split(/\s+/)
+        .map((part) => sanitizeUrl(part))
+        .join(' ');
+};
+
+/**
+ * Logs a warning for each local `!#include` target that leaves the directory
+ * of the containing file.
+ *
+ * The dependency ignores such an include, as uBO does, so the compiled filter
+ * loses the included rules without a message. The warning tells the filter
+ * maintainer why the rules are missing. An absolute URL has no directory that
+ * it can leave, so it is not checked.
+ *
+ * @param {string} directory Directory of the file that contains the directive.
+ * @param {string[]} lines Lines that may contain `!#include` directives.
+ */
+const warnAboutDroppedPreprocessorIncludes = function (directory, lines) {
+    const base = path.resolve(directory);
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const line of lines) {
+        const match = PREPROCESSOR_INCLUDE_REGEXP.exec(line);
+        if (!match) {
+            continue;
+        }
+
+        const includePath = match[1].trim();
+        if (ABSOLUTE_URL_REGEXP.test(includePath)) {
+            continue;
+        }
+
+        // A leading separator means a path inside the directory, as in uBO.
+        const target = path.resolve(base, includePath.replace(/^[\\/]+/, ''));
+        const relative = path.relative(base, target);
+
+        if (relative === '..' || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) {
+            const sanitizedLine = sanitizeDirectiveLine(line.trim());
+            logger.warn(
+                `Ignoring !#include outside the directory of the containing file: '${sanitizedLine}'`,
+            );
+        }
+    }
+};
+
+/**
  * Checks if lines contains invalid redirect directives
  *
  * @param lines
@@ -410,12 +498,16 @@ export const include = async (filterDir, directiveLine, excluded) => {
     const { url, options } = parseIncludeDirective(directiveLine);
 
     if (!url) {
-        throw new Error(`Invalid include directive: '${directiveLine.trim()}'`);
+        throw new Error(`Invalid include directive: '${sanitizeDirectiveLine(directiveLine.trim())}'`);
     }
 
-    logger.info(`Applying inclusion from: ${stripUrlCredentials(url)}`);
-
     const externalInclude = url.includes(':');
+
+    if (externalInclude && !isHttpUrl(url)) {
+        throw new Error(`Invalid external include URL: '${sanitizeUrl(url)}'`);
+    }
+
+    logger.info(`Applying inclusion from: ${sanitizeUrl(url)}`);
 
     const included = externalInclude
         ? await downloadFile(url)
@@ -430,6 +522,10 @@ export const include = async (filterDir, directiveLine, excluded) => {
         const originUrl = externalInclude
             ? FiltersDownloader.getFilterUrlOrigin(url)
             : path.dirname(path.join(filterDir, url));
+
+        if (!externalInclude) {
+            warnAboutDroppedPreprocessorIncludes(originUrl, includedLines);
+        }
 
         includedLines = await FiltersDownloader.resolveIncludes(includedLines, originUrl);
 
@@ -470,7 +566,7 @@ export const include = async (filterDir, directiveLine, excluded) => {
 
         includedLines = fixVersionComments(includedLines);
     } else {
-        throw new Error(`Error handling include from: ${stripUrlCredentials(url)}`);
+        throw new Error(`Error handling include from: ${sanitizeUrl(url)}`);
     }
 
     logger.info(`Inclusion lines: ${includedLines.length}`);
@@ -495,6 +591,8 @@ export const include = async (filterDir, directiveLine, excluded) => {
  * @throws {Error} Throws an error if unable to resolve `!#include` directives.
  */
 const getResolvedPreprocessorIncludes = async function (filterDir, filterName, lines) {
+    warnAboutDroppedPreprocessorIncludes(filterDir, lines);
+
     let rules = lines;
     // bad includes are ignored here because they'll be handled in generator after resolving conditions
     // https://github.com/AdguardTeam/FiltersCompiler/issues/84
@@ -573,7 +671,7 @@ const isDiffPathHeaderTag = (line) => {
  *
  * @returns {Promise<CompileResult>} Promise which resolves to compiled data for the filter.
  */
-const compile = async function (filterDir, filterName, templateContent, trustLevelSettings) {
+export const compile = async function (filterDir, filterName, templateContent, trustLevelSettings) {
     let result = [];
     const excluded = [];
 
@@ -603,9 +701,9 @@ const compile = async function (filterDir, filterName, templateContent, trustLev
             );
 
             if (shouldIgnoreTrustLevel) {
-                logger.info(stripUrlCredentials(
-                    `Ignoring trust level for ${filterName} due to @include directive: ${line}`,
-                ));
+                // `/ignoreTrustLevel` throws for an external include, so this
+                // line can contain only a local path, which has no credentials.
+                logger.info(`Ignoring trust level for ${filterName} due to @include directive: ${line}`);
             } else {
                 logger.info(stripUrlCredentials(
                     `Applying trust-level exclusions to ${filterName} @include directive: ${line}`,

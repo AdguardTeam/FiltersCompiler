@@ -15,11 +15,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { include } from '../src/main/builder';
+import { compile, include } from '../src/main/builder';
 import { logger } from '../src/main/utils/log';
 import { createTempDir } from './utils/fixtures';
 
-const USERNAME = 'user';
+const USERNAME = 'adg-user';
 const PASSWORD = 'pass';
 const RULE = '||example.org^';
 const SERVER_PATH = path.join(
@@ -33,7 +33,6 @@ describe('credentials in @include URLs', () => {
     let port;
     let baseUrl;
     let credentialsUrl;
-    let consoleOutput;
 
     beforeAll(async () => {
         serverProcess = spawn(process.execPath, [SERVER_PATH], {
@@ -66,98 +65,290 @@ describe('credentials in @include URLs', () => {
     });
 
     /**
-     * Runs `include()` with credentials in the URL and collects the log output.
+     * Runs a callback in a temporary directory and removes the directory
+     * afterwards.
      *
-     * @param includePath Path of the included file on the test server.
-     * @param options Include directive options.
-     * @returns Include result, error, and log file content.
+     * @param prefix Directory name prefix.
+     * @param callback Callback that receives the directory path.
+     * @returns Callback result.
      */
-    const runInclude = async (includePath, options = '') => {
-        const dir = createTempDir('filters-compiler-credentials-');
-        const logPath = path.join(dir, 'compile.log');
+    const withTempRoot = async (prefix, callback) => {
+        const dir = createTempDir(prefix);
 
         try {
-            consoleOutput = [];
-            ['info', 'warn', 'error'].forEach((method) => {
-                vi.spyOn(console, method).mockImplementation((...args) => {
-                    consoleOutput.push(...args.map(String));
-                });
-            });
-
-            logger.initialize(logPath);
-
-            const directiveLine = `@include "${credentialsUrl}${includePath}"${options}`;
-            let result;
-            let error;
-
-            try {
-                result = await include(dir, directiveLine, []);
-            } catch (e) {
-                error = e;
-            }
-
-            logger.close();
-
-            return {
-                result,
-                error,
-                log: fs.readFileSync(logPath, 'utf8'),
-            };
+            return await callback(dir);
         } finally {
-            logger.close();
             fs.rmSync(dir, { recursive: true, force: true });
         }
     };
 
     /**
-     * Asserts that the password is absent from every output channel.
+     * Runs a callback with the logger and the console captured.
+     *
+     * @param dir Directory for the log file.
+     * @param callback Callback to run.
+     * @returns Callback result, error, log file content, and console output.
+     */
+    const withLog = async (dir, callback) => {
+        const logPath = path.join(dir, 'compile.log');
+        const consoleOutput = [];
+
+        ['info', 'warn', 'error'].forEach((method) => {
+            vi.spyOn(console, method).mockImplementation((...args) => {
+                consoleOutput.push(...args.map(String));
+            });
+        });
+
+        logger.initialize(logPath);
+
+        let result;
+        let error;
+
+        try {
+            result = await callback();
+        } catch (e) {
+            error = e;
+        } finally {
+            logger.close();
+        }
+
+        return {
+            result,
+            error,
+            log: fs.readFileSync(logPath, 'utf8'),
+            consoleOutput,
+        };
+    };
+
+    /**
+     * Runs `include()` with an arbitrary directive line and collects the output.
+     *
+     * @param directiveLine Include directive line.
+     * @returns Include result, error, log file content, and console output.
+     */
+    const runDirective = (directiveLine) => withTempRoot(
+        'filters-compiler-credentials-',
+        (dir) => withLog(dir, () => include(dir, directiveLine, [])),
+    );
+
+    /**
+     * Runs `include()` with credentials in the URL.
+     *
+     * @param includePath Path of the included file on the test server.
+     * @param options Include directive options.
+     * @returns Include result, error, log file content, and console output.
+     */
+    const runInclude = (includePath, options = '') => runDirective(
+        `@include "${credentialsUrl}${includePath}"${options}`,
+    );
+
+    /**
+     * Runs `compile()` with a template and optional local files.
+     *
+     * @param templateContent Content of `template.txt`.
+     * @param files Local files to create, keyed by a path relative to the
+     * filter directory.
+     * @returns Compile result, error, log file content, and console output.
+     */
+    const runCompile = (templateContent, files = {}) => withTempRoot(
+        'filters-compiler-compile-',
+        (dir) => {
+            const filterDir = path.join(dir, 'filter');
+            fs.mkdirSync(filterDir, { recursive: true });
+
+            Object.entries(files).forEach(([name, content]) => {
+                const filePath = path.join(filterDir, name);
+                fs.mkdirSync(path.dirname(filePath), { recursive: true });
+                fs.writeFileSync(filePath, content);
+            });
+
+            const trustLevelSettings = path.join(dir, 'missing-exclusions.txt');
+
+            return withLog(
+                dir,
+                () => compile(filterDir, 'Test filter', templateContent, trustLevelSettings),
+            );
+        },
+    );
+
+    /**
+     * Asserts that the username and the password are absent from every output
+     * channel.
      *
      * @param log Log file content.
-     * @param error Error thrown by `include()`, if any.
+     * @param error Error thrown by the compiler, if any.
+     * @param consoleOutput Captured console output.
      */
-    const expectNoPassword = (log, error) => {
+    const expectNoCredentials = (log, error, consoleOutput) => {
+        expect(log).not.toContain(USERNAME);
         expect(log).not.toContain(PASSWORD);
+        expect(consoleOutput.join('\n')).not.toContain(USERNAME);
         expect(consoleOutput.join('\n')).not.toContain(PASSWORD);
 
         if (error) {
+            expect(String(error.stack)).not.toContain(USERNAME);
             expect(String(error.stack)).not.toContain(PASSWORD);
         }
     };
 
     it('does not log credentials for a successful include', async () => {
-        const { result, error, log } = await runInclude('/filter.txt');
+        const {
+            result, error, log, consoleOutput,
+        } = await runInclude('/filter.txt');
 
         expect(error).toBeUndefined();
         expect(result.includedLines).toContain(RULE);
         expect(log).toContain(`Applying inclusion from: ${baseUrl}/filter.txt`);
         expect(log).toContain(`Downloading: ${baseUrl}/filter.txt`);
-        expectNoPassword(log, error);
+        expectNoCredentials(log, error, consoleOutput);
     });
 
     it('does not expose credentials in a redirect directive error', async () => {
-        const { error, log } = await runInclude('/redirect.txt');
+        const { error, log, consoleOutput } = await runInclude('/redirect.txt');
 
         expect(error).toBeInstanceOf(Error);
         expect(error.message).toContain(`Error: include ${baseUrl}/redirect.txt`);
         expect(error.message).toContain('contains redirect directive');
         expect(error.message).toContain('! Redirect: http://example.org/next.txt');
-        expectNoPassword(log, error);
+        expectNoCredentials(log, error, consoleOutput);
     });
 
     it('does not expose credentials in an ignoreTrustLevel error', async () => {
-        const { error, log } = await runInclude('/filter.txt', ' /ignoreTrustLevel');
+        const { error, log, consoleOutput } = await runInclude('/filter.txt', ' /ignoreTrustLevel');
 
         expect(error).toBeInstanceOf(Error);
         expect(error.message).toContain('Trust level ignoring option is not supported');
         expect(error.message).toContain(`@include "${baseUrl}/filter.txt" /ignoreTrustLevel`);
-        expectNoPassword(log, error);
+        expectNoCredentials(log, error, consoleOutput);
     });
 
     it('does not expose credentials when a download fails', async () => {
-        const { error, log } = await runInclude('/missing.txt');
+        const { error, log, consoleOutput } = await runInclude('/missing.txt');
 
         expect(error).toBeInstanceOf(Error);
         expect(String(error.stack)).toContain('curl');
-        expectNoPassword(log, error);
+        expectNoCredentials(log, error, consoleOutput);
+    });
+
+    it('does not expose credentials when the included file is empty', async () => {
+        const { error, log, consoleOutput } = await runInclude('/empty.txt');
+
+        expect(error).toBeInstanceOf(Error);
+        expect(error.message).toContain('Error handling include from');
+        expect(error.message).toContain(`${baseUrl}/empty.txt`);
+        expectNoCredentials(log, error, consoleOutput);
+    });
+
+    it('does not expose credentials in an invalid include directive error', async () => {
+        const { error, log, consoleOutput } = await runDirective(
+            `@include "" ${USERNAME}:${PASSWORD}@example.org/filter.txt`,
+        );
+
+        expect(error).toBeInstanceOf(Error);
+        expect(error.message).toContain('Invalid include directive');
+        expect(error.message).toContain('example.org/filter.txt');
+        expectNoCredentials(log, error, consoleOutput);
+    });
+
+    it('rejects a scheme-less external include without exposing credentials', async () => {
+        const { error, log, consoleOutput } = await runDirective(
+            `@include "${USERNAME}:${PASSWORD}@example.org/filter.txt"`,
+        );
+
+        expect(error).toBeInstanceOf(Error);
+        expect(error.message).toContain('Invalid external include URL');
+        expect(error.message).toContain('example.org/filter.txt');
+        expectNoCredentials(log, error, consoleOutput);
+    });
+
+    it('does not log credentials for a credentialed include in compile()', async () => {
+        const {
+            result, error, log, consoleOutput,
+        } = await runCompile(
+            `@include "${credentialsUrl}/filter.txt"`,
+        );
+
+        expect(error).toBeUndefined();
+        expect(result.lines).toContain(RULE);
+        expect(log).toContain(`Applying inclusion from: ${baseUrl}/filter.txt`);
+        expect(log).toContain(
+            'Applying trust-level exclusions to Test filter @include directive:'
+            + ` @include "${baseUrl}/filter.txt"`,
+        );
+        expectNoCredentials(log, error, consoleOutput);
+    });
+
+    it('does not log credentials for a local include with ignoreTrustLevel in compile()', async () => {
+        const {
+            result, error, log, consoleOutput,
+        } = await runCompile(
+            '@include "./local.txt" /ignoreTrustLevel',
+            { 'local.txt': RULE },
+        );
+
+        expect(error).toBeUndefined();
+        expect(result.lines).toContain(RULE);
+        expect(log).toContain(
+            'Ignoring trust level for Test filter due to @include directive:'
+            + ' @include "./local.txt" /ignoreTrustLevel',
+        );
+        expectNoCredentials(log, error, consoleOutput);
+    });
+
+    it('does not expose credentials when compile() includes an empty remote file', async () => {
+        const { error, log, consoleOutput } = await runCompile(
+            `@include "${credentialsUrl}/empty.txt"`,
+        );
+
+        expect(error).toBeInstanceOf(Error);
+        expect(error.message).toContain('Error handling include from');
+        expect(error.message).toContain(`${baseUrl}/empty.txt`);
+        expectNoCredentials(log, error, consoleOutput);
+    });
+
+    it('does not expose credentials when a preprocessor include fails in compile()', async () => {
+        const { log, consoleOutput } = await runCompile(
+            `!#include "${credentialsUrl}/missing.txt"`,
+        );
+
+        expect(log).toContain('Error resolving includes in Test filter');
+        expectNoCredentials(log, undefined, consoleOutput);
+    });
+
+    it('warns when a preprocessor include leaves the directory and drops its rules', async () => {
+        const {
+            result, error, log, consoleOutput,
+        } = await runCompile(
+            '!#include ../common.txt\n||inside.example^',
+            { '../common.txt': '||outside.example^' },
+        );
+
+        expect(error).toBeUndefined();
+        expect(result.lines).toContain('||inside.example^');
+        expect(result.lines.join('\n')).not.toContain('outside.example');
+        expect(log).toContain(
+            "Ignoring !#include outside the directory of the containing file: '!#include ../common.txt'",
+        );
+        expectNoCredentials(log, error, consoleOutput);
+    });
+
+    it('warns when an included file has a preprocessor include that leaves the directory', async () => {
+        const {
+            result, error, log, consoleOutput,
+        } = await runCompile(
+            '@include "./local.txt"',
+            {
+                'local.txt': '!#include ../common.txt\n||inside.example^',
+                '../common.txt': '||outside.example^',
+            },
+        );
+
+        expect(error).toBeUndefined();
+        expect(result.lines).toContain('||inside.example^');
+        expect(result.lines.join('\n')).not.toContain('outside.example');
+        expect(log).toContain(
+            "Ignoring !#include outside the directory of the containing file: '!#include ../common.txt'",
+        );
+        expectNoCredentials(log, error, consoleOutput);
     });
 });

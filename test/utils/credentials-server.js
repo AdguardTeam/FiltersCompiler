@@ -1,7 +1,7 @@
 import http from 'node:http';
 
 const HOST = '127.0.0.1';
-const USERNAME = 'user';
+const USERNAME = 'adg-user';
 const PASSWORD = 'pass';
 const RULE = '||example.org^';
 const REDIRECT_LINE = `! Redirect: http://${USERNAME}:${PASSWORD}@example.org/next.txt`;
@@ -18,6 +18,12 @@ const server = http.createServer((req, res) => {
     if (req.url === '/redirect.txt') {
         res.writeHead(200, { 'Content-Type': 'text/plain' });
         res.end(REDIRECT_LINE);
+        return;
+    }
+
+    if (req.url === '/empty.txt') {
+        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        res.end();
         return;
     }
 

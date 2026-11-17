@@ -16,9 +16,14 @@ import path from 'node:path';
 import { include } from '../src/main/builder';
 import { downloadFile } from '../src/main/utils/webutils';
 
-vi.mock('../src/main/utils/webutils', () => ({
-    downloadFile: vi.fn(),
-}));
+vi.mock('../src/main/utils/webutils', async (importOriginal) => {
+    const actual = await importOriginal();
+
+    return {
+        ...actual,
+        downloadFile: vi.fn(),
+    };
+});
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
