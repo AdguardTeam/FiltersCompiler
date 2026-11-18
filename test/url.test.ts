@@ -6,7 +6,7 @@ import {
 
 import { stripUrlCredentials } from '@adguard/filters-downloader';
 
-import { sanitizeUrl } from '../src/main/utils/webutils';
+import { sanitizeText, sanitizeUrl } from '../src/main/utils/webutils';
 
 // The compiler relies on these guarantees of the dependency, so the test
 // pins them when the dependency is updated.
@@ -107,5 +107,59 @@ describe('sanitizeUrl', () => {
     it('removes credentials from a url with a scheme', () => {
         expect(sanitizeUrl('https://user:pass@example.org/filter.txt'))
             .toBe('https://example.org/filter.txt');
+    });
+
+    it.each([
+        {
+            name: 'a relative path',
+            url: './user:pass@example.org/filter.txt',
+            expected: './example.org/filter.txt',
+        },
+        {
+            name: 'an absolute path',
+            url: '/user:pass@example.org/filter.txt',
+            expected: '/example.org/filter.txt',
+        },
+        {
+            name: 'a path prefix',
+            url: 'sub/user:pass@example.org/f.txt',
+            expected: 'sub/example.org/f.txt',
+        },
+    ])('removes credentials from a scheme-less url after $name', ({ url, expected }) => {
+        // `@include` treats any value with a colon as an external url, so a
+        // path prefix does not stop the scheme-less credential form from
+        // reaching the rejection error.
+        expect(sanitizeUrl(url)).toBe(expected);
+    });
+});
+
+describe('sanitizeText', () => {
+    it('removes a scheme-less credential form and keeps the line breaks', () => {
+        const text = [
+            "Failed to resolve the include directive '!#include adg-user:pass@example.org/missing.txt'",
+            "URL: '/filters'",
+            "\tENOENT: no such file or directory, open '/filters/adg-user:pass@example.org/missing.txt'",
+        ].join('\n');
+
+        expect(sanitizeText(text)).toBe([
+            "Failed to resolve the include directive '!#include example.org/missing.txt'",
+            "URL: '/filters'",
+            "\tENOENT: no such file or directory, open '/filters/example.org/missing.txt'",
+        ].join('\n'));
+    });
+
+    it('removes a url with a scheme and a password that contains a space', () => {
+        expect(sanitizeText('Downloading http://user:pa ss@example.org/f.txt now'))
+            .toBe('Downloading http://example.org/f.txt now');
+    });
+
+    it('removes credentials from a quoted directive line', () => {
+        expect(sanitizeText("Failed to resolve the include directive '!#include \"user:pass@example.org/x.txt\"'"))
+            .toBe("Failed to resolve the include directive '!#include \"example.org/x.txt\"'");
+    });
+
+    it('keeps a text without credentials unchanged', () => {
+        expect(sanitizeText('Applying inclusion from: ./local.txt'))
+            .toBe('Applying inclusion from: ./local.txt');
     });
 });
