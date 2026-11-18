@@ -852,6 +852,7 @@ export const platformsConfig = {
         'expires': '10 days',
         'configuration': {
             'removeRulePatterns': [
+                ...HTML_FILTERING_MODIFIER_PATTERNS,
                 ...APP_MODIFIER_PATTERNS,
                 ...NETWORK_MODIFIER_PATTERNS,
                 ...PROTOBUF_MODIFIER_PATTERNS,
