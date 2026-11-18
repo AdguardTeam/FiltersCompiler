@@ -34,8 +34,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 
 - Removed credentials from `@include` URLs in log messages and error
-  messages, including a scheme-less external include and an invalid
-  `@include` directive.
+  messages, including a scheme-less external include (with or without a path
+  prefix), an invalid `@include` directive, a `! Redirect:` target, and a
+  `!#include` error that the downloader echoes.
 
 ## [4.1.0] - 2026-11-16
 

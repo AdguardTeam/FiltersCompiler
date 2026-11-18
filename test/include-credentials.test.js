@@ -215,6 +215,34 @@ describe('credentials in @include URLs', () => {
         expectNoCredentials(log, error, consoleOutput);
     });
 
+    it('does not expose a scheme-less redirect url in the error', async () => {
+        // `stripUrlCredentials()` keeps the userinfo of a value without a
+        // scheme, so the redirect line is sanitized token by token.
+        const { error, log, consoleOutput } = await runCompile(
+            '@include "./local.txt"',
+            { 'local.txt': `! Redirect: ${USERNAME}:${PASSWORD}@example.org/next.txt` },
+        );
+
+        expect(error).toBeInstanceOf(Error);
+        expect(error.message).toContain('contains redirect directive');
+        expect(error.message).toContain('! Redirect: example.org/next.txt');
+        expectNoCredentials(log, error, consoleOutput);
+    });
+
+    it('does not expose a scheme-less preprocessor include target in the error', async () => {
+        // A local file that `@include` pulls in can contain a `!#include`
+        // whose target is a scheme-less credential form. The downloader
+        // resolves it as a local path and echoes it in the error.
+        const { error, log, consoleOutput } = await runCompile(
+            '@include "./local.txt"',
+            { 'local.txt': `!#include ${USERNAME}:${PASSWORD}@example.org/missing.txt` },
+        );
+
+        expect(error).toBeInstanceOf(Error);
+        expect(error.message).toContain('Failed to resolve the include directive');
+        expectNoCredentials(log, error, consoleOutput);
+    });
+
     it('does not expose credentials in an ignoreTrustLevel error', async () => {
         const { error, log, consoleOutput } = await runInclude('/filter.txt', ' /ignoreTrustLevel');
 
@@ -324,6 +352,22 @@ describe('credentials in @include URLs', () => {
         vi.spyOn(FiltersDownloader, 'resolveIncludes').mockRejectedValueOnce(
             new Error(
                 `Failed to resolve the include directive '!#include ${credentialsUrl}/missing.txt'`,
+            ),
+        );
+
+        const { log, consoleOutput } = await runCompile(RULE);
+
+        expect(log).toContain('Error resolving includes in Test filter');
+        expectNoCredentials(log, undefined, consoleOutput);
+    });
+
+    it('redacts a scheme-less preprocessor include target the downloader did not sanitize', async () => {
+        // `stripUrlCredentials()` needs a scheme, so the guard passes the
+        // scheme-less form through. The message is sanitized token by token
+        // instead.
+        vi.spyOn(FiltersDownloader, 'resolveIncludes').mockRejectedValueOnce(
+            new Error(
+                `Failed to resolve the include directive '!#include ${USERNAME}:${PASSWORD}@example.org/missing.txt'`,
             ),
         );
 

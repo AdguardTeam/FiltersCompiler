@@ -20,7 +20,9 @@ import {
     NOT_OPTIMIZED_HINT,
 } from './rule/rule-masks';
 import { fixVersionComments, removeAdblockVersion } from './utils/workaround';
-import { downloadFile, sanitizeUrl } from './utils/webutils';
+import {
+    downloadFile, sanitizeError, sanitizeText, sanitizeUrl,
+} from './utils/webutils';
 import { getFilterIdFromDirName } from './utils/utils';
 import { optimizeDomainBlockingRules } from './utils/builder-utils';
 
@@ -410,15 +412,13 @@ const isHttpUrl = function (url) {
  *
  * An invalid directive can contain a scheme-less URL, which the generic helper
  * does not recognize, so each whitespace-separated part is sanitized as a URL.
+ * The line is normalized to a single line with single spaces.
  *
  * @param {string} line Include directive line.
  * @returns {string} Directive line without credentials.
  */
 const sanitizeDirectiveLine = function (line) {
-    return line
-        .split(/\s+/)
-        .map((part) => sanitizeUrl(part))
-        .join(' ');
+    return sanitizeText(line).trim().split(/\s+/).join(' ');
 };
 
 /**
@@ -471,9 +471,12 @@ const checkRedirects = function (lines, url) {
     // eslint-disable-next-line no-restricted-syntax
     for (const line of lines) {
         if (/^!\s?[Rr]edirect:/.test(line)) {
-            throw new Error(stripUrlCredentials(
-                `Error: include ${url} contains redirect directive: ${line}`,
-            ));
+            // The redirect target can be a scheme-less URL, which the generic
+            // helper does not recognize, so the URL and the directive line are
+            // sanitized separately.
+            throw new Error(
+                `Error: include ${sanitizeUrl(url)} contains redirect directive: ${sanitizeDirectiveLine(line)}`,
+            );
         }
     }
 };
@@ -530,7 +533,14 @@ export const include = async (filterDir, directiveLine, excluded) => {
             warnAboutDroppedPreprocessorIncludes(originUrl, includedLines);
         }
 
-        includedLines = await FiltersDownloader.resolveIncludes(includedLines, originUrl);
+        try {
+            includedLines = await FiltersDownloader.resolveIncludes(includedLines, originUrl);
+        } catch (e) {
+            // A local file can contain a `!#include` whose target is a
+            // scheme-less URL, and the dependency leaves that form in the
+            // message, so the error reaches the caller sanitized here.
+            throw sanitizeError(e);
+        }
 
         includedLines = removeAdblockVersion(includedLines);
 
@@ -602,7 +612,7 @@ const getResolvedPreprocessorIncludes = async function (filterDir, filterName, l
     try {
         rules = await FiltersDownloader.resolveIncludes(lines, filterDir);
     } catch (e) {
-        logger.error(stripUrlCredentials(`Error resolving includes in ${filterName}: ${e.message}`));
+        logger.error(sanitizeText(`Error resolving includes in ${filterName}: ${e.message}`));
     }
     return rules;
 };
