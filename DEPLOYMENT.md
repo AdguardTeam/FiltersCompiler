@@ -47,6 +47,9 @@ In short:
 | `publish-release.yml` | PR merged to `master` or manual re-run | Tag, build, publish to npm, mirror, create GitHub Release, notify Slack                       |
 | `mirror.yml`          | Push to `master`                       | Mirror commits to `AdguardTeam/FiltersCompiler`                                               |
 
+A manual run of `prepare-release.yml` shows the requested tag in the
+Actions run list, for example `Prepare release v3.3.0`.
+
 Self-hosted jobs run on the `team-extensions` runner label; the npm publish
 job (`deploy-to-npm`) runs on `ubuntu-latest`. Except for the Node.js 24 job
 in `ci.yml`, which runs the checks directly via `actions/setup-node`,
