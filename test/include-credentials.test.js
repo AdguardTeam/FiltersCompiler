@@ -15,6 +15,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { FiltersDownloader } from '@adguard/filters-downloader';
+
 import { compile, include } from '../src/main/builder';
 import { logger } from '../src/main/utils/log';
 import { createTempDir } from './utils/fixtures';
@@ -310,6 +312,22 @@ describe('credentials in @include URLs', () => {
         const { log, consoleOutput } = await runCompile(
             `!#include "${credentialsUrl}/missing.txt"`,
         );
+
+        expect(log).toContain('Error resolving includes in Test filter');
+        expectNoCredentials(log, undefined, consoleOutput);
+    });
+
+    it('redacts credentials in a preprocessor include error the downloader did not sanitize', async () => {
+        // The downloader sanitizes its own errors, so the guard in
+        // getResolvedPreprocessorIncludes() is pinned with a rejection that
+        // carries the credentials, as an unsanitized error would.
+        vi.spyOn(FiltersDownloader, 'resolveIncludes').mockRejectedValueOnce(
+            new Error(
+                `Failed to resolve the include directive '!#include ${credentialsUrl}/missing.txt'`,
+            ),
+        );
+
+        const { log, consoleOutput } = await runCompile(RULE);
 
         expect(log).toContain('Error resolving includes in Test filter');
         expectNoCredentials(log, undefined, consoleOutput);
