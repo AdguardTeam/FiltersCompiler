@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- HTML filtering rules (`$$`, `$@$`) are no longer kept for the Firefox
+  extension. Firefox technically supports them, but they break some websites
+  and older web extensions, so the exclusion removed in 4.1.0 is restored.
+
 ### Deprecated
 
 ### Removed
