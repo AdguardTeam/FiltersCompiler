@@ -42,8 +42,8 @@ const RULES_SEPARATOR = '\r\n';
 let filterIdsPool = [];
 let metadataFilterIdsPool = [];
 
-// Plain ids, not read from platformsConfig: compile() lets customPlatformsConfig
-// override its entries in place, which must not change this behaviour.
+// Plain ids, not read from platformsConfig: compile() lets a platformsConfigPatch
+// override its entries, which must not change this behaviour.
 const OPTIMIZED_PLATFORMS_LIST = ['ext_safari', 'android', 'ios', 'ext_android_cb'];
 const UBLOCK_PLATFORM = 'ext_ublock';
 

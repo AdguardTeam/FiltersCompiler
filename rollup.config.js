@@ -30,10 +30,14 @@ export default {
             // declarations exist.
             hook: 'writeBundle',
             targets: [
-                // src/index.d.ts re-exports from './main/optimization', which must
-                // resolve relative to dist/index.d.ts — mirror the generated
-                // declaration there instead of leaving it under dist/types/src/main.
+                // src/index.d.ts re-exports which must resolve relative to
+                // dist/index.d.ts — mirror the generated declarations there
+                // instead of leaving them under dist/types/src/main.
                 { src: 'dist/types/src/main/optimization.d.ts', dest: 'dist/main' },
+                { src: 'dist/types/src/main/platforms-config.d.ts', dest: 'dist/main' },
+                // Keep the internal declaration with the public declarations
+                // that may reference it.
+                { src: 'dist/types/src/main/utils/deep-freeze.d.ts', dest: 'dist/main/utils' },
             ],
         }),
     ],

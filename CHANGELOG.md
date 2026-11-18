@@ -9,6 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added `platformsConfig` and `platformConfigPatterns` as readonly public
+  exports. The default configurations, the pattern groups, and the merge
+  result are frozen.
+- Added `mergePlatformsConfig` and `PlatformsConfigError` as public exports,
+  so a consumer can change a platform configuration without a compiler
+  release. A patch can add a platform when the entry is complete, uses a
+  supported platform family, and has a unique, portable `path`. A legacy mac
+  platform is patchable like any other platform except its `path`, which
+  cannot change; an added legacy platform must use its `mac` or `mac_v2`
+  directory. Those directory names are reserved. `removeRulePatterns` accepts
+  strings and `RegExp` objects; `false` or `null` removes it.
+- Added the public platform configuration types:
+    - `ReadonlyPlatformsConfig`: the frozen configuration that consumers
+      receive.
+    - `PlatformsConfig`: the mutable draft shape that the merge uses.
+    - `PlatformEntry`, `PlatformConfiguration`, `PlatformDefines`, and
+      `PlatformReplacement`: one platform and its rule options.
+    - `PlatformConfigPatterns`: the exact map of pattern group names to
+      readonly `string[]` values.
+    - `PlatformsConfigPatch`, `PlatformPatch`, and
+      `PlatformConfigurationPatch`: a partial or complete platform override.
+
 ### Changed
 
 - HTML filtering rules (`$$`, `$@$`) are no longer kept for the Firefox
@@ -24,10 +46,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - An external `@include` URL must now use HTTP or HTTPS. A scheme-less value
   such as `user:pass@example.org/filter.txt` is rejected with an error that
   does not contain the credentials.
+- **BREAKING:** Changed `compile()` to accept a `platformsConfigPatch` and
+  merge it over the default configurations instead of changing the shared
+  configuration.
+- Made `replacements` optional in the default platform configurations and
+  removed the `null` placeholder.
 
 ### Deprecated
 
+- Deprecated `CustomPlatformsConfig` in favor of `PlatformsConfigPatch`.
+
 ### Removed
+
+- **BREAKING:** Removed the `PlatformConfig` type. Use `PlatformEntry` for a
+  full platform or `PlatformPatch` for a partial one.
 
 ### Fixed
 

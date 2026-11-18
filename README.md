@@ -42,7 +42,7 @@ the [FiltersRegistry README][filters-metadata].
     - [Validating locale translations](#validating-locale-translations)
 - [`@include` directive and its options](#include-directive)
 - [Configuration](#configuration)
-    - [Custom platforms](#custom-platforms)
+    - [Platform configuration patches](#platform-configuration-patches)
     - [Logging](#logging)
     - [Environment variables](#environment-variables)
 - [Supported platforms](#supported-platforms)
@@ -91,15 +91,19 @@ timestamped log to `logPath`.
 
 ## API Overview
 
-The library exports:
+The library exports these entry points:
 
-| Export                        | Purpose                                                                  |
-| ----------------------------- | ------------------------------------------------------------------------ |
-| `compile(...)`                | Compiles filter lists into platform-specific output                      |
-| `validateJSONSchema(...)`     | Validates built platform output against JSON schemas                     |
-| `validateLocales(...)`        | Validates locale translation files for completeness                      |
-| `localOptimizationStatistics` | Caches optimization statistics for local compilation                     |
-| `OptimizationStatsError`      | Error thrown when optimization statistics can't be loaded or are invalid |
+| Entry point                   | Purpose                                              |
+| ----------------------------- | ---------------------------------------------------- |
+| `compile(...)`                | Compiles filter lists into platform-specific output  |
+| `validateJSONSchema(...)`     | Validates built platform output against JSON schemas |
+| `validateLocales(...)`        | Validates locale translation files for completeness  |
+| `localOptimizationStatistics` | Caches optimization statistics for local compilation |
+| `OptimizationStatsError`      | Error thrown by the optimization statistics API      |
+| `platformsConfig`             | Frozen default platform configurations               |
+| `platformConfigPatterns`      | Frozen regex pattern groups                          |
+| `mergePlatformsConfig(...)`   | Applies a platform configuration patch               |
+| `PlatformsConfigError`        | Error thrown for an invalid platform patch           |
 
 ### `compile(...)`
 
@@ -111,7 +115,7 @@ function compile(
     platformsPath: string | null,
     includedFilterIds?: number[] | null,
     excludedFilterIds?: number[] | null,
-    customPlatformsConfig?: CustomPlatformsConfig,
+    platformsConfigPatch?: PlatformsConfigPatch,
 ): Promise<void>;
 ```
 
@@ -121,8 +125,11 @@ writes the results to `platformsPath`.
 - `includedFilterIds` — compile only the filter IDs listed here (empty array
   compiles all filters).
 - `excludedFilterIds` — exclude the filter IDs listed here.
-- `customPlatformsConfig` — overrides or extends the built-in platform
-  definitions (see [Custom platforms](#custom-platforms)).
+- `platformsConfigPatch` — changes the built-in platform definitions (see
+  [Platform configuration patches](#platform-configuration-patches)).
+
+An invalid `platformsConfigPatch` throws `PlatformsConfigError` synchronously,
+before any file is read or written.
 
 ### `validateJSONSchema(...)`
 
@@ -248,29 +255,19 @@ await compile(
 );
 ```
 
-Compile a single filter into a custom platform:
+Compile a single filter with a platform patch:
 
 ```js
-import { compile } from '@adguard/filters-compiler';
+import { compile, platformConfigPatterns } from '@adguard/filters-compiler';
 
-const customPlatformsConfig = {
-    // Here you can redefine some of the platforms from platforms.json
-    // or add new platforms if you need it.
-    MAC_V3: {
-        platform: 'mac',
-        path: 'mac_v3',
+// A patch changes only the fields it names. Everything else inherits.
+const platformsConfigPatch = {
+    EXTENSION_SAFARI: {
         configuration: {
-            ignoreRuleHints: false,
             removeRulePatterns: [
+                ...platformConfigPatterns.SAFARI_BASED_EXTENSION_PATTERNS,
                 '^\\/.*', // drop regex rules
             ],
-            replacements: [
-                { from: 'regex', to: 'repl' },
-            ],
-        },
-        defines: {
-            adguard: true,
-            adguard_app_mac: true,
         },
     },
 };
@@ -282,7 +279,7 @@ await compile(
     './platforms',
     [1],                // only filter ID 1
     [],
-    customPlatformsConfig,
+    platformsConfigPatch,
 );
 ```
 
@@ -432,34 +429,107 @@ Skip the trust-level check for a same-origin included file:
 
 ## Configuration
 
-### Custom platforms
+### Platform configuration patches
 
-Pass `customPlatformsConfig` to `compile()` to redefine existing
-platforms or add new ones. Each entry mirrors the structure in
-`src/main/platforms-config.js`:
+Pass `platformsConfigPatch` to `compile()` to change platform configuration
+without a compiler release.
+
+A patch of an existing platform can be partial:
 
 ```js
-const customPlatformsConfig = {
+const platformsConfigPatch = {
     MAC_V3: {
-        platform: 'mac',           // platform family
-        path: 'mac_v3',            // output subdirectory under platformsPath
-        expires: '12 hours',       // optional cache TTL written to metadata
+        expires: '6 hours',
         configuration: {
-            ignoreRuleHints: false, // honour `!+ HINT` hints when false
-            removeRulePatterns: [   // regexes of rules to drop
-                '^\\/.*',
-            ],
-            replacements: [        // regex replacements applied to rules
-                { from: 'regex', to: 'repl' },
-            ],
+            ignoreRuleHints: false,
+            removeRulePatterns: ['^\\/.*'],
+            replacements: [{ from: 'regex', to: 'repl' }],
         },
-        defines: {                  // !#if preprocessor flags for this platform
+        defines: {
             adguard: true,
-            adguard_app_mac: true,
         },
     },
 };
 ```
+
+Merge rules:
+
+- An object merges key by key. An array replaces the default array.
+- A platform default `removeRulePatterns` can compose several pattern groups.
+  Spreading one group is not that platform's default list. To append to a
+  platform that composes several groups, start from its current array:
+
+  ```js
+  const platformsConfigPatch = {
+      EXTENSION_UBLOCK: {
+          configuration: {
+              removeRulePatterns: [
+                  ...(platformsConfig.EXTENSION_UBLOCK.configuration.removeRulePatterns ?? []),
+                  '^\\/.*',
+              ],
+          },
+      },
+  };
+  ```
+
+  `platformConfigPatterns` holds the named groups. Nine platform defaults are
+  exactly one group: `MAC`, the Chromium, Edge, and Opera extensions (both
+  variants), `EXTENSION_SAFARI`, and `IOS`. `EXTENSION_FIREFOX`,
+  `EXTENSION_ANDROID_CONTENT_BLOCKER`, and `EXTENSION_UBLOCK` compose their
+  list inline from several groups. `WINDOWS`, `MAC_V2`, `MAC_V3`, `ANDROID`,
+  and `CLI` set no `removeRulePatterns`. Spreading one group equals a
+  platform's default only when its default is exactly that group.
+- An absent field inherits the default value.
+- `null` removes a field. For `defines`, `null` removes one flag. For
+  `removeRulePatterns`, `false` removes the field too.
+- `false` is a value. `ignoreRuleHints: false` stays `false`.
+- `defines` is an open map. A patch can add any flag name.
+- `platform`, `path`, `configuration`, and `defines` cannot be removed.
+- An unknown field or a wrong type throws `PlatformsConfigError` with a
+  `path` that points to the invalid value.
+- A `removeRulePatterns` entry is a string or a `RegExp`. A string must compile
+  as a regular expression. `replacements[].from` must compile as one too. The
+  merge checks both.
+- A `path` is normalized and must stay inside the platforms output. An absolute
+  path, a backslash, and a `..` that resolves outside the output are rejected;
+  inner `..` segments are resolved, so `a/../b` becomes `b`. A segment cannot
+  contain a Windows-reserved character, end with a dot or a space, or be a
+  reserved device name.
+- A `path` must be unique among platforms. The merge compares paths
+  case-insensitively and rejects a duplicate, including a changed path on an
+  existing platform.
+- Every field of a legacy mac platform (`MAC`, `MAC_V2`) is patchable except
+  its `path`, which cannot change. An added legacy platform must use its `mac`
+  or `mac_v2` directory. Those names are reserved: the JSON validator selects
+  the legacy schemas by directory name.
+
+The defaults and the merge result are frozen. The TypeScript types are
+readonly too. `platformsConfig` is a `ReadonlyPlatformsConfig`, and
+`platformConfigPatterns` keeps its exact group names with `readonly string[]`
+values. Do not change the shared configuration object. Use a patch.
+
+To add a platform, use a key that is not in the defaults and a complete
+entry:
+
+```js
+const platformsConfigPatch = {
+    EXTENSION_SAFARI_BETA: {
+        platform: 'ext_safari',        // a family the compiler supports
+        path: 'extension/safari-beta', // must be unique
+        configuration: {
+            removeRulePatterns: [
+                ...platformConfigPatterns.SAFARI_BASED_EXTENSION_PATTERNS,
+            ],
+        },
+        defines: {
+            adguard: true,
+            adguard_ext_safari: true,
+        },
+    },
+};
+```
+
+A new platform family still needs a compiler release.
 
 `replacements[].from` is treated as a regular-expression pattern (it is
 passed to `new RegExp(from, 'g')`), not as literal text. Escape regex

@@ -14,6 +14,7 @@ import path from 'path';
 import os from 'os';
 import {
     existsSync,
+    readdirSync,
     mkdirSync,
     mkdtempSync,
     readFileSync,
@@ -30,6 +31,20 @@ const requireCjs = createRequire(import.meta.url);
 
 // Directory names of the legacy macOS platform builds.
 const legacyPlatformDirs = LEGACY_PLATFORM_PATHS;
+
+const collectFiles = (dir) => {
+    const entries = readdirSync(dir, { withFileTypes: true });
+    return entries.flatMap((entry) => {
+        const entryPath = path.join(dir, entry.name);
+        return entry.isDirectory() ? collectFiles(entryPath) : [entryPath];
+    });
+};
+
+const resolveDeclarationImport = (fromFile, specifier) => {
+    const target = path.resolve(path.dirname(fromFile), specifier);
+    return [target, `${target}.d.ts`, target.replace(/\.js$/, '.d.ts')]
+        .find((candidate) => existsSync(candidate));
+};
 
 describe('Bundle smoke tests', () => {
     describe('Trust-level exclusion files', () => {
@@ -174,8 +189,12 @@ describe('Bundle smoke tests', () => {
 
             expect(Object.keys(api).sort()).toEqual([
                 'OptimizationStatsError',
+                'PlatformsConfigError',
                 'compile',
                 'localOptimizationStatistics',
+                'mergePlatformsConfig',
+                'platformConfigPatterns',
+                'platformsConfig',
                 'validateJSONSchema',
                 'validateLocales',
             ]);
@@ -184,6 +203,10 @@ describe('Bundle smoke tests', () => {
             expect(typeof api.validateLocales).toBe('function');
             expect(typeof api.localOptimizationStatistics).toBe('object');
             expect(typeof api.OptimizationStatsError).toBe('function');
+            expect(typeof api.PlatformsConfigError).toBe('function');
+            expect(typeof api.mergePlatformsConfig).toBe('function');
+            expect(typeof api.platformConfigPatterns).toBe('object');
+            expect(typeof api.platformsConfig).toBe('object');
         }, 15000);
     });
 
@@ -191,6 +214,35 @@ describe('Bundle smoke tests', () => {
         it('test declarations should not be bundled', () => {
             const filePath = path.join(distDir, 'types', 'test');
             expect(existsSync(filePath)).toBe(false);
+        });
+
+        it('mirrors declarations used by src/index.d.ts', () => {
+            const optimizationPath = path.join(distDir, 'main', 'optimization.d.ts');
+            const platformsConfigPath = path.join(distDir, 'main', 'platforms-config.d.ts');
+            expect(existsSync(optimizationPath)).toBe(true);
+            expect(existsSync(platformsConfigPath)).toBe(true);
+        });
+
+        it('declares the readonly platform configuration values', () => {
+            const entry = readFileSync(path.join(distDir, 'index.d.ts'), 'utf-8');
+            expect(entry).toMatch(/export declare const platformConfigPatterns: /);
+            expect(entry).toMatch(/export declare const platformsConfig: ReadonlyPlatformsConfig;/);
+            expect(entry).not.toMatch(/export type \{[^}]*\bplatformConfigPatterns,/);
+        });
+
+        it('resolves every relative declaration import', () => {
+            const declarations = collectFiles(distDir).filter((file) => file.endsWith('.d.ts'));
+            declarations.forEach((file) => {
+                const source = readFileSync(file, 'utf-8');
+                const specifiers = [...source.matchAll(/from\s+['"](\.[^'"]+)['"]/g)]
+                    .map((match) => match[1]);
+                specifiers.forEach((specifier) => {
+                    expect(
+                        resolveDeclarationImport(file, specifier),
+                        `${file} imports ${specifier}`,
+                    ).toBeDefined();
+                });
+            });
         });
     });
 });

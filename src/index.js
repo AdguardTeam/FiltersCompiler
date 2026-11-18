@@ -8,7 +8,19 @@ import { localesValidator } from './main/locales-validator';
 import { logger } from './main/utils/log';
 
 // default platforms config
-import { platformsConfig } from './main/platforms-config';
+import {
+    PlatformsConfigError,
+    mergePlatformsConfig,
+    platformConfigPatterns,
+    platformsConfig,
+} from './main/platforms-config';
+
+export {
+    PlatformsConfigError,
+    mergePlatformsConfig,
+    platformConfigPatterns,
+    platformsConfig,
+};
 
 export { localOptimizationStatistics, OptimizationStatsError } from './main/optimization';
 
@@ -26,15 +38,24 @@ export const compile = (
     platformsPath,
     includedFilterIds,
     excludedFilterIds,
-    customPlatformsConfig,
+    platformsConfigPatch,
 ) => {
-    if (customPlatformsConfig) {
-        logger.info('Using custom platforms configuration');
-        // eslint-disable-next-line no-restricted-syntax, guard-for-in
-        for (const platform in customPlatformsConfig) {
-            logger.info(`Redefining platform ${platform}`);
-            platformsConfig[platform] = customPlatformsConfig[platform];
-        }
+    const effectivePlatformsConfig = mergePlatformsConfig(platformsConfig, platformsConfigPatch ?? {});
+
+    if (platformsConfigPatch) {
+        logger.info('Using platforms configuration patch');
+        Object.keys(platformsConfigPatch).forEach((platform) => {
+            // The merge ignores an undefined entry; the log must do the same.
+            const patchEntry = platformsConfigPatch[platform];
+            if (patchEntry === undefined) {
+                return;
+            }
+            if (Object.hasOwn(platformsConfig, platform)) {
+                logger.info(`Patching platform ${platform}`);
+            } else {
+                logger.info(`Adding platform ${platform} (${patchEntry.platform})`);
+            }
+        });
     }
 
     return build(
@@ -42,7 +63,7 @@ export const compile = (
         logPath,
         reportFile,
         platformsPath,
-        platformsConfig,
+        effectivePlatformsConfig,
         includedFilterIds,
         excludedFilterIds,
     );

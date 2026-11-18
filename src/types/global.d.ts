@@ -24,7 +24,3 @@ declare module '*/rule/rule-masks.js' {
 declare module '*/converter.js' {
     export function getCanonicalRuleTexts(rule: string): string[];
 }
-
-declare module '*/platforms-config.js' {
-    export const platformsConfig: Record<string, { defines: Record<string, true | undefined> }>;
-}

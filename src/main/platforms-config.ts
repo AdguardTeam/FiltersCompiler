@@ -1,12 +1,193 @@
 /**
  * @file Platforms configuration.
  *
- * It shall be overridden by custom configuration:
- * @see {@link https://github.com/AdguardTeam/FiltersRegistry/blob/master/scripts/build/custom_platforms.ts}
+ * This file holds the frozen defaults. Use `mergePlatformsConfig()` to
+ * customize a platform. Do not change the shared configuration object.
  *
- * IMPORTANT: During making any changes in this file,
- * the custom_platforms.ts should also be updated through PR on GitHub.
+ * Consumers such as FiltersRegistry pass a patch, not a copy.
+ *
+ * @see {@link mergePlatformsConfig}
  */
+
+import { posix } from 'node:path';
+
+import { deepFreeze } from './utils/deep-freeze';
+import type { DeepReadonly } from './utils/deep-freeze.js';
+
+/**
+ * One regex replacement applied to every rule of a platform.
+ */
+export interface PlatformReplacement {
+    /**
+     * Regular expression pattern. The compiler passes it to `new RegExp(from, 'g')`.
+     */
+    from: string;
+
+    /**
+     * Replacement text.
+     */
+    to: string;
+}
+
+/**
+ * Rule processing options of one platform.
+ *
+ * The compiler reads this shape after it merges the patches.
+ */
+export interface PlatformConfiguration {
+    /**
+     * Regular expressions of rules to remove from the platform output, as
+     * strings or `RegExp` objects.
+     */
+    removeRulePatterns?: (string | RegExp)[];
+
+    /**
+     * Whether to honour `!+` rule hints.
+     */
+    ignoreRuleHints?: boolean;
+
+    /**
+     * Regex replacements applied to every rule.
+     */
+    replacements?: PlatformReplacement[];
+
+    /**
+     * Header line written before the rules. Used by the uBO platform.
+     */
+    adbHeader?: string;
+}
+
+/**
+ * `!#if` preprocessor flags for a platform.
+ *
+ * The map is open: a filter list can test any flag name. A `true` value
+ * enables the flag. An absent flag reads as `undefined`.
+ */
+export type PlatformDefines = Record<string, boolean | undefined>;
+
+/**
+ * Configuration of one platform.
+ *
+ * `platform` and `path` are required. `expires` is optional.
+ */
+export interface PlatformEntry {
+    /**
+     * Platform family. The compiler branches on this value.
+     */
+    platform: string;
+
+    /**
+     * Output directory under the platforms path.
+     */
+    path: string;
+
+    /**
+     * Cache lifetime written to the platform metadata.
+     */
+    expires?: string;
+
+    /**
+     * Rule processing options.
+     */
+    configuration: PlatformConfiguration;
+
+    /**
+     * `!#if` preprocessor flags.
+     */
+    defines: PlatformDefines;
+}
+
+/**
+ * Full platform configuration keyed by platform name.
+ *
+ * This is the mutable shape that the merge uses for its draft. Consumers
+ * receive the frozen `ReadonlyPlatformsConfig`.
+ */
+export type PlatformsConfig = Record<string, PlatformEntry>;
+
+/**
+ * Patch for the rule processing options of a platform.
+ *
+ * Every field is optional. A `null` value removes the field from the
+ * effective configuration.
+ */
+export interface PlatformConfigurationPatch {
+    /**
+     * Regular expressions of rules to remove, as strings or `RegExp` objects.
+     * Replaces the default array. `false` or `null` removes the field.
+     */
+    removeRulePatterns?: readonly (string | RegExp)[] | false | null | undefined;
+
+    /**
+     * Whether to honour `!+` rule hints. `false` is a value.
+     */
+    ignoreRuleHints?: boolean | null | undefined;
+
+    /**
+     * Regex replacements applied to every rule. Replaces the default array.
+     */
+    replacements?: readonly PlatformReplacement[] | null | undefined;
+
+    /**
+     * Header line written before the rules.
+     */
+    adbHeader?: string | null | undefined;
+}
+
+/**
+ * Patch for one platform.
+ *
+ * A patch of an existing platform can be partial. A patch that adds a platform
+ * must contain `platform`, `path`, `configuration`, and `defines`.
+ * An absent or `undefined` field inherits the current value. A `null` value
+ * removes an optional field. `platform`, `path`, `configuration`, and `defines`
+ * cannot be removed.
+ */
+export interface PlatformPatch {
+    /**
+     * Platform family.
+     */
+    platform?: string | undefined;
+
+    /**
+     * Output directory under the platforms path.
+     *
+     * The merge normalizes it and keeps it relative.
+     */
+    path?: string | undefined;
+
+    /**
+     * Cache lifetime written to the platform metadata.
+     */
+    expires?: string | null | undefined;
+
+    /**
+     * Rule processing options.
+     */
+    configuration?: PlatformConfigurationPatch | undefined;
+
+    /**
+     * `!#if` preprocessor flags. A `null` value removes one flag. An
+     * `undefined` value inherits the current flag.
+     */
+    defines?: Record<string, boolean | null | undefined> | undefined;
+}
+
+/**
+ * Platform patches keyed by platform name.
+ *
+ * A patch can change an existing platform or add a new platform. An
+ * `undefined` entry inherits the base platform, or adds nothing.
+ */
+export type PlatformsConfigPatch = Record<string, PlatformPatch | undefined>;
+
+/**
+ * Frozen platform configuration that consumers receive.
+ *
+ * This is the type of `platformsConfig` and of the value returned by
+ * `mergePlatformsConfig()`. Every property and array is readonly.
+ */
+export type ReadonlyPlatformsConfig = DeepReadonly<PlatformsConfig>;
 
 /**
  * Pattern to check if rule contains `$domain` modifier with regular expression
@@ -670,14 +851,69 @@ export const LEGACY_PLATFORMS = [MAC_V1_PLATFORM, MAC_V2_PLATFORM];
 
 /* eslint-enable max-len */
 
-export const platformsConfig = {
+/**
+ * Regex pattern groups used by the platform configurations.
+ *
+ * The values are the same frozen arrays that the defaults use. A platform
+ * default can compose several groups, so a patch that spreads one group
+ * replaces the composed array with that group. To append, spread the
+ * platform's current `removeRulePatterns` array instead.
+ */
+export const platformConfigPatterns = deepFreeze({
+    DOMAIN_WITH_REGEXPS_PATTERNS,
+    ALL_MODIFIER_PATTERNS,
+    MP4_MODIFIER_PATTERNS,
+    NETWORK_MODIFIER_PATTERNS,
+    WEBRTC_MODIFIER_PATTERNS,
+    CSP_MODIFIER_PATTERNS,
+    HTML_FILTERING_MODIFIER_PATTERNS,
+    PROTOBUF_MODIFIER_PATTERNS,
+    APP_MODIFIER_PATTERNS,
+    EXTENSION_MODIFIER_PATTERNS,
+    ONLY_CONTENT_MODIFIER_PATTERNS,
+    CONTENT_MODIFIER_PATTERNS,
+    JSINJECT_MODIFIER_PATTERNS,
+    URLBLOCK_MODIFIER_PATTERNS,
+    REFERRERPOLICY_MODIFIER_PATTERNS,
+    REPLACE_MODIFIER_PATTERNS,
+    URLTRANSFORM_MODIFIER_PATTERNS,
+    HLS_MODIFIER_PATTERNS,
+    JSONPRUNE_MODIFIER_PATTERNS,
+    REMOVEPARAM_MODIFIER_PATTERNS,
+    REMOVEHEADER_MODIFIER_PATTERNS,
+    STEALTH_MODIFIER_PATTERNS,
+    COOKIE_MODIFIER_PATTERNS,
+    REDIRECT_MODIFIER_PATTERNS,
+    REDIRECT_RULE_MODIFIER_PATTERNS,
+    EMPTY_MODIFIER_PATTERNS,
+    JAVASCRIPT_RULES_PATTERNS,
+    CSS_RULES_PATTERNS,
+    CSS_MEDIA_RULES_PATTERNS,
+    UNBLOCKING_IMPORTANT_RULES_PATTERNS,
+    EXTENDED_CSS_RULES_PATTERNS,
+    NON_BASIC_MODIFIER_PATTERNS,
+    CHROMIUM_BASED_EXTENSION_PATTERNS,
+    CHROMIUM_MV3_BASED_EXTENSION_PATTERNS,
+    SAFARI_BASED_EXTENSION_PATTERNS,
+    CSS_MATCHES_PROPERTY_RULES_PATTERNS,
+    CSS_GENERIC_RULES_PATTERNS,
+}) satisfies Readonly<Record<string, readonly string[]>>;
+
+/**
+ * Frozen regex pattern groups, keyed by their source constant name.
+ *
+ * Use a group to extend a platform's `removeRulePatterns` without copying
+ * the regular expressions.
+ */
+export type PlatformConfigPatterns = typeof platformConfigPatterns;
+
+export const platformsConfig: ReadonlyPlatformsConfig = deepFreeze<PlatformsConfig>({
     'WINDOWS': {
         'platform': 'windows',
         'path': 'windows',
         'expires': '12 hours',
         'configuration': {
             'ignoreRuleHints': false,
-            'replacements': null,
         },
         'defines': {
             'adguard': true,
@@ -692,7 +928,6 @@ export const platformsConfig = {
         'configuration': {
             'removeRulePatterns': HTML_FILTERING_MODIFIER_PATTERNS,
             'ignoreRuleHints': false,
-            'replacements': null,
         },
         'defines': {
             'adguard': true,
@@ -705,7 +940,6 @@ export const platformsConfig = {
         'expires': '12 hours',
         'configuration': {
             'ignoreRuleHints': false,
-            'replacements': null,
         },
         'defines': {
             'adguard': true,
@@ -720,7 +954,6 @@ export const platformsConfig = {
         'expires': '12 hours',
         'configuration': {
             'ignoreRuleHints': false,
-            'replacements': null,
         },
         'defines': {
             'adguard': true,
@@ -734,7 +967,6 @@ export const platformsConfig = {
         'path': 'android',
         'configuration': {
             'ignoreRuleHints': false,
-            'replacements': null,
         },
         'defines': {
             'adguard': true,
@@ -749,7 +981,6 @@ export const platformsConfig = {
         'expires': '12 hours',
         'configuration': {
             'ignoreRuleHints': false,
-            'replacements': null,
         },
         'defines': {
             'adguard': true,
@@ -764,7 +995,6 @@ export const platformsConfig = {
         'expires': '10 days',
         'configuration': {
             'removeRulePatterns': CHROMIUM_BASED_EXTENSION_PATTERNS,
-            'replacements': null,
             'ignoreRuleHints': false,
         },
         'defines': {
@@ -778,7 +1008,6 @@ export const platformsConfig = {
         'expires': '10 days',
         'configuration': {
             'removeRulePatterns': CHROMIUM_MV3_BASED_EXTENSION_PATTERNS,
-            'replacements': null,
             'ignoreRuleHints': false,
         },
         'defines': {
@@ -792,7 +1021,6 @@ export const platformsConfig = {
         'expires': '10 days',
         'configuration': {
             'removeRulePatterns': CHROMIUM_BASED_EXTENSION_PATTERNS,
-            'replacements': null,
             'ignoreRuleHints': false,
         },
         'defines': {
@@ -807,7 +1035,6 @@ export const platformsConfig = {
         'expires': '10 days',
         'configuration': {
             'removeRulePatterns': CHROMIUM_MV3_BASED_EXTENSION_PATTERNS,
-            'replacements': null,
             'ignoreRuleHints': false,
         },
         'defines': {
@@ -822,7 +1049,6 @@ export const platformsConfig = {
         'expires': '10 days',
         'configuration': {
             'removeRulePatterns': CHROMIUM_BASED_EXTENSION_PATTERNS,
-            'replacements': null,
             'ignoreRuleHints': false,
         },
         'defines': {
@@ -837,7 +1063,6 @@ export const platformsConfig = {
         'expires': '10 days',
         'configuration': {
             'removeRulePatterns': CHROMIUM_MV3_BASED_EXTENSION_PATTERNS,
-            'replacements': null,
             'ignoreRuleHints': false,
         },
         'defines': {
@@ -862,7 +1087,6 @@ export const platformsConfig = {
                 ...REFERRERPOLICY_MODIFIER_PATTERNS,
 
             ],
-            'replacements': null,
             'ignoreRuleHints': false,
         },
         'defines': {
@@ -876,7 +1100,6 @@ export const platformsConfig = {
         'path': 'extension/safari',
         'configuration': {
             'removeRulePatterns': SAFARI_BASED_EXTENSION_PATTERNS,
-            'replacements': null,
             'ignoreRuleHints': false,
         },
         'defines': {
@@ -889,7 +1112,6 @@ export const platformsConfig = {
         'path': 'ios',
         'configuration': {
             'removeRulePatterns': SAFARI_BASED_EXTENSION_PATTERNS,
-            'replacements': null,
             'ignoreRuleHints': false,
         },
         'defines': {
@@ -973,7 +1195,7 @@ export const platformsConfig = {
             'ext_ublock': true,
         },
     },
-};
+});
 
 /**
  * Directory names of the legacy macOS platform builds.
@@ -982,3 +1204,537 @@ export const platformsConfig = {
  * tests use the same names.
  */
 export const LEGACY_PLATFORM_PATHS = LEGACY_PLATFORMS.map((key) => platformsConfig[key].path);
+
+/**
+ * Error thrown when a platform configuration patch is invalid.
+ */
+export class PlatformsConfigError extends Error {
+    /**
+     * Dotted path to the invalid value, for example
+     * `patch.EXTENSION_UBLOCK.configuration.removeRulePatterns[1]`.
+     */
+    readonly path: string;
+
+    /**
+     * @param path Dotted path to the invalid value.
+     * @param detail What is wrong.
+     */
+    constructor(path: string, detail: string) {
+        super(`Invalid platforms config patch at ${path}: ${detail}`);
+        this.name = 'PlatformsConfigError';
+        this.path = path;
+    }
+}
+
+/**
+ * Checks that a value is a plain object.
+ *
+ * A plain object has `Object.prototype` or `null` as its prototype. Date,
+ * Map, and class instances are not plain objects.
+ *
+ * @param value Value to check.
+ * @returns `true` when the value is a plain object.
+ */
+const isPlainObject = (value: unknown): value is Record<string, unknown> => {
+    if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+        return false;
+    }
+
+    const proto = Object.getPrototypeOf(value);
+    return proto === Object.prototype || proto === null;
+};
+
+/**
+ * Throws when a value is not a plain object.
+ *
+ * @param value Value to check.
+ * @param path Dotted path for the error.
+ * @returns The value as a record.
+ */
+const requireObject = (value: unknown, path: string): Record<string, unknown> => {
+    if (!isPlainObject(value)) {
+        throw new PlatformsConfigError(path, 'expected an object');
+    }
+
+    return value;
+};
+
+/**
+ * Throws when a value is not an object or is `null`.
+ *
+ * @param value Value to check.
+ * @param path Dotted path for the error.
+ */
+const requireNotCleared = (value: unknown, path: string): void => {
+    if (value === null) {
+        throw new PlatformsConfigError(path, 'cannot be cleared');
+    }
+};
+
+/**
+ * Throws when a value is not a string.
+ *
+ * @param value Value to check.
+ * @param path Dotted path for the error.
+ * @returns The string.
+ */
+const requireString = (value: unknown, path: string): string => {
+    if (typeof value !== 'string') {
+        throw new PlatformsConfigError(path, 'expected a string');
+    }
+
+    return value;
+};
+
+/**
+ * Characters a Windows directory name cannot contain.
+ */
+const WINDOWS_INVALID_PATH_CHARACTER = /[<>:"|?*]/;
+
+/**
+ * Windows device names that cannot be a directory name.
+ */
+const WINDOWS_RESERVED_PATH_NAME = /^(con|prn|aux|nul|com[1-9]|lpt[1-9])(\..*)?$/i;
+
+/**
+ * Checks whether a path segment is not portable to Windows.
+ *
+ * @param segment One segment of a normalized platform path.
+ * @returns `true` when Windows cannot represent the segment.
+ */
+const isUnportablePathSegment = (segment: string): boolean => {
+    if (segment.endsWith('.') || segment.endsWith(' ') || WINDOWS_RESERVED_PATH_NAME.test(segment)) {
+        return true;
+    }
+
+    return [...segment].some((character) => (
+        WINDOWS_INVALID_PATH_CHARACTER.test(character) || character.charCodeAt(0) < 0x20
+    ));
+};
+
+/**
+ * Throws when a value is not a safe, portable relative platform directory.
+ *
+ * The path is normalized so that `./a`, `a/`, and `a` compare equal. Every
+ * segment must also be representable on Windows, otherwise the same patch
+ * would produce a different directory there.
+ *
+ * @param value Value to check.
+ * @param path Dotted path for the error.
+ * @returns The normalized relative path.
+ */
+const requirePlatformPath = (value: unknown, path: string): string => {
+    const raw = requireString(value, path);
+    if (raw === ''
+        || raw.includes('\\')
+        || raw.includes('\0')
+        || posix.isAbsolute(raw)
+        || /^[a-zA-Z]:/.test(raw)) {
+        throw new PlatformsConfigError(path, 'expected a relative directory name');
+    }
+
+    const normalized = posix.normalize(raw).replace(/\/+$/, '');
+    if (normalized === '' || normalized === '.' || normalized === '..' || normalized.startsWith('../')) {
+        throw new PlatformsConfigError(path, 'expected a relative directory name');
+    }
+
+    if (normalized.split('/').some(isUnportablePathSegment)) {
+        throw new PlatformsConfigError(path, 'expected a portable relative directory name');
+    }
+
+    return normalized;
+};
+
+/**
+ * Throws when a value is not an array of rule removal patterns.
+ *
+ * A pattern is a string that compiles as a regular expression or a `RegExp`.
+ * A `RegExp` is copied, so freezing the result cannot freeze the caller's
+ * object.
+ *
+ * @param value Value to check.
+ * @param path Dotted path for the error.
+ * @returns A copy of the array.
+ */
+const requireRulePatterns = (value: unknown, path: string): (string | RegExp)[] => {
+    if (!Array.isArray(value)) {
+        throw new PlatformsConfigError(path, 'expected an array of strings or regular expressions');
+    }
+
+    return value.map((item, index) => {
+        const itemPath = `${path}[${index}]`;
+        if (item instanceof RegExp) {
+            return new RegExp(item.source, item.flags);
+        }
+        if (typeof item !== 'string') {
+            throw new PlatformsConfigError(itemPath, 'expected a string or a regular expression');
+        }
+        try {
+            RegExp(item);
+        } catch {
+            throw new PlatformsConfigError(itemPath, 'invalid regular expression');
+        }
+
+        return item;
+    });
+};
+
+/**
+ * Throws when a value is not an array of `{ from, to }` replacements.
+ *
+ * @param value Value to check.
+ * @param path Dotted path for the error.
+ * @returns A copy of the array.
+ */
+const requireReplacements = (value: unknown, path: string): PlatformReplacement[] => {
+    if (!Array.isArray(value)) {
+        throw new PlatformsConfigError(path, 'expected an array of { from, to } objects');
+    }
+
+    return value.map((item, index) => {
+        const itemPath = `${path}[${index}]`;
+        const replacement = requireObject(item, itemPath);
+        Object.keys(replacement).forEach((field) => {
+            if (field !== 'from' && field !== 'to') {
+                throw new PlatformsConfigError(`${itemPath}.${field}`, 'unknown field');
+            }
+        });
+
+        const from = requireString(replacement.from, `${itemPath}.from`);
+        const to = requireString(replacement.to, `${itemPath}.to`);
+        try {
+            RegExp(from);
+        } catch {
+            throw new PlatformsConfigError(`${itemPath}.from`, 'invalid regular expression');
+        }
+
+        return { from, to };
+    });
+};
+
+/**
+ * Merges a `defines` patch into a defines map.
+ *
+ * @param target Defines map to change.
+ * @param patch Defines patch.
+ * @param path Dotted path for the error.
+ */
+const mergeDefines = (target: PlatformDefines, patch: unknown, path: string): void => {
+    const definesPatch = requireObject(patch, path);
+    Object.keys(definesPatch).forEach((name) => {
+        if (name === '__proto__') {
+            throw new PlatformsConfigError(`${path}.${name}`, 'reserved key');
+        }
+        const value = definesPatch[name];
+        if (value === undefined) {
+            return;
+        }
+        if (value === null) {
+            delete target[name];
+        } else if (typeof value === 'boolean') {
+            target[name] = value;
+        } else {
+            throw new PlatformsConfigError(`${path}.${name}`, 'expected a boolean or null');
+        }
+    });
+};
+
+/**
+ * Merges a configuration patch into a configuration object.
+ *
+ * @param target Configuration to change.
+ * @param patch Configuration patch.
+ * @param path Dotted path for the error.
+ */
+const mergeConfiguration = (
+    target: PlatformConfiguration,
+    patch: unknown,
+    path: string,
+): void => {
+    const configurationPatch = requireObject(patch, path);
+    Object.keys(configurationPatch).forEach((field) => {
+        const value = configurationPatch[field];
+        const fieldPath = `${path}.${field}`;
+        if (value === undefined) {
+            return;
+        }
+        switch (field) {
+            case 'removeRulePatterns':
+                if (value === null || value === false) {
+                    delete target.removeRulePatterns;
+                } else {
+                    target.removeRulePatterns = requireRulePatterns(value, fieldPath);
+                }
+                break;
+            case 'ignoreRuleHints':
+                if (value === null) {
+                    delete target.ignoreRuleHints;
+                } else if (typeof value === 'boolean') {
+                    target.ignoreRuleHints = value;
+                } else {
+                    throw new PlatformsConfigError(fieldPath, 'expected a boolean or null');
+                }
+                break;
+            case 'replacements':
+                if (value === null) {
+                    delete target.replacements;
+                } else {
+                    target.replacements = requireReplacements(value, fieldPath);
+                }
+                break;
+            case 'adbHeader':
+                if (value === null) {
+                    delete target.adbHeader;
+                } else {
+                    target.adbHeader = requireString(value, fieldPath);
+                }
+                break;
+            default:
+                throw new PlatformsConfigError(fieldPath, 'unknown field');
+        }
+    });
+};
+
+/**
+ * Merges a platform patch into a platform entry.
+ *
+ * @param target Platform entry to change.
+ * @param patch Platform patch.
+ * @param path Dotted path for the error.
+ */
+const mergePlatformEntry = (
+    target: PlatformEntry,
+    patch: Record<string, unknown>,
+    path: string,
+): void => {
+    Object.keys(patch).forEach((field) => {
+        const value = patch[field];
+        const fieldPath = `${path}.${field}`;
+        if (value === undefined) {
+            return;
+        }
+        switch (field) {
+            case 'platform':
+                requireNotCleared(value, fieldPath);
+                target.platform = requireString(value, fieldPath);
+                break;
+            case 'path':
+                requireNotCleared(value, fieldPath);
+                target.path = requirePlatformPath(value, fieldPath);
+                break;
+            case 'expires':
+                if (value === null) {
+                    delete target.expires;
+                } else {
+                    target.expires = requireString(value, fieldPath);
+                }
+                break;
+            case 'configuration':
+                requireNotCleared(value, fieldPath);
+                mergeConfiguration(target.configuration, value, fieldPath);
+                break;
+            case 'defines':
+                requireNotCleared(value, fieldPath);
+                mergeDefines(target.defines, value, fieldPath);
+                break;
+            default:
+                throw new PlatformsConfigError(fieldPath, 'unknown field');
+        }
+    });
+};
+
+/**
+ * Creates a platform entry from a complete patch.
+ *
+ * @param key Platform key.
+ * @param patch Platform patch.
+ * @param path Dotted path for the error.
+ * @returns A new platform entry.
+ */
+const createPlatformEntry = (
+    key: string,
+    patch: Record<string, unknown>,
+    path: string,
+): PlatformEntry => {
+    ['platform', 'path', 'configuration', 'defines'].forEach((field) => {
+        if (!Object.hasOwn(patch, field) || patch[field] === undefined) {
+            throw new PlatformsConfigError(
+                path,
+                `unknown platform "${key}": a new platform requires platform, path, configuration, and defines`,
+            );
+        }
+    });
+
+    const entry: PlatformEntry = {
+        platform: '',
+        path: '',
+        configuration: {},
+        defines: {},
+    };
+    mergePlatformEntry(entry, patch, path);
+
+    return entry;
+};
+
+/**
+ * Copies one platform entry and its nested values.
+ *
+ * The merge must own every object and array that it freezes. A shallow copy
+ * would leave the caller's `base` entries shared with the result. The path is
+ * normalized so the merge compares and outputs the same form.
+ *
+ * @param entry Entry to copy.
+ * @returns A mutable copy of the entry.
+ */
+const cloneEntry = (entry: DeepReadonly<PlatformEntry>): PlatformEntry => {
+    const configuration: PlatformConfiguration = {};
+
+    if (entry.configuration.removeRulePatterns) {
+        configuration.removeRulePatterns = entry.configuration.removeRulePatterns.map(
+            (pattern) => (typeof pattern === 'string' ? pattern : new RegExp(pattern.source, pattern.flags)),
+        );
+    }
+    if (entry.configuration.ignoreRuleHints !== undefined) {
+        configuration.ignoreRuleHints = entry.configuration.ignoreRuleHints;
+    }
+    if (entry.configuration.replacements) {
+        configuration.replacements = entry.configuration.replacements.map((replacement) => ({ ...replacement }));
+    }
+    if (entry.configuration.adbHeader !== undefined) {
+        configuration.adbHeader = entry.configuration.adbHeader;
+    }
+
+    return {
+        ...entry,
+        path: posix.normalize(entry.path).replace(/\/+$/, ''),
+        configuration,
+        defines: { ...entry.defines },
+    };
+};
+
+/**
+ * Merges a platform configuration patch into a base configuration.
+ *
+ * The function is pure: it does not change `base` or `patch`, and it returns a
+ * new frozen configuration. An object merges key by key. An array replaces the
+ * base array. An absent or `undefined` field inherits the base value. A `null`
+ * field is removed from the result. `false` is a value for `ignoreRuleHints`;
+ * for `removeRulePatterns`, `false` removes the field. A `removeRulePatterns`
+ * entry is a string or a `RegExp`, and a string must compile as one.
+ *
+ * A patch key that is not in `base` adds a platform. The entry must then be
+ * complete, and its `platform` must be a family that `base` already uses.
+ *
+ * A platform `path` is normalized and must stay inside the platforms output.
+ * A `path` must be unique among platforms; the comparison is case-insensitive.
+ * Every field of a legacy mac platform is patchable except its `path`, which
+ * cannot change. An added legacy platform must use its `mac` or `mac_v2`
+ * directory. Those directory names are reserved for legacy platforms.
+ *
+ * @param base Base configuration.
+ * @param patch Platform patches.
+ * @returns The merged and frozen configuration.
+ * @throws {PlatformsConfigError} When a patch value is invalid.
+ */
+export const mergePlatformsConfig = (
+    base: ReadonlyPlatformsConfig,
+    patch: PlatformsConfigPatch,
+): ReadonlyPlatformsConfig => {
+    const patchObject = requireObject(patch, 'patch');
+
+    // Clone every entry so freezing the result cannot freeze the caller's base.
+    const result: PlatformsConfig = {};
+    Object.keys(base).forEach((key) => {
+        // JSON.parse creates __proto__ as an own key, and assignment runs the
+        // __proto__ setter instead of adding an entry.
+        if (key === '__proto__') {
+            throw new PlatformsConfigError(`base.${key}`, 'reserved key');
+        }
+        result[key] = cloneEntry(base[key]);
+    });
+
+    Object.keys(patchObject).forEach((key) => {
+        const path = `patch.${key}`;
+        if (key === '__proto__') {
+            throw new PlatformsConfigError(path, 'reserved key');
+        }
+        if (patchObject[key] === undefined) {
+            return;
+        }
+        const patchEntry = requireObject(patchObject[key], path);
+        if (Object.hasOwn(base, key)) {
+            mergePlatformEntry(result[key], patchEntry, path);
+        } else {
+            result[key] = createPlatformEntry(key, patchEntry, path);
+        }
+    });
+
+    LEGACY_PLATFORMS.forEach((key) => {
+        if (!Object.hasOwn(result, key)) {
+            return;
+        }
+        // An existing legacy platform keeps the trusted base path; a newly
+        // added one has no prior path, so it must use its legacy directory.
+        const expectedPath = Object.hasOwn(base, key)
+            ? requirePlatformPath(base[key].path, `base.${key}.path`)
+            : platformsConfig[key].path;
+        if (result[key].path !== expectedPath) {
+            throw new PlatformsConfigError(
+                `patch.${key}.path`,
+                Object.hasOwn(base, key)
+                    ? 'the path of a legacy platform cannot change'
+                    : `a legacy platform must use the "${expectedPath}" directory`,
+            );
+        }
+    });
+
+    const families = new Set(Object.values(base).map((entry) => entry.platform));
+    Object.keys(result).forEach((key) => {
+        if (!families.has(result[key].platform)) {
+            throw new PlatformsConfigError(
+                `patch.${key}.platform`,
+                `unknown platform family "${result[key].platform}"`,
+            );
+        }
+    });
+
+    // The JSON validator selects the legacy schemas by directory name, so no
+    // other platform may end up in a legacy directory.
+    const legacyPaths = new Set(LEGACY_PLATFORM_PATHS);
+    Object.keys(result).forEach((key) => {
+        const { path: platformPath } = result[key];
+        const leaf = platformPath.slice(platformPath.lastIndexOf('/') + 1).toLowerCase();
+        if (legacyPaths.has(leaf) && !LEGACY_PLATFORMS.includes(key)) {
+            throw new PlatformsConfigError(
+                `patch.${key}.path`,
+                `the legacy directory "${leaf}" is reserved for a legacy platform`,
+            );
+        }
+    });
+
+    const paths = new Map<string, string>();
+    Object.keys(result).forEach((key) => {
+        const normalizedPath = result[key].path.toLowerCase();
+        const other = paths.get(normalizedPath);
+        if (other !== undefined) {
+            const patchEntry = patchObject[key];
+            const setsPath = isPlainObject(patchEntry)
+                && Object.hasOwn(patchEntry, 'path')
+                && patchEntry.path !== undefined;
+            const offender = setsPath ? key : other;
+            // A path that came from base is not a patch field.
+            const offenderEntry = patchObject[offender];
+            const offenderSetsPath = isPlainObject(offenderEntry)
+                && Object.hasOwn(offenderEntry, 'path')
+                && offenderEntry.path !== undefined;
+            const prefix = offenderSetsPath ? 'patch' : 'base';
+            throw new PlatformsConfigError(
+                `${prefix}.${offender}.path`,
+                `duplicate platform path "${result[key].path}" used by ${other} and ${key}`,
+            );
+        }
+        paths.set(normalizedPath, key);
+    });
+
+    return deepFreeze(result);
+};
