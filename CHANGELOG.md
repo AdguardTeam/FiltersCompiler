@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- A remote `!#include` in a filter template now resolves. If a remote include
+  cannot be resolved, the build fails with an error that names the include URL
+  and the reason instead of silently dropping the directive.
+
 ### Security
 
 ## [4.1.0] - 2026-11-16
@@ -89,9 +93,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   so rules inside `!#if (cap_html_filtering)` were dropped on every platform. It is now set for
   Windows, Mac v2, Mac v3, Android, CLI and Firefox [#270]. Firefox also keeps HTML filtering rules
   (`$$`, `$@$`) outside `!#if (cap_html_filtering)` now, while legacy Mac (v1) no longer gets them.
-- A remote `!#include` in a filter template now resolves. If a remote include
-  cannot be resolved, the build fails with an error that names the include URL
-  and the reason instead of silently dropping the directive.
 - Only the last `NOT_PLATFORM()` clause in a rule hint was applied, so
   `!+ NOT_PLATFORM(windows) NOT_PLATFORM(android)` still kept the rule on Windows. Every
   `NOT_PLATFORM()` clause in the hint is now honored.
