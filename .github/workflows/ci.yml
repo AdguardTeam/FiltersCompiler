@@ -21,18 +21,25 @@ jobs:
       package_file: filters-compiler.tgz
 
   # The shared Docker-based workflow above only covers Node.js 22.22: the
-  # Dockerfile is pinned to `adguard/node-ssh:22.22--0` (no Node.js 24 image
-  # exists) and the shared workflow has no Node-version input. Run the same
-  # checks directly on a Node.js 24 toolchain instead, on the same runner.
+  # Dockerfile is pinned to `adguard/node-ssh:22.22--0` (no other Node.js
+  # image is used there) and the shared workflow has no Node-version input.
+  # Run the same checks directly on the declared minimum Node.js 22.21.0 and
+  # on Node.js 24, on the same runner.
   #
   # pnpm is installed through Corepack rather than `pnpm/action-setup`: the
   # org Actions allowlist does not include that action, and a disallowed
   # `uses:` makes GitHub reject the whole run at startup with no jobs.
-  test-node24:
-    name: Lint, test, build (Node.js 24)
+  test-node-versions:
+    name: Lint, test, build (Node.js ${{ matrix.node-version }})
     runs-on: team-extensions
     permissions:
       contents: read
+    strategy:
+      # Do not cancel the other leg when one Node.js version fails: each
+      # version must report its own result.
+      fail-fast: false
+      matrix:
+        node-version: ['22.21.0', '24']
     env:
       # Keep Corepack from adding a `packageManager` field to package.json.
       COREPACK_ENABLE_AUTO_PIN: '0'
@@ -40,7 +47,7 @@ jobs:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v6
         with:
-          node-version: '24'
+          node-version: ${{ matrix.node-version }}
       - name: Enable pnpm
         run: |
           corepack enable
@@ -61,7 +68,7 @@ jobs:
       # once more after Corepack has provided the shim.
       - uses: actions/setup-node@v6
         with:
-          node-version: '24'
+          node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
