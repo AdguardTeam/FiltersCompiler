@@ -27,7 +27,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A remote `!#include` inside an `!#if` block is now resolved after the
   per-platform conditions, so an inactive branch is not fetched and does not
   stop the build for other platforms. Rules from such an include pass syntax
-  conversion, trust-level exclusions, and validation like other included rules.
+  conversion, trust-level exclusions, validation, and the filter's own
+  exclusions like other included rules. Rules excluded or invalidated at this
+  stage are added to `diff.txt` and the report.
 - The filter revision now covers the content of a deferred remote `!#include`,
   so a change in the remote list increments `Version` and `TimeUpdated`.
 - Indented preprocessor directives are now recognized the same way as trimmed

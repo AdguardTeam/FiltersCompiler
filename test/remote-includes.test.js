@@ -32,8 +32,8 @@ const REMOTE_RULE = '||remote.example^';
 const CHANGED_REMOTE_RULE = '||changed.example^';
 const UBO_HTML_RULE = 'example.com##^script:has-text(ad)';
 const CONVERTED_HTML_RULE = 'example.com$$script:contains(ad)';
-const SCRIPTLET_RULE = "example.com#%#//scriptlet('abort')";
-const UBO_SCRIPTLET_RULE = 'example.com##+js(abort)';
+const SCRIPTLET_RULE = "example.com#%#//scriptlet('set-cookie', 'name', 'value')";
+const UBO_SCRIPTLET_RULE = 'example.com##+js(set-cookie, name, value)';
 const CSS_INJECTION_RULE = 'example.com#$#.banner { display: none; }';
 const INVALID_CONVERSION_RULE = 'example.com#$#selector:style()';
 const INVALID_SELECTOR_RULE = 'example.com##div[class"ads-article"]';
@@ -510,6 +510,87 @@ describe('remote !#include in a filter template', () => {
         expect(platformLines).not.toContain(INVALID_CONVERSION_RULE);
         expect(platformLines).not.toContain(INVALID_SELECTOR_RULE);
     });
+
+    it('applies the filter exclude.txt to rules from a deferred remote !#include', async () => {
+        createConditionalFilter('/rules.txt', { filterId: 2 });
+        fs.writeFileSync(path.join(filterDir, 'exclude.txt'), REMOTE_RULE);
+        platformsDir = fs.mkdtempSync(path.join(os.tmpdir(), 'remote-includes-platforms-'));
+        const reportPath = path.join(filtersDir, 'report.txt');
+
+        await build(
+            filtersDir,
+            null,
+            reportPath,
+            platformsDir,
+            makePlatformsConfig({ adguard_ext_safari: true }),
+            null,
+            null,
+        );
+
+        const platformContent = fs.readFileSync(path.join(platformsDir, 'test', 'filters', '2.txt'), 'utf8');
+        expect(platformContent.split(/\r?\n/)).not.toContain(REMOTE_RULE);
+
+        const diffContent = fs.readFileSync(path.join(filterDir, 'diff.txt'), 'utf8');
+        expect(diffContent).toContain(`${REMOTE_RULE} is excluded by "${REMOTE_RULE}" in exclude.txt`);
+        expect(diffContent.split(/\r?\n/)).toContain(REMOTE_RULE);
+
+        const reportContent = fs.readFileSync(reportPath, 'utf8');
+        const reportEntry = reportContent.substring(reportContent.indexOf('Filter ID: 2'));
+        expect(reportEntry).toContain('Excluded rules: 2');
+        expect(reportEntry).toContain('All rules are valid.');
+    });
+
+    it('reports invalid rules from a deferred remote !#include', async () => {
+        createConditionalFilter('/invalid.txt', { trustLevel: 'full', filterId: 3 });
+        platformsDir = fs.mkdtempSync(path.join(os.tmpdir(), 'remote-includes-platforms-'));
+        const reportPath = path.join(filtersDir, 'report.txt');
+
+        await build(
+            filtersDir,
+            null,
+            reportPath,
+            platformsDir,
+            makePlatformsConfig({ adguard_ext_safari: true }),
+            null,
+            null,
+        );
+
+        const diffContent = fs.readFileSync(path.join(filterDir, 'diff.txt'), 'utf8');
+        expect(diffContent).toContain(INVALID_CONVERSION_RULE);
+        expect(diffContent).toContain(INVALID_SELECTOR_RULE);
+
+        const reportContent = fs.readFileSync(reportPath, 'utf8');
+        const reportEntry = reportContent.substring(reportContent.indexOf('Filter ID: 3'));
+        expect(reportEntry).toContain('INVALID RULES:');
+        expect(reportEntry).toContain(INVALID_CONVERSION_RULE);
+        expect(reportEntry).toContain(INVALID_SELECTOR_RULE);
+        expect(reportEntry).not.toContain('All rules are valid.');
+    });
+
+    it('handles a large deferred remote !#include', async () => {
+        // Above the V8 limit for spread arguments (about 125k): passing the
+        // fragment to `push()` as separate arguments would throw a RangeError.
+        const LARGE_FRAGMENT_SIZE = 130000;
+        rulesResponse = Array.from(
+            { length: LARGE_FRAGMENT_SIZE },
+            (_, index) => `! comment ${index}`,
+        ).join('\n');
+        createConditionalFilter('/rules.txt');
+        platformsDir = fs.mkdtempSync(path.join(os.tmpdir(), 'remote-includes-platforms-'));
+
+        await build(
+            filtersDir,
+            null,
+            null,
+            platformsDir,
+            makePlatformsConfig({ adguard_ext_safari: true }),
+            null,
+            null,
+        );
+
+        const platformContent = fs.readFileSync(path.join(platformsDir, 'test', 'filters', '1.txt'), 'utf8');
+        expect(platformContent).toContain(`! comment ${LARGE_FRAGMENT_SIZE - 1}`);
+    }, 30000);
 
     it('bumps the revision when a deferred remote !#include changes', async () => {
         createConditionalFilter('/rules.txt');

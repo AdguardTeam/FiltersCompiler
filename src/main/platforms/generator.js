@@ -27,6 +27,7 @@ import { readJsonOrNull } from '../utils/read-json';
 import { isIncludeDirective, resolveIncludes } from '../utils/include-resolver';
 import { exclude, getTrustLevelExclusionsFile } from '../utils/rule-exclusions';
 import { makeRevision } from '../utils/revision';
+import { addFilterDetails } from '../utils/report';
 import {
     FILTERS_I18N_METADATA_FILE_JS,
     FILTERS_I18N_METADATA_FILE_JSON,
@@ -46,6 +47,8 @@ const OPTIMIZED_PLATFORMS_LIST = ['ext_safari', 'android', 'ios', 'ext_android_c
 const UBLOCK_PLATFORM = 'ext_ublock';
 
 const PLATFORM_FILTERS_DIR = 'filters';
+const EXCLUDE_FILE = 'exclude.txt';
+const EXCLUDED_LINES_FILE = 'diff.txt';
 
 /**
  * Tag id for obsolete filters.
@@ -962,6 +965,43 @@ const removeRuleDuplicates = function (list) {
 };
 
 /**
+ * Appends lines to the filter's excluded rules file.
+ *
+ * The compile stage writes the file before the platform conditions are
+ * resolved. Lines excluded from a deferred include are added here. Duplicate
+ * lines are skipped, because the same include can be resolved for more than
+ * one platform.
+ *
+ * @param {string} filterDir Path to the filter directory.
+ * @param {string[]} lines Excluded rules and their messages.
+ */
+const appendExcludedLines = (filterDir, lines) => {
+    if (lines.length === 0) {
+        return;
+    }
+
+    const filePath = path.join(filterDir, EXCLUDED_LINES_FILE);
+    const current = fs.existsSync(filePath) ? fs.readFileSync(filePath, 'utf8') : '';
+    const knownLines = new Set(current.split(/\r?\n/));
+
+    const additions = lines.filter((line) => {
+        if (knownLines.has(line)) {
+            return false;
+        }
+
+        knownLines.add(line);
+        return true;
+    });
+
+    if (additions.length === 0) {
+        return;
+    }
+
+    const separator = current.length > 0 && !current.endsWith('\n') ? RULES_SEPARATOR : '';
+    fs.writeFileSync(filePath, current + separator + additions.join(RULES_SEPARATOR), 'utf8');
+};
+
+/**
  * Resolves deferred `!#include` directives and processes the included rules.
  *
  * The compile stage converts and filters every include it can resolve. A
@@ -973,6 +1013,7 @@ const removeRuleDuplicates = function (list) {
  * @param {object} defines Defined expressions for the platform.
  * @param {string} filterName Filter name.
  * @param {string} trustLevelSettings Path to the trust-level exclusions file.
+ * @param {string} excludeFilePath Path to the filter's own exclusions file.
  * @param {string[]} excluded Collected excluded rules.
  * @param {string[]} invalid Collected invalid rules.
  * @param {(included: string[]) => void} [onIncluded] Receives each resolved
@@ -985,6 +1026,7 @@ const resolveDeferredIncludes = async (
     defines,
     filterName,
     trustLevelSettings,
+    excludeFilePath,
     excluded,
     invalid,
     onIncluded,
@@ -1014,9 +1056,14 @@ const resolveDeferredIncludes = async (
 
         let includedRules = convertRulesToAdgSyntax(included, excluded, invalid);
         includedRules = exclude(includedRules, trustLevelSettings, excluded);
+        includedRules = exclude(includedRules, excludeFilePath, excluded);
         includedRules = validateAndFilterRules(includedRules, excluded, invalid, filterName);
 
-        result.push(...includedRules);
+        // 'for' loop is used in purpose instead of spread operator
+        // to avoid 'Maximum call stack size exceeded' error on large number of rules
+        for (let i = 0; i < includedRules.length; i += 1) {
+            result.push(includedRules[i]);
+        }
     }
 
     return result;
@@ -1066,6 +1113,7 @@ const buildFilter = async (filterDir, platformsPath, includedFilterIds, excluded
 
     const optimizationConfig = await getOptimizationStatistics(filterId);
     const trustLevelSettings = getTrustLevelExclusionsFile(metadata.trustLevel);
+    const excludeFilePath = path.join(filterDir, EXCLUDE_FILE);
 
     const excluded = [];
     const invalid = [];
@@ -1098,6 +1146,7 @@ const buildFilter = async (filterDir, platformsPath, includedFilterIds, excluded
             config.defines,
             metadata.name,
             trustLevelSettings,
+            excludeFilePath,
             excluded,
             invalid,
             (included) => includedContent.push(included.join('\n')),
@@ -1131,6 +1180,12 @@ const buildFilter = async (filterDir, platformsPath, includedFilterIds, excluded
     if (excluded.length > 0) {
         logger.info(`Filter ${filterId}. Deferred include rules excluded: ${excluded.length}`);
     }
+
+    // The compile stage applies the filter's own exclusions to `filter.txt`,
+    // where a deferred include is only a directive. Apply the same exclusions
+    // to the resolved content and record the result in `diff.txt` and the report.
+    appendExcludedLines(filterDir, excluded);
+    addFilterDetails(metadata, excluded, invalid);
 
     // The builder writes the revision only for a filter-only build. When the
     // platform output is requested, the revision must cover the deferred
