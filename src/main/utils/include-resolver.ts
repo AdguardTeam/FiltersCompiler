@@ -6,6 +6,12 @@ import { FiltersDownloader, type DefinedExpressions } from '@adguard/filters-dow
 const INCLUDE_DIRECTIVE = '!#include';
 
 /**
+ * Preprocessor conditional directive prefixes.
+ */
+const CONDITION_START_DIRECTIVE = '!#if';
+const CONDITION_END_DIRECTIVE = '!#endif';
+
+/**
  * Absolute external URL, including protocol-relative URLs. `file://` URLs are
  * excluded because they have no usable URL origin.
  */
@@ -80,6 +86,13 @@ export interface ResolveIncludesOptions {
      * valid origin.
      */
     remoteOrigin?: boolean;
+
+    /**
+     * Leave a remote `!#include` in place for a later resolution after the
+     * conditions are resolved. The caller must set this flag for a single line
+     * that belongs to a conditional block.
+     */
+    deferRemoteIncludes?: boolean;
 }
 
 /**
@@ -88,7 +101,9 @@ export interface ResolveIncludesOptions {
  * When the default origin is a local path, an absolute external include uses
  * its own origin, so the include validation accepts it and relative nested
  * includes resolve against the remote directory. All other lines use the
- * default origin. When the default origin is a remote URL, the directives are
+ * default origin. A remote include inside a conditional block is left in place
+ * for the caller to resolve after the conditions, so an inactive branch is
+ * never fetched. When the default origin is a remote URL, the directives are
  * delegated unchanged, so the downloader keeps its same-origin validation.
  *
  * @param lines Lines with rules and preprocessor directives.
@@ -114,6 +129,7 @@ export const resolveIncludes = async (
 
     let result: string[] = [];
     let batch: string[] = [];
+    let conditionDepth = 0;
 
     const resolveBatch = async (): Promise<void> => {
         if (batch.length === 0) {
@@ -130,12 +146,27 @@ export const resolveIncludes = async (
         const remoteUrl = getRemoteIncludeUrl(line);
 
         if (!remoteUrl) {
+            if (line.startsWith(CONDITION_START_DIRECTIVE)) {
+                conditionDepth += 1;
+            } else if (line.startsWith(CONDITION_END_DIRECTIVE)) {
+                conditionDepth = Math.max(0, conditionDepth - 1);
+            }
+
             batch.push(line);
             continue;
         }
 
         // eslint-disable-next-line no-await-in-loop
         await resolveBatch();
+
+        // The generator resolves a conditional include after the per-platform
+        // conditions: this keeps an inactive branch out of the network and does
+        // not stop the build for platforms that never use the include.
+        // See https://github.com/AdguardTeam/FiltersCompiler/issues/84.
+        if (options?.deferRemoteIncludes || conditionDepth > 0) {
+            result.push(line);
+            continue;
+        }
 
         try {
             // eslint-disable-next-line no-await-in-loop

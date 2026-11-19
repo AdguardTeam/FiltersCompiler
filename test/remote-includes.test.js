@@ -17,11 +17,14 @@ import fs from 'node:fs';
 import os from 'node:os';
 
 import { build, include } from '../src/main/builder';
+import { disableOptimization } from '../src/main/optimization';
 import { downloadFile } from '../src/main/utils/webutils';
 
 vi.mock('../src/main/utils/webutils', () => ({
     downloadFile: vi.fn(),
 }));
+
+disableOptimization();
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
@@ -197,6 +200,19 @@ describe('remote !#include in a filter template', () => {
     let remotePort;
     let filtersDir;
     let filterDir;
+    let platformsDir;
+
+    const makePlatformsConfig = (defines) => ({
+        TEST: {
+            platform: 'test',
+            path: 'test',
+            configuration: {
+                removeRulePatterns: false,
+                ignoreRuleHints: false,
+            },
+            defines,
+        },
+    });
 
     const createFilter = (templateContent) => {
         filtersDir = fs.mkdtempSync(path.join(os.tmpdir(), 'remote-includes-'));
@@ -217,6 +233,14 @@ describe('remote !#include in a filter template', () => {
             trustLevel: 'low',
         }));
     };
+
+    const createConditionalFilter = (includePath) => createFilter([
+        '! Title: Remote Include Test',
+        '!#if adguard_ext_safari',
+        `!#include ${remoteBaseUrl}${includePath}`,
+        '!#endif',
+        '',
+    ].join('\n'));
 
     beforeAll(async () => {
         server = http.createServer((req, res) => {
@@ -254,6 +278,11 @@ describe('remote !#include in a filter template', () => {
     afterEach(() => {
         if (filtersDir) {
             fs.rmSync(filtersDir, { recursive: true, force: true });
+            filtersDir = undefined;
+        }
+        if (platformsDir) {
+            fs.rmSync(platformsDir, { recursive: true, force: true });
+            platformsDir = undefined;
         }
     });
 
@@ -319,5 +348,50 @@ describe('remote !#include in a filter template', () => {
         expect(error).toBeInstanceOf(Error);
         expect(error.message).not.toContain(CREDENTIAL_PASSWORD);
         expect(error.message).toContain(MISSING_INCLUDE_PATH);
+    });
+
+    it('leaves a remote !#include inside a condition for the per-platform build', async () => {
+        createConditionalFilter('/rules.txt');
+
+        await build(filtersDir, null, null, null, {}, null, null);
+
+        const filterContent = fs.readFileSync(path.join(filterDir, 'filter.txt'), 'utf8');
+        expect(filterContent).toContain(`!#include ${remoteBaseUrl}/rules.txt`);
+        expect(filterContent.split(/\r?\n/)).not.toContain(REMOTE_RULE);
+    });
+
+    it('does not fetch a conditional remote !#include for a platform without the condition', async () => {
+        createConditionalFilter(MISSING_INCLUDE_PATH);
+        platformsDir = fs.mkdtempSync(path.join(os.tmpdir(), 'remote-includes-platforms-'));
+
+        await build(
+            filtersDir,
+            null,
+            null,
+            platformsDir,
+            makePlatformsConfig({ adguard: true }),
+            null,
+            null,
+        );
+
+        const platformContent = fs.readFileSync(path.join(platformsDir, 'test', 'filters', '1.txt'), 'utf8');
+        expect(platformContent).not.toContain(MISSING_INCLUDE_PATH);
+    });
+
+    it('rejects a failing conditional remote !#include for a platform with the condition', async () => {
+        createConditionalFilter(MISSING_INCLUDE_PATH);
+        platformsDir = fs.mkdtempSync(path.join(os.tmpdir(), 'remote-includes-platforms-'));
+
+        await expect(build(
+            filtersDir,
+            null,
+            null,
+            platformsDir,
+            makePlatformsConfig({ adguard: true, adguard_ext_safari: true }),
+            null,
+            null,
+        ))
+            .rejects
+            .toThrow(new RegExp(`${MISSING_INCLUDE_PATH}.*\\b404\\b`, 's'));
     });
 });

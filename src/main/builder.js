@@ -42,6 +42,8 @@ const COMMA = ',';
 const EQUAL_SIGN = '=';
 const MODIFIERS_SEPARATOR = '$';
 const INCLUDE_DIRECTIVE = '@include ';
+const CONDITION_START_DIRECTIVE = '!#if';
+const CONDITION_END_DIRECTIVE = '!#endif';
 const STRIP_COMMENTS_OPTION = 'stripComments';
 const OPTIMIZE_DOMAIN_BLOCKING_RULES = 'optimizeDomainBlockingRules';
 const NOT_OPTIMIZED_OPTION = 'notOptimized';
@@ -505,15 +507,17 @@ export const include = async (filterDir, directiveLine, excluded) => {
  * @param {string} filterDir Filter directory.
  * @param {string} filterName Filter name.
  * @param {string[]} lines Array of lines.
+ * @param {boolean} [deferRemoteIncludes] Leave a remote `!#include` for the
+ * generator to resolve after the conditions. Set for a line inside a conditional block.
  *
  * @returns {Promise<string[]>} Promise which resolves
  * to array of rules as a result of resolving preprocessor `!#include` directives.
  *
  * @throws {Error} Throws an error if unable to resolve `!#include` directives.
  */
-const getResolvedPreprocessorIncludes = async function (filterDir, filterName, lines) {
+const getResolvedPreprocessorIncludes = async function (filterDir, filterName, lines, deferRemoteIncludes) {
     try {
-        return await resolveIncludes(lines, filterDir);
+        return await resolveIncludes(lines, filterDir, undefined, { deferRemoteIncludes });
     } catch (e) {
         // remote includes must fail the build: an unresolved directive would be
         // dropped by the converter and never reach the generator
@@ -536,6 +540,8 @@ const getResolvedPreprocessorIncludes = async function (filterDir, filterName, l
  * @param {string[]} excluded Array of rules to exclude.
  * @param {string[]} invalidRules Invalid rules for the report file.
  * @param {string} [previousLine] Line preceding the first of `lines` in the template.
+ * @param {boolean} [deferRemoteIncludes] Leave a remote `!#include` for the
+ * generator to resolve after the conditions. Set for a line inside a conditional block.
  *
  * @returns {Promise<string[]>} Promise which resolves to array of AdGuard syntax rules.
  */
@@ -546,8 +552,14 @@ const prepareAdgRules = async function (
     excluded,
     invalidRules,
     previousLine,
+    deferRemoteIncludes,
 ) {
-    const resolvedIncludes = await getResolvedPreprocessorIncludes(filterDir, filterName, lines);
+    const resolvedIncludes = await getResolvedPreprocessorIncludes(
+        filterDir,
+        filterName,
+        lines,
+        deferRemoteIncludes,
+    );
     return convertRulesToAdgSyntax(resolvedIncludes, excluded, invalidRules, previousLine);
 };
 
@@ -604,8 +616,15 @@ const compile = async function (filterDir, filterName, templateContent, trustLev
 
     const lines = splitLines(templateContent);
     let previousLine;
+    let conditionDepth = 0;
     // eslint-disable-next-line no-restricted-syntax
     for (const line of lines) {
+        const trimmedLine = line.trim();
+
+        if (line.startsWith(CONDITION_START_DIRECTIVE)) {
+            conditionDepth += 1;
+        }
+
         if (line.startsWith(INCLUDE_DIRECTIVE)) {
             // eslint-disable-next-line no-await-in-loop
             const { includedLines, shouldIgnoreTrustLevel } = await include(filterDir, line, excluded);
@@ -636,7 +655,6 @@ const compile = async function (filterDir, filterName, templateContent, trustLev
                 result.push(includedRules[i]);
             }
         } else {
-            const trimmedLine = line.trim();
             // A preprocessor directive is not a rule, and `!#include` expands to the rules of
             // another file, so a hint on the line before any `!#` directive (`!#include`,
             // `!#if`, `!#else`, `!#endif`, ...) must not apply to the lines it resolves to.
@@ -654,6 +672,7 @@ const compile = async function (filterDir, filterName, templateContent, trustLev
                 excluded,
                 invalid,
                 inlinePreviousLine,
+                conditionDepth > 0,
             );
 
             logger.info('Applying trust-level exclusions to inline template.txt rules...');
@@ -664,6 +683,10 @@ const compile = async function (filterDir, filterName, templateContent, trustLev
             for (let i = 0; i < inlineRules.length; i += 1) {
                 result.push(inlineRules[i]);
             }
+        }
+
+        if (line.startsWith(CONDITION_END_DIRECTIVE)) {
+            conditionDepth = Math.max(0, conditionDepth - 1);
         }
 
         previousLine = line.trim();
