@@ -360,6 +360,24 @@ describe('remote !#include in a filter template', () => {
         expect(filterContent.split(/\r?\n/)).not.toContain(REMOTE_RULE);
     });
 
+    it('resolves a conditional remote !#include in the per-platform build', async () => {
+        createConditionalFilter('/rules.txt');
+        platformsDir = fs.mkdtempSync(path.join(os.tmpdir(), 'remote-includes-platforms-'));
+
+        await build(
+            filtersDir,
+            null,
+            null,
+            platformsDir,
+            makePlatformsConfig({ adguard: true, adguard_ext_safari: true }),
+            null,
+            null,
+        );
+
+        const platformContent = fs.readFileSync(path.join(platformsDir, 'test', 'filters', '1.txt'), 'utf8');
+        expect(platformContent.split(/\r?\n/)).toContain(REMOTE_RULE);
+    });
+
     it('does not fetch a conditional remote !#include for a platform without the condition', async () => {
         createConditionalFilter(MISSING_INCLUDE_PATH);
         platformsDir = fs.mkdtempSync(path.join(os.tmpdir(), 'remote-includes-platforms-'));
