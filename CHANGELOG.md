@@ -24,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A remote `!#include` in a filter template now resolves. If a remote include
   cannot be resolved, the build fails with an error that names the include URL
   and the reason instead of silently dropping the directive.
+- The `/ignoreTrustLevel` option of `@include` now rejects content with a remote
+  `!#include`, so third-party rules cannot skip the trust-level exclusions.
 
 ### Security
 

@@ -23,7 +23,7 @@ import { fixVersionComments, removeAdblockVersion } from './utils/workaround';
 import { downloadFile } from './utils/webutils';
 import { getFilterIdFromDirName } from './utils/utils';
 import { optimizeDomainBlockingRules } from './utils/builder-utils';
-import { RemoteIncludeError, resolveIncludes } from './utils/include-resolver';
+import { getRemoteIncludeUrl, RemoteIncludeError, resolveIncludes } from './utils/include-resolver';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -412,6 +412,8 @@ export const include = async (filterDir, directiveLine, excluded) => {
         throw new Error(`Invalid include directive: '${directiveLine.trim()}'`);
     }
 
+    const ignoreTrustLevel = options.some(({ name }) => name === IGNORE_TRUST_LEVEL_OPTION);
+
     logger.info(`Applying inclusion from: ${url}`);
 
     const externalInclude = url.includes(':');
@@ -424,6 +426,20 @@ export const include = async (filterDir, directiveLine, excluded) => {
         includedLines = splitLines(included);
 
         checkRedirects(includedLines, url);
+
+        // A local include with `/ignoreTrustLevel` must not pull third-party
+        // rules through a remote `!#include`: such rules would skip the
+        // trust-level exclusions, which is forbidden for external content.
+        if (ignoreTrustLevel) {
+            const remoteIncludeUrl = includedLines
+                .map((line) => getRemoteIncludeUrl(line))
+                .find((remoteUrl) => remoteUrl !== null);
+
+            if (remoteIncludeUrl) {
+                throw new Error('Trust level ignoring option is not supported for an @include '
+                    + `with a remote !#include: ${directiveLine}`);
+            }
+        }
 
         // resolved `@include` directive url
         const originUrl = externalInclude

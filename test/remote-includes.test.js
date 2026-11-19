@@ -276,6 +276,15 @@ describe('remote !#include in a filter template', () => {
         expect(filterContent.split(/\r?\n/)).toContain(REMOTE_RULE);
     });
 
+    it('rejects a remote !#include in an @include body with /ignoreTrustLevel', async () => {
+        createFilter('! Title: Remote Include Test\n@include "body.txt" /ignoreTrustLevel\n');
+        fs.writeFileSync(path.join(filterDir, 'body.txt'), `!#include ${remoteBaseUrl}/rules.txt\n`);
+
+        await expect(build(filtersDir, null, null, null, {}, null, null))
+            .rejects
+            .toThrow(/Trust level ignoring option is not supported for an @include with a remote !#include/);
+    });
+
     it('rejects when a remote !#include from template.txt returns 404', async () => {
         createFilter(`! Title: Remote Include Test\n!#include ${remoteBaseUrl}${MISSING_INCLUDE_PATH}\n`);
 
