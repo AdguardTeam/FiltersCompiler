@@ -422,6 +422,41 @@ const sanitizeDirectiveLine = function (line) {
 };
 
 /**
+ * Normalizes the separators and the dot segments of a local `!#include` path
+ * the same way the downloader does before it checks the directory.
+ *
+ * The downloader converts `\` to `/` and treats `%2e`, `.%2e`, `%2e.`, and
+ * `%2e%2e` as dot segments before `isInsideLocalDirectory()` runs. A plain
+ * `path.resolve()` does neither on POSIX, so without this normalization the
+ * warning misses a target that the downloader drops, for example
+ * `..\common.txt` or `%2e%2e/common.txt`.
+ *
+ * @param {string} includePath Path from the `!#include` directive.
+ * @returns {string} Path with forward slashes and plain dot segments.
+ */
+const normalizeIncludePath = function (includePath) {
+    return includePath
+        .replace(/\\/g, '/')
+        .split('/')
+        .map((segment) => {
+            const lowerCaseSegment = segment.toLowerCase();
+
+            if (lowerCaseSegment === '%2e') {
+                return '.';
+            }
+
+            if (lowerCaseSegment === '.%2e'
+                || lowerCaseSegment === '%2e.'
+                || lowerCaseSegment === '%2e%2e') {
+                return '..';
+            }
+
+            return segment;
+        })
+        .join('/');
+};
+
+/**
  * Logs a warning for each local `!#include` target that leaves the directory
  * of the containing file.
  *
@@ -429,6 +464,9 @@ const sanitizeDirectiveLine = function (line) {
  * loses the included rules without a message. The warning tells the filter
  * maintainer why the rules are missing. An absolute URL has no directory that
  * it can leave, so it is not checked.
+ *
+ * The target is normalized the way the downloader normalizes it, so Windows
+ * separators and percent-encoded dot segments are checked too.
  *
  * @param {string} directory Directory of the file that contains the directive.
  * @param {string[]} lines Lines that may contain `!#include` directives.
@@ -449,7 +487,8 @@ const warnAboutDroppedPreprocessorIncludes = function (directory, lines) {
         }
 
         // A leading separator means a path inside the directory, as in uBO.
-        const target = path.resolve(base, includePath.replace(/^[\\/]+/, ''));
+        const normalizedIncludePath = normalizeIncludePath(includePath).replace(/^\/+/, '');
+        const target = path.resolve(base, normalizedIncludePath);
         const relative = path.relative(base, target);
 
         if (relative === '..' || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) {

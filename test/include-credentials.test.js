@@ -450,6 +450,31 @@ describe('credentials in @include URLs', () => {
         expectNoCredentials(log, error, consoleOutput);
     }, 30000);
 
+    it.each([
+        '..\\common.txt',
+        '%2e%2e/common.txt',
+        '.%2e/common.txt',
+        '%2e./common.txt',
+    ])('warns when a preprocessor include leaves the directory through %s', async (target) => {
+        // The downloader normalizes Windows separators and percent-encoded
+        // dot segments before it drops the include, so the warning must
+        // normalize them too.
+        const {
+            result, error, log, consoleOutput,
+        } = await runCompile(
+            `!#include ${target}\n||inside.example^`,
+            { '../common.txt': '||outside.example^' },
+        );
+
+        expect(error).toBeUndefined();
+        expect(result.lines).toContain('||inside.example^');
+        expect(result.lines.join('\n')).not.toContain('outside.example');
+        expect(log).toContain(
+            `Ignoring !#include outside the directory of the containing file: '!#include ${target}'`,
+        );
+        expectNoCredentials(log, error, consoleOutput);
+    });
+
     it('warns when a preprocessor include leaves the directory and drops its rules', async () => {
         const {
             result, error, log, consoleOutput,
