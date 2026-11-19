@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import crypto from 'crypto';
+import md5 from 'md5';
 import { format } from 'date-fns';
 import { utc } from '@date-fns/utc';
 
@@ -16,13 +17,16 @@ import {
     rewriteMetadataForOldMacV2,
     modifyBaseFilterHeader,
 } from '../utils/workaround';
-import { convertToUbo } from '../converter';
+import { convertToUbo, convertRulesToAdgSyntax } from '../converter';
+import { validateAndFilterRules } from '../validator';
 import { getOptimizationStatistics } from '../optimization';
 import { RuleMasks } from '../rule/rule-masks';
 import { LEGACY_PLATFORMS, MAC_V1_PLATFORM, MAC_V2_PLATFORM } from '../platforms-config';
 import { ENTITY_KINDS, KEY_PREFIXES, parseLocaleMessages } from '../utils/locale-messages';
 import { readJsonOrNull } from '../utils/read-json';
-import { resolveIncludes } from '../utils/include-resolver';
+import { isIncludeDirective, resolveIncludes } from '../utils/include-resolver';
+import { exclude, getTrustLevelExclusionsFile } from '../utils/rule-exclusions';
+import { makeRevision } from '../utils/revision';
 import {
     FILTERS_I18N_METADATA_FILE_JS,
     FILTERS_I18N_METADATA_FILE_JSON,
@@ -958,6 +962,81 @@ const removeRuleDuplicates = function (list) {
 };
 
 /**
+ * Resolves deferred `!#include` directives and processes the included rules.
+ *
+ * The compile stage converts and filters every include it can resolve. A
+ * deferred include is resolved here, after the platform conditions, so its
+ * rules must pass the same steps before they reach the platform output.
+ *
+ * @param {string[]} rules Rules with preprocessor directives.
+ * @param {string} filterDir Path to the filter directory.
+ * @param {object} defines Defined expressions for the platform.
+ * @param {string} filterName Filter name.
+ * @param {string} trustLevelSettings Path to the trust-level exclusions file.
+ * @param {string[]} excluded Collected excluded rules.
+ * @param {string[]} invalid Collected invalid rules.
+ * @param {(included: string[]) => void} [onIncluded] Receives each resolved
+ * include fragment, so the caller can include it in the revision hash.
+ * @returns {Promise<string[]>} Rules with the deferred includes resolved and processed.
+ */
+const resolveDeferredIncludes = async (
+    rules,
+    filterDir,
+    defines,
+    filterName,
+    trustLevelSettings,
+    excluded,
+    invalid,
+    onIncluded,
+) => {
+    const CONTEXT_LINES = 3;
+    const result = [];
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const rule of rules) {
+        if (!isIncludeDirective(rule)) {
+            result.push(rule);
+            continue;
+        }
+
+        // Resolve the directive with the previous lines as context, so a
+        // failure keeps the same error message as a bulk resolution. Resolved
+        // lines never contain an unresolved include, so the context is safe.
+        const context = result.slice(-CONTEXT_LINES);
+
+        // eslint-disable-next-line no-await-in-loop
+        const resolved = await resolveIncludes([...context, rule.trim()], filterDir, defines);
+        const included = resolved.slice(context.length);
+
+        if (onIncluded) {
+            onIncluded(included);
+        }
+
+        let includedRules = convertRulesToAdgSyntax(included, excluded, invalid);
+        includedRules = exclude(includedRules, trustLevelSettings, excluded);
+        includedRules = validateAndFilterRules(includedRules, excluded, invalid, filterName);
+
+        result.push(...includedRules);
+    }
+
+    return result;
+};
+
+/**
+ * Calculates the revision hash from the compiled filter and the deferred
+ * include content.
+ *
+ * @param {string[]} originalRules Lines of `filter.txt`.
+ * @param {string[]} includedContent Resolved deferred include fragments.
+ * @returns {string} Base64 MD5 hash.
+ */
+const calculateRevisionHash = (originalRules, includedContent) => {
+    const content = [originalRules.join('\r\n'), ...includedContent].join('\n');
+
+    return Buffer.from(md5(content, { asString: true })).toString('base64').trim();
+};
+
+/**
  * Builds platforms for filter
  *
  * @param filterDir - Path to filter directory
@@ -986,6 +1065,15 @@ const buildFilter = async (filterDir, platformsPath, includedFilterIds, excluded
     }
 
     const optimizationConfig = await getOptimizationStatistics(filterId);
+    const trustLevelSettings = getTrustLevelExclusionsFile(metadata.trustLevel);
+
+    const excluded = [];
+    const invalid = [];
+    const includedContent = [];
+
+    // Collect the platform output before writing, so the revision hash covers
+    // the content that the generator resolves after the conditions.
+    const platformOutputs = [];
 
     // eslint-disable-next-line guard-for-in,no-restricted-syntax
     for (const platform in platformPathsConfig) {
@@ -999,11 +1087,21 @@ const buildFilter = async (filterDir, platformsPath, includedFilterIds, excluded
 
         let rules = FiltersDownloader.resolveConditions(originalRules, config.defines);
 
-        // handle includes after resolving conditions:
-        // if there is a bad include after resolving conditions, the generator should be terminated
+        // Handle includes after resolving conditions: an inactive branch is
+        // never fetched, and the rules of an active one pass the same
+        // conversion, exclusion, and validation steps as the compile stage.
         // https://github.com/AdguardTeam/FiltersCompiler/issues/84
         // eslint-disable-next-line no-await-in-loop
-        rules = await resolveIncludes(rules, filterDir, config.defines);
+        rules = await resolveDeferredIncludes(
+            rules,
+            filterDir,
+            config.defines,
+            metadata.name,
+            trustLevelSettings,
+            excluded,
+            invalid,
+            (included) => includedContent.push(included.join('\n')),
+        );
 
         rules = cleanupRules(rules, config, filterId);
         rules = removeRuleDuplicates(rules);
@@ -1023,6 +1121,30 @@ const buildFilter = async (filterDir, platformsPath, includedFilterIds, excluded
         // eslint-disable-next-line max-len
         logger.info(`Filter ${filterId}. Rules ${originalRules.length} => ${rules.length} => ${optimizedRules.length}. PlatformPath: '${config.path}'`);
 
+        platformOutputs.push({
+            config,
+            rules,
+            optimizedRules,
+        });
+    }
+
+    if (excluded.length > 0) {
+        logger.info(`Filter ${filterId}. Deferred include rules excluded: ${excluded.length}`);
+    }
+
+    // The builder writes the revision only for a filter-only build. When the
+    // platform output is requested, the revision must cover the deferred
+    // include content too: `filter.txt` contains only the directives, so its
+    // hash does not change when a remote list changes. A disabled filter has
+    // no fresh `filter.txt`, so keep its revision unchanged.
+    if (!metadata.disabled) {
+        const hash = calculateRevisionHash(originalRules, includedContent);
+        const revision = makeRevision(revisionFilePath, hash);
+        fs.writeFileSync(revisionFilePath, JSON.stringify(revision, null, '\t'), 'utf8');
+    }
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const { config, rules, optimizedRules } of platformOutputs) {
         const header = makeHeader(metadataFilePath, revisionFilePath, config.expires);
 
         const platformDir = path.join(platformsPath, config.path, PLATFORM_FILTERS_DIR);

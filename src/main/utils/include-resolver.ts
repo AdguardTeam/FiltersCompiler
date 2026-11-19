@@ -67,14 +67,25 @@ export class RemoteIncludeError extends Error {
  * @returns Include URL or `null` if the line is not a remote include.
  */
 export const getRemoteIncludeUrl = (line: string): string | null => {
-    if (!line.startsWith(INCLUDE_DIRECTIVE)) {
+    const trimmedLine = line.trim();
+
+    if (!trimmedLine.startsWith(INCLUDE_DIRECTIVE)) {
         return null;
     }
 
-    const url = line.substring(INCLUDE_DIRECTIVE.length).trim();
+    const url = trimmedLine.substring(INCLUDE_DIRECTIVE.length).trim();
 
     return ABSOLUTE_EXTERNAL_URL.test(url) ? url : null;
 };
+
+/**
+ * Checks if a line is a preprocessor include directive.
+ *
+ * @param line Line to check.
+ *
+ * @returns `true` if the trimmed line starts with `!#include`.
+ */
+export const isIncludeDirective = (line: string): boolean => line.trim().startsWith(INCLUDE_DIRECTIVE);
 
 /**
  * Options for include resolution.
@@ -143,16 +154,17 @@ export const resolveIncludes = async (
 
     // eslint-disable-next-line no-restricted-syntax
     for (const line of lines) {
-        const remoteUrl = getRemoteIncludeUrl(line);
+        const trimmedLine = line.trim();
+        const remoteUrl = getRemoteIncludeUrl(trimmedLine);
 
         if (!remoteUrl) {
-            if (line.startsWith(CONDITION_START_DIRECTIVE)) {
+            if (trimmedLine.startsWith(CONDITION_START_DIRECTIVE)) {
                 conditionDepth += 1;
-            } else if (line.startsWith(CONDITION_END_DIRECTIVE)) {
+            } else if (trimmedLine.startsWith(CONDITION_END_DIRECTIVE)) {
                 conditionDepth = Math.max(0, conditionDepth - 1);
             }
 
-            batch.push(line);
+            batch.push(trimmedLine);
             continue;
         }
 
@@ -164,14 +176,14 @@ export const resolveIncludes = async (
         // not stop the build for platforms that never use the include.
         // See https://github.com/AdguardTeam/FiltersCompiler/issues/84.
         if (options?.deferRemoteIncludes || conditionDepth > 0) {
-            result.push(line);
+            result.push(trimmedLine);
             continue;
         }
 
         try {
             // eslint-disable-next-line no-await-in-loop
             const resolved = await FiltersDownloader.resolveIncludes(
-                [line],
+                [trimmedLine],
                 FiltersDownloader.getFilterUrlOrigin(remoteUrl),
                 definedExpressions,
             );

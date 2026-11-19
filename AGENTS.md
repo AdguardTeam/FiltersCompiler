@@ -78,10 +78,12 @@ The library exposes four public API functions: `compile`, `validateJSONSchema`,
 │           ├── metadata-file-names.ts  # Metadata output file names
 │           ├── read-json.ts           # JSON file reading with parse error context
 │           ├── report.js              # Compilation report builder
+│           ├── rule-exclusions.ts     # Trust-level rule exclusions shared by builder and generator
 │           ├── builder-utils.js       # Helper functions (domain optimization)
 │           ├── include-resolver.ts    # Remote-aware preprocessor !#include resolution
 │           ├── extended-css-validator.js  # CSS selector validation
 │           ├── concurrent.ts          # Bounded-concurrency task runner
+│           ├── revision.ts            # Revision hash and version maintenance
 │           ├── version.ts             # Version parsing and incrementing
 │           ├── webutils.ts            # HTTP download via curl
 │           ├── workaround.js          # Platform-specific hacks and workarounds

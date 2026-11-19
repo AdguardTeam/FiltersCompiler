@@ -15,6 +15,14 @@
 
 declare module '*/rule/rule-masks.js' {
     export const RuleMasks: Record<string, string>;
+    export const SPACE: string;
+    export const NOT_CONVERT_HINT: string;
+    export function hasHint(line: string | null | undefined, hint: string): boolean;
+    export function isHint(line: string | null | undefined): boolean;
+}
+
+declare module '*/converter.js' {
+    export function getCanonicalRuleTexts(rule: string): string[];
 }
 
 declare module '*/platforms-config.js' {

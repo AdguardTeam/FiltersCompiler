@@ -29,6 +29,14 @@ disableOptimization();
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 const REMOTE_RULE = '||remote.example^';
+const CHANGED_REMOTE_RULE = '||changed.example^';
+const UBO_HTML_RULE = 'example.com##^script:has-text(ad)';
+const CONVERTED_HTML_RULE = 'example.com$$script:contains(ad)';
+const SCRIPTLET_RULE = "example.com#%#//scriptlet('abort')";
+const UBO_SCRIPTLET_RULE = 'example.com##+js(abort)';
+const CSS_INJECTION_RULE = 'example.com#$#.banner { display: none; }';
+const INVALID_CONVERSION_RULE = 'example.com#$#selector:style()';
+const INVALID_SELECTOR_RULE = 'example.com##div[class"ads-article"]';
 const MISSING_INCLUDE_PATH = '/missing.txt';
 const PROTECTED_INCLUDE_PATH = '/protected.txt';
 const REDIRECT_INCLUDE_PATH = '/redirect.txt';
@@ -201,6 +209,8 @@ describe('remote !#include in a filter template', () => {
     let filtersDir;
     let filterDir;
     let platformsDir;
+    let rulesResponse;
+    const requestedPaths = [];
 
     const makePlatformsConfig = (defines) => ({
         TEST: {
@@ -214,7 +224,7 @@ describe('remote !#include in a filter template', () => {
         },
     });
 
-    const createFilter = (templateContent) => {
+    const createFilter = (templateContent, metadataOverrides = {}) => {
         filtersDir = fs.mkdtempSync(path.join(os.tmpdir(), 'remote-includes-'));
         filterDir = path.join(filtersDir, FILTER_DIR_NAME);
         fs.mkdirSync(filterDir);
@@ -231,22 +241,37 @@ describe('remote !#include in a filter template', () => {
             subscriptionUrl: 'https://example.org/filter.txt',
             tags: ['purpose:ads'],
             trustLevel: 'low',
+            ...metadataOverrides,
         }));
     };
 
-    const createConditionalFilter = (includePath) => createFilter([
+    const createConditionalFilter = (includePath, metadataOverrides) => createFilter([
         '! Title: Remote Include Test',
         '!#if adguard_ext_safari',
         `!#include ${remoteBaseUrl}${includePath}`,
         '!#endif',
         '',
-    ].join('\n'));
+    ].join('\n'), metadataOverrides);
 
     beforeAll(async () => {
         server = http.createServer((req, res) => {
+            requestedPaths.push(req.url);
+
             if (req.url === '/rules.txt') {
                 res.writeHead(200, { 'Content-Type': 'text/plain' });
-                res.end(REMOTE_RULE);
+                res.end(rulesResponse);
+                return;
+            }
+
+            if (req.url === '/processed.txt') {
+                res.writeHead(200, { 'Content-Type': 'text/plain' });
+                res.end([SCRIPTLET_RULE, UBO_SCRIPTLET_RULE, CSS_INJECTION_RULE, UBO_HTML_RULE].join('\n'));
+                return;
+            }
+
+            if (req.url === '/invalid.txt') {
+                res.writeHead(200, { 'Content-Type': 'text/plain' });
+                res.end([INVALID_CONVERSION_RULE, INVALID_SELECTOR_RULE].join('\n'));
                 return;
             }
 
@@ -273,6 +298,11 @@ describe('remote !#include in a filter template', () => {
         await new Promise((resolve) => {
             server.close(resolve);
         });
+    });
+
+    beforeEach(() => {
+        rulesResponse = REMOTE_RULE;
+        requestedPaths.length = 0;
     });
 
     afterEach(() => {
@@ -394,6 +424,122 @@ describe('remote !#include in a filter template', () => {
 
         const platformContent = fs.readFileSync(path.join(platformsDir, 'test', 'filters', '1.txt'), 'utf8');
         expect(platformContent).not.toContain(MISSING_INCLUDE_PATH);
+    });
+
+    it('does not fetch a conditional remote !#include in an @include body at compile time', async () => {
+        createFilter('! Title: Remote Include Test\n@include "body.txt"\n');
+        fs.writeFileSync(path.join(filterDir, 'body.txt'), [
+            '  !#if adguard_ext_safari',
+            `  !#include ${remoteBaseUrl}/rules.txt`,
+            '  !#endif',
+            '',
+        ].join('\n'));
+
+        await build(filtersDir, null, null, null, {}, null, null);
+
+        const filterContent = fs.readFileSync(path.join(filterDir, 'filter.txt'), 'utf8');
+        expect(filterContent).toContain(`!#include ${remoteBaseUrl}/rules.txt`);
+        expect(filterContent.split(/\r?\n/)).not.toContain(REMOTE_RULE);
+        expect(requestedPaths).not.toContain('/rules.txt');
+
+        platformsDir = fs.mkdtempSync(path.join(os.tmpdir(), 'remote-includes-platforms-'));
+        await build(
+            filtersDir,
+            null,
+            null,
+            platformsDir,
+            makePlatformsConfig({ adguard_ext_safari: true }),
+            null,
+            null,
+        );
+
+        const platformContent = fs.readFileSync(path.join(platformsDir, 'test', 'filters', '1.txt'), 'utf8');
+        expect(platformContent.split(/\r?\n/)).toContain(REMOTE_RULE);
+    });
+
+    it('rejects an indented remote !#include in an @include body with /ignoreTrustLevel', async () => {
+        createFilter('! Title: Remote Include Test\n@include "body.txt" /ignoreTrustLevel\n');
+        fs.writeFileSync(path.join(filterDir, 'body.txt'), `  !#include ${remoteBaseUrl}/rules.txt\n`);
+
+        await expect(build(filtersDir, null, null, null, {}, null, null))
+            .rejects
+            .toThrow(/Trust level ignoring option is not supported for an @include with a remote !#include/);
+    });
+
+    it('converts and excludes rules from a deferred remote !#include', async () => {
+        createConditionalFilter('/processed.txt');
+        platformsDir = fs.mkdtempSync(path.join(os.tmpdir(), 'remote-includes-platforms-'));
+
+        await build(
+            filtersDir,
+            null,
+            null,
+            platformsDir,
+            makePlatformsConfig({ adguard_ext_safari: true }),
+            null,
+            null,
+        );
+
+        const platformContent = fs.readFileSync(path.join(platformsDir, 'test', 'filters', '1.txt'), 'utf8');
+        const platformLines = platformContent.split(/\r?\n/);
+
+        expect(platformLines).toContain(CONVERTED_HTML_RULE);
+        expect(platformLines).not.toContain(UBO_HTML_RULE);
+        expect(platformLines).not.toContain(SCRIPTLET_RULE);
+        expect(platformLines).not.toContain(UBO_SCRIPTLET_RULE);
+        expect(platformLines).not.toContain(CSS_INJECTION_RULE);
+    });
+
+    it('validates rules from a deferred remote !#include', async () => {
+        createConditionalFilter('/invalid.txt', { trustLevel: 'full' });
+        platformsDir = fs.mkdtempSync(path.join(os.tmpdir(), 'remote-includes-platforms-'));
+
+        await build(
+            filtersDir,
+            null,
+            null,
+            platformsDir,
+            makePlatformsConfig({ adguard_ext_safari: true }),
+            null,
+            null,
+        );
+
+        const platformContent = fs.readFileSync(path.join(platformsDir, 'test', 'filters', '1.txt'), 'utf8');
+        const platformLines = platformContent.split(/\r?\n/);
+
+        expect(platformLines).not.toContain(INVALID_CONVERSION_RULE);
+        expect(platformLines).not.toContain(INVALID_SELECTOR_RULE);
+    });
+
+    it('bumps the revision when a deferred remote !#include changes', async () => {
+        createConditionalFilter('/rules.txt');
+        platformsDir = fs.mkdtempSync(path.join(os.tmpdir(), 'remote-includes-platforms-'));
+        const platformsConfig = makePlatformsConfig({ adguard_ext_safari: true });
+        const revisionPath = path.join(filterDir, 'revision.json');
+
+        await build(filtersDir, null, null, platformsDir, platformsConfig, null, null);
+
+        const firstRevision = JSON.parse(fs.readFileSync(revisionPath, 'utf8'));
+
+        await build(filtersDir, null, null, platformsDir, platformsConfig, null, null);
+
+        const unchangedRevision = JSON.parse(fs.readFileSync(revisionPath, 'utf8'));
+
+        expect(unchangedRevision.version).toBe(firstRevision.version);
+        expect(unchangedRevision.hash).toBe(firstRevision.hash);
+
+        rulesResponse = CHANGED_REMOTE_RULE;
+
+        await build(filtersDir, null, null, platformsDir, platformsConfig, null, null);
+
+        const secondRevision = JSON.parse(fs.readFileSync(revisionPath, 'utf8'));
+        const platformContent = fs.readFileSync(path.join(platformsDir, 'test', 'filters', '1.txt'), 'utf8');
+
+        expect(secondRevision.version).not.toBe(firstRevision.version);
+        expect(secondRevision.hash).not.toBe(firstRevision.hash);
+        expect(secondRevision.timeUpdated).toBeGreaterThanOrEqual(firstRevision.timeUpdated);
+        expect(platformContent.split(/\r?\n/)).toContain(CHANGED_REMOTE_RULE);
+        expect(platformContent.split(/\r?\n/)).not.toContain(REMOTE_RULE);
     });
 
     it('rejects a failing conditional remote !#include for a platform with the condition', async () => {
