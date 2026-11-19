@@ -17,7 +17,7 @@ import { fileURLToPath } from 'node:url';
 
 import { FiltersDownloader } from '@adguard/filters-downloader';
 
-import { compile, include } from '../src/main/builder';
+import { build, compile, include } from '../src/main/builder';
 import { logger } from '../src/main/utils/log';
 import { createTempDir } from './utils/fixtures';
 
@@ -170,6 +170,65 @@ describe('credentials in @include URLs', () => {
                 dir,
                 () => compile(filterDir, 'Test filter', templateContent, trustLevelSettings),
             );
+        },
+    );
+
+    /**
+     * Runs `build()` for a filter directory with one filter.
+     *
+     * @param templateContent Content of `template.txt`.
+     * @returns Build error, log file content, and console output.
+     */
+    const runBuild = (templateContent) => withTempRoot(
+        'filters-compiler-build-',
+        async (dir) => {
+            const filtersDir = path.join(dir, 'filters');
+            const filterDir = path.join(filtersDir, 'filter_1_Test');
+            fs.mkdirSync(filterDir, { recursive: true });
+            fs.writeFileSync(path.join(filterDir, 'template.txt'), templateContent);
+            fs.writeFileSync(path.join(filterDir, 'metadata.json'), JSON.stringify({
+                filterId: 1,
+                name: 'Test filter',
+                subscriptionUrl: 'https://example.org/filter.txt',
+            }));
+
+            const logPath = path.join(dir, 'build.log');
+            const consoleOutput = [];
+
+            ['info', 'warn', 'error'].forEach((method) => {
+                vi.spyOn(console, method).mockImplementation((...args) => {
+                    consoleOutput.push(...args.map(String));
+                });
+            });
+
+            let error;
+
+            try {
+                await build(
+                    filtersDir,
+                    logPath,
+                    path.join(dir, 'report.txt'),
+                    path.join(dir, 'platforms'),
+                    {
+                        TEST: {
+                            platform: 'test',
+                            path: 'test',
+                            configuration: {},
+                            defines: {},
+                        },
+                    },
+                );
+            } catch (e) {
+                error = e;
+            } finally {
+                logger.close();
+            }
+
+            return {
+                error,
+                log: fs.readFileSync(logPath, 'utf8'),
+                consoleOutput,
+            };
         },
     );
 
@@ -376,6 +435,20 @@ describe('credentials in @include URLs', () => {
         expect(log).toContain('Error resolving includes in Test filter');
         expectNoCredentials(log, undefined, consoleOutput);
     });
+
+    it('does not expose a scheme-less preprocessor include in the build error', async () => {
+        // The builder leaves a local `!#include` that it cannot resolve in
+        // `filter.txt`, and the generator resolves it again. The dependency
+        // keeps the scheme-less form in that error, so the generator must
+        // sanitize it before the error leaves `build()`.
+        const { error, log, consoleOutput } = await runBuild(
+            `!#include ${USERNAME}:${PASSWORD}@example.org/missing.txt`,
+        );
+
+        expect(error).toBeInstanceOf(Error);
+        expect(String(error.stack)).toContain('!#include');
+        expectNoCredentials(log, error, consoleOutput);
+    }, 30000);
 
     it('warns when a preprocessor include leaves the directory and drops its rules', async () => {
         const {
