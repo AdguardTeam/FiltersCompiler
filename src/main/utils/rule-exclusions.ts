@@ -15,8 +15,26 @@ import { logger } from './log';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const SLASH = '/';
-const TRUST_LEVEL_DIR = './trust-levels';
 const DEFAULT_TRUST_LEVEL = 'low';
+
+/**
+ * Candidate directories for the trust-level exclusion files, relative to the
+ * module directory. In the source tree the files are next to this module. In
+ * the published bundle, `dist/index.js` is the module entry and Rollup copies
+ * the files to `dist/utils/trust-levels`.
+ */
+const TRUST_LEVEL_DIRS = ['./trust-levels', './utils/trust-levels'];
+
+/**
+ * Returns the directory with the trust-level exclusion files.
+ *
+ * @returns Absolute path to the first existing candidate directory.
+ */
+const getTrustLevelDir = (): string => {
+    return TRUST_LEVEL_DIRS
+        .map((dir) => path.resolve(__dirname, dir))
+        .find((dir) => fs.existsSync(dir)) ?? path.resolve(__dirname, TRUST_LEVEL_DIRS[0]);
+};
 
 /**
  * Returns the path to the trust-level exclusions file for a filter.
@@ -26,7 +44,7 @@ const DEFAULT_TRUST_LEVEL = 'low';
  * @returns Absolute path to the exclusions file.
  */
 export const getTrustLevelExclusionsFile = (trustLevel?: string): string => {
-    return path.resolve(__dirname, TRUST_LEVEL_DIR, `exclusions-${trustLevel || DEFAULT_TRUST_LEVEL}.txt`);
+    return path.join(getTrustLevelDir(), `exclusions-${trustLevel || DEFAULT_TRUST_LEVEL}.txt`);
 };
 
 /**
