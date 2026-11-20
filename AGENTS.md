@@ -232,7 +232,8 @@ The following universal principles apply to the codebase:
 - **Dependency Direction** — dependencies point inward / downward; never from
   lower layers to higher ones.
 - **Explicit Boundaries** — module interfaces are intentional; no reaching into
-  internals. The public API surface is explicitly limited to 4 functions.
+  internals. The public API surface is explicitly limited to the exports listed
+  in [Project Overview](#project-overview).
 - **Data Flow Clarity** — data moves through the system in a predictable,
   traceable path (template → compiled rules → platform output).
 - **Minimize Coupling, Maximize Cohesion** — modules are self-contained and
