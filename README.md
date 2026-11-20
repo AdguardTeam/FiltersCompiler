@@ -91,14 +91,15 @@ timestamped log to `logPath`.
 
 ## API Overview
 
-The library exports four functions:
+The library exports:
 
-| Function                      | Purpose                                              |
-| ----------------------------- | ---------------------------------------------------- |
-| `compile(...)`                | Compiles filter lists into platform-specific output  |
-| `validateJSONSchema(...)`     | Validates built platform output against JSON schemas |
-| `validateLocales(...)`        | Validates locale translation files for completeness  |
-| `localOptimizationStatistics` | Caches optimization statistics for local compilation |
+| Export                        | Purpose                                                                  |
+| ----------------------------- | ------------------------------------------------------------------------ |
+| `compile(...)`                | Compiles filter lists into platform-specific output                      |
+| `validateJSONSchema(...)`     | Validates built platform output against JSON schemas                     |
+| `validateLocales(...)`        | Validates locale translation files for completeness                      |
+| `localOptimizationStatistics` | Caches optimization statistics for local compilation                     |
+| `OptimizationStatsError`      | Error thrown when optimization statistics can't be loaded or are invalid |
 
 ### `compile(...)`
 
