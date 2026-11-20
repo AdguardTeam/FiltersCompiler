@@ -23,8 +23,8 @@ lists into platform-specific formats. It is consumed by [FiltersRegistry]
 to produce production filter builds for AdGuard products across all supported
 platforms (extensions and apps).
 
-The library exposes four public API functions: `compile`, `validateJSONSchema`,
-`validateLocales`, and `localOptimizationStatistics`.
+The library exposes a small public API: `compile`, `validateJSONSchema`,
+`validateLocales`, `localOptimizationStatistics`, `OptimizationStatsError`.
 
 ## Technical Context
 
