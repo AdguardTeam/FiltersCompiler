@@ -99,6 +99,7 @@ The library exports four functions:
 | `validateJSONSchema(...)`     | Validates built platform output against JSON schemas |
 | `validateLocales(...)`        | Validates locale translation files for completeness  |
 | `localOptimizationStatistics` | Caches optimization statistics for local compilation |
+| `OptimizationStatsError`      | Error thrown for invalid optimization statistics     |
 
 ### `compile(...)`
 
