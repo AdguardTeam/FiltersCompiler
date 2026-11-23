@@ -14,6 +14,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - HTML filtering rules (`$$`, `$@$`) are no longer kept for the Firefox
   extension. Firefox technically supports them, but they break some websites
   and older web extensions, so the exclusion removed in 4.1.0 is restored.
+- Updated [@adguard/filters-downloader] to v3.1.0. The compiler now uses the
+  package's `stripUrlCredentials()` for logs and error messages.
+  **Breaking:** an `!#include` path that leaves the directory of
+  the file containing the directive is now ignored, as in uBO. Move the
+  included file into that directory. In a remote file, a same-origin absolute
+  URL also works. The compiler logs a warning when it ignores such an
+  `!#include` in a template or a local `@include` file.
+- An external `@include` URL must now use HTTP or HTTPS. A scheme-less value
+  such as `user:pass@example.org/filter.txt` is rejected with an error that
+  does not contain the credentials.
 
 ### Deprecated
 
@@ -22,6 +32,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 ### Security
+
+- Removed credentials from `@include` URLs in log messages and error
+  messages, including a scheme-less external include (with or without a path
+  prefix), an invalid `@include` directive, a `! Redirect:` target, and a
+  `!#include` error that the downloader echoes. A scheme-less value whose
+  password starts with digits and then contains `?` or `#`, for example
+  `admin:2024#Secret1@example.org/filter.txt`, is not recognized by the
+  dependency helper yet and can still appear in these messages; the library
+  fix is tracked as AG-61940.
 
 ## [4.1.0] - 2026-11-16
 

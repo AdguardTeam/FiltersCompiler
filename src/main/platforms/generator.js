@@ -7,6 +7,7 @@ import { utc } from '@date-fns/utc';
 
 import { FiltersDownloader } from '@adguard/filters-downloader';
 import { logger } from '../utils/log';
+import { sanitizeError } from '../utils/webutils';
 import { cleanupAndOptimizeRules, cleanupRules } from './filter';
 import {
     rewriteRules,
@@ -1001,8 +1002,16 @@ const buildFilter = async (filterDir, platformsPath, includedFilterIds, excluded
         // handle includes after resolving conditions:
         // if there is a bad include after resolving conditions, the generator should be terminated
         // https://github.com/AdguardTeam/FiltersCompiler/issues/84
-        // eslint-disable-next-line no-await-in-loop
-        rules = await FiltersDownloader.resolveIncludes(rules, filterDir, config.defines);
+        try {
+            // eslint-disable-next-line no-await-in-loop
+            rules = await FiltersDownloader.resolveIncludes(rules, filterDir, config.defines);
+        } catch (e) {
+            // The builder leaves a local `!#include` that it could not
+            // resolve in `filter.txt`, and the dependency error can carry a
+            // scheme-less credential form, so the error leaves the build
+            // sanitized here too.
+            throw sanitizeError(e);
+        }
 
         rules = cleanupRules(rules, config, filterId);
         rules = removeRuleDuplicates(rules);

@@ -3,7 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import md5 from 'md5';
 
-import { FiltersDownloader } from '@adguard/filters-downloader';
+import { FiltersDownloader, stripUrlCredentials } from '@adguard/filters-downloader';
 import { Version } from './utils/version';
 import { convertRulesToAdgSyntax, getCanonicalRuleTexts } from './converter';
 import { validateAndFilterRules, checkAffinityDirectives } from './validator';
@@ -20,7 +20,9 @@ import {
     NOT_OPTIMIZED_HINT,
 } from './rule/rule-masks';
 import { fixVersionComments, removeAdblockVersion } from './utils/workaround';
-import { downloadFile } from './utils/webutils';
+import {
+    downloadFile, sanitizeError, sanitizeText, sanitizeUrl,
+} from './utils/webutils';
 import { getFilterIdFromDirName } from './utils/utils';
 import { optimizeDomainBlockingRules } from './utils/builder-utils';
 
@@ -50,6 +52,16 @@ const IGNORE_TRUST_LEVEL_OPTION = 'ignoreTrustLevel';
 
 const NOT_OPTIMIZED_SUFFIX = `${SPACE}${NOT_OPTIMIZED_HINT}`;
 const NOT_OPTIMIZED_HINT_LINE = `${HINT_MASK}${NOT_OPTIMIZED_HINT}`;
+
+/**
+ * Matches a preprocessor include directive line.
+ */
+const PREPROCESSOR_INCLUDE_REGEXP = /^!#include\s+(.+)$/;
+
+/**
+ * Matches an absolute URL. Such a target has no directory that it can leave.
+ */
+const ABSOLUTE_URL_REGEXP = /^([a-z][a-z0-9+.-]*:[/\\]{2,})|^[/\\]{2,}/i;
 
 /**
  * Filter header tag for diff path which is needed for patch updates.
@@ -371,6 +383,124 @@ const parseIncludeDirective = function (lineWithDirective) {
 };
 
 /**
+ * Checks that an external include URL uses HTTP or HTTPS.
+ *
+ * The `@include` directive treats any value with a colon as an external URL
+ * and passes it to curl. A scheme-less credential form, for example
+ * `user:pass@example.org/filter.txt`, is not an HTTP(S) URL. Curl versions
+ * differ in how they read that form: some send the userinfo as Basic auth and
+ * download the file, while others read `user:` as a protocol and fail. The
+ * compiler accepts only HTTP(S) here, so the value is rejected before the log
+ * and the download, and the password cannot reach either. This is a
+ * deliberate behavior change: a scheme-less value that some curl versions
+ * downloaded is now rejected.
+ *
+ * @param {string} url Include URL.
+ * @returns {boolean} `true` if the URL uses HTTP or HTTPS.
+ */
+const isHttpUrl = function (url) {
+    try {
+        const { protocol } = new URL(url);
+        return protocol === 'http:' || protocol === 'https:';
+    } catch {
+        return false;
+    }
+};
+
+/**
+ * Removes credentials from every URL in an include directive line.
+ *
+ * An invalid directive can contain a scheme-less URL, which the generic helper
+ * does not recognize, so each whitespace-separated part is sanitized as a URL.
+ * The line is normalized to a single line with single spaces.
+ *
+ * @param {string} line Include directive line.
+ * @returns {string} Directive line without credentials.
+ */
+const sanitizeDirectiveLine = function (line) {
+    return sanitizeText(line).trim().split(/\s+/).join(' ');
+};
+
+/**
+ * Normalizes the separators and the dot segments of a local `!#include` path
+ * the same way the downloader does before it checks the directory.
+ *
+ * The downloader converts `\` to `/` and treats `%2e`, `.%2e`, `%2e.`, and
+ * `%2e%2e` as dot segments before `isInsideLocalDirectory()` runs. A plain
+ * `path.resolve()` does neither on POSIX, so without this normalization the
+ * warning misses a target that the downloader drops, for example
+ * `..\common.txt` or `%2e%2e/common.txt`.
+ *
+ * @param {string} includePath Path from the `!#include` directive.
+ * @returns {string} Path with forward slashes and plain dot segments.
+ */
+const normalizeIncludePath = function (includePath) {
+    return includePath
+        .replace(/\\/g, '/')
+        .split('/')
+        .map((segment) => {
+            const lowerCaseSegment = segment.toLowerCase();
+
+            if (lowerCaseSegment === '%2e') {
+                return '.';
+            }
+
+            if (lowerCaseSegment === '.%2e'
+                || lowerCaseSegment === '%2e.'
+                || lowerCaseSegment === '%2e%2e') {
+                return '..';
+            }
+
+            return segment;
+        })
+        .join('/');
+};
+
+/**
+ * Logs a warning for each local `!#include` target that leaves the directory
+ * of the containing file.
+ *
+ * The dependency ignores such an include, as uBO does, so the compiled filter
+ * loses the included rules without a message. The warning tells the filter
+ * maintainer why the rules are missing. An absolute URL has no directory that
+ * it can leave, so it is not checked.
+ *
+ * The target is normalized the way the downloader normalizes it, so Windows
+ * separators and percent-encoded dot segments are checked too.
+ *
+ * @param {string} directory Directory of the file that contains the directive.
+ * @param {string[]} lines Lines that may contain `!#include` directives.
+ */
+const warnAboutDroppedPreprocessorIncludes = function (directory, lines) {
+    const base = path.resolve(directory);
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const line of lines) {
+        const match = PREPROCESSOR_INCLUDE_REGEXP.exec(line);
+        if (!match) {
+            continue;
+        }
+
+        const includePath = match[1].trim();
+        if (ABSOLUTE_URL_REGEXP.test(includePath)) {
+            continue;
+        }
+
+        // A leading separator means a path inside the directory, as in uBO.
+        const normalizedIncludePath = normalizeIncludePath(includePath).replace(/^\/+/, '');
+        const target = path.resolve(base, normalizedIncludePath);
+        const relative = path.relative(base, target);
+
+        if (relative === '..' || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) {
+            const sanitizedLine = sanitizeDirectiveLine(line.trim());
+            logger.warn(
+                `Ignoring !#include outside the directory of the containing file: '${sanitizedLine}'`,
+            );
+        }
+    }
+};
+
+/**
  * Checks if lines contains invalid redirect directives
  *
  * @param lines
@@ -380,7 +510,12 @@ const checkRedirects = function (lines, url) {
     // eslint-disable-next-line no-restricted-syntax
     for (const line of lines) {
         if (/^!\s?[Rr]edirect:/.test(line)) {
-            throw new Error(`Error: include ${url} contains redirect directive: ${line}`);
+            // The redirect target can be a scheme-less URL, which the generic
+            // helper does not recognize, so the URL and the directive line are
+            // sanitized separately.
+            throw new Error(
+                `Error: include ${sanitizeUrl(url)} contains redirect directive: ${sanitizeDirectiveLine(line)}`,
+            );
         }
     }
 };
@@ -408,12 +543,16 @@ export const include = async (filterDir, directiveLine, excluded) => {
     const { url, options } = parseIncludeDirective(directiveLine);
 
     if (!url) {
-        throw new Error(`Invalid include directive: '${directiveLine.trim()}'`);
+        throw new Error(`Invalid include directive: '${sanitizeDirectiveLine(directiveLine.trim())}'`);
     }
 
-    logger.info(`Applying inclusion from: ${url}`);
-
     const externalInclude = url.includes(':');
+
+    if (externalInclude && !isHttpUrl(url)) {
+        throw new Error(`Invalid external include URL: '${sanitizeUrl(url)}'`);
+    }
+
+    logger.info(`Applying inclusion from: ${sanitizeUrl(url)}`);
 
     const included = externalInclude
         ? await downloadFile(url)
@@ -429,7 +568,18 @@ export const include = async (filterDir, directiveLine, excluded) => {
             ? FiltersDownloader.getFilterUrlOrigin(url)
             : path.dirname(path.join(filterDir, url));
 
-        includedLines = await FiltersDownloader.resolveIncludes(includedLines, originUrl);
+        if (!externalInclude) {
+            warnAboutDroppedPreprocessorIncludes(originUrl, includedLines);
+        }
+
+        try {
+            includedLines = await FiltersDownloader.resolveIncludes(includedLines, originUrl);
+        } catch (e) {
+            // A local file can contain a `!#include` whose target is a
+            // scheme-less URL, and the dependency leaves that form in the
+            // message, so the error reaches the caller sanitized here.
+            throw sanitizeError(e);
+        }
 
         includedLines = removeAdblockVersion(includedLines);
 
@@ -457,7 +607,7 @@ export const include = async (filterDir, directiveLine, excluded) => {
                 case IGNORE_TRUST_LEVEL_OPTION:
                     if (externalInclude) {
                         // eslint-disable-next-line max-len
-                        throw new Error(`Trust level ignoring option is not supported for external includes: ${directiveLine}`);
+                        throw new Error(stripUrlCredentials(`Trust level ignoring option is not supported for external includes: ${directiveLine}`));
                     }
                     shouldIgnoreTrustLevel = true;
                     break;
@@ -468,7 +618,7 @@ export const include = async (filterDir, directiveLine, excluded) => {
 
         includedLines = fixVersionComments(includedLines);
     } else {
-        throw new Error(`Error handling include from: ${url}`);
+        throw new Error(`Error handling include from: ${sanitizeUrl(url)}`);
     }
 
     logger.info(`Inclusion lines: ${includedLines.length}`);
@@ -493,13 +643,15 @@ export const include = async (filterDir, directiveLine, excluded) => {
  * @throws {Error} Throws an error if unable to resolve `!#include` directives.
  */
 const getResolvedPreprocessorIncludes = async function (filterDir, filterName, lines) {
+    warnAboutDroppedPreprocessorIncludes(filterDir, lines);
+
     let rules = lines;
     // bad includes are ignored here because they'll be handled in generator after resolving conditions
     // https://github.com/AdguardTeam/FiltersCompiler/issues/84
     try {
         rules = await FiltersDownloader.resolveIncludes(lines, filterDir);
     } catch (e) {
-        logger.error(`Error resolving includes in ${filterName}: ${e.message}`);
+        logger.error(sanitizeText(`Error resolving includes in ${filterName}: ${e.message}`));
     }
     return rules;
 };
@@ -571,7 +723,7 @@ const isDiffPathHeaderTag = (line) => {
  *
  * @returns {Promise<CompileResult>} Promise which resolves to compiled data for the filter.
  */
-const compile = async function (filterDir, filterName, templateContent, trustLevelSettings) {
+export const compile = async function (filterDir, filterName, templateContent, trustLevelSettings) {
     let result = [];
     const excluded = [];
 
@@ -601,9 +753,13 @@ const compile = async function (filterDir, filterName, templateContent, trustLev
             );
 
             if (shouldIgnoreTrustLevel) {
+                // `/ignoreTrustLevel` throws for an external include, so this
+                // line can contain only a local path, which has no credentials.
                 logger.info(`Ignoring trust level for ${filterName} due to @include directive: ${line}`);
             } else {
-                logger.info(`Applying trust-level exclusions to ${filterName} @include directive: ${line}`);
+                logger.info(stripUrlCredentials(
+                    `Applying trust-level exclusions to ${filterName} @include directive: ${line}`,
+                ));
                 includedRules = exclude(includedRules, trustLevelSettings, excluded);
             }
 

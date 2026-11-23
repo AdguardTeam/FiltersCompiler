@@ -326,8 +326,10 @@ filter lists from shared fragments.
 @include <filepath> [<options>]
 ```
 
-- `<filepath>` — required, URL or same-origin relative file path to
-  include.
+- `<filepath>` — required, a same-origin relative file path, or an
+  `http:`/`https:` URL for an external include. Any other value is
+  rejected, including a URL that uses another scheme, for example
+  `ftp://example.org/filter.txt`.
 - `<options>` — optional, space-separated flags:
 
     - `/stripComments` — removes AdBlock-style comment lines (starting
