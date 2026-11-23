@@ -4,7 +4,10 @@ import {
     expect,
     vi,
     beforeAll,
+    beforeEach,
 } from 'vitest';
+import fs from 'node:fs';
+import path from 'node:path';
 
 import { downloadFile, RETRY_NUM } from '../src/main/utils/webutils';
 
@@ -61,5 +64,150 @@ describe('downloadFile', () => {
         expect(command).toBe('curl');
         expect(args).toContain('--retry');
         expect(args).toContain(String(RETRY_NUM));
+    });
+});
+
+describe('downloadFile transport', () => {
+    const USERNAME = 'adg-user';
+    // Distinctive enough that a temporary path or an option cannot contain it
+    // by accident, unlike a word such as `pass`.
+    const PASSWORD = 'adg-s3cr3t-9f4c';
+    const URL_WITH_CREDENTIALS = `https://${USERNAME}:${PASSWORD}@example.org/filter.txt`;
+    const CONTENT = 'raw content';
+
+    beforeEach(() => {
+        execFileSync.mockReset();
+    });
+
+    /**
+     * Returns the path of the curl config file from a call argument list.
+     *
+     * @param args Arguments of the curl call.
+     *
+     * @returns Path to the curl config file.
+     */
+    const getConfigPath = (args: string[]): string => {
+        const optionIndex = args.indexOf('-K');
+        expect(optionIndex).toBeGreaterThan(-1);
+
+        return args[optionIndex + 1];
+    };
+
+    it('keeps the URL and the password out of the curl arguments', async () => {
+        let configPath: string | undefined;
+        let configContent: string | undefined;
+
+        execFileSync.mockImplementationOnce((_command: string, args: string[]) => {
+            configPath = getConfigPath(args);
+            configContent = fs.readFileSync(configPath, 'utf8');
+
+            return CONTENT;
+        });
+
+        await expect(downloadFile(URL_WITH_CREDENTIALS)).resolves.toBe(CONTENT);
+
+        const [command, args] = execFileSync.mock.calls[0];
+        const serializedArgs = JSON.stringify(args);
+
+        expect(command).toBe('curl');
+        expect(serializedArgs).not.toContain(URL_WITH_CREDENTIALS);
+        expect(serializedArgs).not.toContain(PASSWORD);
+        expect(serializedArgs).not.toContain(USERNAME);
+        // The URL with the credentials still reaches curl, but through the
+        // config file that `-K` names.
+        expect(configContent).toBe(`url = "${URL_WITH_CREDENTIALS}"\n`);
+        expect(configPath).toBeDefined();
+    });
+
+    it('creates the config file with mode 0600', async () => {
+        let configMode: number | undefined;
+
+        execFileSync.mockImplementationOnce((_command: string, args: string[]) => {
+            configMode = fs.statSync(getConfigPath(args)).mode & 0o777;
+
+            return CONTENT;
+        });
+
+        await downloadFile(URL_WITH_CREDENTIALS);
+
+        if (process.platform !== 'win32') {
+            expect(configMode).toBe(0o600);
+        }
+    });
+
+    it('removes the config file after a successful download', async () => {
+        let configPath: string | undefined;
+
+        execFileSync.mockImplementationOnce((_command: string, args: string[]) => {
+            configPath = getConfigPath(args);
+
+            return CONTENT;
+        });
+
+        await expect(downloadFile(URL_WITH_CREDENTIALS)).resolves.toBe(CONTENT);
+
+        expect(configPath).toBeDefined();
+        expect(fs.existsSync(configPath as string)).toBe(false);
+        expect(fs.existsSync(path.dirname(configPath as string))).toBe(false);
+    });
+
+    it('removes the config file after a failed download', async () => {
+        const configPaths: string[] = [];
+
+        execFileSync.mockImplementation((_command: string, args: string[]) => {
+            configPaths.push(getConfigPath(args));
+
+            throw new Error('curl failed');
+        });
+
+        await expect(downloadFile(URL_WITH_CREDENTIALS)).rejects.toThrow('curl failed');
+
+        // `downloadFile` retries once after the first failure, and each attempt
+        // must remove its own file.
+        expect(configPaths).toHaveLength(2);
+        configPaths.forEach((configPath) => {
+            expect(fs.existsSync(configPath)).toBe(false);
+            expect(fs.existsSync(path.dirname(configPath))).toBe(false);
+        });
+    });
+
+    it('keeps the TLS=insecure handling and the retry argument', async () => {
+        const originalTls = process.env.TLS;
+        const calls: string[][] = [];
+        process.env.TLS = 'insecure';
+
+        try {
+            execFileSync
+                .mockImplementationOnce((_command: string, args: string[]) => {
+                    calls.push(args);
+
+                    throw new Error('curl failed');
+                })
+                .mockImplementationOnce((_command: string, args: string[]) => {
+                    calls.push(args);
+
+                    return CONTENT;
+                });
+
+            await expect(downloadFile(URL_WITH_CREDENTIALS)).resolves.toBe(CONTENT);
+
+            expect(calls).toHaveLength(2);
+            calls.forEach((args) => {
+                expect(args[0]).toBe('--insecure');
+                expect(args).toContain('--fail');
+                expect(args).toContain('--silent');
+                expect(args).toContain('--user-agent');
+                expect(args).toContain('-L');
+            });
+            expect(calls[0]).not.toContain('--retry');
+            expect(calls[1]).toContain('--retry');
+            expect(calls[1]).toContain(String(RETRY_NUM));
+        } finally {
+            if (originalTls === undefined) {
+                delete process.env.TLS;
+            } else {
+                process.env.TLS = originalTls;
+            }
+        }
     });
 });

@@ -10,7 +10,7 @@ import {
     afterEach,
     vi,
 } from 'vitest';
-import { spawn } from 'node:child_process';
+import childProcess, { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -264,6 +264,36 @@ describe('credentials in @include URLs', () => {
         expect(log).toContain(`Applying inclusion from: ${baseUrl}/filter.txt`);
         expect(log).toContain(`Downloading: ${baseUrl}/filter.txt`);
         expectNoCredentials(log, error, consoleOutput);
+    });
+
+    it('downloads a credentialed include without the credentials in the curl arguments', async () => {
+        let configPath;
+        let configContent;
+        const execFileSync = vi.spyOn(childProcess, 'execFileSync').mockImplementationOnce((command, args) => {
+            const optionIndex = args.indexOf('-K');
+            expect(optionIndex).toBeGreaterThan(-1);
+            configPath = args[optionIndex + 1];
+            configContent = fs.readFileSync(configPath, 'utf8');
+
+            return RULE;
+        });
+
+        const {
+            result, error, log, consoleOutput,
+        } = await runInclude('/filter.txt');
+
+        expect(error).toBeUndefined();
+        expect(result.includedLines).toContain(RULE);
+        expectNoCredentials(log, error, consoleOutput);
+
+        const [command, args] = execFileSync.mock.calls[0];
+        expect(command).toBe('curl');
+        expect(JSON.stringify(args)).not.toContain(`${credentialsUrl}/filter.txt`);
+        expect(JSON.stringify(args)).not.toContain(PASSWORD);
+        // The credentialed URL still reaches curl, but only through the
+        // config file that `-K` names.
+        expect(configContent).toBe(`url = "${credentialsUrl}/filter.txt"\n`);
+        expect(fs.existsSync(configPath)).toBe(false);
     });
 
     it('does not expose credentials in a redirect directive error', async () => {

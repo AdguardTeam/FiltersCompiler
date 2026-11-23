@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import { createRequire } from 'module';
 
 import { stripUrlCredentials } from '@adguard/filters-downloader';
@@ -13,25 +16,65 @@ const USER_AGENT = 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) Apple
     + 'Chrome/63.0.3239.132 Mobile Safari/537.36';
 
 /**
- * Downloads file from url
+ * Name of the temporary curl config file that carries the URL.
+ */
+const CURL_CONFIG_FILE_NAME = 'curl.conf';
+
+/**
+ * Escapes a value for a double-quoted parameter of a curl config file.
  *
- * @param url
+ * Curl reads a backslash as the start of an escape sequence in a quoted
+ * value, so a backslash and a double quote in the URL must be escaped.
+ *
+ * @param value Value to escape.
+ *
+ * @returns Escaped value.
+ */
+const escapeCurlConfigValue = (value: string): string => value
+    .replace(/\\/g, '\\\\')
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r')
+    .replace(/\t/g, '\\t')
+    .replace(/\v/g, '\\v');
+
+/**
+ * Downloads file from url.
+ *
+ * The URL is passed to curl in a temporary config file with mode 0600 instead
+ * of the process argument list, so the userinfo component of the URL is not
+ * visible in the process metadata. The file and its private directory are
+ * removed after the child process exits, on success and on failure.
+ *
+ * @param url URL of the file to download.
  * @param retryNum number of times to retry downloading, defaults to 0
+ *
  * @returns raw content of the file
  */
 const tryDownloadFile = async function (url: string, retryNum = 0) {
-    let args = ['--fail', '--silent', '--user-agent', USER_AGENT, '-L', url];
-    if (retryNum) {
-        args.push('--retry');
-        args.push(String(retryNum));
+    const configDirectory = fs.mkdtempSync(path.join(os.tmpdir(), 'filters-compiler-curl-'));
+
+    try {
+        const configPath = path.join(configDirectory, CURL_CONFIG_FILE_NAME);
+        fs.writeFileSync(configPath, `url = "${escapeCurlConfigValue(url)}"\n`, { mode: 0o600 });
+
+        let args = ['--fail', '--silent', '--user-agent', USER_AGENT, '-L', '-K', configPath];
+        if (retryNum) {
+            args.push('--retry');
+            args.push(String(retryNum));
+        }
+        const options = { encoding: 'utf8' as const, maxBuffer: Infinity };
+        const tlsCheck = process.env.TLS;
+        if (tlsCheck === 'insecure') {
+            args = ['--insecure'].concat(args);
+        }
+        return require('child_process')
+            .execFileSync('curl', args, options) as string;
+    } finally {
+        // `execFileSync` returns after the child process exits, so the file is
+        // not in use here on any platform, including Windows.
+        fs.rmSync(configDirectory, { recursive: true, force: true });
     }
-    const options = { encoding: 'utf8' as const, maxBuffer: Infinity };
-    const tlsCheck = process.env.TLS;
-    if (tlsCheck === 'insecure') {
-        args = ['--insecure'].concat(args);
-    }
-    return require('child_process')
-        .execFileSync('curl', args, options) as string;
 };
 
 /**

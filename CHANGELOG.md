@@ -57,6 +57,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `admin:2024#Secret1@example.org/filter.txt`, is not recognized by the
   dependency helper yet and can still appear in these messages; the library
   fix is tracked as AG-61940.
+- The compiler now passes the `@include` URL to curl in a temporary config
+  file with mode 0600. The URL credentials are no longer visible in the
+  process argument list of the curl child process. The file and its private
+  directory are removed after the download, on success and on failure.
 
 ## [4.1.0] - 2026-11-16
 
