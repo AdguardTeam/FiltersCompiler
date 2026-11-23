@@ -198,9 +198,17 @@ describe('remote !#include in an @include body', () => {
 
         // @adguard/filters-downloader 3.0.1 allows a nested included filter
         // to be empty, so it does not raise its "Response is empty" error
-        // here. A direct empty `@include` still throws in `include()`.
+        // here.
         expect(includedLines.filter((line) => line.trim() !== '')).toEqual([]);
         expect(requestedPaths).toEqual([EMPTY_INCLUDE_PATH]);
+    });
+
+    it('accepts a direct @include with an empty remote body', async () => {
+        downloadFile.mockResolvedValue('');
+
+        const { includedLines } = await include(__dirname, `@include "${parentUrl}"`, []);
+
+        expect(includedLines.filter((line) => line.trim() !== '')).toEqual([]);
     });
 });
 

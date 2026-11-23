@@ -470,7 +470,7 @@ export const include = async (filterDir, directiveLine, excluded) => {
         ? await downloadFile(url)
         : readFile(path.join(filterDir, url));
 
-    if (included) {
+    if (included !== null) {
         includedLines = splitLines(included);
 
         checkRedirects(includedLines, url);
