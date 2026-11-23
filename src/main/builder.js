@@ -1,11 +1,9 @@
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import md5 from 'md5';
 
 import { FiltersDownloader, stripUrlCredentials } from '@adguard/filters-downloader';
-import { Version } from './utils/version';
-import { convertRulesToAdgSyntax, getCanonicalRuleTexts } from './converter';
+import { convertRulesToAdgSyntax } from './converter';
 import { validateAndFilterRules, checkAffinityDirectives } from './validator';
 import { init, generate } from './platforms/generator';
 import { logger } from './utils/log';
@@ -16,7 +14,6 @@ import {
     isHint,
     SPACE,
     HINT_MASK,
-    NOT_CONVERT_HINT,
     NOT_OPTIMIZED_HINT,
 } from './rule/rule-masks';
 import { fixVersionComments, removeAdblockVersion } from './utils/workaround';
@@ -25,8 +22,9 @@ import {
 } from './utils/webutils';
 import { getFilterIdFromDirName } from './utils/utils';
 import { optimizeDomainBlockingRules } from './utils/builder-utils';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+import { getRemoteIncludeUrl, RemoteIncludeError, resolveIncludes } from './utils/include-resolver';
+import { exclude, getTrustLevelExclusionsFile } from './utils/rule-exclusions';
+import { makeRevision } from './utils/revision';
 
 const TEMPLATE_FILE = 'template.txt';
 const FILTER_FILE = 'filter.txt';
@@ -35,14 +33,14 @@ const EXCLUDE_FILE = 'exclude.txt';
 const EXCLUDED_LINES_FILE = 'diff.txt';
 const METADATA_FILE = 'metadata.json';
 const ADGUARD_FILTERS_SERVER_URL = 'https://filters.adtidy.org/';
-const TRUST_LEVEL_DIR = './utils/trust-levels';
-const DEFAULT_TRUST_LEVEL = 'low';
 
 const SLASH = '/';
 const COMMA = ',';
 const EQUAL_SIGN = '=';
 const MODIFIERS_SEPARATOR = '$';
 const INCLUDE_DIRECTIVE = '@include ';
+const CONDITION_START_DIRECTIVE = '!#if';
+const CONDITION_END_DIRECTIVE = '!#endif';
 const STRIP_COMMENTS_OPTION = 'stripComments';
 const OPTIMIZE_DOMAIN_BLOCKING_RULES = 'optimizeDomainBlockingRules';
 const NOT_OPTIMIZED_OPTION = 'notOptimized';
@@ -214,94 +212,6 @@ const addModifiers = (lines, modifiersStr) => {
 
         return `${rule}${MODIFIERS_SEPARATOR}${combinedModifiers}`;
     });
-};
-
-/**
- * Checks case when '#%#' rules are excluded to DON'T exclude '#%#//scriptlet' rules
- *
- * @param {string} line
- * @param {string} exclusion
- * @return {boolean}
- */
-const scriptletException = (line, exclusion) => (exclusion === '#%#' && line.includes('#%#//scriptlet'))
-    || (exclusion === '#@%#' && line.includes('#@%#//scriptlet'));
-
-/**
- * Checks if line is excluded with specified set of exclusions
- *
- * @param line
- * @param exclusions
- * @param excluded
- * @param reason
- * @param {string[]} [additionalLines] Alternative representations of the line (e.g. canonical
- * AdGuard syntax) which are checked against the exclusions as well.
- */
-const isExcluded = function (line, exclusions, excluded, reason, additionalLines = []) {
-    // eslint-disable-next-line no-restricted-syntax
-    for (let exclusion of exclusions) {
-        exclusion = exclusion.trim();
-
-        if (exclusion && !exclusion.startsWith(RuleMasks.MASK_COMMENT)) {
-            const message = `${line} is excluded by "${exclusion}" in ${reason}`;
-
-            const matches = [line, ...additionalLines].some((candidate) => {
-                const isExcludedByRegexp = exclusion.endsWith(SLASH) && exclusion.startsWith(SLASH)
-                    && new RegExp(exclusion.substring(1, exclusion.length - 1)).test(candidate);
-
-                return (isExcludedByRegexp || candidate.includes(exclusion))
-                    && !scriptletException(candidate, exclusion);
-            });
-
-            if (matches) {
-                logger.info(message);
-                excluded.push(`${RuleMasks.MASK_COMMENT}${SPACE}${message}`);
-                excluded.push(line);
-                return exclusion;
-            }
-        }
-    }
-
-    return null;
-};
-
-/**
- * Applies exclusion from exclusions file
- *
- * @param lines
- * @param exclusionsFile
- * @param excluded
- * @param {string} [previousLine] Line preceding the first line of `lines`, so that a hint
- * on a separate line is honored when the lines are processed on their own.
- * @returns {*}
- */
-const exclude = function (lines, exclusionsFile, excluded, previousLine = undefined) {
-    logger.info('Applying exclusions..');
-
-    let exclusions = readFile(exclusionsFile);
-    if (!exclusions) {
-        return lines;
-    }
-
-    exclusions = splitLines(exclusions);
-
-    const exclusionsFileName = path.parse(exclusionsFile).base;
-    const result = [];
-
-    lines.forEach((line, pos) => {
-        const hintLine = pos > 0 ? lines[pos - 1] : previousLine;
-        const canonicalLines = hasHint(hintLine, NOT_CONVERT_HINT) ? getCanonicalRuleTexts(line) : [];
-        const exclusion = isExcluded(line, exclusions, excluded, exclusionsFileName, canonicalLines);
-
-        if (exclusion) {
-            if (isHint(hintLine)) {
-                result.push(`${RuleMasks.MASK_COMMENT} [excluded by ${exclusion}] ${line}`);
-            }
-        } else {
-            result.push(line);
-        }
-    });
-
-    return result;
 };
 
 /**
@@ -546,6 +456,8 @@ export const include = async (filterDir, directiveLine, excluded) => {
         throw new Error(`Invalid include directive: '${sanitizeDirectiveLine(directiveLine.trim())}'`);
     }
 
+    const ignoreTrustLevel = options.some(({ name }) => name === IGNORE_TRUST_LEVEL_OPTION);
+
     const externalInclude = url.includes(':');
 
     if (externalInclude && !isHttpUrl(url)) {
@@ -563,6 +475,20 @@ export const include = async (filterDir, directiveLine, excluded) => {
 
         checkRedirects(includedLines, url);
 
+        // A local include with `/ignoreTrustLevel` must not pull third-party
+        // rules through a remote `!#include`: such rules would skip the
+        // trust-level exclusions, which is forbidden for external content.
+        if (ignoreTrustLevel) {
+            const remoteIncludeUrl = includedLines
+                .map((line) => getRemoteIncludeUrl(line))
+                .find((remoteUrl) => remoteUrl !== null);
+
+            if (remoteIncludeUrl) {
+                throw new Error('Trust level ignoring option is not supported for an @include '
+                    + `with a remote !#include: ${directiveLine}`);
+            }
+        }
+
         // resolved `@include` directive url
         const originUrl = externalInclude
             ? FiltersDownloader.getFilterUrlOrigin(url)
@@ -573,7 +499,9 @@ export const include = async (filterDir, directiveLine, excluded) => {
         }
 
         try {
-            includedLines = await FiltersDownloader.resolveIncludes(includedLines, originUrl);
+            includedLines = await resolveIncludes(includedLines, originUrl, undefined, {
+                remoteOrigin: externalInclude,
+            });
         } catch (e) {
             // A local file can contain a `!#include` whose target is a
             // scheme-less URL, and the dependency leaves that form in the
@@ -636,24 +564,30 @@ export const include = async (filterDir, directiveLine, excluded) => {
  * @param {string} filterDir Filter directory.
  * @param {string} filterName Filter name.
  * @param {string[]} lines Array of lines.
+ * @param {boolean} [deferRemoteIncludes] Leave a remote `!#include` for the
+ * generator to resolve after the conditions. Set for a line inside a conditional block.
  *
  * @returns {Promise<string[]>} Promise which resolves
  * to array of rules as a result of resolving preprocessor `!#include` directives.
  *
  * @throws {Error} Throws an error if unable to resolve `!#include` directives.
  */
-const getResolvedPreprocessorIncludes = async function (filterDir, filterName, lines) {
+const getResolvedPreprocessorIncludes = async function (filterDir, filterName, lines, deferRemoteIncludes) {
     warnAboutDroppedPreprocessorIncludes(filterDir, lines);
 
-    let rules = lines;
-    // bad includes are ignored here because they'll be handled in generator after resolving conditions
-    // https://github.com/AdguardTeam/FiltersCompiler/issues/84
     try {
-        rules = await FiltersDownloader.resolveIncludes(lines, filterDir);
+        return await resolveIncludes(lines, filterDir, undefined, { deferRemoteIncludes });
     } catch (e) {
+        // remote includes must fail the build: an unresolved directive would be
+        // dropped by the converter and never reach the generator
+        if (e instanceof RemoteIncludeError) {
+            throw new Error(`Error resolving includes in ${filterName}: ${e.message}`, { cause: e });
+        }
+        // bad local includes are ignored here because they'll be handled in generator after resolving conditions
+        // https://github.com/AdguardTeam/FiltersCompiler/issues/84
         logger.error(sanitizeText(`Error resolving includes in ${filterName}: ${e.message}`));
+        return lines;
     }
-    return rules;
 };
 
 /**
@@ -665,6 +599,8 @@ const getResolvedPreprocessorIncludes = async function (filterDir, filterName, l
  * @param {string[]} excluded Array of rules to exclude.
  * @param {string[]} invalidRules Invalid rules for the report file.
  * @param {string} [previousLine] Line preceding the first of `lines` in the template.
+ * @param {boolean} [deferRemoteIncludes] Leave a remote `!#include` for the
+ * generator to resolve after the conditions. Set for a line inside a conditional block.
  *
  * @returns {Promise<string[]>} Promise which resolves to array of AdGuard syntax rules.
  */
@@ -675,8 +611,14 @@ const prepareAdgRules = async function (
     excluded,
     invalidRules,
     previousLine,
+    deferRemoteIncludes,
 ) {
-    const resolvedIncludes = await getResolvedPreprocessorIncludes(filterDir, filterName, lines);
+    const resolvedIncludes = await getResolvedPreprocessorIncludes(
+        filterDir,
+        filterName,
+        lines,
+        deferRemoteIncludes,
+    );
     return convertRulesToAdgSyntax(resolvedIncludes, excluded, invalidRules, previousLine);
 };
 
@@ -733,11 +675,18 @@ export const compile = async function (filterDir, filterName, templateContent, t
 
     const lines = splitLines(templateContent);
     let previousLine;
+    let conditionDepth = 0;
     // eslint-disable-next-line no-restricted-syntax
     for (const line of lines) {
-        if (line.startsWith(INCLUDE_DIRECTIVE)) {
+        const trimmedLine = line.trim();
+
+        if (trimmedLine.startsWith(CONDITION_START_DIRECTIVE)) {
+            conditionDepth += 1;
+        }
+
+        if (trimmedLine.startsWith(INCLUDE_DIRECTIVE)) {
             // eslint-disable-next-line no-await-in-loop
-            const { includedLines, shouldIgnoreTrustLevel } = await include(filterDir, line, excluded);
+            const { includedLines, shouldIgnoreTrustLevel } = await include(filterDir, trimmedLine, excluded);
 
             let includedRules = [];
 
@@ -769,7 +718,6 @@ export const compile = async function (filterDir, filterName, templateContent, t
                 result.push(includedRules[i]);
             }
         } else {
-            const trimmedLine = line.trim();
             // A preprocessor directive is not a rule, and `!#include` expands to the rules of
             // another file, so a hint on the line before any `!#` directive (`!#include`,
             // `!#if`, `!#else`, `!#endif`, ...) must not apply to the lines it resolves to.
@@ -787,6 +735,7 @@ export const compile = async function (filterDir, filterName, templateContent, t
                 excluded,
                 invalid,
                 inlinePreviousLine,
+                conditionDepth > 0,
             );
 
             logger.info('Applying trust-level exclusions to inline template.txt rules...');
@@ -797,6 +746,10 @@ export const compile = async function (filterDir, filterName, templateContent, t
             for (let i = 0; i < inlineRules.length; i += 1) {
                 result.push(inlineRules[i]);
             }
+        }
+
+        if (trimmedLine.startsWith(CONDITION_END_DIRECTIVE)) {
+            conditionDepth = Math.max(0, conditionDepth - 1);
         }
 
         previousLine = line.trim();
@@ -817,49 +770,16 @@ export const compile = async function (filterDir, filterName, templateContent, t
 };
 
 /**
- * Creates revision object,
- * doesn't increment version if hash is not changed
- *
- * @param {string} path - The path to the revision file.
- * @param {string} hash - The hash of the filter file.
- * @returns {{version: string, timeUpdated: number}}
- */
-const makeRevision = function (path, hash) {
-    const result = {
-        version: '1.0.0.0',
-        timeUpdated: new Date().getTime(),
-        hash,
-    };
-
-    const current = readFile(path);
-    if (current) {
-        const currentRevision = JSON.parse(current);
-        if (currentRevision.version) {
-            result.version = currentRevision.version;
-
-            if (currentRevision.timeUpdated) {
-                result.timeUpdated = currentRevision.timeUpdated;
-            }
-
-            if (!currentRevision.hash || currentRevision.hash !== result.hash) {
-                result.version = Version.increment(currentRevision.version);
-                result.timeUpdated = new Date().getTime();
-            }
-        }
-    }
-
-    return result;
-};
-
-/**
  * Builds filter txt file from directory contents
  *
  * @param {string} filterDir - The path to the directory containing filters.
  * @param {Array<number>|null} [includedFilterIds] - An array of filter IDs to include.
  * @param {Array<number>|null} [excludedFilterIds] - An array of filter IDs to exclude.
+ * @param {boolean} [writeRevision] - Write the revision file. Set to `false` when
+ * the generator computes the revision from the final platform output.
  * @returns {Promise<void>} A promise that resolves when all filters and its subdirectories have been processed.
  */
-const buildFilter = async function (filterDir, includedFilterIds, excludedFilterIds) {
+const buildFilter = async function (filterDir, includedFilterIds, excludedFilterIds, writeRevision = true) {
     const templateContent = readFile(path.join(filterDir, TEMPLATE_FILE));
     if (!templateContent) {
         throw new Error('Invalid template');
@@ -886,8 +806,7 @@ const buildFilter = async function (filterDir, includedFilterIds, excludedFilter
         return;
     }
 
-    const trustLevel = metadata.trustLevel ? metadata.trustLevel : DEFAULT_TRUST_LEVEL;
-    const trustLevelSettings = path.resolve(__dirname, TRUST_LEVEL_DIR, `exclusions-${trustLevel}.txt`);
+    const trustLevelSettings = getTrustLevelExclusionsFile(metadata.trustLevel);
 
     const { name: filterName } = metadata;
     logger.info(`Compiling ${filterName}`);
@@ -910,12 +829,14 @@ const buildFilter = async function (filterDir, includedFilterIds, excludedFilter
     writeFile(path.join(filterDir, FILTER_FILE), compiledData);
     logger.info(`Writing excluded file, lines:${excluded.length}`);
     writeFile(path.join(filterDir, EXCLUDED_LINES_FILE), excluded.join('\r\n'));
-    logger.info('Writing revision file..');
 
-    const hash = Buffer.from(md5(compiledData, { asString: true })).toString('base64').trim();
-    const revisionFile = path.join(filterDir, REVISION_FILE);
-    const revision = makeRevision(revisionFile, hash);
-    writeFile(revisionFile, JSON.stringify(revision, null, '\t'));
+    if (writeRevision) {
+        logger.info('Writing revision file..');
+        const hash = Buffer.from(md5(compiledData, { asString: true })).toString('base64').trim();
+        const revisionFile = path.join(filterDir, REVISION_FILE);
+        const revision = makeRevision(revisionFile, hash);
+        writeFile(revisionFile, JSON.stringify(revision, null, '\t'));
+    }
 };
 
 /**
@@ -924,9 +845,10 @@ const buildFilter = async function (filterDir, includedFilterIds, excludedFilter
  * @param {string} filtersDir - The path to the directory containing filters.
  * @param {Array<number>|null} [includedFilterIds] - An array of filter IDs to include.
  * @param {Array<number>|null} [excludedFilterIds] - An array of filter IDs to exclude.
+ * @param {boolean} [writeRevision] - Write revision files during compilation.
  * @returns {Promise<void>} A promise that resolves when all filters and its subdirectories have been processed.
  */
-const parseDirectory = async function (filtersDir, includedFilterIds, excludedFilterIds) {
+const parseDirectory = async function (filtersDir, includedFilterIds, excludedFilterIds, writeRevision = true) {
     const items = fs.readdirSync(filtersDir)
         .sort((a, b) => getFilterIdFromDirName(a) - getFilterIdFromDirName(b));
 
@@ -938,11 +860,11 @@ const parseDirectory = async function (filtersDir, includedFilterIds, excludedFi
             if (fs.existsSync(template)) {
                 logger.info(`Building filter ${directory}...`);
                 // eslint-disable-next-line no-await-in-loop
-                await buildFilter(filterDir, includedFilterIds, excludedFilterIds);
+                await buildFilter(filterDir, includedFilterIds, excludedFilterIds, writeRevision);
                 logger.info(`Filter ${directory} ok`);
             } else {
                 // eslint-disable-next-line no-await-in-loop
-                await parseDirectory(filterDir, includedFilterIds, excludedFilterIds);
+                await parseDirectory(filterDir, includedFilterIds, excludedFilterIds, writeRevision);
             }
         }
     }
@@ -974,7 +896,7 @@ export const build = async (
     logger.initialize(logFile);
     init(FILTER_FILE, METADATA_FILE, REVISION_FILE, platformsConfig, ADGUARD_FILTERS_SERVER_URL);
 
-    await parseDirectory(filtersDir, includedFilterIds, excludedFilterIds);
+    await parseDirectory(filtersDir, includedFilterIds, excludedFilterIds, !platformsPath);
 
     logger.info('Generating platforms');
     await generate(filtersDir, platformsPath, includedFilterIds, excludedFilterIds);

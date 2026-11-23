@@ -11,7 +11,15 @@ import {
     expect,
 } from 'vitest';
 import path from 'path';
-import { existsSync, readFileSync } from 'fs';
+import os from 'os';
+import {
+    existsSync,
+    mkdirSync,
+    mkdtempSync,
+    readFileSync,
+    rmSync,
+    writeFileSync,
+} from 'fs';
 import { createRequire } from 'module';
 
 import { LEGACY_PLATFORM_PATHS } from '../src/main/platforms-config';
@@ -72,6 +80,45 @@ describe('Bundle smoke tests', () => {
             // $replace modifier should be excluded for low trust level
             expect(content).toContain('$replace');
         });
+
+        it('applies trust-level exclusions when the package is loaded from dist', async () => {
+            const root = mkdtempSync(path.join(os.tmpdir(), 'bundle-trust-level-'));
+            const filterDir = path.join(root, 'filter_1_BundleTrustLevel');
+            mkdirSync(filterDir);
+
+            const rule = "example.com#%#//scriptlet('set-cookie', 'name', 'value')";
+
+            writeFileSync(path.join(filterDir, 'template.txt'), [
+                '! Title: Bundle Trust Level Test',
+                rule,
+                '||example.com^',
+            ].join('\n'));
+            writeFileSync(path.join(filterDir, 'metadata.json'), JSON.stringify({
+                filterId: 1,
+                name: 'Bundle Trust Level Test',
+                description: 'Bundle trust level test filter',
+                timeAdded: 1404115015843,
+                homepage: 'https://example.org/',
+                expires: '2 days',
+                displayNumber: 101,
+                groupId: 2,
+                subscriptionUrl: 'https://example.org/filter.txt',
+                tags: ['purpose:ads'],
+                trustLevel: 'low',
+            }));
+
+            try {
+                const { compile } = requireCjs('@adguard/filters-compiler');
+
+                await compile(root, undefined, undefined, null, [1], null);
+
+                const filterContent = readFileSync(path.join(filterDir, 'filter.txt'), 'utf8');
+                expect(filterContent).not.toContain(rule);
+                expect(filterContent).toContain('||example.com^');
+            } finally {
+                rmSync(root, { recursive: true, force: true });
+            }
+        }, 15000);
     });
 
     describe('Schema files', () => {

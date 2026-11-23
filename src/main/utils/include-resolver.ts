@@ -1,0 +1,185 @@
+import { FiltersDownloader, stripUrlCredentials, type DefinedExpressions } from '@adguard/filters-downloader';
+
+/**
+ * Preprocessor include directive prefix.
+ */
+const INCLUDE_DIRECTIVE = '!#include';
+
+/**
+ * Preprocessor conditional directive prefixes.
+ */
+const CONDITION_START_DIRECTIVE = '!#if';
+const CONDITION_END_DIRECTIVE = '!#endif';
+
+/**
+ * Absolute external URL, including protocol-relative URLs. `file://` URLs are
+ * excluded because they have no usable URL origin.
+ */
+const ABSOLUTE_EXTERNAL_URL = /^(?!file)(?:[a-z]+:)?\/\//i;
+
+/**
+ * Absolute URL with a scheme. Used to detect a remote default origin.
+ */
+const ABSOLUTE_URL = /^[a-z]+:\/\//i;
+
+/**
+ * Error thrown when a remote preprocessor `!#include` cannot be resolved.
+ */
+export class RemoteIncludeError extends Error {
+    /**
+     * URL of the include directive that failed to resolve.
+     */
+    public readonly url: string;
+
+    /**
+     * Creates a remote include error.
+     *
+     * @param url URL of the include directive that failed to resolve.
+     * @param cause Underlying error.
+     */
+    constructor(url: string, cause: unknown) {
+        const reason = cause instanceof Error ? cause.message : String(cause);
+        super(`Error resolving remote include '${stripUrlCredentials(url)}': ${reason}`);
+        this.name = 'RemoteIncludeError';
+        this.url = url;
+    }
+}
+
+/**
+ * Returns the absolute external URL from a preprocessor include directive line.
+ *
+ * @param line Line to check.
+ *
+ * @returns Include URL or `null` if the line is not a remote include.
+ */
+export const getRemoteIncludeUrl = (line: string): string | null => {
+    const trimmedLine = line.trim();
+
+    if (!trimmedLine.startsWith(INCLUDE_DIRECTIVE)) {
+        return null;
+    }
+
+    const url = trimmedLine.substring(INCLUDE_DIRECTIVE.length).trim();
+
+    return ABSOLUTE_EXTERNAL_URL.test(url) ? url : null;
+};
+
+/**
+ * Checks if a line is a preprocessor include directive.
+ *
+ * @param line Line to check.
+ *
+ * @returns `true` if the trimmed line starts with `!#include`.
+ */
+export const isIncludeDirective = (line: string): boolean => line.trim().startsWith(INCLUDE_DIRECTIVE);
+
+/**
+ * Options for include resolution.
+ */
+export interface ResolveIncludesOptions {
+    /**
+     * The default origin comes from a remote `@include` URL. The caller must
+     * set this flag because a remote URL with no path cannot be parsed into a
+     * valid origin.
+     */
+    remoteOrigin?: boolean;
+
+    /**
+     * Leave a remote `!#include` in place for a later resolution after the
+     * conditions are resolved. The caller must set this flag for a single line
+     * that belongs to a conditional block.
+     */
+    deferRemoteIncludes?: boolean;
+}
+
+/**
+ * Resolves preprocessor `!#include` directives.
+ *
+ * When the default origin is a local path, an absolute external include uses
+ * its own origin, so the include validation accepts it and relative nested
+ * includes resolve against the remote directory. All other lines use the
+ * default origin. A remote include inside a conditional block is left in place
+ * for the caller to resolve after the conditions, so an inactive branch is
+ * never fetched. When the default origin is a remote URL, the directives are
+ * delegated unchanged, so the downloader keeps its same-origin validation.
+ *
+ * @param lines Lines with rules and preprocessor directives.
+ * @param defaultOrigin Origin for local and relative includes.
+ * @param definedExpressions Defined expressions for condition resolution.
+ * @param options Resolution options.
+ *
+ * @returns Resolved lines in the original order.
+ *
+ * @throws {RemoteIncludeError} If a local-path remote include cannot be resolved.
+ */
+export const resolveIncludes = async (
+    lines: string[],
+    defaultOrigin: string,
+    definedExpressions?: DefinedExpressions,
+    options?: ResolveIncludesOptions,
+): Promise<string[]> => {
+    const isRemoteOrigin = options?.remoteOrigin ?? ABSOLUTE_URL.test(defaultOrigin);
+
+    if (isRemoteOrigin) {
+        return FiltersDownloader.resolveIncludes(lines, defaultOrigin, definedExpressions);
+    }
+
+    let result: string[] = [];
+    let batch: string[] = [];
+    let conditionDepth = 0;
+
+    const resolveBatch = async (): Promise<void> => {
+        if (batch.length === 0) {
+            return;
+        }
+
+        const resolved = await FiltersDownloader.resolveIncludes(batch, defaultOrigin, definedExpressions);
+        result = result.concat(resolved);
+        batch = [];
+    };
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const line of lines) {
+        const trimmedLine = line.trim();
+        const remoteUrl = getRemoteIncludeUrl(trimmedLine);
+
+        if (!remoteUrl) {
+            if (trimmedLine.startsWith(CONDITION_START_DIRECTIVE)) {
+                conditionDepth += 1;
+            } else if (trimmedLine.startsWith(CONDITION_END_DIRECTIVE)) {
+                conditionDepth = Math.max(0, conditionDepth - 1);
+            }
+
+            batch.push(trimmedLine);
+            continue;
+        }
+
+        // eslint-disable-next-line no-await-in-loop
+        await resolveBatch();
+
+        // The generator resolves a conditional include after the per-platform
+        // conditions: this keeps an inactive branch out of the network and does
+        // not stop the build for platforms that never use the include.
+        // See https://github.com/AdguardTeam/FiltersCompiler/issues/84.
+        if (options?.deferRemoteIncludes || conditionDepth > 0) {
+            result.push(trimmedLine);
+            continue;
+        }
+
+        try {
+            // eslint-disable-next-line no-await-in-loop
+            const resolved = await FiltersDownloader.resolveIncludes(
+                [trimmedLine],
+                FiltersDownloader.getFilterUrlOrigin(remoteUrl),
+                definedExpressions,
+            );
+            result = result.concat(resolved);
+        } catch (e) {
+            throw new RemoteIncludeError(remoteUrl, e);
+        }
+    }
+
+    await resolveBatch();
+
+    return result;
+};
