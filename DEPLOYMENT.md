@@ -40,22 +40,22 @@ In short:
 
 ## CI/CD
 
-| Workflow              | Trigger                                | Purpose                                                                                       |
-| --------------------- | -------------------------------------- | --------------------------------------------------------------------------------------------- |
-| `ci.yml`              | PRs and pushes to `master`             | Lint, test, build in Docker (Node.js 22.22) and on Node.js 24; uploads `filters-compiler.tgz` |
-| `prepare-release.yml` | Manual (`workflow_dispatch` with tag)  | Open a release-bump PR that finalizes `CHANGELOG.md`                                          |
-| `publish-release.yml` | PR merged to `master` or manual re-run | Tag, build, publish to npm, mirror, create GitHub Release, notify Slack                       |
-| `mirror.yml`          | Push to `master`                       | Mirror commits to `AdguardTeam/FiltersCompiler`                                               |
+| Workflow              | Trigger                                | Purpose                                                                                                   |
+| --------------------- | -------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `ci.yml`              | PRs and pushes to `master`             | Lint, test, build in Docker (Node.js 22.22) and on Node.js 22.21.0 and 24; uploads `filters-compiler.tgz` |
+| `prepare-release.yml` | Manual (`workflow_dispatch` with tag)  | Open a release-bump PR that finalizes `CHANGELOG.md`                                                      |
+| `publish-release.yml` | PR merged to `master` or manual re-run | Tag, build, publish to npm, mirror, create GitHub Release, notify Slack                                   |
+| `mirror.yml`          | Push to `master`                       | Mirror commits to `AdguardTeam/FiltersCompiler`                                                           |
 
 A manual run of `prepare-release.yml` shows the requested tag in the
 Actions run list, for example `Prepare release v3.3.0`.
 
 Self-hosted jobs run on the `team-extensions` runner label; the npm publish
-job (`deploy-to-npm`) runs on `ubuntu-latest`. Except for the Node.js 24 job
-in `ci.yml`, which runs the checks directly via `actions/setup-node`,
-workflows reuse the shared pipeline definitions from
-[AdGuardSoftwareLimited/ext-shared-actions][ext-shared-actions] and
-[AdGuardSoftwareLimited/actions][actions].
+job (`deploy-to-npm`) runs on `ubuntu-latest`. Except for the Node.js version
+matrix job in `ci.yml` (Node.js 22.21.0 and 24), which runs the checks
+directly via `actions/setup-node`, workflows reuse the shared pipeline
+definitions from [AdGuardSoftwareLimited/ext-shared-actions][ext-shared-actions]
+and [AdGuardSoftwareLimited/actions][actions].
 
 **Concurrency**: `ci.yml` uses a concurrency group
 `ci-ext-compiler-${{ github.ref }}` with `cancel-in-progress: true` to
@@ -200,9 +200,10 @@ docker build --platform linux/amd64 --target build-output \
 # → ./artifacts/filters-compiler.tgz
 ```
 
-The `test-output` target reproduces only the Node.js 22.22 job. The Node.js 24
-job in `ci.yml` runs `pnpm run ci` directly on the runner. Both call the same
-`ci` script from `package.json`, so the check set is defined once.
+The `test-output` target reproduces only the Node.js 22.22 checks. The Node.js
+version matrix job in `ci.yml` runs `pnpm run ci` directly on the runner for
+Node.js 22.21.0 and 24. Both call the same `ci` script from `package.json`,
+so the check set is defined once.
 
 `package.json` intentionally has no `version` field — CI injects the release
 version before building the image, and `pnpm pack` requires one. Pass a
