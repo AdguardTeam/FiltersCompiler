@@ -56,7 +56,7 @@ the [FiltersRegistry README][filters-metadata].
 npm install @adguard/filters-compiler
 ```
 
-Requires Node.js 22.21+ (22.x) or 24+.
+Requires Node.js 22.23.5+ (22.x) or 24+.
 
 Also available via pnpm or yarn:
 

@@ -23,7 +23,7 @@ jobs:
   # The shared Docker-based workflow above only covers Node.js 22.23: the
   # Dockerfile is pinned to `adguard/node-ssh:22.23--0`, and the shared
   # workflow has no Node-version input. Run the same checks directly on the
-  # declared minimum Node.js 22.21.0 and on Node.js 24, on the same runner.
+  # declared minimum Node.js 22.23.5 and on Node.js 24, on the same runner.
   #
   # pnpm is installed through Corepack rather than `pnpm/action-setup`: the
   # org Actions allowlist does not include that action, and a disallowed
@@ -38,7 +38,7 @@ jobs:
       # version must report its own result.
       fail-fast: false
       matrix:
-        node-version: ['22.21.0', '24']
+        node-version: ['22.23.5', '24']
     env:
       # Keep Corepack from adding a `packageManager` field to package.json.
       COREPACK_ENABLE_AUTO_PIN: '0'

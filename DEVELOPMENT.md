@@ -42,11 +42,11 @@ running tests, and contributing code to the AdGuard Filters Compiler.
 
 ### Required Tools
 
-| Tool                           | Version              | Notes                        |
-| ------------------------------ | -------------------- | ---------------------------- |
-| [Node.js](https://nodejs.org/) | 22.21+ (22.x) or 24+ | Use [nvm] to manage versions |
-| [pnpm](https://pnpm.io/)       | >=10.33.4 and <11    | Package manager              |
-| [Git](https://git-scm.com/)    | Latest               | Version control              |
+| Tool                           | Version                | Notes                        |
+| ------------------------------ | ---------------------- | ---------------------------- |
+| [Node.js](https://nodejs.org/) | 22.23.5+ (22.x) or 24+ | Use [nvm] to manage versions |
+| [pnpm](https://pnpm.io/)       | >=10.33.4 and <11      | Package manager              |
+| [Git](https://git-scm.com/)    | Latest                 | Version control              |
 
 > **Note**: Development is tested on macOS and Linux. Windows users should use
 > WSL or a virtual machine. The repository must still be checkable out on
@@ -351,15 +351,15 @@ try {
 **Problem**: Build or tests fail with unexpected errors.
 
 **Solution**: Ensure you use a supported Node.js version. `package.json`
-declares `^22.21.0 || >=24.0.0`. The `require` entry point relies on
+declares `^22.23.5 || >=24.0.0`. The `require` entry point relies on
 `require(ESM)`, which Node.js enables by default from version 22.12, so every
 supported version can use both `import` and `require`:
 
 ```bash
-node --version  # Should be v22.21+ on 22.x, or v24+
+node --version  # Should be v22.23.5+ on 22.x, or v24+
 ```
 
-CI validates the declared minimum Node.js 22.21.0 and Node.js 24 (both as
+CI validates the declared minimum Node.js 22.23.5 and Node.js 24 (both as
 legs of the `ci.yml` matrix job) and Node.js 22.23 (the Docker `test-output`
 target), so a change must pass on all three versions. Any supported version
 works for local development. If using nvm, install one of them:
@@ -368,7 +368,7 @@ works for local development. If using nvm, install one of them:
 # Latest 22.x — the Docker-based CI job uses Node.js 22.23
 nvm install 22
 nvm use 22
-# Exact 22.21.0 CI leg: nvm install 22.21.0 && nvm use 22.21.0
+# Exact 22.23.5 CI leg: nvm install 22.23.5 && nvm use 22.23.5
 ```
 
 or:

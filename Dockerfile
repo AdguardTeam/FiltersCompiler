@@ -39,7 +39,7 @@ COPY . /compiler
 # Runs lint, builds the library, and runs vitest unit tests.
 # Used as the Node.js 22.23 CI target: `docker build --target test-output .`
 # fails if lint, build, or tests fail. The Node.js version matrix job in ci.yml
-# (Node.js 22.21.0 and 24) runs the same `pnpm run ci` command directly on the
+# (Node.js 22.23.5 and 24) runs the same `pnpm run ci` command directly on the
 # runner.
 # ============================================================================
 FROM source AS test-output

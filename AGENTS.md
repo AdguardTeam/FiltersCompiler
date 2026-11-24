@@ -28,7 +28,7 @@ The library exposes a small public API: `compile`, `validateJSONSchema`,
 
 ## Technical Context
 
-- **Language**: JavaScript (ES2022 modules), Node.js ^22.21.0 || >=24.0.0
+- **Language**: JavaScript (ES2022 modules), Node.js ^22.23.5 || >=24.0.0
 - **Package Manager**: pnpm >=10.33.4 and <11
 - **Bundler**: Rollup (single ESM output; `require()` relies on Node.js
   `require(ESM)`, enabled by default since Node.js 22.12)
