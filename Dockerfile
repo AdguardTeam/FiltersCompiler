@@ -2,7 +2,7 @@
 # Dependencies are cached until package.json/pnpm-lock.yaml change
 # Each stage can be built independently via --target
 
-FROM adguard/node-ssh:22.22--0 AS base
+FROM adguard/node-ssh:22.23--0 AS base
 SHELL ["/bin/bash", "-lc"]
 
 WORKDIR /compiler
@@ -37,7 +37,7 @@ COPY . /compiler
 # ============================================================================
 # Stage: test-output
 # Runs lint, builds the library, and runs vitest unit tests.
-# Used as the Node.js 22.22 CI target: `docker build --target test-output .`
+# Used as the Node.js 22.23 CI target: `docker build --target test-output .`
 # fails if lint, build, or tests fail. The Node.js version matrix job in ci.yml
 # (Node.js 22.21.0 and 24) runs the same `pnpm run ci` command directly on the
 # runner.
