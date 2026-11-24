@@ -360,12 +360,12 @@ node --version  # Should be v22.21+ on 22.x, or v24+
 ```
 
 CI validates the declared minimum Node.js 22.21.0 and Node.js 24 (both as
-legs of the `ci.yml` matrix job) and Node.js 22.22 (the Docker `test-output`
+legs of the `ci.yml` matrix job) and Node.js 22.23 (the Docker `test-output`
 target), so a change must pass on all three versions. Any supported version
 works for local development. If using nvm, install one of them:
 
 ```bash
-# Latest 22.x — the Docker-based CI job uses Node.js 22.22
+# Latest 22.x — the Docker-based CI job uses Node.js 22.23
 nvm install 22
 nvm use 22
 # Exact 22.21.0 CI leg: nvm install 22.21.0 && nvm use 22.21.0
