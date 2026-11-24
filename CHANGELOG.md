@@ -31,8 +31,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- An existing empty local `@include` file is no longer reported as a missing
-  include and no longer stops the build.
+- An existing empty local `@include` file and an empty remote `@include`
+  response no longer stop the build; they contribute no rules. An empty
+  remote response is reported with a warning.
 - A remote `!#include` in a filter template now resolves. If a remote include
   cannot be resolved, the build fails with an error that names the include URL
   and the reason instead of silently dropping the directive.

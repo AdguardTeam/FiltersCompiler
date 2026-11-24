@@ -473,6 +473,12 @@ export const include = async (filterDir, directiveLine, excluded) => {
     if (included !== null) {
         includedLines = splitLines(included);
 
+        // An empty remote response is accepted, but it is likely a broken
+        // source rather than an intentional empty list, so keep a signal.
+        if (externalInclude && included.trim() === '') {
+            logger.warn(`Included remote file is empty: ${sanitizeUrl(url)}`);
+        }
+
         checkRedirects(includedLines, url);
 
         // A local include with `/ignoreTrustLevel` must not pull third-party

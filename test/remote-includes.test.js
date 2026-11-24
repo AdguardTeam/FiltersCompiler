@@ -18,6 +18,7 @@ import os from 'node:os';
 
 import { build, include } from '../src/main/builder';
 import { disableOptimization } from '../src/main/optimization';
+import { logger } from '../src/main/utils/log';
 import { downloadFile } from '../src/main/utils/webutils';
 
 vi.mock('../src/main/utils/webutils', async (importOriginal) => {
@@ -205,10 +206,16 @@ describe('remote !#include in an @include body', () => {
 
     it('accepts a direct @include with an empty remote body', async () => {
         downloadFile.mockResolvedValue('');
+        const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
 
-        const { includedLines } = await include(__dirname, `@include "${parentUrl}"`, []);
+        try {
+            const { includedLines } = await include(__dirname, `@include "${parentUrl}"`, []);
 
-        expect(includedLines.filter((line) => line.trim() !== '')).toEqual([]);
+            expect(includedLines.filter((line) => line.trim() !== '')).toEqual([]);
+            expect(warnSpy).toHaveBeenCalledWith(`Included remote file is empty: ${parentUrl}`);
+        } finally {
+            warnSpy.mockRestore();
+        }
     });
 });
 
