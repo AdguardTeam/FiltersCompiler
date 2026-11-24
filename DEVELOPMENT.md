@@ -113,9 +113,9 @@ pnpm lint
 | `pnpm tgz`           | Pack release tarball (`filters-compiler.tgz`)         |
 
 > **Note**: `pnpm run ci` is the single definition of the CI check set: the
-> Docker `test-output` stage and the Node.js 24 job in `ci.yml` both call it.
-> Use `pnpm run ci`, not `pnpm ci` — `ci` is pnpm's own command for a clean
-> install.
+> Docker `test-output` stage and the Node.js version matrix job in `ci.yml`
+> both call it. Use `pnpm run ci`, not `pnpm ci` — `ci` is pnpm's own command
+> for a clean install.
 >
 > **Note**: `pnpm tgz` requires a temporary `version` field in
 > `package.json` — the workaround is documented in
@@ -359,20 +359,22 @@ supported version can use both `import` and `require`:
 node --version  # Should be v22.21+ on 22.x, or v24+
 ```
 
-CI validates both Node.js 22.22 (the Docker `test-output` target) and
-Node.js 24 (a separate CI job), so a change must pass on both. Either version
+CI validates the declared minimum Node.js 22.21.0 and Node.js 24 (both as
+legs of the `ci.yml` matrix job) and Node.js 22.22 (the Docker `test-output`
+target), so a change must pass on all three versions. Any supported version
 works for local development. If using nvm, install one of them:
 
 ```bash
 # Latest 22.x — the Docker-based CI job uses Node.js 22.22
 nvm install 22
 nvm use 22
+# Exact 22.21.0 CI leg: nvm install 22.21.0 && nvm use 22.21.0
 ```
 
 or:
 
 ```bash
-# 24.x — matches the Node.js 24 CI job
+# 24.x — matches the Node.js 24 CI leg
 nvm install 24
 nvm use 24
 ```
