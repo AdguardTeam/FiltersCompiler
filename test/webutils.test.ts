@@ -119,6 +119,25 @@ describe('downloadFile transport', () => {
         expect(configPath).toBeDefined();
     });
 
+    it('escapes characters that are special in a curl config file', async () => {
+        let configContent: string | undefined;
+        const rawUrl = 'https://adg-user:p"a\\ss word@example.org/fi\nlter.txt';
+
+        execFileSync.mockImplementationOnce((_command: string, args: string[]) => {
+            configContent = fs.readFileSync(getConfigPath(args), 'utf8');
+
+            return CONTENT;
+        });
+
+        await downloadFile(rawUrl);
+
+        // The backslash must be escaped before the double quote. Otherwise the
+        // quote escape would produce a real closing quote and the rest of the
+        // URL would become a second config line.
+        expect(configContent).toBe('url = "https://adg-user:p\\"a\\\\ss word@example.org/fi\\nlter.txt"\n');
+        expect(configContent?.split('\n')).toHaveLength(2);
+    });
+
     it('creates the config file with mode 0600', async () => {
         let configMode: number | undefined;
 
@@ -169,6 +188,53 @@ describe('downloadFile transport', () => {
             expect(fs.existsSync(configPath)).toBe(false);
             expect(fs.existsSync(path.dirname(configPath))).toBe(false);
         });
+    });
+
+    it('does not replace the download result when cleanup fails', async () => {
+        let configPath: string | undefined;
+
+        execFileSync.mockImplementationOnce((_command: string, args: string[]) => {
+            configPath = getConfigPath(args);
+
+            return CONTENT;
+        });
+
+        const rmSpy = vi.spyOn(fs, 'rmSync').mockImplementationOnce(() => {
+            throw new Error('EPERM: operation not permitted');
+        });
+
+        try {
+            await expect(downloadFile(URL_WITH_CREDENTIALS)).resolves.toBe(CONTENT);
+        } finally {
+            rmSpy.mockRestore();
+            if (configPath !== undefined) {
+                fs.rmSync(path.dirname(configPath), { recursive: true, force: true });
+            }
+        }
+    });
+
+    it('does not replace the curl error when cleanup fails', async () => {
+        const configDirectories: string[] = [];
+
+        execFileSync.mockImplementation((_command: string, args: string[]) => {
+            configDirectories.push(path.dirname(getConfigPath(args)));
+
+            throw new Error('curl failed');
+        });
+
+        const rmSpy = vi.spyOn(fs, 'rmSync').mockImplementation(() => {
+            throw new Error('EPERM: operation not permitted');
+        });
+
+        try {
+            await expect(downloadFile(URL_WITH_CREDENTIALS)).rejects.toThrow('curl failed');
+            expect(configDirectories).toHaveLength(2);
+        } finally {
+            rmSpy.mockRestore();
+            configDirectories.forEach((directory) => {
+                fs.rmSync(directory, { recursive: true, force: true });
+            });
+        }
     });
 
     it('keeps the TLS=insecure handling and the retry argument', async () => {

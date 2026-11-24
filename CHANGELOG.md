@@ -57,10 +57,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `admin:2024#Secret1@example.org/filter.txt`, is not recognized by the
   dependency helper yet and can still appear in these messages; the library
   fix is tracked as AG-61940.
-- The compiler now passes the `@include` URL to curl in a temporary config
-  file with mode 0600. The URL credentials are no longer visible in the
-  process argument list of the curl child process. The file and its private
-  directory are removed after the download, on success and on failure.
+- Every curl download, including the optimization data downloads, now
+  passes its URL in a temporary config file instead of the process argument
+  list, so URL credentials are not visible in the process metadata. The file
+  lives in a private directory under `os.tmpdir()`, so the compiler now needs
+  a writable temporary directory. The file has mode 0600 on POSIX systems. On
+  Windows, `mode` only controls the read-only bit, so the privacy of the file
+  depends on the `%TEMP%` ACLs. The file and the directory are removed after
+  the download, on success and on failure.
 
 ## [4.1.0] - 2026-11-16
 

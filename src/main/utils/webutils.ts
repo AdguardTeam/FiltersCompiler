@@ -41,10 +41,16 @@ const escapeCurlConfigValue = (value: string): string => value
 /**
  * Downloads file from url.
  *
- * The URL is passed to curl in a temporary config file with mode 0600 instead
- * of the process argument list, so the userinfo component of the URL is not
- * visible in the process metadata. The file and its private directory are
- * removed after the child process exits, on success and on failure.
+ * Every URL is passed to curl in a temporary config file that `-K` names,
+ * never in the process argument list, so the userinfo component of the URL is
+ * not visible in the process metadata. The file lives in a private directory
+ * under `os.tmpdir()`, so every download needs a writable temporary directory.
+ * The file has mode 0600 on POSIX systems. On Windows, `mode` only controls
+ * the read-only bit, so the privacy of the file depends on the `%TEMP%` ACLs.
+ *
+ * The file and its directory are removed after the child process exits, on
+ * success and on failure. A cleanup failure is logged and never replaces the
+ * download result or the curl error.
  *
  * @param url URL of the file to download.
  * @param retryNum number of times to retry downloading, defaults to 0
@@ -73,7 +79,16 @@ const tryDownloadFile = async function (url: string, retryNum = 0) {
     } finally {
         // `execFileSync` returns after the child process exits, so the file is
         // not in use here on any platform, including Windows.
-        fs.rmSync(configDirectory, { recursive: true, force: true });
+        try {
+            fs.rmSync(configDirectory, { recursive: true, force: true, maxRetries: 3 });
+        } catch (cleanupError) {
+            // A cleanup failure must not replace the download result or the
+            // curl error. The directory and file names contain no credentials.
+            const message = cleanupError instanceof Error
+                ? cleanupError.message
+                : String(cleanupError);
+            logger.warn(`Cannot remove temporary curl config directory: ${message}`);
+        }
     }
 };
 

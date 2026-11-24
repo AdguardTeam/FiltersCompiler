@@ -96,15 +96,20 @@ per-project configuration.
 ## Infrastructure Dependencies
 
 The compiler is a **stateless library** with no database, cache, or message
-queue dependencies. The only infrastructure requirement is:
+queue dependencies. The infrastructure requirements are:
 
-| Dependency | Required | Purpose                                            |
-| ---------- | -------- | -------------------------------------------------- |
-| **curl**   | Yes      | Downloading external filter sources via shell-out  |
+| Dependency                       | Required | Purpose                                                    |
+| -------------------------------- | -------- | ---------------------------------------------------------- |
+| **curl**                         | Yes      | Downloading external filter sources via shell-out          |
+| **Writable temporary directory** | Yes      | Storing the curl config file that carries the download URL |
 
 `curl` is invoked synchronously via `child_process.execFileSync` from
-`src/main/utils/webutils.ts`. The Docker base image
-(`adguard/node-ssh:22.22--0`) includes `curl` by default.
+`src/main/utils/webutils.ts`. The compiler writes each download URL to a curl
+config file under `os.tmpdir()` and passes the file to `curl` with
+`-K <path>`, so the URL never appears in the process argument list. The file
+has mode 0600 on POSIX systems. On Windows, `mode` only controls the
+read-only bit, so the privacy of the file depends on the `%TEMP%` ACLs. The
+Docker base image (`adguard/node-ssh:22.22--0`) includes `curl` by default.
 
 ## Logging
 
