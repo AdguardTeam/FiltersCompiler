@@ -35,39 +35,104 @@ const tryDownloadFile = async function (url: string, retryNum = 0) {
 };
 
 /**
- * Matches a scheme-less URL with a username and a password, for example
- * `user:pass@example.org/filter.txt`.
- *
- * A colon before the at sign is the userinfo separator. A local path, for
- * example `C:\filters\file@name.txt`, has no such separator, because a
- * separator follows the drive prefix.
- */
-const SCHEME_LESS_CREDENTIALS_REGEXP = /^[^/\\\s@]+:[^/\\\s@]*@/;
-
-/**
- * Matches the last path segment before the at sign when that segment is a
- * userinfo component, for example `user:pass` in
- * `sub/user:pass@example.org/filter.txt`.
- *
- * A scheme-less URL can follow a path prefix, which
- * {@link SCHEME_LESS_CREDENTIALS_REGEXP} does not match because it is anchored
- * at the first character. A local path with an at sign has no colon in the
- * segment before it, for example `filters/user@example.txt`, so it stays
- * unchanged.
- */
-const PREFIXED_SCHEME_LESS_CREDENTIALS_REGEXP = /^(.*?)([^/\\\s@]+:[^/\\\s@]*)@/;
-
-/**
  * Matches a URL that starts with a scheme and a slash or a backslash, for
  * example `https://`, `https:/`, or `https:\`.
  *
- * The scheme-less fallbacks in {@link sanitizeUrl} handle a value such as
+ * The scheme-less fallback in {@link sanitizeUrl} handles a value such as
  * `user:pass@example.org`, which has a colon but no slash after it. A real URL
- * can contain a `name:value@` segment in a path or a query, so the fallbacks
+ * can contain a `name:value@` segment in a path or a query, so the fallback
  * must not run on it: the sanitized value is logged and put into the error,
  * and it must name the URL that was requested.
  */
 const SCHEME_WITH_SLASHES_REGEXP = /^[a-z][a-z0-9+.-]+:[\\/]/i;
+
+/**
+ * Placeholder scheme for the dependency helper.
+ *
+ * The helper finds the userinfo only in a URL that has a scheme or starts with
+ * `//`. An external `@include` accepts a scheme-less URL, for example
+ * `user:pass@example.org/filter.txt`, because the `@include` directive treats
+ * any value with a colon as an external URL. The helper parses that form with
+ * this placeholder scheme, then the placeholder is removed from the result.
+ */
+const PLACEHOLDER_SCHEME = 'http://';
+
+/**
+ * Checks that a value can start with a userinfo component.
+ *
+ * A userinfo component has a colon between the username and the password. A
+ * scheme-less value can be a local path whose file name contains an at sign,
+ * for example `filters/user@example.txt`. The dependency helper removes that
+ * at sign as a username when a scheme is present, so the fallback must not try
+ * such a value.
+ *
+ * @param value Value that the dependency helper parses with a placeholder
+ * scheme.
+ *
+ * @returns `true` if a colon precedes an at sign.
+ */
+const startsWithUserinfo = (value: string): boolean => {
+    const colonIndex = value.indexOf(':');
+    const atSignIndex = value.indexOf('@');
+
+    return colonIndex !== -1 && atSignIndex !== -1 && colonIndex < atSignIndex;
+};
+
+/**
+ * Returns the offsets at which a userinfo component can start in a value
+ * without a scheme.
+ *
+ * The value can start with the userinfo, as in
+ * `user:pass@example.org/filter.txt`, or a path can precede it, as in
+ * `sub/user:pass@example.org/filter.txt`. A password cannot contain a slash in
+ * a URL with a scheme, but a malformed password can, for example
+ * `admin:2024#Se/cret@example.org/filter.txt`, so a match that stops at a
+ * path separator misses it. The offsets are the start and every position after
+ * a slash or a backslash, and the dependency helper decides whether a suffix
+ * has userinfo.
+ *
+ * @param url URL without a scheme.
+ *
+ * @returns Offsets from the start to the end of the value.
+ */
+const getUserinfoStartOffsets = (url: string): number[] => {
+    const offsets = [0];
+
+    for (let index = 0; index < url.length; index += 1) {
+        if (url[index] === '/' || url[index] === '\\') {
+            offsets.push(index + 1);
+        }
+    }
+
+    return offsets;
+};
+
+/**
+ * Removes the userinfo component from a value without a scheme at the given
+ * offset.
+ *
+ * @param url Value without a scheme.
+ * @param offset Offset at which a userinfo component can start.
+ *
+ * @returns Value without the userinfo component, or `undefined` if the offset
+ * has no userinfo.
+ */
+const sanitizeUserinfoAt = (url: string, offset: number): string | undefined => {
+    const candidate = url.slice(offset);
+
+    if (!startsWithUserinfo(candidate)) {
+        return undefined;
+    }
+
+    const valueWithPlaceholder = `${PLACEHOLDER_SCHEME}${candidate}`;
+    const sanitizedValue = stripUrlCredentials(valueWithPlaceholder);
+
+    if (sanitizedValue === valueWithPlaceholder) {
+        return undefined;
+    }
+
+    return `${url.slice(0, offset)}${sanitizedValue.slice(PLACEHOLDER_SCHEME.length)}`;
+};
 
 /**
  * Removes the userinfo component from a URL, including a URL without a scheme.
@@ -75,19 +140,25 @@ const SCHEME_WITH_SLASHES_REGEXP = /^[a-z][a-z0-9+.-]+:[\\/]/i;
  * The dependency helper finds the userinfo only in a URL that has a scheme or
  * starts with `//`. An external `@include` accepts a scheme-less URL, for
  * example `user:pass@example.org/filter.txt`, because the `@include` directive
- * treats any value with a colon as an external URL. The helper parses that
- * form with a placeholder scheme, then removes the placeholder.
+ * treats any value with a colon as an external URL. The fallback parses each
+ * candidate with a placeholder scheme, then removes the placeholder.
  *
  * A value that such a directive treats as external can also start with a path
- * prefix, for example `sub/user:pass@example.org/filter.txt`. The placeholder
- * scheme does not make a URL of that value, so the userinfo is dropped from the
- * matched position instead, and the prefix stays as it is.
+ * prefix, for example `sub/user:pass@example.org/filter.txt`, or contain a
+ * malformed password, for example
+ * `admin:2024#Se/cret@example.org/filter.txt`. The fallback tries every
+ * position after a path separator, so the prefix stays as it is and the
+ * dependency helper finds the userinfo.
  *
  * @param url URL that may contain a username and a password.
  *
  * @returns URL without the userinfo component.
  */
 export const sanitizeUrl = (url: string): string => {
+    if (!url.includes('@')) {
+        return url;
+    }
+
     const sanitizedUrl = stripUrlCredentials(url);
 
     if (sanitizedUrl !== url) {
@@ -95,25 +166,22 @@ export const sanitizeUrl = (url: string): string => {
     }
 
     if (SCHEME_WITH_SLASHES_REGEXP.test(url)) {
-        // The scheme-less form the fallbacks cover has no slash after the
-        // colon, so a value with one keeps the result the dependency helper
-        // produced. Without this guard the fallback rewrites a real URL whose
-        // path or query happens to contain `name:value@`.
+        // The scheme-less fallback handles a value such as
+        // `user:pass@example.org`, which has no slash after the colon. A value
+        // with one keeps the result the dependency helper produced. Without
+        // this guard the fallback rewrites a real URL whose path or query
+        // happens to contain `name:value@`.
         return sanitizedUrl;
     }
 
-    if (SCHEME_LESS_CREDENTIALS_REGEXP.test(url)) {
-        const placeholder = 'http://';
+    const offsets = getUserinfoStartOffsets(url);
 
-        return stripUrlCredentials(`${placeholder}${url}`).slice(placeholder.length);
-    }
+    for (let index = 0; index < offsets.length; index += 1) {
+        const sanitizedValue = sanitizeUserinfoAt(url, offsets[index]);
 
-    const prefixedUserinfo = PREFIXED_SCHEME_LESS_CREDENTIALS_REGEXP.exec(url);
-
-    if (prefixedUserinfo !== null) {
-        const [, prefix, userinfo] = prefixedUserinfo;
-
-        return `${prefix}${url.slice(prefix.length + userinfo.length + 1)}`;
+        if (sanitizedValue !== undefined) {
+            return sanitizedValue;
+        }
     }
 
     return sanitizedUrl;

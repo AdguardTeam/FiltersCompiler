@@ -54,6 +54,42 @@ describe('stripUrlCredentials', () => {
             .toBe('https://exa mple.org/f.txt');
     });
 
+    it('removes a password that starts with digits and then contains #', () => {
+        // The WHATWG parser accepts this value as a host with a port and an at
+        // sign in the fragment, so only the display-text redaction recognizes
+        // the credentials.
+        expect(stripUrlCredentials('https://admin:2024#Secret1@example.org/filter.txt'))
+            .toBe('https://example.org/filter.txt');
+    });
+
+    it('removes a password that starts with digits and then contains ?', () => {
+        expect(stripUrlCredentials('https://admin:2024?Secret1@example.org/filter.txt'))
+            .toBe('https://example.org/filter.txt');
+    });
+
+    it('removes a digit-first password without a username', () => {
+        expect(stripUrlCredentials('https://:2024#Se/cret@example.org'))
+            .toBe('https://example.org');
+    });
+
+    it('removes a digit-first password that contains a slash', () => {
+        expect(stripUrlCredentials('https://admin:2024#Se/cret@example.org/f.txt'))
+            .toBe('https://example.org/f.txt');
+    });
+
+    it('removes a digit-first password that contains an at sign', () => {
+        expect(stripUrlCredentials('https://admin:2024#Se@cret@example.org/f.txt'))
+            .toBe('https://example.org/f.txt');
+    });
+
+    it('keeps a valid url with a path after a single-label host and a port', () => {
+        // The redaction reads the digit-first form only when the query or
+        // fragment follows the port directly. A path after the port stays.
+        const url = 'https://myhost:8080/path?email=user@example.com';
+
+        expect(stripUrlCredentials(url)).toBe(url);
+    });
+
     it('keeps a URL without credentials unchanged', () => {
         const url = 'https://example.org/filter.txt';
 
@@ -80,6 +116,13 @@ describe('stripUrlCredentials in text', () => {
         const text = 'Included https://example.org/path@name?query=user@name#fragment@name';
 
         expect(stripUrlCredentials(text)).toBe(text);
+    });
+
+    it('removes a digit-first password from a curl error message', () => {
+        const message = 'Downloading https://admin:2024#Secret1@example.org/filter.txt';
+
+        expect(stripUrlCredentials(message))
+            .toBe('Downloading https://example.org/filter.txt');
     });
 });
 
@@ -126,6 +169,17 @@ describe('sanitizeUrl', () => {
             .toBe('https://example.org/filter.txt?email=user:pass@example.com');
     });
 
+    it('removes a scheme-less digit-first password', () => {
+        // The dependency helper needs a scheme, so the scheme-less form is
+        // parsed with a placeholder scheme.
+        expect(sanitizeUrl('admin:2024#Secret1@example.org/filter.txt'))
+            .toBe('example.org/filter.txt');
+    });
+
+    it('removes a scheme-less digit-first password without a username', () => {
+        expect(sanitizeUrl(':2024#Se/cret@example.org')).toBe('example.org');
+    });
+
     it.each([
         {
             name: 'a relative path',
@@ -141,6 +195,16 @@ describe('sanitizeUrl', () => {
             name: 'a path prefix',
             url: 'sub/user:pass@example.org/f.txt',
             expected: 'sub/example.org/f.txt',
+        },
+        {
+            name: 'a path prefix and a digit-first password',
+            url: 'sub/admin:2024#Se/cret@example.org/f.txt',
+            expected: 'sub/example.org/f.txt',
+        },
+        {
+            name: 'a windows path prefix and a digit-first password',
+            url: 'C:\\filters\\admin:2024#Se/cret@example.org\\f.txt',
+            expected: 'C:\\filters\\example.org\\f.txt',
         },
     ])('removes credentials from a scheme-less url after $name', ({ url, expected }) => {
         // `@include` treats any value with a colon as an external url, so a
@@ -195,6 +259,19 @@ describe('sanitizeText', () => {
         },
     ])('removes a scheme-less password with a space after $name', ({ text, expected }) => {
         expect(sanitizeText(text)).toBe(expected);
+    });
+
+    it('removes a digit-first password from a local path error', () => {
+        // The dependency helper needs a scheme, so the scheme-less form is
+        // redacted token by token.
+        expect(sanitizeText(
+            "ENOENT: no such file or directory, open '/filters/admin:2024#Se/cret@example.org/x.txt'",
+        )).toBe("ENOENT: no such file or directory, open '/filters/example.org/x.txt'");
+    });
+
+    it('removes a scheme-less digit-first password from a redirect error', () => {
+        expect(sanitizeText('! Redirect: admin:2024#Secret1@example.org/next.txt'))
+            .toBe('! Redirect: example.org/next.txt');
     });
 
     it('keeps a colon in prose before an email address', () => {

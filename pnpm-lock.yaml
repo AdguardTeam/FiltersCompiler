@@ -21,8 +21,8 @@ importers:
         specifier: 2.2.0
         version: 2.2.0
       '@adguard/filters-downloader':
-        specifier: 3.1.0
-        version: 3.1.0
+        specifier: 3.1.1
+        version: 3.1.1
       '@adguard/logger':
         specifier: 2.0.0
         version: 2.0.0
@@ -125,8 +125,8 @@ packages:
   '@adguard/css-tokenizer@1.2.0':
     resolution: {integrity: sha512-cUj5j/AU5z/T4//5M6KnIJBpykAY4QbDsoiQ2DaWX/r2XkepMkTb8DhIbUHJD/QLGEyLeQLpi+nlxAgf4NTRRQ==}
 
-  '@adguard/diff-builder@1.1.4':
-    resolution: {integrity: sha512-QccjhVenfU4rNA4NR8yxKi1BneZe7/Nc54CSA1FzURA4VrcpkqDhi/tfmqOkbzYwrcv1eRbRJBdYuYr+j90Qaw==}
+  '@adguard/diff-builder@1.1.9':
+    resolution: {integrity: sha512-thbK6ZoTZo4iICOBS3O+GQWuMjN8kr4RFpU0MfUR0oqzxh0d4ibWjpxz7CdFZd+FTz7wEce76AVDlqh1X5JoiA==}
     engines: {node: '>=20'}
     hasBin: true
 
@@ -137,8 +137,8 @@ packages:
     resolution: {integrity: sha512-LCSQDGV1yvtbehNsFmv0nMFHxLtYAzu8by9QJd9zmS07ZsgL6n5YQ3TZzqaUdLvBIuTIuG4Lfn73xwuRk5J9Og==}
     engines: {node: '>=16'}
 
-  '@adguard/filters-downloader@3.1.0':
-    resolution: {integrity: sha512-yPIp5tgvbYQpar1WsCqf/pYSYT3OlxFAeBWvaMosOWkFFYrAClcHu8M+FxJg4MIGYrn3GqU7fv8X3vFO1uqMZA==}
+  '@adguard/filters-downloader@3.1.1':
+    resolution: {integrity: sha512-iUaWJG5yA47RoJReqipH5b3fuoBG9Fuuw9LnbbLDJuuPS+5QxcgdfHVZ5wXZRnwP+AcQqFfteeJfp3Wt0OHHAQ==}
     engines: {node: ^22.21.0 || >=24.0.0, pnpm: '>=10.33.4 <11'}
 
   '@adguard/logger@2.0.0':
@@ -2228,7 +2228,7 @@ snapshots:
 
   '@adguard/css-tokenizer@1.2.0': {}
 
-  '@adguard/diff-builder@1.1.4':
+  '@adguard/diff-builder@1.1.9':
     dependencies:
       commander: 11.1.0
       crypto-js: 4.2.0
@@ -2240,9 +2240,9 @@ snapshots:
 
   '@adguard/extended-css@2.2.0': {}
 
-  '@adguard/filters-downloader@3.1.0':
+  '@adguard/filters-downloader@3.1.1':
     dependencies:
-      '@adguard/diff-builder': 1.1.4
+      '@adguard/diff-builder': 1.1.9
       crypto-js: 4.2.0
 
   '@adguard/logger@2.0.0': {}

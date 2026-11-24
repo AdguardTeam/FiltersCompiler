@@ -25,6 +25,11 @@ const USERNAME = 'adg-user';
 // Distinctive enough that a log path, a stack frame, or a dependency name
 // cannot contain it by accident, unlike a word such as `pass`.
 const PASSWORD = 'adg-s3cr3t-9f4c';
+// A password that starts with digits and then contains `#` looks like a port
+// and a fragment, so the URL parser cannot detect it. A slash is possible in
+// such a password too.
+const DIGIT_FIRST_PASSWORD = '2024#Secret1';
+const DIGIT_FIRST_SLASH_PASSWORD = '2024#Se/cret';
 const RULE = '||example.org^';
 const SERVER_PATH = path.join(
     path.dirname(fileURLToPath(import.meta.url)),
@@ -243,15 +248,17 @@ describe('credentials in @include URLs', () => {
      * @param consoleOutput Captured console output.
      */
     const expectNoCredentials = (log, error, consoleOutput) => {
-        expect(log).not.toContain(USERNAME);
-        expect(log).not.toContain(PASSWORD);
-        expect(consoleOutput.join('\n')).not.toContain(USERNAME);
-        expect(consoleOutput.join('\n')).not.toContain(PASSWORD);
+        const secrets = [USERNAME, PASSWORD, DIGIT_FIRST_PASSWORD, DIGIT_FIRST_SLASH_PASSWORD];
+        const consoleText = consoleOutput.join('\n');
 
-        if (error) {
-            expect(String(error.stack)).not.toContain(USERNAME);
-            expect(String(error.stack)).not.toContain(PASSWORD);
-        }
+        secrets.forEach((secret) => {
+            expect(log).not.toContain(secret);
+            expect(consoleText).not.toContain(secret);
+
+            if (error) {
+                expect(String(error.stack)).not.toContain(secret);
+            }
+        });
     };
 
     it('does not log credentials for a successful include', async () => {
@@ -290,6 +297,18 @@ describe('credentials in @include URLs', () => {
         expectNoCredentials(log, error, consoleOutput);
     });
 
+    it('does not expose a scheme-less redirect url with a digit-first password', async () => {
+        const { error, log, consoleOutput } = await runCompile(
+            '@include "./local.txt"',
+            { 'local.txt': `! Redirect: ${USERNAME}:${DIGIT_FIRST_PASSWORD}@example.org/next.txt` },
+        );
+
+        expect(error).toBeInstanceOf(Error);
+        expect(error.message).toContain('contains redirect directive');
+        expect(error.message).toContain('! Redirect: example.org/next.txt');
+        expectNoCredentials(log, error, consoleOutput);
+    });
+
     it('does not expose a scheme-less redirect url whose password contains a space', async () => {
         // The dependency helper keeps a password with a space only in a URL
         // with a scheme, and a token-wise pass cannot see a scheme-less form:
@@ -305,6 +324,23 @@ describe('credentials in @include URLs', () => {
         expectNoCredentials(log, error, consoleOutput);
     });
 
+    it('does not expose a scheme-less redirect url with a slash in a digit-first password', async () => {
+        // A digit-first password can contain a slash, so the sanitizer must
+        // not stop the userinfo at a path separator.
+        const { error, log, consoleOutput } = await runCompile(
+            '@include "./local.txt"',
+            {
+                'local.txt': `! Redirect: sub/${USERNAME}:${DIGIT_FIRST_SLASH_PASSWORD}`
+                    + '@example.org/next.txt',
+            },
+        );
+
+        expect(error).toBeInstanceOf(Error);
+        expect(error.message).toContain('contains redirect directive');
+        expect(error.message).toContain('! Redirect: sub/example.org/next.txt');
+        expectNoCredentials(log, error, consoleOutput);
+    });
+
     it('does not expose a scheme-less preprocessor include target in the error', async () => {
         // A local file that `@include` pulls in can contain a `!#include`
         // whose target is a scheme-less credential form. The downloader
@@ -312,6 +348,22 @@ describe('credentials in @include URLs', () => {
         const { error, log, consoleOutput } = await runCompile(
             '@include "./local.txt"',
             { 'local.txt': `!#include ${USERNAME}:${PASSWORD}@example.org/missing.txt` },
+        );
+
+        expect(error).toBeInstanceOf(Error);
+        expect(error.message).toContain('Failed to resolve the include directive');
+        expectNoCredentials(log, error, consoleOutput);
+    });
+
+    it('does not expose a digit-first password in a scheme-less preprocessor include error', async () => {
+        // The slash in the password keeps a userinfo match from ending at a
+        // path separator, so the dependency helper decides each segment.
+        const { error, log, consoleOutput } = await runCompile(
+            '@include "./local.txt"',
+            {
+                'local.txt': `!#include ${USERNAME}:${DIGIT_FIRST_SLASH_PASSWORD}`
+                    + '@example.org/missing.txt',
+            },
         );
 
         expect(error).toBeInstanceOf(Error);
@@ -359,6 +411,28 @@ describe('credentials in @include URLs', () => {
     it('rejects a scheme-less external include without exposing credentials', async () => {
         const { error, log, consoleOutput } = await runDirective(
             `@include "${USERNAME}:${PASSWORD}@example.org/filter.txt"`,
+        );
+
+        expect(error).toBeInstanceOf(Error);
+        expect(error.message).toContain('Invalid external include URL');
+        expect(error.message).toContain('example.org/filter.txt');
+        expectNoCredentials(log, error, consoleOutput);
+    });
+
+    it('rejects a scheme-less external include with a digit-first password', async () => {
+        const { error, log, consoleOutput } = await runDirective(
+            `@include "${USERNAME}:${DIGIT_FIRST_PASSWORD}@example.org/filter.txt"`,
+        );
+
+        expect(error).toBeInstanceOf(Error);
+        expect(error.message).toContain('Invalid external include URL');
+        expect(error.message).toContain('example.org/filter.txt');
+        expectNoCredentials(log, error, consoleOutput);
+    });
+
+    it('rejects a scheme-less external include with a digit-first password that contains a slash', async () => {
+        const { error, log, consoleOutput } = await runDirective(
+            `@include "${USERNAME}:${DIGIT_FIRST_SLASH_PASSWORD}@example.org/filter.txt"`,
         );
 
         expect(error).toBeInstanceOf(Error);
