@@ -11,14 +11,7 @@ import {
     test,
 } from 'vitest';
 import path from 'path';
-import {
-    promises as fs,
-    existsSync,
-    mkdtempSync,
-    rmSync,
-    writeFileSync,
-} from 'fs';
-import { tmpdir } from 'os';
+import { promises as fs, existsSync } from 'fs';
 
 import { disableOptimization } from '../src/main/optimization';
 import { addNotOptimizedHints, build, include } from '../src/main/builder';
@@ -1557,18 +1550,9 @@ describe('check include directive function', () => {
     });
 
     it('accepts an existing empty local @include', async () => {
-        // Git does not track empty files, so create one at runtime.
-        const dir = mkdtempSync(path.join(tmpdir(), 'filters-compiler-empty-include-'));
-        const emptyInclude = 'empty.txt';
-        writeFileSync(path.join(dir, emptyInclude), '');
+        const { includedLines } = await include(filtersDir, '@include empty.txt', []);
 
-        try {
-            const { includedLines } = await include(dir, `@include ${emptyInclude}`, []);
-
-            expect(includedLines.filter((line) => line.trim() !== '')).toEqual([]);
-        } finally {
-            rmSync(dir, { recursive: true, force: true });
-        }
+        expect(includedLines.filter((line) => line.trim() !== '')).toEqual([]);
     });
 
     it('accepts extra whitespace between the @include directive and the path', async () => {
