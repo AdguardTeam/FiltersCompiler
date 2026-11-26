@@ -164,6 +164,12 @@ or use the Docker build with the `VERSION` build arg (see DEPLOYMENT.md).
   Documentation-only changes (e.g., `AGENTS.md`, `DEVELOPMENT.md`, `README.md`)
   do NOT belong in the changelog.
 
+- Write each `CHANGELOG.md` entry for a user: one or two sentences about what
+  changes for them, about as long as the neighboring entries, one bullet per
+  user-visible effect. Do not narrate the old behavior or what did not change,
+  and leave out internal mechanics and follow-up tickets. When an example needs
+  a domain, use `example.com` or `example.org`.
+
 - When adding an `## [Unreleased]` section to `CHANGELOG.md`, always add the
   corresponding link reference immediately after the section's last entry,
   pointing to `HEAD` from the latest released version, e.g.:
