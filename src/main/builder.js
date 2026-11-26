@@ -71,8 +71,8 @@ const DIFF_PATH_TAG = 'Diff-Path:';
 /**
  * Sync reads file content
  *
- * @param path
- * @returns {*}
+ * @param {string} path Path to the file.
+ * @returns {string|null} File content, or `null` if the file does not exist.
  */
 const readFile = function (path) {
     if (!fs.existsSync(path)) {
