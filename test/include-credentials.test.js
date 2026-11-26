@@ -336,13 +336,12 @@ describe('credentials in @include URLs', () => {
         expectNoCredentials(log, error, consoleOutput);
     });
 
-    it('does not expose credentials for an empty included file', async () => {
-        const {
-            result, error, log, consoleOutput,
-        } = await runInclude('/empty.txt');
+    it('does not expose credentials when the included file is empty', async () => {
+        const { error, log, consoleOutput } = await runInclude('/empty.txt');
 
-        expect(error).toBeUndefined();
-        expect(result.includedLines.filter((line) => line.trim() !== '')).toEqual([]);
+        expect(error).toBeInstanceOf(Error);
+        expect(error.message).toContain('Error handling include from');
+        expect(error.message).toContain(`${baseUrl}/empty.txt`);
         expectNoCredentials(log, error, consoleOutput);
     });
 
@@ -403,14 +402,13 @@ describe('credentials in @include URLs', () => {
     });
 
     it('does not expose credentials when compile() includes an empty remote file', async () => {
-        const {
-            result, error, log, consoleOutput,
-        } = await runCompile(
+        const { error, log, consoleOutput } = await runCompile(
             `@include "${credentialsUrl}/empty.txt"`,
         );
 
-        expect(error).toBeUndefined();
-        expect(result.lines.filter((line) => line.trim() !== '')).toEqual([]);
+        expect(error).toBeInstanceOf(Error);
+        expect(error.message).toContain('Error handling include from');
+        expect(error.message).toContain(`${baseUrl}/empty.txt`);
         expectNoCredentials(log, error, consoleOutput);
     });
 

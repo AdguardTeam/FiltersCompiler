@@ -470,14 +470,12 @@ export const include = async (filterDir, directiveLine, excluded) => {
         ? await downloadFile(url)
         : readFile(path.join(filterDir, url));
 
-    if (included !== null) {
+    // `readFile()` returns `null` only when a local file is missing, so an
+    // existing empty local file is valid content. `downloadFile()` returns a
+    // string or throws; an empty or whitespace-only remote body is more likely
+    // a broken source than an intentional empty list, so it still fails.
+    if (included !== null && (!externalInclude || included.trim() !== '')) {
         includedLines = splitLines(included);
-
-        // An empty remote response is accepted, but it is likely a broken
-        // source rather than an intentional empty list, so keep a signal.
-        if (externalInclude && included.trim() === '') {
-            logger.warn(`Included remote file is empty: ${sanitizeUrl(url)}`);
-        }
 
         checkRedirects(includedLines, url);
 

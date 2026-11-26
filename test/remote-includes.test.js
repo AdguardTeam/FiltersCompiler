@@ -18,7 +18,6 @@ import os from 'node:os';
 
 import { build, include } from '../src/main/builder';
 import { disableOptimization } from '../src/main/optimization';
-import { logger } from '../src/main/utils/log';
 import { downloadFile } from '../src/main/utils/webutils';
 
 vi.mock('../src/main/utils/webutils', async (importOriginal) => {
@@ -197,25 +196,21 @@ describe('remote !#include in an @include body', () => {
 
         const { includedLines } = await include(__dirname, `@include "${parentUrl}"`, []);
 
-        // @adguard/filters-downloader 3.0.1 allows a nested included filter
-        // to be empty, so it does not raise its "Response is empty" error
-        // here.
+        // @adguard/filters-downloader allows a nested included filter to be
+        // empty, so it does not raise its "Response is empty" error here.
         expect(includedLines.filter((line) => line.trim() !== '')).toEqual([]);
         expect(requestedPaths).toEqual([EMPTY_INCLUDE_PATH]);
     });
 
-    it('accepts a direct @include with an empty remote body', async () => {
-        downloadFile.mockResolvedValue('');
-        const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+    it.each([
+        { label: 'empty', body: '' },
+        { label: 'whitespace-only', body: '\n' },
+    ])('rejects a direct @include with an $label remote body', async ({ body }) => {
+        downloadFile.mockResolvedValue(body);
 
-        try {
-            const { includedLines } = await include(__dirname, `@include "${parentUrl}"`, []);
-
-            expect(includedLines.filter((line) => line.trim() !== '')).toEqual([]);
-            expect(warnSpy).toHaveBeenCalledWith(`Included remote file is empty: ${parentUrl}`);
-        } finally {
-            warnSpy.mockRestore();
-        }
+        await expect(include(__dirname, `@include "${parentUrl}"`, []))
+            .rejects
+            .toThrow(`Error handling include from: ${parentUrl}`);
     });
 });
 
