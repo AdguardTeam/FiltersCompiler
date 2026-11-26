@@ -554,7 +554,6 @@ export const include = async (filterDir, directiveLine, excluded) => {
     }
 
     logger.info(`Inclusion lines: ${includedLines.length}`);
-    logger.info(`Should be filtered due to trust level: ${shouldIgnoreTrustLevel}`);
 
     return {
         includedLines,
