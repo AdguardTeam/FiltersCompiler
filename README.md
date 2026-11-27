@@ -490,11 +490,11 @@ Merge rules:
 - A `removeRulePatterns` entry is a string or a `RegExp`. A string must compile
   as a regular expression. `replacements[].from` must compile as one too. The
   merge checks both.
-- A `path` is normalized and must stay inside the platforms output. An absolute
-  path, a backslash, and a `..` that resolves outside the output are rejected;
-  inner `..` segments are resolved, so `a/../b` becomes `b`. A segment cannot
-  contain a Windows-reserved character, end with a dot or a space, or be a
-  reserved device name.
+- A `path`, in `base` or in a patch, is normalized and must stay inside the
+  platforms output. An absolute path, a backslash, and a `..` that resolves
+  outside the output are rejected; inner `..` segments are resolved, so
+  `a/../b` becomes `b`. A segment cannot contain a Windows-reserved character,
+  end with a dot or a space, or be a reserved device name.
 - A `path` must be unique among platforms. The merge compares paths
   case-insensitively and rejects a duplicate, including a changed path on an
   existing platform.

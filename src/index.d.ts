@@ -63,8 +63,9 @@ export declare const platformConfigPatterns: PlatformConfigPatterns;
  *
  * A patch key that is not in `base` adds a platform. The entry must then be
  * complete, and its `platform` must be a family that `base` already uses. A
- * platform `path` must be unique among platforms; the comparison is
- * case-insensitive. Every field of a legacy mac platform is patchable except
+ * platform `path`, in `base` or in a patch, is normalized and must stay inside
+ * the platforms output; it must be unique among platforms, and the comparison
+ * is case-insensitive. Every field of a legacy mac platform is patchable except
  * its path, which cannot change. An added legacy platform must use its `mac`
  * or `mac_v2` directory. Those directory names are reserved for legacy
  * platforms.
@@ -72,7 +73,7 @@ export declare const platformConfigPatterns: PlatformConfigPatterns;
  * @param base Base configuration.
  * @param patch Platform patches.
  * @returns The merged and frozen configuration.
- * @throws {PlatformsConfigError} When a patch value is invalid.
+ * @throws {PlatformsConfigError} When a base path or a patch value is invalid.
  */
 export declare function mergePlatformsConfig(
     base: ReadonlyPlatformsConfig,

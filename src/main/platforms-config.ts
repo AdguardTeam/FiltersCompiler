@@ -1625,8 +1625,9 @@ const cloneEntry = (entry: DeepReadonly<PlatformEntry>): PlatformEntry => {
  * A patch key that is not in `base` adds a platform. The entry must then be
  * complete, and its `platform` must be a family that `base` already uses.
  *
- * A platform `path` is normalized and must stay inside the platforms output.
- * A `path` must be unique among platforms; the comparison is case-insensitive.
+ * A platform `path`, in `base` or in a patch, is normalized and must stay
+ * inside the platforms output. A `path` must be unique among platforms; the
+ * comparison is case-insensitive.
  * Every field of a legacy mac platform is patchable except its `path`, which
  * cannot change. An added legacy platform must use its `mac` or `mac_v2`
  * directory. Those directory names are reserved for legacy platforms.
@@ -1634,7 +1635,7 @@ const cloneEntry = (entry: DeepReadonly<PlatformEntry>): PlatformEntry => {
  * @param base Base configuration.
  * @param patch Platform patches.
  * @returns The merged and frozen configuration.
- * @throws {PlatformsConfigError} When a patch value is invalid.
+ * @throws {PlatformsConfigError} When a base path or a patch value is invalid.
  */
 export const mergePlatformsConfig = (
     base: ReadonlyPlatformsConfig,
@@ -1650,7 +1651,10 @@ export const mergePlatformsConfig = (
         if (key === '__proto__') {
             throw new PlatformsConfigError(`base.${key}`, 'reserved key');
         }
-        result[key] = cloneEntry(base[key]);
+        result[key] = {
+            ...cloneEntry(base[key]),
+            path: requirePlatformPath(base[key].path, `base.${key}.path`),
+        };
     });
 
     Object.keys(patchObject).forEach((key) => {

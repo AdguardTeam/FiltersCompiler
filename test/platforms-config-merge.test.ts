@@ -646,6 +646,21 @@ describe('mergePlatformsConfig', () => {
         expect(base.X.path).toBe('./x/');
     });
 
+    it('rejects an unsafe base path', () => {
+        ['../escape', '/abs', 'a\\b', 'C:/abs'].forEach((path) => {
+            const base: PlatformsConfig = {
+                X: {
+                    platform: 'ios',
+                    path,
+                    configuration: {},
+                    defines: {},
+                },
+            };
+
+            expect(() => mergePlatformsConfig(base, {})).toThrow(/base\.X\.path/);
+        });
+    });
+
     it('normalizes base paths before the duplicate check', () => {
         const base: PlatformsConfig = {
             A: {

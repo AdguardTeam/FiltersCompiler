@@ -15,11 +15,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `mergePlatformsConfig` and `PlatformsConfigError` as public exports,
   so a consumer can change a platform configuration without a compiler
   release. A patch can add a platform when the entry is complete, uses a
-  supported platform family, and has a unique, portable `path`. A legacy mac
-  platform is patchable like any other platform except its `path`, which
-  cannot change; an added legacy platform must use its `mac` or `mac_v2`
-  directory. Those directory names are reserved. `removeRulePatterns` accepts
-  strings and `RegExp` objects; `false` or `null` removes it.
+  supported platform family, and has a unique, portable `path`; a `base` path
+  is checked with the same rules. A legacy mac platform is patchable like any
+  other platform except its `path`, which cannot change; an added legacy
+  platform must use its `mac` or `mac_v2` directory. Those directory names are
+  reserved. `removeRulePatterns` accepts strings and `RegExp` objects; `false`
+  or `null` removes it.
 - Added the public platform configuration types:
     - `ReadonlyPlatformsConfig`: the frozen configuration that consumers
       receive.
