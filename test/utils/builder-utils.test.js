@@ -91,6 +91,22 @@ describe('optimizeDomainBlockingRules options of include directive', () => {
         expect(result).toEqual(lines);
     });
 
+    it('Still optimizes unhinted rules after a hinted rule', async () => {
+        const lines = [
+            '!+ PLATFORM(ios)',
+            '||example.com^',
+            '||sub.anotherexample.com^',
+            '||anotherexample.com^',
+        ];
+        const expectedOutput = [
+            '!+ PLATFORM(ios)',
+            '||example.com^',
+            '||anotherexample.com^',
+        ];
+        const result = await optimizeDomainBlockingRules(lines);
+        expect(result).toEqual(expectedOutput);
+    });
+
     it('Does not drop an unhinted rule covered by a hinted wider rule', async () => {
         const lines = [
             '!+ PLATFORM(ios)',
