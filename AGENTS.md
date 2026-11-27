@@ -339,7 +339,8 @@ Public API layer.
 - **Shared regex fragments**: One fragment, one constant. Define a reused
   fragment once as a named constant and interpolate it everywhere.
 - **TypeScript for new code**: New source files should be written in TypeScript
-  (`.ts`) under `src/`. Existing `.js` files are not migrated yet.
+  (`.ts`) under `src/`. Existing `.js` files are migrated only when a change
+  explicitly does so, as with `src/main/platforms-config.ts`.
 
 ### Testing
 
