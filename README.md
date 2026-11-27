@@ -480,11 +480,13 @@ Merge rules:
   and `CLI` set no `removeRulePatterns`. Spreading one group equals a
   platform's default only when its default is exactly that group.
 - An absent field inherits the default value.
-- `null` removes a field. For `defines`, `null` removes one flag. For
-  `removeRulePatterns`, `false` removes the field too.
+- `null` removes a field. For `defines`, `null` clears the map, and a `null`
+  flag removes one flag. For `removeRulePatterns`, `false` removes the field
+  too.
 - `false` is a value. `ignoreRuleHints: false` stays `false`.
 - `defines` is an open map. A patch can add any flag name.
-- `platform`, `path`, `configuration`, and `defines` cannot be removed.
+- `platform`, `path`, `configuration`, and `defines` cannot be removed;
+  `defines: null` leaves an empty map.
 - An unknown field or a wrong type throws `PlatformsConfigError` with a
   `path` that points to the invalid value.
 - A `removeRulePatterns` entry is a string or a `RegExp`. A string must compile

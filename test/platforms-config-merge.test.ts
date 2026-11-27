@@ -102,6 +102,27 @@ describe('mergePlatformsConfig', () => {
         expect(merged.WINDOWS.defines.adguard_app_windows).toBe(true);
     });
 
+    it('clears the defines map with null', () => {
+        const merged = mergePlatformsConfig(platformsConfig, {
+            WINDOWS: { defines: null },
+        });
+
+        expect(merged.WINDOWS.defines).toEqual({});
+    });
+
+    it('accepts defines null for a new platform', () => {
+        const merged = mergePlatformsConfig(platformsConfig, {
+            NEW: {
+                platform: 'ext_ublock',
+                path: 'new/ublock',
+                configuration: {},
+                defines: null,
+            },
+        });
+
+        expect(merged.NEW.defines).toEqual({});
+    });
+
     it('keeps false as a value', () => {
         const merged = mergePlatformsConfig(platformsConfig, {
             WINDOWS: { configuration: { ignoreRuleHints: false } },
@@ -196,7 +217,6 @@ describe('mergePlatformsConfig', () => {
         expectConfigError({ WINDOWS: { platform: null } }, 'patch.WINDOWS.platform');
         expectConfigError({ WINDOWS: { path: null } }, 'patch.WINDOWS.path');
         expectConfigError({ WINDOWS: { configuration: null } }, 'patch.WINDOWS.configuration');
-        expectConfigError({ WINDOWS: { defines: null } }, 'patch.WINDOWS.defines');
     });
 
     it('rejects an invalid regular expression', () => {

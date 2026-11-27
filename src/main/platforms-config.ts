@@ -140,8 +140,8 @@ export interface PlatformConfigurationPatch {
  * A patch of an existing platform can be partial. A patch that adds a platform
  * must contain `platform`, `path`, `configuration`, and `defines`.
  * An absent or `undefined` field inherits the current value. A `null` value
- * removes an optional field. `platform`, `path`, `configuration`, and `defines`
- * cannot be removed.
+ * removes an optional field; `defines: null` clears the map instead.
+ * `platform`, `path`, `configuration`, and `defines` cannot be removed.
  */
 export interface PlatformPatch {
     /**
@@ -167,10 +167,10 @@ export interface PlatformPatch {
     configuration?: PlatformConfigurationPatch | undefined;
 
     /**
-     * `!#if` preprocessor flags. A `null` value removes one flag. An
-     * `undefined` value inherits the current flag.
+     * `!#if` preprocessor flags. `null` clears the map. A `null` flag removes
+     * one flag; an `undefined` flag inherits the current flag.
      */
-    defines?: Record<string, boolean | null | undefined> | undefined;
+    defines?: Record<string, boolean | null | undefined> | null | undefined;
 }
 
 /**
@@ -1534,8 +1534,13 @@ const mergePlatformEntry = (
                 mergeConfiguration(target.configuration, value, fieldPath);
                 break;
             case 'defines':
-                requireNotCleared(value, fieldPath);
-                mergeDefines(target.defines, value, fieldPath);
+                if (value === null) {
+                    Object.keys(target.defines).forEach((name) => {
+                        delete target.defines[name];
+                    });
+                } else {
+                    mergeDefines(target.defines, value, fieldPath);
+                }
                 break;
             default:
                 throw new PlatformsConfigError(fieldPath, 'unknown field');
@@ -1618,7 +1623,8 @@ const cloneEntry = (entry: DeepReadonly<PlatformEntry>): PlatformEntry => {
  * The function is pure: it does not change `base` or `patch`, and it returns a
  * new frozen configuration. An object merges key by key. An array replaces the
  * base array. An absent or `undefined` field inherits the base value. A `null`
- * field is removed from the result. `false` is a value for `ignoreRuleHints`;
+ * field is removed from the result; `defines: null` clears the map instead.
+ * `false` is a value for `ignoreRuleHints`;
  * for `removeRulePatterns`, `false` removes the field. A `removeRulePatterns`
  * entry is a string or a `RegExp`, and a string must compile as one.
  *

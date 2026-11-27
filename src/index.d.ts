@@ -57,9 +57,10 @@ export declare const platformConfigPatterns: PlatformConfigPatterns;
  *
  * An object merges key by key. An array replaces the base array. An absent or
  * `undefined` field inherits the base value. A `null` field is removed from
- * the result. `false` is a value for `ignoreRuleHints`; for
- * `removeRulePatterns`, `false` removes the field. A `removeRulePatterns`
- * entry is a string or a `RegExp`, and a string must compile as one.
+ * the result; `defines: null` clears the map instead. `false` is a value for
+ * `ignoreRuleHints`; for `removeRulePatterns`, `false` removes the field. A
+ * `removeRulePatterns` entry is a string or a `RegExp`, and a string must
+ * compile as one.
  *
  * A patch key that is not in `base` adds a platform. The entry must then be
  * complete, and its `platform` must be a family that `base` already uses. A

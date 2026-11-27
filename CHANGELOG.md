@@ -49,7 +49,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   does not contain the credentials.
 - **BREAKING:** Changed `compile()` to accept a `platformsConfigPatch` and
   merge it over the default configurations instead of changing the shared
-  configuration.
+  configuration. `defines` merges key by key; set `defines: null` to clear the
+  inherited map.
 - Made `replacements` optional in the default platform configurations and
   removed the `null` placeholder.
 
