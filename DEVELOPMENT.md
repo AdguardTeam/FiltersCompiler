@@ -81,7 +81,11 @@ pnpm build
 ```
 
 Build output goes to `dist/` as a single ES module (`dist/index.js`).
-Rollup also copies JSON schemas and trust-level files into `dist/`.
+Rollup also copies JSON schemas, trust-level files, and the hand-written
+`src/index.d.ts` into `dist/`. It also mirrors the generated declarations that
+`dist/index.d.ts` references (`dist/main/optimization.d.ts`,
+`dist/main/platforms-config.d.ts`, and `dist/main/utils/deep-freeze.d.ts`)
+alongside it.
 
 ### 4. Run Tests
 
