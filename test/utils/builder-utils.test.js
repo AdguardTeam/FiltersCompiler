@@ -81,14 +81,44 @@ describe('optimizeDomainBlockingRules options of include directive', () => {
         });
     });
 
-    it('Drops hints attached to optimized-out rules', async () => {
+    it('Keeps hints attached to hinted rules', async () => {
         const lines = [
             '!+ PLATFORM(ios)',
             '||sub.example.com^',
             '||example.com^',
         ];
         const result = await optimizeDomainBlockingRules(lines);
-        expect(result).toEqual(['||example.com^']);
+        expect(result).toEqual(lines);
+    });
+
+    it('Does not drop an unhinted rule covered by a hinted wider rule', async () => {
+        const lines = [
+            '!+ PLATFORM(ios)',
+            '||example.com^',
+            '||sub.example.com^',
+        ];
+        const result = await optimizeDomainBlockingRules(lines);
+        expect(result).toEqual(lines);
+    });
+
+    it('Skips optimization of a rule preceded by multiple hint lines', async () => {
+        const lines = [
+            '!+ PLATFORM(ios)',
+            '!+ PLATFORM(windows)',
+            '||example.com^',
+            '||sub.example.com^',
+        ];
+        const result = await optimizeDomainBlockingRules(lines);
+        expect(result).toEqual(lines);
+    });
+
+    it('Keeps a trailing hint line at the end of the input', async () => {
+        const lines = [
+            '||example.com^',
+            '!+ PLATFORM(ios)',
+        ];
+        const result = await optimizeDomainBlockingRules(lines);
+        expect(result).toEqual(lines);
     });
 
     it('Keeps hints attached to retained rules', async () => {

@@ -1,6 +1,6 @@
 import { parse } from 'tldts';
 
-import { RuleMasks, filterWithHints } from '../rule/rule-masks';
+import { RuleMasks, filterWithHints, isHint } from '../rule/rule-masks';
 
 const DOT = '.';
 
@@ -81,8 +81,20 @@ export const optimizeDomainBlockingRules = async (lines) => {
     const linesToSkipOptimization = new Set();
     const rawDomainsToOptimize = new Set();
 
+    let hasPendingHint = false;
+
     lines.forEach((line) => {
-        if (!shouldOptimize(line)) {
+        if (isHint(line)) {
+            hasPendingHint = true;
+            return;
+        }
+
+        const isHinted = hasPendingHint;
+        hasPendingHint = false;
+
+        // A hinted rule exists only where the hint applies, so it must not
+        // cover other rules or lose its hint during optimization.
+        if (isHinted || !shouldOptimize(line)) {
             linesToSkipOptimization.add(line);
             return;
         }
