@@ -1585,8 +1585,8 @@ const createPlatformEntry = (
  * Copies one platform entry and its nested values.
  *
  * The merge must own every object and array that it freezes. A shallow copy
- * would leave the caller's `base` entries shared with the result. The path is
- * normalized so the merge compares and outputs the same form.
+ * would leave the caller's `base` entries shared with the result. The merge
+ * validates and normalizes the path after cloning.
  *
  * @param entry Entry to copy.
  * @returns A mutable copy of the entry.
@@ -1611,7 +1611,6 @@ const cloneEntry = (entry: DeepReadonly<PlatformEntry>): PlatformEntry => {
 
     return {
         ...entry,
-        path: posix.normalize(entry.path).replace(/\/+$/, ''),
         configuration,
         defines: { ...entry.defines },
     };
@@ -1651,16 +1650,19 @@ export const mergePlatformsConfig = (
 
     // Clone every entry so freezing the result cannot freeze the caller's base.
     const result: PlatformsConfig = {};
+    const basePaths = new Map<string, string>();
     Object.keys(base).forEach((key) => {
         // JSON.parse creates __proto__ as an own key, and assignment runs the
         // __proto__ setter instead of adding an entry.
         if (key === '__proto__') {
             throw new PlatformsConfigError(`base.${key}`, 'reserved key');
         }
+        const basePath = requirePlatformPath(base[key].path, `base.${key}.path`);
         result[key] = {
             ...cloneEntry(base[key]),
-            path: requirePlatformPath(base[key].path, `base.${key}.path`),
+            path: basePath,
         };
+        basePaths.set(key, basePath);
     });
 
     Object.keys(patchObject).forEach((key) => {
@@ -1685,9 +1687,7 @@ export const mergePlatformsConfig = (
         }
         // An existing legacy platform keeps the trusted base path; a newly
         // added one has no prior path, so it must use its legacy directory.
-        const expectedPath = Object.hasOwn(base, key)
-            ? requirePlatformPath(base[key].path, `base.${key}.path`)
-            : platformsConfig[key].path;
+        const expectedPath = basePaths.get(key) ?? platformsConfig[key].path;
         if (result[key].path !== expectedPath) {
             throw new PlatformsConfigError(
                 `patch.${key}.path`,
