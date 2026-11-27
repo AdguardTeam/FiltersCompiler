@@ -31,6 +31,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- An empty local `@include` file is accepted and adds no rules. A remote
+  `@include` that returns an empty or whitespace-only response stops the build:
+  a missing remote section is more likely a broken source than an intentional
+  empty list.
 - A remote `!#include` in a filter template now resolves. If a remote include
   cannot be resolved, the build fails with an error that names the include URL
   and the reason instead of silently dropping the directive.

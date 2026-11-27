@@ -345,6 +345,15 @@ describe('credentials in @include URLs', () => {
         expectNoCredentials(log, error, consoleOutput);
     });
 
+    it('does not expose credentials when the included file is whitespace-only', async () => {
+        const { error, log, consoleOutput } = await runInclude('/whitespace.txt');
+
+        expect(error).toBeInstanceOf(Error);
+        expect(error.message).toContain('Error handling include from');
+        expect(error.message).toContain(`${baseUrl}/whitespace.txt`);
+        expectNoCredentials(log, error, consoleOutput);
+    });
+
     it('does not expose credentials in an invalid include directive error', async () => {
         const { error, log, consoleOutput } = await runDirective(
             `@include "" ${USERNAME}:${PASSWORD}@example.org/filter.txt`,
@@ -409,6 +418,17 @@ describe('credentials in @include URLs', () => {
         expect(error).toBeInstanceOf(Error);
         expect(error.message).toContain('Error handling include from');
         expect(error.message).toContain(`${baseUrl}/empty.txt`);
+        expectNoCredentials(log, error, consoleOutput);
+    });
+
+    it('does not expose credentials when compile() includes a whitespace-only remote file', async () => {
+        const { error, log, consoleOutput } = await runCompile(
+            `@include "${credentialsUrl}/whitespace.txt"`,
+        );
+
+        expect(error).toBeInstanceOf(Error);
+        expect(error.message).toContain('Error handling include from');
+        expect(error.message).toContain(`${baseUrl}/whitespace.txt`);
         expectNoCredentials(log, error, consoleOutput);
     });
 

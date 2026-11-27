@@ -71,8 +71,8 @@ const DIFF_PATH_TAG = 'Diff-Path:';
 /**
  * Sync reads file content
  *
- * @param path
- * @returns {*}
+ * @param {string} path Path to the file.
+ * @returns {string|null} File content, or `null` if the file does not exist.
  */
 const readFile = function (path) {
     if (!fs.existsSync(path)) {
@@ -470,7 +470,12 @@ export const include = async (filterDir, directiveLine, excluded) => {
         ? await downloadFile(url)
         : readFile(path.join(filterDir, url));
 
-    if (included) {
+    // `readFile()` returns `null` only when a local file is missing, so an
+    // existing empty local file is valid content. `downloadFile()` returns a
+    // string or throws; an empty remote body still fails, and a whitespace-only
+    // one now fails too: a missing remote section is more likely a broken
+    // source than an intentional empty list.
+    if (included !== null && (!externalInclude || included.trim() !== '')) {
         includedLines = splitLines(included);
 
         checkRedirects(includedLines, url);
@@ -550,7 +555,6 @@ export const include = async (filterDir, directiveLine, excluded) => {
     }
 
     logger.info(`Inclusion lines: ${includedLines.length}`);
-    logger.info(`Should be filtered due to trust level: ${shouldIgnoreTrustLevel}`);
 
     return {
         includedLines,

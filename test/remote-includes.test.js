@@ -196,11 +196,21 @@ describe('remote !#include in an @include body', () => {
 
         const { includedLines } = await include(__dirname, `@include "${parentUrl}"`, []);
 
-        // @adguard/filters-downloader 3.0.1 allows a nested included filter
-        // to be empty, so it does not raise its "Response is empty" error
-        // here. A direct empty `@include` still throws in `include()`.
+        // @adguard/filters-downloader allows a nested included filter to be
+        // empty, so it does not raise its "Response is empty" error here.
         expect(includedLines.filter((line) => line.trim() !== '')).toEqual([]);
         expect(requestedPaths).toEqual([EMPTY_INCLUDE_PATH]);
+    });
+
+    it.each([
+        { label: 'empty', body: '' },
+        { label: 'whitespace-only', body: '\n' },
+    ])('rejects a direct @include with an $label remote body', async ({ body }) => {
+        downloadFile.mockResolvedValue(body);
+
+        await expect(include(__dirname, `@include "${parentUrl}"`, []))
+            .rejects
+            .toThrow(`Error handling include from: ${parentUrl}`);
     });
 });
 
@@ -328,6 +338,22 @@ describe('remote !#include in a filter template', () => {
 
         const filterContent = fs.readFileSync(path.join(filterDir, 'filter.txt'), 'utf8');
         expect(filterContent.split(/\r?\n/)).toContain(REMOTE_RULE);
+    });
+
+    it('builds a filter with an empty local @include', async () => {
+        createFilter('! Title: Remote Include Test\n@include empty.txt\n');
+        fs.copyFileSync(
+            path.join(__dirname, 'resources', 'filters', 'empty.txt'),
+            path.join(filterDir, 'empty.txt'),
+        );
+
+        await build(filtersDir, null, null, null, {}, null, null);
+
+        const filterContent = fs.readFileSync(path.join(filterDir, 'filter.txt'), 'utf8');
+        const filterLines = filterContent.split(/\r?\n/);
+
+        expect(filterLines).toContain('! Title: Remote Include Test');
+        expect(filterLines.filter((line) => line !== '' && !line.startsWith('!'))).toEqual([]);
     });
 
     it('resolves an absolute remote !#include in a local @include body', async () => {

@@ -1549,6 +1549,12 @@ describe('check include directive function', () => {
         ).rejects.toThrow(`Error handling include from: ${missingInclude}`);
     });
 
+    it('accepts an existing empty local @include', async () => {
+        const { includedLines } = await include(filtersDir, '@include empty.txt', []);
+
+        expect(includedLines.filter((line) => line.trim() !== '')).toEqual([]);
+    });
+
     it('accepts extra whitespace between the @include directive and the path', async () => {
         const { includedLines } = await include(filtersDir, '@include  common.txt', []);
 

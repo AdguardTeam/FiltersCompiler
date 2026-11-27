@@ -29,6 +29,12 @@ const server = http.createServer((req, res) => {
         return;
     }
 
+    if (req.url === '/whitespace.txt') {
+        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        res.end('\n');
+        return;
+    }
+
     res.writeHead(404, { 'Content-Type': 'text/plain' });
     res.end('Not Found');
 });
