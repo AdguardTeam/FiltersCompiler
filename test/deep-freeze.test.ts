@@ -85,4 +85,13 @@ describe('deepFreeze', () => {
         expect(value.fn).toBe(fn);
         expect(Object.isFrozen(fn)).toBe(false);
     });
+
+    it('does not freeze RegExp values', () => {
+        const pattern = /a/g;
+        const frozen = deepFreeze({ pattern });
+
+        expect(Object.isFrozen(frozen.pattern)).toBe(false);
+        expect(frozen.pattern.test('abc')).toBe(true);
+        expect(frozen.pattern.lastIndex).toBe(1);
+    });
 });

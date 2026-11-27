@@ -81,6 +81,10 @@ describe('mergePlatformsConfig', () => {
         expect(patterns?.[0]).toBeInstanceOf(RegExp);
         expect(patterns?.[0]).not.toBe(pattern);
         expect(Object.isFrozen(pattern)).toBe(false);
+
+        const returned = patterns?.[0] as RegExp;
+        expect(Object.isFrozen(returned)).toBe(false);
+        expect(returned.test('zzz-a')).toBe(true);
     });
 
     it('deletes fields with null', () => {

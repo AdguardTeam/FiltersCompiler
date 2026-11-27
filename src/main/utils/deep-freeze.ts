@@ -20,6 +20,12 @@ export type DeepReadonly<T> = T extends (...args: never[]) => unknown
  * @returns The same value, frozen in place, typed as recursively readonly.
  */
 export const deepFreeze = <T>(value: T): DeepReadonly<T> => {
+    if (value instanceof RegExp) {
+        // `Object.freeze` would make `lastIndex` read-only, which breaks
+        // stateful use of the pattern; the type keeps `RegExp` mutable.
+        return value as DeepReadonly<T>;
+    }
+
     if (typeof value === 'object' && value !== null) {
         Object.values(value as object).forEach((child) => deepFreeze(child));
         Object.freeze(value);
