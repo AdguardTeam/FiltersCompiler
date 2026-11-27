@@ -131,6 +131,28 @@ writes the results to `platformsPath`.
 An invalid `platformsConfigPatch` throws `PlatformsConfigError` synchronously,
 before any file is read or written.
 
+### `mergePlatformsConfig(...)`
+
+```ts
+function mergePlatformsConfig(
+    base: ReadonlyPlatformsConfig,
+    patch: PlatformsConfigPatch,
+): ReadonlyPlatformsConfig;
+```
+
+Applies a patch to a base configuration and returns a new configuration.
+`compile()` uses it on `platformsConfig`; call it directly to build a custom
+`base` or to inspect the merged result. Neither argument is changed. Objects
+and arrays in the result are frozen, except `RegExp` entries of
+`removeRulePatterns`, which stay mutable so a stateful `/g` or `/y` pattern
+keeps working. See
+[Platform configuration patches](#platform-configuration-patches) for the
+merge rules.
+
+An invalid base path or patch value throws `PlatformsConfigError`; its `path`
+property points at the invalid value, for example
+`patch.EXTENSION_UBLOCK.configuration.removeRulePatterns[0]`.
+
 ### `validateJSONSchema(...)`
 
 ```ts
@@ -266,7 +288,7 @@ const platformsConfigPatch = {
         configuration: {
             removeRulePatterns: [
                 ...platformConfigPatterns.SAFARI_BASED_EXTENSION_PATTERNS,
-                '^\\/.*', // drop regex rules
+                '^\\/.*', // drop regex blocking rules
             ],
         },
     },
@@ -472,13 +494,8 @@ Merge rules:
   };
   ```
 
-  `platformConfigPatterns` holds the named groups. Nine platform defaults are
-  exactly one group: `MAC`, the Chromium, Edge, and Opera extensions (both
-  variants), `EXTENSION_SAFARI`, and `IOS`. `EXTENSION_FIREFOX`,
-  `EXTENSION_ANDROID_CONTENT_BLOCKER`, and `EXTENSION_UBLOCK` compose their
-  list inline from several groups. `WINDOWS`, `MAC_V2`, `MAC_V3`, `ANDROID`,
-  and `CLI` set no `removeRulePatterns`. Spreading one group equals a
-  platform's default only when its default is exactly that group.
+  `platformConfigPatterns` holds the named groups. Spreading one group equals
+  a platform's default only when its default is exactly that group.
 - An absent field inherits the default value.
 - `null` removes a field. For `defines`, `null` clears the map, and a `null`
   flag removes one flag. For `removeRulePatterns`, `false` removes the field
@@ -505,8 +522,10 @@ Merge rules:
   or `mac_v2` directory. Those names are reserved: the JSON validator selects
   the legacy schemas by directory name.
 
-The defaults and the merge result are frozen. The TypeScript types are
-readonly too. `platformsConfig` is a `ReadonlyPlatformsConfig`, and
+The defaults and the merge result are frozen, except `RegExp` entries of
+`removeRulePatterns`, which stay mutable so a stateful pattern keeps working.
+The TypeScript types are readonly too, with the same exception.
+`platformsConfig` is a `ReadonlyPlatformsConfig`, and
 `platformConfigPatterns` keeps its exact group names with `readonly string[]`
 values. Do not change the shared configuration object. Use a patch.
 

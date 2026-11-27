@@ -12,6 +12,8 @@
 import { posix } from 'node:path';
 
 import { deepFreeze } from './utils/deep-freeze';
+// The explicit `.js` extension keeps the published declaration resolvable
+// under `node16` (TS2834 without it); see the note in `src/index.d.ts`.
 import type { DeepReadonly } from './utils/deep-freeze.js';
 
 /**
@@ -37,19 +39,23 @@ export interface PlatformReplacement {
 export interface PlatformConfiguration {
     /**
      * Regular expressions of rules to remove from the platform output, as
-     * strings or `RegExp` objects.
+     * strings or `RegExp` objects. The array is readonly, so a merged entry
+     * stays assignable to `PlatformEntry`.
      */
-    removeRulePatterns?: (string | RegExp)[];
+    removeRulePatterns?: readonly (string | RegExp)[];
 
     /**
-     * Whether to honour `!+` rule hints.
+     * Whether to ignore `!+` rule hints. `true` keeps rules that carry a
+     * `PLATFORM()` or `NOT_PLATFORM()` hint, because the compiler omits a
+     * rule by hint only when this is `false`.
      */
     ignoreRuleHints?: boolean;
 
     /**
-     * Regex replacements applied to every rule.
+     * Regex replacements applied to every rule. The array is readonly, so a
+     * merged entry stays assignable to `PlatformEntry`.
      */
-    replacements?: PlatformReplacement[];
+    replacements?: readonly PlatformReplacement[];
 
     /**
      * Header line written before the rules. Used by the uBO platform.
@@ -101,7 +107,7 @@ export interface PlatformEntry {
  * Full platform configuration keyed by platform name.
  *
  * This is the mutable shape that the merge uses for its draft. Consumers
- * receive the frozen `ReadonlyPlatformsConfig`.
+ * receive the readonly `ReadonlyPlatformsConfig`.
  */
 export type PlatformsConfig = Record<string, PlatformEntry>;
 
@@ -119,7 +125,8 @@ export interface PlatformConfigurationPatch {
     removeRulePatterns?: readonly (string | RegExp)[] | false | null | undefined;
 
     /**
-     * Whether to honour `!+` rule hints. `false` is a value.
+     * Whether to ignore `!+` rule hints. `true` keeps rules that carry a
+     * `PLATFORM()` or `NOT_PLATFORM()` hint; `false` is a value.
      */
     ignoreRuleHints?: boolean | null | undefined;
 
@@ -185,7 +192,8 @@ export type PlatformsConfigPatch = Record<string, PlatformPatch | undefined>;
  * Frozen platform configuration that consumers receive.
  *
  * This is the type of `platformsConfig` and of the value returned by
- * `mergePlatformsConfig()`. Every property and array is readonly.
+ * `mergePlatformsConfig()`. Every property and array is readonly; a `RegExp`
+ * entry of `removeRulePatterns` keeps its mutable `lastIndex`.
  */
 export type ReadonlyPlatformsConfig = DeepReadonly<PlatformsConfig>;
 
@@ -291,6 +299,16 @@ const HTML_FILTERING_MODIFIER_PATTERNS = [
 const NON_BASIC_MODIFIER_LIST_GUARD = '(?<=^\\[\\$)(path|domain|url)\\b.*]';
 
 /**
+ * Prefix of the modifier patterns below.
+ *
+ * It matches the `$` that opens the modifiers, skips CSS rules (`#$#`), a
+ * non-basic modifier list (see `NON_BASIC_MODIFIER_LIST_GUARD`), and
+ * `$removeparam` values, then starts the modifier itself. Keeping the
+ * exclusion logic here means every modifier pattern shares one definition.
+ */
+const MODIFIER_PATTERN_PREFIX = `\\$(?!#|${NON_BASIC_MODIFIER_LIST_GUARD}|.*removeparam=).*`;
+
+/**
  * Pattern to check if rule contains `$protobuf` modifier
  * and does not contain a non-basic modifier list (`$domain`, `$path`, `$url`).
  *
@@ -306,7 +324,7 @@ const NON_BASIC_MODIFIER_LIST_GUARD = '(?<=^\\[\\$)(path|domain|url)\\b.*]';
  * https://github.com/AdguardTeam/CoreLibs/issues/1778
  */
 const PROTOBUF_MODIFIER_PATTERNS = [
-    `\\$(?!#|${NON_BASIC_MODIFIER_LIST_GUARD}|.*removeparam=).*protobuf(,|=|$)`,
+    `${MODIFIER_PATTERN_PREFIX}protobuf(,|=|$)`,
 ];
 
 /**
@@ -323,7 +341,7 @@ const PROTOBUF_MODIFIER_PATTERNS = [
  * ```@@||imasdk.googleapis.com^$app=tv.htv.app```
  */
 const APP_MODIFIER_PATTERNS = [
-    `\\$(?!#|${NON_BASIC_MODIFIER_LIST_GUARD}|.*removeparam=).*app=`,
+    `${MODIFIER_PATTERN_PREFIX}app=`,
 ];
 
 /**
@@ -342,7 +360,7 @@ const APP_MODIFIER_PATTERNS = [
  * ```@@||radar.cloudflare.com^$elemhide,extension,content```
  */
 const EXTENSION_MODIFIER_PATTERNS = [
-    `\\$(?!#|${NON_BASIC_MODIFIER_LIST_GUARD}|.*removeparam=).*extension(,|=|$)`,
+    `${MODIFIER_PATTERN_PREFIX}extension(,|=|$)`,
 ];
 
 /**
@@ -370,7 +388,7 @@ const ONLY_CONTENT_MODIFIER_PATTERNS = [
  * ```@@||dnsleaktest.com^$content,elemhide,jsinject```
  */
 const CONTENT_MODIFIER_PATTERNS = [
-    `\\$(?!#|${NON_BASIC_MODIFIER_LIST_GUARD}|.*removeparam=).*content(,|$)`,
+    `${MODIFIER_PATTERN_PREFIX}content(,|$)`,
 ];
 
 /**
@@ -388,7 +406,7 @@ const CONTENT_MODIFIER_PATTERNS = [
  * ```@@://www.atlassian.com^$elemhide,jsinject,extension```
  */
 const JSINJECT_MODIFIER_PATTERNS = [
-    `\\$(?!#|${NON_BASIC_MODIFIER_LIST_GUARD}|.*removeparam=).*jsinject(,|$)`,
+    `${MODIFIER_PATTERN_PREFIX}jsinject(,|$)`,
 ];
 
 /**
@@ -406,7 +424,7 @@ const JSINJECT_MODIFIER_PATTERNS = [
  * ```@@||google.com/settings/ads/onweb$urlblock```
  */
 const URLBLOCK_MODIFIER_PATTERNS = [
-    `\\$(?!#|${NON_BASIC_MODIFIER_LIST_GUARD}|.*removeparam=).*urlblock(,|$)`,
+    `${MODIFIER_PATTERN_PREFIX}urlblock(,|$)`,
 ];
 
 /**
@@ -425,7 +443,7 @@ const URLBLOCK_MODIFIER_PATTERNS = [
  * ```||yallo.tv^$referrerpolicy=origin```
  */
 const REFERRERPOLICY_MODIFIER_PATTERNS = [
-    `\\$(?!#|${NON_BASIC_MODIFIER_LIST_GUARD}|.*removeparam=).*referrerpolicy(,|=|$)`,
+    `${MODIFIER_PATTERN_PREFIX}referrerpolicy(,|=|$)`,
 ];
 
 /**
@@ -444,7 +462,7 @@ const REFERRERPOLICY_MODIFIER_PATTERNS = [
  * ```||pubads.g.doubleclick.net/gampad/live/ads?correlator=$replace=/(<VAST[\s\S]*?>)[\s\S]*<\/VAST>/\$1<\/VAST>/```
  */
 const REPLACE_MODIFIER_PATTERNS = [
-    `\\$(?!#|${NON_BASIC_MODIFIER_LIST_GUARD}|.*removeparam=).*replace(,|=|$)`,
+    `${MODIFIER_PATTERN_PREFIX}replace(,|=|$)`,
 ];
 
 /**
@@ -463,7 +481,7 @@ const REPLACE_MODIFIER_PATTERNS = [
  * ```||example.com^$urltransform=/firstpath/secondpath/```
  */
 const URLTRANSFORM_MODIFIER_PATTERNS = [
-    `\\$(?!#|${NON_BASIC_MODIFIER_LIST_GUARD}|.*removeparam=).*urltransform(,|=|$)`,
+    `${MODIFIER_PATTERN_PREFIX}urltransform(,|=|$)`,
 ];
 
 /* eslint-disable max-len */
@@ -484,7 +502,7 @@ const URLTRANSFORM_MODIFIER_PATTERNS = [
  * ```||pubads.g.doubleclick.net/ondemand/hls/*.m3u8$hls=/redirector\.googlevideo\.com\/videoplayback[\s\S]*?dclk_video_ads/,domain=10play.com.au```
  */
 const HLS_MODIFIER_PATTERNS = [
-    `\\$(?!#|${NON_BASIC_MODIFIER_LIST_GUARD}|.*removeparam=).*hls(,|=|$)`,
+    `${MODIFIER_PATTERN_PREFIX}hls(,|=|$)`,
 ];
 
 /**
@@ -503,7 +521,7 @@ const HLS_MODIFIER_PATTERNS = [
  * ```.com/watch?v=$xmlhttprequest,jsonprune=\$..[adPlacements\, adSlots\, playerAds],domain=youtubekids.com|youtube-nocookie.com|youtube.com```
  */
 const JSONPRUNE_MODIFIER_PATTERNS = [
-    `\\$(?!#|${NON_BASIC_MODIFIER_LIST_GUARD}|.*removeparam=).*jsonprune(,|=|$)`,
+    `${MODIFIER_PATTERN_PREFIX}jsonprune(,|=|$)`,
 ];
 
 /* eslint-enable max-len */
@@ -543,7 +561,7 @@ const REMOVEPARAM_MODIFIER_PATTERNS = [
  * ```||dubznetwork.com^$removeheader=refresh```
  */
 const REMOVEHEADER_MODIFIER_PATTERNS = [
-    `\\$(?!#|${NON_BASIC_MODIFIER_LIST_GUARD}|.*removeparam=).*removeheader(,|=|$)`,
+    `${MODIFIER_PATTERN_PREFIX}removeheader(,|=|$)`,
 ];
 
 /**
@@ -562,7 +580,7 @@ const REMOVEHEADER_MODIFIER_PATTERNS = [
  * ```@@.php?play_vid=$subdocument,stealth=referrer,domain=xyflv.cc```
  */
 const STEALTH_MODIFIER_PATTERNS = [
-    `\\$(?!#|${NON_BASIC_MODIFIER_LIST_GUARD}|.*removeparam=).*stealth(,|=|$)`,
+    `${MODIFIER_PATTERN_PREFIX}stealth(,|=|$)`,
 ];
 
 /**
@@ -581,7 +599,7 @@ const STEALTH_MODIFIER_PATTERNS = [
  * ```$cookie=_ga```
  */
 const COOKIE_MODIFIER_PATTERNS = [
-    `\\$(?!#|${NON_BASIC_MODIFIER_LIST_GUARD}|.*removeparam=).*cookie(,|=|$)`,
+    `${MODIFIER_PATTERN_PREFIX}cookie(,|=|$)`,
 ];
 
 /**
@@ -600,7 +618,7 @@ const COOKIE_MODIFIER_PATTERNS = [
  * ```||google-analytics.com/analytics.js$script,redirect=google-analytics,domain=~olx.*|~banki.ru|~bigc.co.th```
  */
 const REDIRECT_MODIFIER_PATTERNS = [
-    `\\$(?!#|${NON_BASIC_MODIFIER_LIST_GUARD}|.*removeparam=).*redirect(,|=|$)`,
+    `${MODIFIER_PATTERN_PREFIX}redirect(,|=|$)`,
 ];
 
 /**
@@ -619,7 +637,7 @@ const REDIRECT_MODIFIER_PATTERNS = [
  * ```$script,third-party,redirect-rule=noopjs,domain=paraphraser.io```
  */
 const REDIRECT_RULE_MODIFIER_PATTERNS = [
-    `\\$(?!#|${NON_BASIC_MODIFIER_LIST_GUARD}|.*removeparam=).*redirect-rule(,|=|$)`,
+    `${MODIFIER_PATTERN_PREFIX}redirect-rule(,|=|$)`,
 ];
 
 /**
@@ -637,7 +655,7 @@ const REDIRECT_RULE_MODIFIER_PATTERNS = [
  * ```Deprecated, use $redirect=nooptext instead```
  */
 const EMPTY_MODIFIER_PATTERNS = [
-    `\\$(?!#|${NON_BASIC_MODIFIER_LIST_GUARD}|.*removeparam=).*empty(,|$)`,
+    `${MODIFIER_PATTERN_PREFIX}empty(,|$)`,
 ];
 
 /**
@@ -903,7 +921,9 @@ export const platformConfigPatterns = deepFreeze({
  * Frozen regex pattern groups, keyed by their source constant name.
  *
  * Use a group to extend a platform's `removeRulePatterns` without copying
- * the regular expressions.
+ * the regular expressions. Spreading a group replaces the platform's array,
+ * so it only extends a platform whose default is exactly that group; to
+ * append to a composed default, spread the platform's current array.
  */
 export type PlatformConfigPatterns = typeof platformConfigPatterns;
 
@@ -1206,7 +1226,7 @@ export const platformsConfig: ReadonlyPlatformsConfig = deepFreeze<PlatformsConf
 export const LEGACY_PLATFORM_PATHS = LEGACY_PLATFORMS.map((key) => platformsConfig[key].path);
 
 /**
- * Error thrown when a platform configuration patch is invalid.
+ * Error thrown when a base platform configuration or a patch is invalid.
  */
 export class PlatformsConfigError extends Error {
     /**
@@ -1220,7 +1240,7 @@ export class PlatformsConfigError extends Error {
      * @param detail What is wrong.
      */
     constructor(path: string, detail: string) {
-        super(`Invalid platforms config patch at ${path}: ${detail}`);
+        super(`Invalid platforms config at ${path}: ${detail}`);
         this.name = 'PlatformsConfigError';
         this.path = path;
     }
@@ -1260,7 +1280,7 @@ const requireObject = (value: unknown, path: string): Record<string, unknown> =>
 };
 
 /**
- * Throws when a value is not an object or is `null`.
+ * Throws when a value is `null`.
  *
  * @param value Value to check.
  * @param path Dotted path for the error.
@@ -1327,14 +1347,13 @@ const requirePlatformPath = (value: unknown, path: string): string => {
     const raw = requireString(value, path);
     if (raw === ''
         || raw.includes('\\')
-        || raw.includes('\0')
         || posix.isAbsolute(raw)
         || /^[a-zA-Z]:/.test(raw)) {
         throw new PlatformsConfigError(path, 'expected a relative directory name');
     }
 
     const normalized = posix.normalize(raw).replace(/\/+$/, '');
-    if (normalized === '' || normalized === '.' || normalized === '..' || normalized.startsWith('../')) {
+    if (normalized === '.' || normalized === '..' || normalized.startsWith('../')) {
         throw new PlatformsConfigError(path, 'expected a relative directory name');
     }
 
@@ -1349,8 +1368,8 @@ const requirePlatformPath = (value: unknown, path: string): string => {
  * Throws when a value is not an array of rule removal patterns.
  *
  * A pattern is a string that compiles as a regular expression or a `RegExp`.
- * A `RegExp` is copied, so freezing the result cannot freeze the caller's
- * object.
+ * A `RegExp` is copied so the result does not share `lastIndex` with the
+ * caller's pattern.
  *
  * @param value Value to check.
  * @param path Dotted path for the error.
@@ -1371,8 +1390,8 @@ const requireRulePatterns = (value: unknown, path: string): (string | RegExp)[] 
         }
         try {
             RegExp(item);
-        } catch {
-            throw new PlatformsConfigError(itemPath, 'invalid regular expression');
+        } catch (error) {
+            throw new PlatformsConfigError(itemPath, `invalid regular expression: ${(error as Error).message}`);
         }
 
         return item;
@@ -1404,8 +1423,11 @@ const requireReplacements = (value: unknown, path: string): PlatformReplacement[
         const to = requireString(replacement.to, `${itemPath}.to`);
         try {
             RegExp(from);
-        } catch {
-            throw new PlatformsConfigError(`${itemPath}.from`, 'invalid regular expression');
+        } catch (error) {
+            throw new PlatformsConfigError(
+                `${itemPath}.from`,
+                `invalid regular expression: ${(error as Error).message}`,
+            );
         }
 
         return { from, to };
@@ -1535,9 +1557,7 @@ const mergePlatformEntry = (
                 break;
             case 'defines':
                 if (value === null) {
-                    Object.keys(target.defines).forEach((name) => {
-                        delete target.defines[name];
-                    });
+                    target.defines = {};
                 } else {
                     mergeDefines(target.defines, value, fieldPath);
                 }
@@ -1585,42 +1605,25 @@ const createPlatformEntry = (
  * Copies one platform entry and its nested values.
  *
  * The merge must own every object and array that it freezes. A shallow copy
- * would leave the caller's `base` entries shared with the result. The merge
- * validates and normalizes the path after cloning.
+ * would leave the caller's `base` entries shared with the result.
+ * `structuredClone` copies the entry, its arrays, its `RegExp` values, and its
+ * nested objects, so a new configuration field is picked up automatically.
+ * The merge validates and normalizes the path after cloning.
  *
  * @param entry Entry to copy.
  * @returns A mutable copy of the entry.
  */
-const cloneEntry = (entry: DeepReadonly<PlatformEntry>): PlatformEntry => {
-    const configuration: PlatformConfiguration = {};
-
-    if (entry.configuration.removeRulePatterns) {
-        configuration.removeRulePatterns = entry.configuration.removeRulePatterns.map(
-            (pattern) => (typeof pattern === 'string' ? pattern : new RegExp(pattern.source, pattern.flags)),
-        );
-    }
-    if (entry.configuration.ignoreRuleHints !== undefined) {
-        configuration.ignoreRuleHints = entry.configuration.ignoreRuleHints;
-    }
-    if (entry.configuration.replacements) {
-        configuration.replacements = entry.configuration.replacements.map((replacement) => ({ ...replacement }));
-    }
-    if (entry.configuration.adbHeader !== undefined) {
-        configuration.adbHeader = entry.configuration.adbHeader;
-    }
-
-    return {
-        ...entry,
-        configuration,
-        defines: { ...entry.defines },
-    };
-};
+const cloneEntry = (entry: DeepReadonly<PlatformEntry>): PlatformEntry => (
+    structuredClone(entry) as PlatformEntry
+);
 
 /**
  * Merges a platform configuration patch into a base configuration.
  *
  * The function is pure: it does not change `base` or `patch`, and it returns a
- * new frozen configuration. An object merges key by key. An array replaces the
+ * new configuration. Objects and arrays are frozen; a `RegExp` entry of
+ * `removeRulePatterns` is copied and stays mutable so a stateful pattern keeps
+ * working. An object merges key by key. An array replaces the
  * base array. An absent or `undefined` field inherits the base value. A `null`
  * field is removed from the result; `defines: null` clears the map instead.
  * `false` is a value for `ignoreRuleHints`;
@@ -1639,7 +1642,8 @@ const cloneEntry = (entry: DeepReadonly<PlatformEntry>): PlatformEntry => {
  *
  * @param base Base configuration.
  * @param patch Platform patches.
- * @returns The merged and frozen configuration.
+ * @returns The merged configuration; objects and arrays are frozen, `RegExp`
+ * entries are not.
  * @throws {PlatformsConfigError} When a base path or a patch value is invalid.
  */
 export const mergePlatformsConfig = (
@@ -1647,6 +1651,13 @@ export const mergePlatformsConfig = (
     patch: PlatformsConfigPatch,
 ): ReadonlyPlatformsConfig => {
     const patchObject = requireObject(patch, 'patch');
+
+    // Every non-undefined patch entry passed `requireObject`, so a key is a
+    // patch key when `patchObject[key]` is an object.
+    const patchSetsPath = (key: string): boolean => {
+        const entry = patchObject[key] as Record<string, unknown> | undefined;
+        return entry !== undefined && Object.hasOwn(entry, 'path') && entry.path !== undefined;
+    };
 
     // Clone every entry so freezing the result cannot freeze the caller's base.
     const result: PlatformsConfig = {};
@@ -1715,8 +1726,10 @@ export const mergePlatformsConfig = (
         const { path: platformPath } = result[key];
         const leaf = platformPath.slice(platformPath.lastIndexOf('/') + 1).toLowerCase();
         if (legacyPaths.has(leaf) && !LEGACY_PLATFORMS.includes(key)) {
+            // A path that came from `base` is not a patch field.
+            const prefix = patchSetsPath(key) ? 'patch' : 'base';
             throw new PlatformsConfigError(
-                `patch.${key}.path`,
+                `${prefix}.${key}.path`,
                 `the legacy directory "${leaf}" is reserved for a legacy platform`,
             );
         }
@@ -1727,17 +1740,8 @@ export const mergePlatformsConfig = (
         const normalizedPath = result[key].path.toLowerCase();
         const other = paths.get(normalizedPath);
         if (other !== undefined) {
-            const patchEntry = patchObject[key];
-            const setsPath = isPlainObject(patchEntry)
-                && Object.hasOwn(patchEntry, 'path')
-                && patchEntry.path !== undefined;
-            const offender = setsPath ? key : other;
-            // A path that came from base is not a patch field.
-            const offenderEntry = patchObject[offender];
-            const offenderSetsPath = isPlainObject(offenderEntry)
-                && Object.hasOwn(offenderEntry, 'path')
-                && offenderEntry.path !== undefined;
-            const prefix = offenderSetsPath ? 'patch' : 'base';
+            const offender = patchSetsPath(key) ? key : other;
+            const prefix = patchSetsPath(offender) ? 'patch' : 'base';
             throw new PlatformsConfigError(
                 `${prefix}.${offender}.path`,
                 `duplicate platform path "${result[key].path}" used by ${other} and ${key}`,

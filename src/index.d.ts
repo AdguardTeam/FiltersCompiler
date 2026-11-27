@@ -13,9 +13,7 @@
  * Platform configuration types and the patch API.
  */
 import type {
-    PlatformConfigPatterns,
     PlatformsConfigPatch,
-    ReadonlyPlatformsConfig,
 } from './main/platforms-config.js';
 
 export type {
@@ -37,66 +35,6 @@ export type {
  * @deprecated Use {@link PlatformsConfigPatch}.
  */
 export type CustomPlatformsConfig = PlatformsConfigPatch;
-
-/**
- * Frozen default platform configurations.
- *
- * The type is deeply readonly.
- */
-export declare const platformsConfig: ReadonlyPlatformsConfig;
-
-/**
- * Regex pattern groups used by the default platform configurations.
- *
- * Every value is a frozen array of strings.
- */
-export declare const platformConfigPatterns: PlatformConfigPatterns;
-
-/**
- * Merges a platform configuration patch into a base configuration.
- *
- * An object merges key by key. An array replaces the base array. An absent or
- * `undefined` field inherits the base value. A `null` field is removed from
- * the result; `defines: null` clears the map instead. `false` is a value for
- * `ignoreRuleHints`; for `removeRulePatterns`, `false` removes the field. A
- * `removeRulePatterns` entry is a string or a `RegExp`, and a string must
- * compile as one.
- *
- * A patch key that is not in `base` adds a platform. The entry must then be
- * complete, and its `platform` must be a family that `base` already uses. A
- * platform `path`, in `base` or in a patch, is normalized and must stay inside
- * the platforms output; it must be unique among platforms, and the comparison
- * is case-insensitive. Every field of a legacy mac platform is patchable except
- * its path, which cannot change. An added legacy platform must use its `mac`
- * or `mac_v2` directory. Those directory names are reserved for legacy
- * platforms.
- *
- * @param base Base configuration.
- * @param patch Platform patches.
- * @returns The merged and frozen configuration.
- * @throws {PlatformsConfigError} When a base path or a patch value is invalid.
- */
-export declare function mergePlatformsConfig(
-    base: ReadonlyPlatformsConfig,
-    patch: PlatformsConfigPatch,
-): ReadonlyPlatformsConfig;
-
-/**
- * Error thrown when a platform configuration patch is invalid.
- */
-export declare class PlatformsConfigError extends Error {
-    /**
-     * Dotted path to the invalid value, for example
-     * `patch.EXTENSION_UBLOCK.configuration.removeRulePatterns[1]`.
-     */
-    readonly path: string;
-
-    /**
-     * @param path Dotted path to the invalid value.
-     * @param detail What is wrong.
-     */
-    constructor(path: string, detail: string);
-}
 
 /**
  * Compiles filter lists for all platforms.
@@ -212,6 +150,13 @@ export function validateLocales(
     requiredLocales: string[],
     logFormat?: LocalesLogFormat,
 ): ValidateLocalesResult;
+
+export {
+    mergePlatformsConfig,
+    platformConfigPatterns,
+    platformsConfig,
+    PlatformsConfigError,
+} from './main/platforms-config.js';
 
 /**
  * TS2834: Unable to resolve './main/optimization' on the consumer side.

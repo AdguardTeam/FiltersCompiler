@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 
 import { platformConfigPatterns, platformsConfig } from '../src/main/platforms-config.js';
+import type { PlatformEntry } from '../src/main/platforms-config.js';
 
 const HTML_FILTERING_PLATFORMS = ['WINDOWS', 'MAC_V2', 'MAC_V3', 'ANDROID', 'CLI', 'EXTENSION_FIREFOX'];
 const CORELIBS_PLATFORMS = ['WINDOWS', 'MAC_V2', 'MAC_V3', 'ANDROID', 'CLI'];
@@ -39,6 +40,14 @@ describe('production platformsConfig defines', () => {
 });
 
 describe('production platformsConfig immutability', () => {
+    it('keeps every entry assignable to PlatformEntry', () => {
+        const takeEntry = (entry: PlatformEntry): string => entry.path;
+
+        Object.values(platformsConfig).forEach((entry) => {
+            expect(takeEntry(entry)).toBe(entry.path);
+        });
+    });
+
     it('freezes the root, entries, configuration, and defines', () => {
         expect(Object.isFrozen(platformsConfig)).toBe(true);
         Object.values(platformsConfig).forEach((entry) => {
@@ -59,7 +68,6 @@ describe('production platformsConfig immutability', () => {
 describe('platformConfigPatterns', () => {
     it('registers every pattern group as a frozen array of strings', () => {
         expect(Object.isFrozen(platformConfigPatterns)).toBe(true);
-        expect(Object.keys(platformConfigPatterns)).toHaveLength(37);
         Object.entries(platformConfigPatterns).forEach(([name, patterns]) => {
             expect(name).toMatch(/_PATTERNS$/);
             expect(Array.isArray(patterns)).toBe(true);

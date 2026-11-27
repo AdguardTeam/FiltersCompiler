@@ -9,28 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added `platformsConfig` and `platformConfigPatterns` as readonly public
-  exports. The default configurations, the pattern groups, and the merge
-  result are frozen.
-- Added `mergePlatformsConfig` and `PlatformsConfigError` as public exports,
-  so a consumer can change a platform configuration without a compiler
-  release. A patch can add a platform when the entry is complete, uses a
-  supported platform family, and has a unique, portable `path`; a `base` path
-  is checked with the same rules. A legacy mac platform is patchable like any
-  other platform except its `path`, which cannot change; an added legacy
-  platform must use its `mac` or `mac_v2` directory. Those directory names are
-  reserved. `removeRulePatterns` accepts strings and `RegExp` objects; `false`
-  or `null` removes it.
-- Added the public platform configuration types:
-    - `ReadonlyPlatformsConfig`: the frozen configuration that consumers
-      receive.
-    - `PlatformsConfig`: the mutable draft shape that the merge uses.
-    - `PlatformEntry`, `PlatformConfiguration`, `PlatformDefines`, and
-      `PlatformReplacement`: one platform and its rule options.
-    - `PlatformConfigPatterns`: the exact map of pattern group names to
-      readonly `string[]` values.
-    - `PlatformsConfigPatch`, `PlatformPatch`, and
-      `PlatformConfigurationPatch`: a partial or complete platform override.
+- Added `platformsConfig`, `platformConfigPatterns`, `mergePlatformsConfig()`,
+  and `PlatformsConfigError` as public exports, so a consumer can patch or add
+  a platform configuration without a compiler release. The defaults and the
+  merge result are frozen, except `RegExp` entries of `removeRulePatterns`,
+  which stay mutable so a stateful pattern keeps working.
+- Added the public platform configuration types, such as
+  `PlatformsConfigPatch`, `PlatformEntry`, and `ReadonlyPlatformsConfig`.
 
 ### Changed
 
@@ -47,12 +32,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - An external `@include` URL must now use HTTP or HTTPS. A scheme-less value
   such as `user:pass@example.org/filter.txt` is rejected with an error that
   does not contain the credentials.
-- **BREAKING:** Changed `compile()` to accept a `platformsConfigPatch` and
-  merge it over the default configurations instead of changing the shared
-  configuration. `defines` merges key by key; set `defines: null` to clear the
-  inherited map.
-- Made `replacements` optional in the default platform configurations and
-  removed the `null` placeholder.
+- **BREAKING:** `compile()` now takes a `platformsConfigPatch` and merges it
+  over the defaults. An entry for an existing platform no longer replaces it:
+  omitted fields are inherited and `defines` merges flag by flag. Set a field
+  to `null` to remove it, or `defines: null` to clear the map. An invalid patch
+  throws `PlatformsConfigError`.
+- Made `replacements` optional in the default platform configurations.
 
 ### Deprecated
 

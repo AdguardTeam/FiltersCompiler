@@ -223,13 +223,6 @@ describe('Bundle smoke tests', () => {
             expect(existsSync(platformsConfigPath)).toBe(true);
         });
 
-        it('declares the readonly platform configuration values', () => {
-            const entry = readFileSync(path.join(distDir, 'index.d.ts'), 'utf-8');
-            expect(entry).toMatch(/export declare const platformConfigPatterns: /);
-            expect(entry).toMatch(/export declare const platformsConfig: ReadonlyPlatformsConfig;/);
-            expect(entry).not.toMatch(/export type \{[^}]*\bplatformConfigPatterns,/);
-        });
-
         it('resolves every relative declaration import', () => {
             const declarations = collectFiles(distDir).filter((file) => file.endsWith('.d.ts'));
             declarations.forEach((file) => {

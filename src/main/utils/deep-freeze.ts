@@ -1,5 +1,8 @@
 /**
  * Recursively marks all properties of an object as readonly.
+ *
+ * A `RegExp` is left as is, because `Object.freeze` would make its
+ * `lastIndex` read-only and break a stateful `/g` or `/y` pattern.
  */
 export type DeepReadonly<T> = T extends (...args: never[]) => unknown
     ? T
@@ -14,10 +17,15 @@ export type DeepReadonly<T> = T extends (...args: never[]) => unknown
 /**
  * Freezes an object and every nested object and array.
  *
+ * A `RegExp` value is not frozen: `Object.freeze` would make `lastIndex`
+ * read-only and break a stateful `/g` or `/y` pattern. `DeepReadonly` leaves
+ * that type alone as well.
+ *
  * Internal helper, exported for tests. It is not part of the package API.
  *
  * @param value Value to freeze.
- * @returns The same value, frozen in place, typed as recursively readonly.
+ * @returns The same objects and arrays, frozen in place, and the same `RegExp`
+ * values, left mutable; typed as `DeepReadonly`.
  */
 export const deepFreeze = <T>(value: T): DeepReadonly<T> => {
     if (value instanceof RegExp) {

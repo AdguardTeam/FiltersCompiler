@@ -9,9 +9,7 @@ import {
 import { compile, PlatformsConfigError } from '../src/index';
 import { build } from '../src/main/builder';
 import { platformsConfig } from '../src/main/platforms-config';
-import { logger } from '../src/main/utils/log';
 
-vi.mock('../src/main/utils/log');
 vi.mock('../src/main/builder', () => ({
     build: vi.fn().mockResolvedValue(undefined),
 }));
@@ -63,12 +61,12 @@ describe('compile platforms config patch', () => {
         expect(build).toHaveBeenCalledTimes(1);
         expect(passed.IOS).toEqual(platformsConfig.IOS);
         expect(passed).not.toHaveProperty('NEW_PLATFORM');
-        expect(vi.mocked(logger.info).mock.calls.map(([message]) => message)).toEqual([
+        expect(vi.mocked(build).mock.calls[0][7]).toEqual([
             'Using platforms configuration patch',
         ]);
     });
 
-    it('logs whether a platform is patched or added', async () => {
+    it('passes the patch log lines to the build', async () => {
         await compile('.', undefined, undefined, null, [], [], {
             IOS: { expires: '1 hour' },
             NEW_PLATFORM: {
@@ -79,9 +77,11 @@ describe('compile platforms config patch', () => {
             },
         });
 
-        expect(logger.info).toHaveBeenCalledWith('Using platforms configuration patch');
-        expect(logger.info).toHaveBeenCalledWith('Patching platform IOS');
-        expect(logger.info).toHaveBeenCalledWith('Adding platform NEW_PLATFORM (ext_ublock)');
+        expect(vi.mocked(build).mock.calls[0][7]).toEqual([
+            'Using platforms configuration patch',
+            'Patching platform IOS',
+            'Adding platform NEW_PLATFORM (ext_ublock)',
+        ]);
     });
 
     it('passes a legacy platform patch to the build', async () => {

@@ -9,6 +9,21 @@ import type { PlatformsConfig, PlatformsConfigPatch } from '../src/main/platform
 
 const asPatch = (value: unknown): PlatformsConfigPatch => value as PlatformsConfigPatch;
 
+/**
+ * A complete `NEW` platform entry whose only interesting value is the path.
+ *
+ * @param path Platform output directory.
+ * @returns A patch that adds the `NEW` platform.
+ */
+const newPlatform = (path: string): PlatformsConfigPatch => ({
+    NEW: {
+        platform: 'ext_safari',
+        path,
+        configuration: {},
+        defines: {},
+    },
+});
+
 const expectConfigError = (patch: unknown, path: string, message?: string): void => {
     try {
         mergePlatformsConfig(platformsConfig, asPatch(patch));
@@ -223,10 +238,12 @@ describe('mergePlatformsConfig', () => {
         expectConfigError(
             { WINDOWS: { configuration: { removeRulePatterns: ['('] } } },
             'patch.WINDOWS.configuration.removeRulePatterns[0]',
+            'invalid regular expression',
         );
         expectConfigError(
             { WINDOWS: { configuration: { replacements: [{ from: '(', to: '' }] } } },
             'patch.WINDOWS.configuration.replacements[0].from',
+            'invalid regular expression',
         );
     });
 
@@ -264,17 +281,7 @@ describe('mergePlatformsConfig', () => {
     });
 
     it('rejects a duplicate platform path', () => {
-        expectConfigError(
-            {
-                NEW: {
-                    platform: 'ext_safari',
-                    path: 'windows',
-                    configuration: {},
-                    defines: {},
-                },
-            },
-            'patch.NEW.path',
-        );
+        expectConfigError(newPlatform('windows'), 'patch.NEW.path');
         expectConfigError({ IOS: { path: 'windows' } }, 'patch.IOS.path');
         expectConfigError({ WINDOWS: { path: 'ios' } }, 'patch.WINDOWS.path');
     });
@@ -316,17 +323,7 @@ describe('mergePlatformsConfig', () => {
     });
 
     it('rejects a path that collides case-insensitively', () => {
-        expectConfigError(
-            {
-                NEW: {
-                    platform: 'ext_safari',
-                    path: 'IOS',
-                    configuration: {},
-                    defines: {},
-                },
-            },
-            'patch.NEW.path',
-        );
+        expectConfigError(newPlatform('IOS'), 'patch.NEW.path');
     });
 
     it('names the patch that supplies the colliding path', () => {
@@ -337,127 +334,29 @@ describe('mergePlatformsConfig', () => {
     });
 
     it('normalizes a platform path before the uniqueness check', () => {
-        expectConfigError(
-            {
-                NEW: {
-                    platform: 'ext_safari',
-                    path: './windows',
-                    configuration: {},
-                    defines: {},
-                },
-            },
-            'patch.NEW.path',
-        );
-        expectConfigError(
-            {
-                NEW: {
-                    platform: 'ext_safari',
-                    path: 'windows/',
-                    configuration: {},
-                    defines: {},
-                },
-            },
-            'patch.NEW.path',
-        );
-        expectConfigError(
-            {
-                NEW: {
-                    platform: 'ext_safari',
-                    path: 'windows/../ios',
-                    configuration: {},
-                    defines: {},
-                },
-            },
-            'patch.NEW.path',
-        );
+        ['./windows', 'windows/', 'windows/../ios'].forEach((path) => {
+            expectConfigError(newPlatform(path), 'patch.NEW.path');
+        });
     });
 
     it('rejects an unsafe platform path', () => {
-        expectConfigError(
-            {
-                NEW: {
-                    platform: 'ext_safari',
-                    path: '../out',
-                    configuration: {},
-                    defines: {},
-                },
-            },
-            'patch.NEW.path',
-        );
-        expectConfigError(
-            {
-                NEW: {
-                    platform: 'ext_safari',
-                    path: '/abs',
-                    configuration: {},
-                    defines: {},
-                },
-            },
-            'patch.NEW.path',
-        );
-        expectConfigError(
-            {
-                NEW: {
-                    platform: 'ext_safari',
-                    path: 'a\\b',
-                    configuration: {},
-                    defines: {},
-                },
-            },
-            'patch.NEW.path',
-        );
-        expectConfigError(
-            {
-                NEW: {
-                    platform: 'ext_safari',
-                    path: 'C:/tmp/evil',
-                    configuration: {},
-                    defines: {},
-                },
-            },
-            'patch.NEW.path',
-        );
+        ['../out', '/abs', 'a\\b', 'C:/tmp/evil'].forEach((path) => {
+            expectConfigError(newPlatform(path), 'patch.NEW.path');
+        });
     });
 
     it('rejects a path Windows cannot represent', () => {
-        ['mac.', 'mac ', 'a<b', 'con', 'con.txt'].forEach((badPath) => {
-            expectConfigError(
-                {
-                    NEW: {
-                        platform: 'ext_safari',
-                        path: badPath,
-                        configuration: {},
-                        defines: {},
-                    },
-                },
-                'patch.NEW.path',
-            );
+        ['mac.', 'mac ', 'a<b', 'con', 'con.txt'].forEach((path) => {
+            expectConfigError(newPlatform(path), 'patch.NEW.path');
         });
     });
 
     it('rejects a legacy directory in another case', () => {
-        expectConfigError(
-            {
-                NEW: {
-                    platform: 'ext_safari',
-                    path: 'x/MAC',
-                    configuration: {},
-                    defines: {},
-                },
-            },
-            'patch.NEW.path',
-        );
+        expectConfigError(newPlatform('x/MAC'), 'patch.NEW.path');
     });
 
     it('stores a normalized platform path', () => {
-        const merged = mergePlatformsConfig(platformsConfig, {
-            NEW: {
-                platform: 'ext_safari',
-                path: './new/dir',
-                configuration: {},
-                defines: {},
-            },
-        });
+        const merged = mergePlatformsConfig(platformsConfig, newPlatform('./new/dir'));
 
         expect(merged.NEW.path).toBe('new/dir');
     });
@@ -543,15 +442,21 @@ describe('mergePlatformsConfig', () => {
     });
 
     it('rejects a platform path that ends with a legacy directory', () => {
-        expectConfigError({
-            NEW: {
+        expectConfigError(newPlatform('extension/mac'), 'patch.NEW.path');
+        expectConfigError({ WINDOWS: { path: 'x/mac_v2' } }, 'patch.WINDOWS.path');
+    });
+
+    it('attributes a reserved legacy directory in base to the base entry', () => {
+        const base: PlatformsConfig = {
+            IOS: {
                 platform: 'ext_safari',
-                path: 'extension/mac',
+                path: 'x/mac',
                 configuration: {},
                 defines: {},
             },
-        }, 'patch.NEW.path');
-        expectConfigError({ WINDOWS: { path: 'x/mac_v2' } }, 'patch.WINDOWS.path');
+        };
+
+        expect(() => mergePlatformsConfig(base, {})).toThrow(/base\.IOS\.path/);
     });
 
     it('compares a legacy base path after normalization', () => {

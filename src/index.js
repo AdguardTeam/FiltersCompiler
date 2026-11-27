@@ -5,7 +5,6 @@ import { setConfiguration, CompatibilityTypes } from '@adguard/tsurlfilter';
 import { build } from './main/builder';
 import { schemaValidator } from './main/json-validator';
 import { localesValidator } from './main/locales-validator';
-import { logger } from './main/utils/log';
 
 // default platforms config
 import {
@@ -31,6 +30,37 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const jsonSchemasConfigDir = path.join(__dirname, './schemas/');
 
+/**
+ * Builds the log lines that describe an applied platform configuration patch.
+ *
+ * The lines are logged by `build()` after it initializes the logger, so they
+ * reach the log file of the current compilation.
+ *
+ * @param platformsConfigPatch Platform configuration patch.
+ * @returns Log lines, empty when there is no patch.
+ */
+const getPlatformsConfigPatchLog = (platformsConfigPatch) => {
+    if (!platformsConfigPatch) {
+        return [];
+    }
+
+    const log = ['Using platforms configuration patch'];
+    Object.keys(platformsConfigPatch).forEach((platform) => {
+        // The merge ignores an undefined entry; the log must do the same.
+        const patchEntry = platformsConfigPatch[platform];
+        if (patchEntry === undefined) {
+            return;
+        }
+        if (Object.hasOwn(platformsConfig, platform)) {
+            log.push(`Patching platform ${platform}`);
+        } else {
+            log.push(`Adding platform ${platform} (${patchEntry.platform})`);
+        }
+    });
+
+    return log;
+};
+
 export const compile = (
     path,
     logPath,
@@ -42,22 +72,6 @@ export const compile = (
 ) => {
     const effectivePlatformsConfig = mergePlatformsConfig(platformsConfig, platformsConfigPatch ?? {});
 
-    if (platformsConfigPatch) {
-        logger.info('Using platforms configuration patch');
-        Object.keys(platformsConfigPatch).forEach((platform) => {
-            // The merge ignores an undefined entry; the log must do the same.
-            const patchEntry = platformsConfigPatch[platform];
-            if (patchEntry === undefined) {
-                return;
-            }
-            if (Object.hasOwn(platformsConfig, platform)) {
-                logger.info(`Patching platform ${platform}`);
-            } else {
-                logger.info(`Adding platform ${platform} (${patchEntry.platform})`);
-            }
-        });
-    }
-
     return build(
         path,
         logPath,
@@ -66,6 +80,7 @@ export const compile = (
         effectivePlatformsConfig,
         includedFilterIds,
         excludedFilterIds,
+        getPlatformsConfigPatchLog(platformsConfigPatch),
     );
 };
 

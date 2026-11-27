@@ -882,6 +882,8 @@ const parseDirectory = async function (filtersDir, includedFilterIds, excludedFi
  * @param {Object} platformsConfig - The configuration object for platforms.
  * @param {Array<number>|null} [includedFilterIds] - A list of filter IDs to include in processing.
  * @param {Array<number>|null} [excludedFilterIds] - A list of filter IDs to exclude from processing.
+ * @param {string[]} [platformsConfigPatchLog] - Log lines that describe the applied platform
+ *   configuration patch; they are logged after the logger is initialized.
  * @returns {Promise<void>} A promise that resolves when the build process is complete.
  */
 export const build = async (
@@ -892,8 +894,10 @@ export const build = async (
     platformsConfig,
     includedFilterIds,
     excludedFilterIds,
+    platformsConfigPatchLog = [],
 ) => {
     logger.initialize(logFile);
+    platformsConfigPatchLog.forEach((message) => logger.info(message));
     init(FILTER_FILE, METADATA_FILE, REVISION_FILE, platformsConfig, ADGUARD_FILTERS_SERVER_URL);
 
     await parseDirectory(filtersDir, includedFilterIds, excludedFilterIds, !platformsPath);

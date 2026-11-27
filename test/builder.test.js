@@ -118,7 +118,10 @@ describe('Test builder', async () => {
 
         await cleanup();
 
-        await build(filtersDir, logFile, reportFile, platformsDir, platformsConfig);
+        await build(filtersDir, logFile, reportFile, platformsDir, platformsConfig, null, null, [
+            'Using platforms configuration patch',
+            'Patching platform IOS',
+        ]);
     });
 
     describe('Log file tests', () => {
@@ -129,6 +132,15 @@ describe('Test builder', async () => {
             // Proves the file was written by this build and is not leftover
             // from a previous run: `parseDirectory()` logs this per filter.
             expect(logContent).toContain('Building filter');
+        });
+
+        it('should log the platform configuration patch after initializing the log', async () => {
+            const logContent = await readFile(logFile);
+
+            // These lines are only in the file when `build()` logs them after
+            // `logger.initialize(logFile)`.
+            expect(logContent).toContain('Using platforms configuration patch');
+            expect(logContent).toContain('Patching platform IOS');
         });
     });
 
